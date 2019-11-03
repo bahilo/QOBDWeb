@@ -24,7 +24,7 @@ class OrderStatus
     private $Name;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Order", mappedBy="Status")
+     * @ORM\OneToMany(targetEntity="App\Entity\QuoteOrder", mappedBy="Status")
      */
     private $orders;
 
@@ -51,14 +51,14 @@ class OrderStatus
     }
 
     /**
-     * @return Collection|Order[]
+     * @return Collection|QuoteOrder[]
      */
     public function getOrders(): Collection
     {
         return $this->orders;
     }
 
-    public function addOrder(Order $order): self
+    public function addOrder(QuoteOrder $order): self
     {
         if (!$this->orders->contains($order)) {
             $this->orders[] = $order;
@@ -68,7 +68,7 @@ class OrderStatus
         return $this;
     }
 
-    public function removeOrder(Order $order): self
+    public function removeOrder(QuoteOrder $order): self
     {
         if ($this->orders->contains($order)) {
             $this->orders->removeElement($order);

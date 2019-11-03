@@ -3,10 +3,21 @@
     <head>
         <meta charset="UTF-8">
         <title>{% block title %}Welcome!{% endblock %}</title>
-        {% block stylesheets %}{% endblock %}
+        <link rel="stylesheet" href="{{ asset('bootstrap.min.css', 'bootstrap_css') }}">
+        <link rel="stylesheet" href="{{ asset('datatables.min.css', 'datatable_dir') }}">
+        <link rel="stylesheet" href="{{ asset('all.min.css', 'font_awsome_css') }}">
+        <link rel="stylesheet" href="{{ asset('base.css', 'qobd_web_css') }}">
+        {% block stylesheets %} {% endblock %}
     </head>
     <body>
         {% block body %}{% endblock %}
-        {% block javascripts %}{% endblock %}
+            <script src="{{ asset('jquery-3.4.1.js','qobd_web_js') }}"></script>
+            <script src="{{ asset('bootstrap.js','bootstrap_js') }}"></script>
+            <script src="{{ asset('datatables.min.js','datatable_dir') }}"></script>
+            <script src="{{ asset('all.min.js','font_awsome_js') }}"></script>
+            <script src="{{ asset('bundles/fosjsrouting/js/router.min.js') }}"></script>
+            <script src="{{ asset('fos_js_routes.js','qobd_web_js') }}"></script>
+            <!-- <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>-->
+        {% block javascripts %} {% endblock %}
     </body>
 </html>

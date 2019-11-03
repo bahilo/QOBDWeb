@@ -12,3 +12,23 @@ framework:
     #fragments: true
     php_errors:
         log: true
+
+    assets:
+        packages:
+            qobd_web_images:
+                base_path: ressources/image
+            qobd_web_css:
+                base_path: ressources/css
+            qobd_web_js: 
+                base_path: ressources/js
+            bootstrap_css:
+                base_path: ressources/css/bootstrap
+            bootstrap_js:
+                base_path: ressources/js/bootstrap
+            datatable_dir:
+                base_path: ressources/datatable
+            font_awsome_css:
+                base_path: ressources/fontawesome-web-5.11.2/css
+            font_awsome_js:
+                base_path: ressources/fontawesome-web-5.11.2/js
+

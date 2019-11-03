@@ -44,7 +44,7 @@ class Tax
     private $CreateAt;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Order", mappedBy="Tax")
+     * @ORM\OneToMany(targetEntity="App\Entity\QuoteOrder", mappedBy="Tax")
      */
     private $orders;
 
@@ -130,14 +130,14 @@ class Tax
     }
 
     /**
-     * @return Collection|Order[]
+     * @return Collection|QuoteOrder[]
      */
     public function getOrders(): Collection
     {
         return $this->orders;
     }
 
-    public function addOrder(Order $order): self
+    public function addOrder(QuoteOrder $order): self
     {
         if (!$this->orders->contains($order)) {
             $this->orders[] = $order;
@@ -147,7 +147,7 @@ class Tax
         return $this;
     }
 
-    public function removeOrder(Order $order): self
+    public function removeOrder(QuoteOrder $order): self
     {
         if ($this->orders->contains($order)) {
             $this->orders->removeElement($order);

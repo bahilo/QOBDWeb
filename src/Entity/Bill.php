@@ -49,7 +49,7 @@ class Bill
     private $Client;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Order", inversedBy="bills")
+     * @ORM\ManyToOne(targetEntity="App\Entity\QuoteOrder", inversedBy="bills")
      */
     private $Order_;
 
@@ -185,12 +185,12 @@ class Bill
         return $this;
     }
 
-    public function getOrder(): ?Order
+    public function getOrder(): ?QuoteOrder
     {
         return $this->Order_;
     }
 
-    public function setOrder(?Order $Order_): self
+    public function setOrder(?QuoteOrder $Order_): self
     {
         $this->Order_ = $Order_;
 

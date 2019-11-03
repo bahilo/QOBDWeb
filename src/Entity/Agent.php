@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\AgentRepository")
@@ -40,6 +41,9 @@ class Agent
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\Email(
+     * message = "The email '{{ value }}' is not a valid email.",
+     * checkMX = true)
      */
     private $Email;
 
@@ -74,11 +78,6 @@ class Agent
     private $ListSize;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="comment")
-     */
-    private $Comment;
-
-    /**
      * @ORM\Column(type="boolean")
      */
     private $IsActivated;
@@ -104,7 +103,7 @@ class Agent
     private $Clients;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Order", mappedBy="Agent")
+     * @ORM\OneToMany(targetEntity="App\Entity\QuoteOrder", mappedBy="Agent")
      */
     private $orders;
 
@@ -118,15 +117,20 @@ class Agent
      */
     private $Discussion;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="agent")
+     */
+    private $Comment;
+
     public function __construct()
     {
-        $this->Comment = new ArrayCollection();
         $this->Roles = new ArrayCollection();
         $this->actionTrackers = new ArrayCollection();
         $this->Clients = new ArrayCollection();
         $this->orders = new ArrayCollection();
         $this->messages = new ArrayCollection();
         $this->Discussion = new ArrayCollection();
+        $this->Comment = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -266,37 +270,6 @@ class Agent
         return $this;
     }
 
-    /**
-     * @return Collection|Comment[]
-     */
-    public function getComment(): Collection
-    {
-        return $this->Comment;
-    }
-
-    public function addComment(Comment $comment): self
-    {
-        if (!$this->Comment->contains($comment)) {
-            $this->Comment[] = $comment;
-            $comment->setComment($this);
-        }
-
-        return $this;
-    }
-
-    public function removeComment(Comment $comment): self
-    {
-        if ($this->Comment->contains($comment)) {
-            $this->Comment->removeElement($comment);
-            // set the owning side to null (unless already changed)
-            if ($comment->getComment() === $this) {
-                $comment->setComment(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getIsActivated(): ?bool
     {
         return $this->IsActivated;
@@ -410,14 +383,14 @@ class Agent
     }
 
     /**
-     * @return Collection|Order[]
+     * @return Collection|QuoteOrder[]
      */
     public function getOrders(): Collection
     {
         return $this->orders;
     }
 
-    public function addOrder(Order $order): self
+    public function addOrder(QuoteOrder $order): self
     {
         if (!$this->orders->contains($order)) {
             $this->orders[] = $order;
@@ -427,7 +400,7 @@ class Agent
         return $this;
     }
 
-    public function removeOrder(Order $order): self
+    public function removeOrder(QuoteOrder $order): self
     {
         if ($this->orders->contains($order)) {
             $this->orders->removeElement($order);
@@ -489,6 +462,37 @@ class Agent
     {
         if ($this->Discussion->contains($discussion)) {
             $this->Discussion->removeElement($discussion);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Comment[]
+     */
+    public function getComment(): Collection
+    {
+        return $this->Comment;
+    }
+
+    public function addComment(Comment $comment): self
+    {
+        if (!$this->Comment->contains($comment)) {
+            $this->Comment[] = $comment;
+            $comment->setAgent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): self
+    {
+        if ($this->Comment->contains($comment)) {
+            $this->Comment->removeElement($comment);
+            // set the owning side to null (unless already changed)
+            if ($comment->getAgent() === $this) {
+                $comment->setAgent(null);
+            }
         }
 
         return $this;

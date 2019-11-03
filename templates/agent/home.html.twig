@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Agents{% endblock %}
+
+{% block stylesheets %} 
+    <link rel="stylesheet" href="{{ asset('agent.css', 'qobd_web_css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <div class="agent-wrapper">
+        
+        <div class="container">
+            
+            <table id="agent_table_js" style="width:100%">
+            </table>
+
+            
+        </div>
+
+    </div>
+    <input type="hidden" id="agent_data_source" value="{{ agents_data_source }}">
+
+{% endblock %}
+{% block javascripts %} 
+    <script src="{{  asset('agent.js','qobd_web_js') }}"></script>
+{% endblock %}

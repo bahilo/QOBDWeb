@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvel Agent{% endblock %}
+
+{% block stylesheets %} 
+    <link rel="stylesheet" href="{{ asset('agent.css', 'qobd_web_css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <div class="agent-wrapper">
+        
+        <div class="container">
+            <h1>Création d'un Agent !</h1>
+
+            {{ form_start(formAgent) }}
+
+            
+            {{ form_widget(formAgent.FirstName,{'attr': {'placeholder': 'prénom'}}) }}
+            {{ form_widget(formAgent.LastName,{'attr': {'placeholder': 'Nom'}}) }}
+            {{ form_widget(formAgent.Phone,{'attr': {'placeholder': 'Numéro de téléphone'}}) }}
+            {{ form_widget(formAgent.Fax,{'attr': {'placeholder': 'fax'}}) }}
+            {{ form_widget(formAgent.Email,{'attr': {'placeholder': 'email'}}) }}
+            {{ form_widget(formAgent.UserName,{'attr': {'placeholder': 'pseudonyme'}}) }}
+            {{ form_widget(formAgent.Password,{'attr': {'placeholder': 'mot de passe'}}) }}
+            <div class="form-group">
+                <!-- <label for="form_password_confirmation">Comfirmation du mot de passe</label> -->
+                <input class="form-control" type="text" id="form_password_confirmation" name="PasswordConfirmation" value="" placeholder="mot de passe confirmation">
+            </div>
+            {{ form_widget(formAgent.Picture,{'attr': {'placeholder': 'photo'}}) }}
+            {{ form_row(formAgent.IsActivated) }}
+
+            <input type="file" name="photo" id="">
+            <button type="submit" class="btn btn-success">Ajouter l'agent</button>
+
+            {{ form_end(formAgent) }}
+        </div>
+
+    </div>
+
+{% endblock %}
+{% block javascripts %} 
+    <script src="{{  asset('agent.js','qobd_web_js') }}"></script>
+{% endblock %}

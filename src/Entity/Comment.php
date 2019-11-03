@@ -27,11 +27,6 @@ class Comment
     private $createAt;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Agent", inversedBy="agent")
-     */
-    private $Agent;
-
-    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Client", inversedBy="Comment")
      */
     private $client;
@@ -42,9 +37,14 @@ class Comment
     private $address;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Order", mappedBy="PublicComment", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity="App\Entity\QuoteOrder", mappedBy="PublicComment", cascade={"persist", "remove"})
      */
     private $Order_;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Agent", inversedBy="Comment")
+     */
+    private $agent;
 
     public function getId(): ?int
     {
@@ -71,18 +71,6 @@ class Comment
     public function setCreateAt(\DateTimeInterface $createAt): self
     {
         $this->createAt = $createAt;
-
-        return $this;
-    }
-
-    public function getAgent(): ?Agent
-    {
-        return $this->Agent;
-    }
-
-    public function setAgent(?Agent $Agent): self
-    {
-        $this->Agent = $Agent;
 
         return $this;
     }
@@ -117,12 +105,12 @@ class Comment
         return $this;
     }
 
-    public function getOrder(): ?Order
+    public function getOrder(): ?QuoteOrder
     {
         return $this->Order_;
     }
 
-    public function setOrder(?Order $Order_): self
+    public function setOrder(?QuoteOrder $Order_): self
     {
         $this->Order_ = $Order_;
 
@@ -131,6 +119,18 @@ class Comment
         if ($Order_->getPublicComment() !== $newPublicComment) {
             $Order_->setPublicComment($newPublicComment);
         }
+
+        return $this;
+    }
+
+    public function getAgent(): ?Agent
+    {
+        return $this->agent;
+    }
+
+    public function setAgent(?Agent $agent): self
+    {
+        $this->agent = $agent;
 
         return $this;
     }

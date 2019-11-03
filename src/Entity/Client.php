@@ -89,7 +89,7 @@ class Client
     private $agent;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Order", mappedBy="Client")
+     * @ORM\OneToMany(targetEntity="App\Entity\QuoteOrder", mappedBy="Client")
      */
     private $orders;
 
@@ -323,14 +323,14 @@ class Client
     }
 
     /**
-     * @return Collection|Order[]
+     * @return Collection|QuoteOrder[]
      */
     public function getOrders(): Collection
     {
         return $this->orders;
     }
 
-    public function addOrder(Order $order): self
+    public function addOrder(QuoteOrder $order): self
     {
         if (!$this->orders->contains($order)) {
             $this->orders[] = $order;
@@ -340,7 +340,7 @@ class Client
         return $this;
     }
 
-    public function removeOrder(Order $order): self
+    public function removeOrder(QuoteOrder $order): self
     {
         if ($this->orders->contains($order)) {
             $this->orders->removeElement($order);

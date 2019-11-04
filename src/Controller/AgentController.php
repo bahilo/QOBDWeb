@@ -14,7 +14,7 @@ class AgentController extends Controller
 {
 
     /**
-     * @Route("/agent", name="agent_home")
+     * @Route("/", name="agent_home")
      */
     public function home(AgentRepository $agentRepo, QOBDSerializer $QOBDSerializer)
     {
@@ -41,6 +41,7 @@ class AgentController extends Controller
                      ->add('Email')
                      ->add('UserName')
                      ->add('Password')
+                     ->add('Confirme_password')
                      ->add('Picture')
                      ->add('IsActivated')
                      ->getForm();

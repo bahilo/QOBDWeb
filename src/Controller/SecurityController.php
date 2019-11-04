@@ -2,17 +2,19 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Routing\Annotation\Route;
-use App\Entity\Security;
-use Symfony\Component\HttpFoundation\Request;
-use Doctrine\Common\Persistence\ObjectManager;
+use App\Entity\Agent;
+use App\Form\RegistrationType;
+use App\Services\QOBDSerializer;
 use App\Repository\RoleRepository;
-use App\Repository\PrivilegeRepository;
 use App\Repository\ActionRepository;
 use App\Repository\LicenseRepository;
+use App\Repository\PrivilegeRepository;
 use App\Repository\ActionTrackerRepository;
-use App\Services\QOBDSerializer;
+use Symfony\Component\HttpFoundation\Request;
+use Doctrine\Common\Persistence\ObjectManager;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class SecurityController extends Controller
 {
@@ -27,52 +29,41 @@ class SecurityController extends Controller
     }
 
     /**
-     * @Route("/security/create", name="security_create")
-     * @Route("/security/{id}/edit", options={"expose"=true}, name="security_edit")
+     * @Route("/inscription", name="security_registration")
+     * 
      */
-    public function create(Request $request, ObjectManager $manager)
+    public function registration(Agent $agent = null, Request $request, ObjectManager $manager, UserPasswordEncoderInterface $encoder)
     {
-        /*if(!$security){
-            $security = new Security();
+        if(!$agent){
+            $agent = new Agent();
         }
         
-        $form = $this->createFormBuilder($security)
-                     ->add('FirstName')
-                     ->add('LastName')
-                     ->add('Phone')
-                     ->add('Fax')
-                     ->add('Email')
-                     ->add('UserName')
-                     ->add('Password')
-                     ->add('Picture')
-                     ->add('IsActivated')
-                     ->getForm();
+        $form = $this->createForm(RegistrationType::class, $agent);
 
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid() ){
-            $security->setIsAdmin(false);
-            $manager->persist($security);
+            $hash = $encoder->encodePassword($agent, $agent->getPassword());
+
+            $agent->setPassword($hash);
+            $agent->setIsAdmin(false);
+            $manager->persist($agent);
             $manager->flush();
 
-            return $this->redirectToRoute('security_home', [
-                'id' => $security->getId()
-            ]);
-        }*/
+            return $this->redirectToRoute('security_login');
+        }
 
-        return $this->render('security/create.html.twig', [
-            //'formsecurity' => $form->createView()
+        return $this->render('security/registration.html.twig', [
+            'formAgent' => $form->createView()
         ]);
     }
 
     /**
-     * @Route("/security/{id}/show", options={"expose"=true}, name="security_show")
+     * @Route("/connexion", options={"expose"=true}, name="security_login")
      */
-    public function show()
+    public function login()
     {
-        return $this->render('security/index.html.twig', [
-            'controller_name' => 'securityController',
-        ]);
+        return $this->render('security/login.html.twig');
     }
 
     /**

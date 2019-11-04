@@ -2,15 +2,20 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\AgentRepository")
+ * @UniqueEntity(fields={"Email"},message="L'email existe déjà dans la base de données")
+ * @UniqueEntity(fields={"UserName"},message="Le pseudonyme existe déjà dans la base donnéés")
+ * 
  */
-class Agent
+class Agent implements UserInterface
 {
     /**
      * @ORM\Id()
@@ -41,21 +46,27 @@ class Agent
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\Email(
-     * message = "The email '{{ value }}' is not a valid email.",
-     * checkMX = true)
+     * @Assert\Email(message = "l'email '{{ value }}' n'est pas valide.",checkMX = true)
+     * 
      */
     private $Email;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\Length(min="6", minMessage="Votre pseudonyme doit faire minimun {{ limit }} caractères")
      */
     private $UserName;
 
     /**
      * @ORM\Column(type="string", length=300)
+     * @Assert\Length(min="8", minMessage="Votre mot de passe doit faire minimun {{ limit }} caractères")
      */
     private $Password;
+
+    /**
+     * @Assert\EqualTo(propertyPath="Password", message="Vous n'avez pas entré le même mot de passe")
+     */
+    private $Confirme_password;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -222,6 +233,18 @@ class Agent
         return $this;
     }
 
+    public function getConfirmePassword(): ?string
+    {
+        return $this->Confirme_password;
+    }
+
+    public function setConfirmePassword(string $Confirme_password): self
+    {
+        $this->Confirme_password = $Confirme_password;
+
+        return $this;
+    }
+
     public function getPicture(): ?string
     {
         return $this->Picture;
@@ -297,9 +320,13 @@ class Agent
     /**
      * @return Collection|Role[]
      */
-    public function getRoles(): Collection
+    /*public function getRoles(): Collection
     {
         return $this->Roles;
+    }*/
+    public function getRoles()
+    {
+        return ["USER_ROLE"];
     }
 
     public function addRole(Role $role): self
@@ -497,4 +524,9 @@ class Agent
 
         return $this;
     }
+
+    public function getSalt(){}
+
+    public function eraseCredentials(){}
+
 }

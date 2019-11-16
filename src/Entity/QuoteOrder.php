@@ -3,6 +3,14 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\MaxDepth;
+use Doctrine\Common\Collections\Collection;
+use JMS\Serializer\Annotation\SerializedName;
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use Doctrine\Common\Collections\ArrayCollection;
+
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\QuoteOrderRepository")
@@ -13,73 +21,100 @@ class QuoteOrder
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"class_property"})
      */
     private $id;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Comment", cascade={"persist", "remove"})
+     * @Groups({"class_relation"})
      */
     private $AdminComment;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Comment", cascade={"persist", "remove"})
+     * @Groups({"class_relation"})
      */
     private $PrivateComment;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Comment", cascade={"persist", "remove"})
+     * @Groups({"class_relation"})
      */
     private $PublicComment;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Agent", inversedBy="orders")
+     * @Groups({"class_relation"})
+     * @MaxDepth(2)
      */
     private $Agent;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Client", inversedBy="orders")
+     * @Groups({"class_relation"})
+     * @MaxDepth(2)
      */
     private $Client;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Currency", inversedBy="orders")
+     * @Groups({"class_relation"})
+     * @MaxDepth(2)
      */
     private $Currency;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Tax", inversedBy="orders")
-     */
-    private $Tax;
-
-    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\OrderStatus", inversedBy="orders")
+     * @Groups({"class_relation"})
+     * @MaxDepth(2)
      */
     private $Status;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Contact", inversedBy="quoteOrders")
+     */
+    private $Contact;
+    
     /**
      * @ORM\Column(type="datetime")
      */
     private $CreatedAt;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Bill", mappedBy="Order_")
+     * @ORM\OneToMany(targetEntity="App\Entity\QuoteOrderDetail", mappedBy="QuoteOrder")
+     * @Groups({"class_relation"})
+     * @MaxDepth(2)
      */
-    private $bills;
+    private $quoteOrderDetails;
+
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Delivery", inversedBy="orders")
+     * @Groups({"class_property"})
+     * @SerializedName("AgentFirstName")
      */
-    private $Delivery;
-
+    private $AgentFirstName;
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Item", inversedBy="orders")
+     * @Groups({"class_property"})
+     * @SerializedName("AgentLastName")
      */
-    private $Items;
+    private $AgentLastName;
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("ClientCompanyName")
+     */
+    private $ClientCompanyName;
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("CreatedAtToString")
+     */
+    private $CreatedAtToString;
+
+
 
     public function __construct()
     {
-        $this->bills = new ArrayCollection();
-        $this->Items = new ArrayCollection();
+        $this->quoteOrderDetails = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -159,18 +194,6 @@ class QuoteOrder
         return $this;
     }
 
-    public function getTax(): ?Tax
-    {
-        return $this->Tax;
-    }
-
-    public function setTax(?Tax $Tax): self
-    {
-        $this->Tax = $Tax;
-
-        return $this;
-    }
-
     public function getStatus(): ?OrderStatus
     {
         return $this->Status;
@@ -196,70 +219,92 @@ class QuoteOrder
     }
 
     /**
-     * @return Collection|Bill[]
+     * @return Collection|QuoteOrderDetail[]
      */
-    public function getBills(): Collection
+    public function getQuoteOrderDetails(): Collection
     {
-        return $this->bills;
+        return $this->quoteOrderDetails;
     }
 
-    public function addBill(Bill $bill): self
+    public function addQuoteOrderDetail(QuoteOrderDetail $quoteOrderDetail): self
     {
-        if (!$this->bills->contains($bill)) {
-            $this->bills[] = $bill;
-            $bill->setOrder($this);
+        if (!$this->quoteOrderDetails->contains($quoteOrderDetail)) {
+            $this->quoteOrderDetails[] = $quoteOrderDetail;
+            $quoteOrderDetail->setQuoteOrder($this);
         }
 
         return $this;
     }
 
-    public function removeBill(Bill $bill): self
+    public function removeQuoteOrderDetail(QuoteOrderDetail $quoteOrderDetail): self
     {
-        if ($this->bills->contains($bill)) {
-            $this->bills->removeElement($bill);
+        if ($this->quoteOrderDetails->contains($quoteOrderDetail)) {
+            $this->quoteOrderDetails->removeElement($quoteOrderDetail);
             // set the owning side to null (unless already changed)
-            if ($bill->getOrder() === $this) {
-                $bill->setOrder(null);
+            if ($quoteOrderDetail->getQuoteOrder() === $this) {
+                $quoteOrderDetail->setQuoteOrder(null);
             }
         }
 
         return $this;
     }
 
-    public function getDelivery(): ?Delivery
+    public function getAgentFirstName(): ?string
     {
-        return $this->Delivery;
+        return $this->AgentFirstName;
     }
 
-    public function setDelivery(?Delivery $Delivery): self
+    public function setAgentFirstName(?string $AgentFirstName): self
     {
-        $this->Delivery = $Delivery;
+        $this->AgentFirstName = $AgentFirstName;
 
         return $this;
     }
 
-    /**
-     * @return Collection|Item[]
-     */
-    public function getItems(): Collection
+    public function getAgentLastName(): ?string
     {
-        return $this->Items;
+        return $this->AgentLastName;
     }
 
-    public function addItem(Item $item): self
+    public function setAgentLastName(?string $AgentLastName): self
     {
-        if (!$this->Items->contains($item)) {
-            $this->Items[] = $item;
-        }
+        $this->AgentLastName = $AgentLastName;
 
         return $this;
     }
 
-    public function removeItem(Item $item): self
+    public function getClientCompanyName(): ?string
     {
-        if ($this->Items->contains($item)) {
-            $this->Items->removeElement($item);
-        }
+        return $this->ClientCompanyName;
+    }
+
+    public function setClientCompanyName(?string $ClientCompanyName): self
+    {
+        $this->ClientCompanyName = $ClientCompanyName;
+
+        return $this;
+    }
+
+    public function getCreatedAtToString(): ?string
+    {
+        return $this->CreatedAtToString;
+    }
+
+    public function setCreatedAtToString(?string $CreatedAtToString): self
+    {
+        $this->CreatedAtToString = $CreatedAtToString;
+
+        return $this;
+    }
+
+    public function getContact(): ?Contact
+    {
+        return $this->Contact;
+    }
+
+    public function setContact(?Contact $Contact): self
+    {
+        $this->Contact = $Contact;
 
         return $this;
     }

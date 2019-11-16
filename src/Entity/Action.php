@@ -29,23 +29,19 @@ class Action
     private $DisplayName;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Role", mappedBy="actions")
-     */
-    private $roles;
-
-    /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Privilege", mappedBy="Action", cascade={"persist", "remove"})
-     */
-    private $privilege;
-
-    /**
      * @ORM\OneToOne(targetEntity="App\Entity\ActionTracker", mappedBy="Action", cascade={"persist", "remove"})
      */
     private $actionTracker;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\ActionRole", mappedBy="Action")
+     */
+    private $actionRoles;
+
+
     public function __construct()
     {
-        $this->roles = new ArrayCollection();
+        $this->actionRoles = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -76,53 +72,7 @@ class Action
 
         return $this;
     }
-
-    /**
-     * @return Collection|Role[]
-     */
-    public function getRoles(): Collection
-    {
-        return $this->roles;
-    }
-
-    public function addRole(Role $role): self
-    {
-        if (!$this->roles->contains($role)) {
-            $this->roles[] = $role;
-            $role->addRelation($this);
-        }
-
-        return $this;
-    }
-
-    public function removeRole(Role $role): self
-    {
-        if ($this->roles->contains($role)) {
-            $this->roles->removeElement($role);
-            $role->removeRelation($this);
-        }
-
-        return $this;
-    }
-
-    public function getPrivilege(): ?Privilege
-    {
-        return $this->privilege;
-    }
-
-    public function setPrivilege(?Privilege $privilege): self
-    {
-        $this->privilege = $privilege;
-
-        // set (or unset) the owning side of the relation if necessary
-        $newAction = null === $privilege ? null : $this;
-        if ($privilege->getAction() !== $newAction) {
-            $privilege->setAction($newAction);
-        }
-
-        return $this;
-    }
-
+        
     public function getActionTracker(): ?ActionTracker
     {
         return $this->actionTracker;
@@ -140,4 +90,36 @@ class Action
 
         return $this;
     }
+
+    /**
+     * @return Collection|ActionRole[]
+     */
+    public function getActionRoles(): Collection
+    {
+        return $this->actionRoles;
+    }
+
+    public function addActionRole(ActionRole $actionRole): self
+    {
+        if (!$this->actionRoles->contains($actionRole)) {
+            $this->actionRoles[] = $actionRole;
+            $actionRole->setAction($this);
+        }
+
+        return $this;
+    }
+
+    public function removeActionRole(ActionRole $actionRole): self
+    {
+        if ($this->actionRoles->contains($actionRole)) {
+            $this->actionRoles->removeElement($actionRole);
+            // set the owning side to null (unless already changed)
+            if ($actionRole->getAction() === $this) {
+                $actionRole->setAction(null);
+            }
+        }
+
+        return $this;
+    }
+    
 }

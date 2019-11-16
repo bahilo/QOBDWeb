@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+// use LinqFactory;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -59,14 +60,19 @@ class Agent implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=300)
-     * @Assert\Length(min="8", minMessage="Votre mot de passe doit faire minimun {{ limit }} caractères")
+     * 
      */
     private $Password;
 
     /**
-     * @Assert\EqualTo(propertyPath="Password", message="Vous n'avez pas entré le même mot de passe")
+     * @Assert\EqualTo(propertyPath="PlainTextPassword", message="Vous n'avez pas entré le même mot de passe")
      */
     private $Confirme_password;
+
+    /**
+     * 
+     */
+    private $PlainTextPassword;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -245,6 +251,18 @@ class Agent implements UserInterface
         return $this;
     }
 
+    public function getPlainTextPassword(): ?string
+    {
+        return $this->PlainTextPassword;
+    }
+
+    public function setPlainTextPassword(string $PlainTextPassword): self
+    {
+        $this->PlainTextPassword = $PlainTextPassword;
+
+        return $this;
+    }
+
     public function getPicture(): ?string
     {
         return $this->Picture;
@@ -320,13 +338,15 @@ class Agent implements UserInterface
     /**
      * @return Collection|Role[]
      */
-    /*public function getRoles(): Collection
+    public function getObjectRoles(): Collection
     {
         return $this->Roles;
-    }*/
+    }
+    
     public function getRoles()
     {
-        return ["USER_ROLE"];
+        return \array_map(\create_function('$role','return $role->getName();'), $this->Roles->toArray());
+        //return ["USER_ROLE"];
     }
 
     public function addRole(Role $role): self
@@ -527,6 +547,8 @@ class Agent implements UserInterface
 
     public function getSalt(){}
 
-    public function eraseCredentials(){}
+    public function eraseCredentials(){
+        $this->PlainTextPassword = null;
+    }
 
 }

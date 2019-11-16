@@ -1,0 +1,48 @@
+{% extends 'template_coreui.html.twig' %}
+
+{% block title %}Nouvel Agent{% endblock %}
+
+{% block stylesheets %}
+
+{% endblock %}
+
+{% block body %}
+
+<div class="contact-wrapper">
+
+    <div class="container">
+        <h5>Création d'un Contact !</h5>
+
+        {{ form_start(formContact) }}
+
+
+        {{ form_row(formContact.Firstname,{'label': 'Prénom','attr': {'placeholder': 'Prénom'}}) }}
+        {{ form_row(formContact.LastName,{'label': 'Nom','attr': {'placeholder': 'Nom'}}) }}
+        {{ form_row(formContact.Position,{'label': 'Position','attr': {'placeholder': 'Position'}}) }}
+        {{ form_row(formContact.Email,{'label': 'Email','attr': {'placeholder': 'Email...'}}) }}
+        {{ form_row(formContact.Phone,{'label': 'Numéro de téléphone','attr': {'placeholder': 'Numéro de téléphone'}}) }}
+        {{ form_row(formContact.Mobile,{'label': 'Mobile','attr': {'placeholder': 'Mobile'}}) }}
+        {{ form_row(formContact.Fax,{'label': 'Fax','attr': {'placeholder': 'Fax'}}) }}
+        
+        {{ form_row(formContact.AddressName,{'label': 'Intitulé de l\'address', 'attr': {'placeholder': 'Intitulé de l\'address'}}) }}
+        {{ form_row(formContact.Street,{'label': 'Adresse', 'attr': {'placeholder': 'Adresse'}}) }}
+        {{ form_row(formContact.ZipCode,{'label': 'Code Postal', 'attr': {'placeholder': 'Code Postal'}}) }}
+        {{ form_row(formContact.City,{'label': 'Ville', 'attr': {'placeholder': 'Ville'}}) }}
+        {{ form_row(formContact.Country,{'label': 'Pays', 'attr': {'placeholder': 'Pays'}}) }}
+        {{ form_row(formContact.ContentComment,{'label': 'Commentaire sur le contact','attr': {'placeholder': 'Commentaire'}}) }}
+        {{ form_row(formContact.AddressComment,{'label': 'Commentaire sur l\'adresse', 'attr': {'placeholder': 'Commentaire sur l\'adresse'}})
+        }}
+        
+        {{ form_row(formContact.IsPrincipal) }}
+
+        <button type="submit" class="btn btn-success">Ajouter l'agent</button>
+
+        {{ form_end(formContact) }}
+    </div>
+
+</div>
+
+{% endblock %}
+{% block javascripts %}
+<!-- <script src="{#{  asset('client.js','qobd_web_js') }#}"></script> -->
+{% endblock %}

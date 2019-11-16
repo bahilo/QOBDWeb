@@ -16,4 +16,5 @@ return [
     Symfony\Bundle\WebServerBundle\WebServerBundle::class => ['dev' => true],
     FOS\JsRoutingBundle\FOSJsRoutingBundle::class => ['all' => true],
     NoiseLabs\Bundle\NuSOAPBundle\NoiseLabsNuSOAPBundle::class => ['all' => true],
+    JMS\SerializerBundle\JMSSerializerBundle::class => ['all' => true],
 ];

@@ -27,11 +27,6 @@ class Comment
     private $createAt;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Client", inversedBy="Comment")
-     */
-    private $client;
-
-    /**
      * @ORM\OneToOne(targetEntity="App\Entity\Address", mappedBy="Comment", cascade={"persist", "remove"})
      */
     private $address;
@@ -71,18 +66,6 @@ class Comment
     public function setCreateAt(\DateTimeInterface $createAt): self
     {
         $this->createAt = $createAt;
-
-        return $this;
-    }
-
-    public function getClient(): ?Client
-    {
-        return $this->client;
-    }
-
-    public function setClient(?Client $client): self
-    {
-        $this->client = $client;
 
         return $this;
     }

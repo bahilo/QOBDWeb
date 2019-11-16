@@ -1,0 +1,117 @@
+{% extends 'template_coreui.html.twig' %}
+
+
+
+{% set source = [] %}
+{% set page_title = "" %}
+{% set target = "" %}
+{% if order_data_source is defined %}
+{% set source = order_data_source %}
+{% set page_title = "Commandes" %}
+{% set target = "order_data_source" %}
+{% elseif quote_data_source is defined %}
+{% set source = quote_data_source %}
+{% set page_title = "Devis" %}
+{% set target = "quote_data_source" %}
+{% elseif preorder_data_source is defined %}
+{% set source = preorder_data_source %}
+{% set page_title = "Commande à valider" %}
+{% set target = "preorder_data_source" %}
+{% elseif prerefund_data_source is defined %}
+{% set source = prerefund_data_source %}
+{% set page_title = "Avoirs à valider" %}
+{% set target = "prerefund_data_source" %}
+{% elseif refund_data_source is defined %}
+{% set source = refund_data_source %}
+{% set page_title = "Avoirs" %}
+{% set target = "refund_data_source" %}
+{% elseif bill_data_source is defined %}
+{% set source = bill_data_source %}
+{% set page_title = "Factures expédiées" %}
+{% set target = "bill_data_source" %}
+{% elseif bill_refund_data_source is defined %}
+{% set source = bill_refund_data_source %}
+{% set page_title = "Avoirs Expédiés" %}
+{% set target = "bill_refund_data_source" %}
+{% elseif customer_valid_data_source is defined %}
+{% set source = customer_valid_data_source %}
+{% set page_title = "Commandes à re-valider avec le client" %}
+{% set target = "customer_valid_data_source" %}
+{% elseif closed_data_source is defined %}
+{% set source = closed_data_source %}
+{% set page_title = "Commandes cloturées" %}
+{% set target = "closed_data_source" %}
+{% elseif refund_closed_data_source is defined %}
+{% set source = refund_closed_data_source %}
+{% set page_title = "Avoirs cloturés" %}
+{% set target = "refund_closed_data_source" %}
+{% endif %}
+
+{% block title %} {{ page_title }} {% endblock %}
+
+{% block home_path %}
+<li class="breadcrumb-item">
+    <a href="#">Commande</a>
+</li>
+<li class="breadcrumb-item">
+    {{ page_title }}
+</li>
+{% endblock %}
+
+{% block body %}
+
+<div class="commande-wrapper">
+
+    <table id="" class="table">
+    </table>
+
+    
+
+    <input type="hidden" id="order_target" value="{{ target }}">
+    <input type="hidden" id="order_data_source" value="{{ source }}">
+
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa fa-align-justify"></i> Liste des produits et tarifs</div>
+                    <div class="card-body">
+                        <table id="order_table_js"
+                            class="table table-responsive-md table-bordered table-striped table-md">
+                        </table>
+                        <nav>
+                            <ul class="pagination">
+                                <li class="page-item">
+                                    <a class="page-link" href="#">Prev</a>
+                                </li>
+                                <li class="page-item active">
+                                    <a class="page-link" href="#">1</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">2</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">3</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">4</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <!-- /.col-->
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+{% block javascripts %}
+<script src="{{  asset('order.js','qobd_web_js') }}"></script>
+{% endblock %}

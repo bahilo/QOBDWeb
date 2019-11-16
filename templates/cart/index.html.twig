@@ -1,0 +1,54 @@
+{% extends 'template_coreui.html.twig' %}
+
+{% block title %}panier!{% endblock %}
+
+{% block body %}
+
+<a href="{{ path('catalogue_home') }}" class="btn btn-success">Catalogue</a>
+
+{% if items | length > 0 %}
+
+<a href="{{ path('client_home') }}" class="btn btn-warning">Choisir un client</a>
+<a href="{{ path('order_registration') }}" class="btn btn-danger">Devis</a>
+
+{% if error_message %}
+    <div class="error">{{ error_message }}</div>
+{% endif %}
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>produit</th>
+                    <th>Prix</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.product.Name }}</td>
+                    <td>{{ item.product.SellPrice }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.product.SellPrice * item.quantity }}</td>
+                    <td><a href="{{ path('cart_delete', {id: item.product.id})}}"><i class="fa fa-trash"></i></a></td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td>total</td>
+                    <td>{{ total }}</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+
+    {% else %}
+
+    <h3>Empty</h3>
+
+    {% endif %}
+
+{% endblock %}

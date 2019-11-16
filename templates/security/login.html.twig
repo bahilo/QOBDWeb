@@ -1,35 +1,88 @@
-{% extends 'base.html.twig' %}
+<!DOCTYPE html>
+<html>
 
-{% block title %}Page de login{% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{% block title %}Welcome!{% endblock %}</title>
+    <link rel="stylesheet" href="https://unpkg.com/@coreui/coreui/dist/css/coreui.min.css">
+    <link rel="stylesheet" href="{{ asset('bootstrap.min.css', 'bootstrap_css') }}">
+    <!-- <link rel="stylesheet" href="{{ asset('datatables.min.css', 'datatable_dir') }}"> -->
+    <link rel="stylesheet" href="{{ asset('all.min.css', 'font_awsome_css') }}">
+    <!-- <link rel="stylesheet" href="{{ asset('base.css', 'qobd_web_css') }}"> -->
 
-{% block stylesheets %} 
-    <link rel="stylesheet" href="{{ asset('agent.css', 'qobd_web_css') }}">
-{% endblock %}
+</head>
 
-{% block body %}
-
-    <div class="login-wrapper">
-        
-        <div class="container">
-            <h1>Page d'authentification !</h1>
-
-            <form action="{{ path('security_login')}}" method="POST">
-                <div class="form-group">
-                    <input type="text" name="_username" id="" class="form-control" placeholder="pseudo ..." required>
+<body class="app flex-row align-items-center">
+    <div class="container">
+        <form action="{{ path('security_login')}}" method="POST">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card-group">
+                        <div class="card p-4">
+                            <div class="card-body">
+                                <h1>Login</h1>
+                                <p class="text-muted">Sign In to your account</p>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <i class="icon-user"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" name="_username" id="" class="form-control"
+                                        placeholder="pseudo ..." required>
+                                </div>
+                                <div class="input-group mb-4">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <i class="icon-lock"></i>
+                                        </span>
+                                    </div>
+                                    <input type="password" name="_password" id="" class="form-control"
+                                        placeholder="Mot de passe">
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <input type="submit" class="btn btn-primary px-4" value="Login">
+                                    </div>
+                                    <div class="col-6 text-right">
+                                        <a href="" class="btn btn-link px-0" type="button">Forgot password?</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card text-white bg-primary py-5 d-md-down-none" style="width:44%">
+                            <div class="card-body text-center">
+                                <div>
+                                    <h2>S'enregistrer</h2>
+                                    <p>Veuillez contacter et faire votre demande d'enregistrement au près de
+                                        l'administrateur du site.</p>
+                                    <!-- <button class="btn btn-primary active mt-3" type="button">Register Now!</button> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <input type="password" name="_password" id="" class="form-control" placeholder="Mot de passe">
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-success">Connexion!</button>
-                </div>
-            </form>
-
-        </div>
-
+            </div>
+        </form>
     </div>
 
-{% endblock %}
-{% block javascripts %} 
-    <script src="{{  asset('agent.js','qobd_web_js') }}"></script>
-{% endblock %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
+        crossorigin="anonymous"></script>
+    <!---->
+    <script src="https://unpkg.com/@coreui/coreui/dist/js/coreui.min.js"></script>
+    <!--  -->
+
+
+    <script src="{{ asset('datatables.min.js','datatable_dir') }}"></script>
+    <script src="{{ asset('all.min.js','font_awsome_js') }}"></script>
+    <script src="{{ asset('lodash.min.js','qobd_web_js') }}"></script>
+    <script src="{{ asset('bundles/fosjsrouting/js/router.min.js') }}"></script>
+    <script src="{{ asset('fos_js_routes.js','qobd_web_js') }}"></script>
+    <script src="{{ asset('render_methods.js','qobd_web_js') }}"></script>
+    <script src="{{ asset('data_table.js','qobd_web_js') }}"></script>
+</body>
+
+</html>

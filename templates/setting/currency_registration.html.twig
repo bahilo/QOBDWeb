@@ -1,0 +1,36 @@
+{% extends 'template_coreui.html.twig' %}
+
+{% block title %}Configuration de la Monnaie{% endblock %}
+
+{% block stylesheets %}
+
+{% endblock %}
+
+{% block body %}
+
+<div class="brand-wrapper">
+
+    <div class="container">
+        <h1>Création de la monnaie !</h1>
+
+        {{ form_start(formCurrency) }}
+
+
+        {{ form_row(formCurrency.Name,{'label': 'désignation de la monnaie', 'attr': {'placeholder': 'désignation de la monnaie'}}) }}
+        {{ form_row(formCurrency.Symbol,{'label': 'Symbole', 'attr': {'placeholder': 'Symbole'}}) }}
+        {{ form_row(formCurrency.Rate,{'label': 'Taux', 'attr': {'placeholder': 'Taux'}}) }}
+        {{ form_row(formCurrency.CountryCode,{'label': 'Code du pays', 'attr': {'placeholder': 'Code du pays'}}) }}
+        {{ form_row(formCurrency.Country,{'label': 'Pays', 'attr': {'placeholder': 'Pays'}}) }}
+        {{ form_row(formCurrency.IsDefault) }}
+       
+        <button type="submit" class="btn btn-success">Ajouter la monnaie</button>
+
+        {{ form_end(formCurrency) }}
+    </div>
+
+</div>
+
+{% endblock %}
+{% block javascripts %}
+<!-- <script src="{#{  asset('client.js','qobd_web_js') }#}"></script> -->
+{% endblock %}

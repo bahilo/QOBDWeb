@@ -31,4 +31,10 @@ framework:
                 base_path: ressources/fontawesome-web-5.11.2/css
             font_awsome_js:
                 base_path: ressources/fontawesome-web-5.11.2/js
+            fos_route_js:
+                base_path: ressources/../../web/js
+            theme_coreui:
+                base_path: ressources/themes/coreui
+            theme_default:
+                base_path: ressources/themes/default
 

@@ -34,24 +34,19 @@ class Delivery
     private $Status;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Address", inversedBy="deliveries")
-     */
-    private $Address;
-
-    /**
      * @ORM\OneToMany(targetEntity="App\Entity\QuoteOrder", mappedBy="Delivery")
      */
     private $orders;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Item", inversedBy="deliveries")
+     * @ORM\OneToMany(targetEntity="App\Entity\QuoteOrderDetail", mappedBy="Delivery")
      */
-    private $Items;
+    private $quoteOrderDetails;
 
     public function __construct()
     {
         $this->orders = new ArrayCollection();
-        $this->Items = new ArrayCollection();
+        $this->quoteOrderDetails = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -95,18 +90,6 @@ class Delivery
         return $this;
     }
 
-    public function getAddress(): ?Address
-    {
-        return $this->Address;
-    }
-
-    public function setAddress(?Address $Address): self
-    {
-        $this->Address = $Address;
-
-        return $this;
-    }
-
     /**
      * @return Collection|QuoteOrder[]
      */
@@ -139,26 +122,31 @@ class Delivery
     }
 
     /**
-     * @return Collection|Item[]
+     * @return Collection|QuoteOrderDetail[]
      */
-    public function getItems(): Collection
+    public function getQuoteOrderDetails(): Collection
     {
-        return $this->Items;
+        return $this->quoteOrderDetails;
     }
 
-    public function addItem(Item $item): self
+    public function addQuoteOrderDetail(QuoteOrderDetail $quoteOrderDetail): self
     {
-        if (!$this->Items->contains($item)) {
-            $this->Items[] = $item;
+        if (!$this->quoteOrderDetails->contains($quoteOrderDetail)) {
+            $this->quoteOrderDetails[] = $quoteOrderDetail;
+            $quoteOrderDetail->setDelivery($this);
         }
 
         return $this;
     }
 
-    public function removeItem(Item $item): self
+    public function removeQuoteOrderDetail(QuoteOrderDetail $quoteOrderDetail): self
     {
-        if ($this->Items->contains($item)) {
-            $this->Items->removeElement($item);
+        if ($this->quoteOrderDetails->contains($quoteOrderDetail)) {
+            $this->quoteOrderDetails->removeElement($quoteOrderDetail);
+            // set the owning side to null (unless already changed)
+            if ($quoteOrderDetail->getDelivery() === $this) {
+                $quoteOrderDetail->setDelivery(null);
+            }
         }
 
         return $this;

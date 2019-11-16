@@ -14,73 +14,73 @@ class AgentController extends Controller
 {
 
     /**
-     * @Route("/", name="agent_home")
+     * @Route("/admin/agent", name="agent_home")
      */
     public function home(AgentRepository $agentRepo, QOBDSerializer $QOBDSerializer)
     {
-        return $this->render('agent/home.html.twig', [
+        return $this->render('agent/index.html.twig', [
             'agents_data_source' => $QOBDSerializer->getSerializer()->serialize($agentRepo->findAll(), 'json'),
         ]);
     }
 
-    /**
-     * @Route("/agent/create", name="agent_create")
-     * @Route("/agent/{id}/edit", options={"expose"=true}, name="agent_edit")
-     */
-    public function create(Agent $agent = null,Request $request, ObjectManager $manager)
-    {
-        if(!$agent){
-            $agent = new Agent();
-        }
+    // /**
+    //  * @Route("/agent/create", name="agent_create")
+    //  * @Route("/agent/{id}/edit", options={"expose"=true}, name="agent_edit")
+    //  */
+    // public function create(Agent $agent = null,Request $request, ObjectManager $manager)
+    // {
+    //     if(!$agent){
+    //         $agent = new Agent();
+    //     }
         
-        $form = $this->createFormBuilder($agent)
-                     ->add('FirstName')
-                     ->add('LastName')
-                     ->add('Phone')
-                     ->add('Fax')
-                     ->add('Email')
-                     ->add('UserName')
-                     ->add('Password')
-                     ->add('Confirme_password')
-                     ->add('Picture')
-                     ->add('IsActivated')
-                     ->getForm();
+    //     $form = $this->createFormBuilder($agent)
+    //                  ->add('FirstName')
+    //                  ->add('LastName')
+    //                  ->add('Phone')
+    //                  ->add('Fax')
+    //                  ->add('Email')
+    //                  ->add('UserName')
+    //                  ->add('Password')
+    //                  ->add('Confirme_password')
+    //                  ->add('Picture')
+    //                  ->add('IsActivated')
+    //                  ->getForm();
 
-        $form->handleRequest($request);
+    //     $form->handleRequest($request);
 
-        if($form->isSubmitted() && $form->isValid() ){
-            $agent->setIsAdmin(false);
-            $manager->persist($agent);
-            $manager->flush();
+    //     if($form->isSubmitted() && $form->isValid() ){
+    //         $agent->setIsAdmin(false);
+    //         $manager->persist($agent);
+    //         $manager->flush();
 
-            return $this->redirectToRoute('agent_home', [
-                'id' => $agent->getId()
-            ]);
-        }
+    //         return $this->redirectToRoute('agent_home', [
+    //             'id' => $agent->getId()
+    //         ]);
+    //     }
 
-        return $this->render('agent/create.html.twig', [
-            'formAgent' => $form->createView()
-        ]);
-    }
+    //     return $this->render('agent/create.html.twig', [
+    //         'formAgent' => $form->createView()
+    //     ]);
+    // }
 
     /**
-     * @Route("/agent/{id}/show", options={"expose"=true}, name="agent_show")
+     * @Route("/admin/agent/{id}/show", options={"expose"=true}, name="agent_show")
      */
     public function show(Agent $agent)
     {
-        return $this->render('agent/index.html.twig', [
-            'controller_name' => 'AgentController',
+        return $this->render('agent/show.html.twig', [
+            'agent' =>$agent,
         ]);
     }
 
-    /**
-     * @Route("/agent/{id}/delete", options={"expose"=true}, name="agent_delete")
-     */
-    public function delete(Agent $agent, ObjectManager $manager)
-    {
-        $manager->remove($agent);
-        $manager->flush();
+    // /**
+    //  * @Route("/agent/{id}/delete", options={"expose"=true}, name="agent_delete")
+    //  */
+    // public function delete(Agent $agent, ObjectManager $manager)
+    // {
+    //     $manager->remove($agent);
+    //     $manager->flush();
 
-        return $this->RedirectToRoute('agent_home');
-    }
+    //     return $this->RedirectToRoute('agent_home');
+    // }
 }

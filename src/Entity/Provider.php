@@ -38,10 +38,19 @@ class Provider
      */
     private $items;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $IsEnabled;
+
     public function __construct()
     {
         $this->Contact = new ArrayCollection();
         $this->items = new ArrayCollection();
+    }
+
+    public function __tostring(){
+        return $this->getName();
     }
 
     public function getId(): ?int
@@ -128,6 +137,18 @@ class Provider
             $this->items->removeElement($item);
             $item->removeProvider($this);
         }
+
+        return $this;
+    }
+
+    public function getIsEnabled(): ?bool
+    {
+        return $this->IsEnabled;
+    }
+
+    public function setIsEnabled(bool $IsEnabled): self
+    {
+        $this->IsEnabled = $IsEnabled;
 
         return $this;
     }

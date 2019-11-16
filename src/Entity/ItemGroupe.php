@@ -38,6 +38,10 @@ class ItemGroupe
         $this->items = new ArrayCollection();
     }
 
+    public function __tostring(){
+        return $this->getName();
+    }
+
     public function getId(): ?int
     {
         return $this->id;

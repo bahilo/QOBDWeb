@@ -2,9 +2,11 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Groups;
+use Doctrine\Common\Collections\Collection;
+use JMS\Serializer\Annotation\SerializedName;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ClientRepository")
@@ -15,98 +17,162 @@ class Client
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"class_property"})
+     * @SerializedName("id")
      */
     private $id;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $FirstName;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $LastName;
-
+    
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("CompanyName")
      */
     private $CompanyName;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $Email;
-
-    /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $Phone;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $Fax;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("Rib")
      */
     private $Rib;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("CRN")
      */
     private $CRN;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("PayDelay")
      */
     private $PayDelay;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="client")
-     */
-    private $Comment;
-
-    /**
      * @ORM\Column(type="float", nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("MaxCredit")
      */
     private $MaxCredit;
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"class_property"})
+     * @SerializedName("IsActivated")
      */
     private $IsActivated;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Address", mappedBy="client")
-     */
-    private $Addresses;
-
-    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Agent", inversedBy="Clients")
+     * @Groups({"relation_property"})
      */
     private $agent;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\QuoteOrder", mappedBy="Client")
+     * @Groups({"relation_property"})
      */
     private $orders;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Bill", inversedBy="Client")
+     * @Groups({"relation_property"})
      */
     private $bill;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Contact", mappedBy="Client")
+     * @Groups({"relation_property"})
      */
     private $contacts;
 
+    /**
+     * @ORM\Column(type="boolean")
+     * @Groups({"class_property"})
+     * @SerializedName("IsProspect")
+     */
+    private $IsProspect;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("Denomination")
+     */
+    private $Denomination;
+
+
+    // contact principal
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("FirstName")
+     */
+    private $FirstName;
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("LastName")
+     */
+    private $LastName;
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("Email")
+     */
+    private $Email;
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("Phone")
+     */
+    private $Phone;
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("Fax")
+     */
+    private $Fax;
+
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("City")
+     */
+    private $City;
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("Street")
+     */
+    private $Street;
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("ZipCode")
+     */
+    private $ZipCode;
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("Country")
+     */
+    private $Country;
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("AddressComment")
+     */
+    private $AddressComment;
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("ClientComment")
+     */
+    private $ClientComment;
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("AddressName")
+     */
+    private $AddressName;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Comment", cascade={"persist", "remove"})
+     */
+    private $Comment;
+
     public function __construct()
     {
-        $this->Comment = new ArrayCollection();
-        $this->Addresses = new ArrayCollection();
         $this->orders = new ArrayCollection();
         $this->contacts = new ArrayCollection();
     }
@@ -115,31 +181,7 @@ class Client
     {
         return $this->id;
     }
-
-    public function getFirstName(): ?string
-    {
-        return $this->FirstName;
-    }
-
-    public function setFirstName(string $FirstName): self
-    {
-        $this->FirstName = $FirstName;
-
-        return $this;
-    }
-
-    public function getLastName(): ?string
-    {
-        return $this->LastName;
-    }
-
-    public function setLastName(string $LastName): self
-    {
-        $this->LastName = $LastName;
-
-        return $this;
-    }
-
+    
     public function getCompanyName(): ?string
     {
         return $this->CompanyName;
@@ -151,43 +193,7 @@ class Client
 
         return $this;
     }
-
-    public function getEmail(): ?string
-    {
-        return $this->Email;
-    }
-
-    public function setEmail(string $Email): self
-    {
-        $this->Email = $Email;
-
-        return $this;
-    }
-
-    public function getPhone(): ?string
-    {
-        return $this->Phone;
-    }
-
-    public function setPhone(?string $Phone): self
-    {
-        $this->Phone = $Phone;
-
-        return $this;
-    }
-
-    public function getFax(): ?string
-    {
-        return $this->Fax;
-    }
-
-    public function setFax(?string $Fax): self
-    {
-        $this->Fax = $Fax;
-
-        return $this;
-    }
-
+    
     public function getRib(): ?string
     {
         return $this->Rib;
@@ -224,37 +230,6 @@ class Client
         return $this;
     }
 
-    /**
-     * @return Collection|Comment[]
-     */
-    public function getComment(): Collection
-    {
-        return $this->Comment;
-    }
-
-    public function addComment(Comment $comment): self
-    {
-        if (!$this->Comment->contains($comment)) {
-            $this->Comment[] = $comment;
-            $comment->setClient($this);
-        }
-
-        return $this;
-    }
-
-    public function removeComment(Comment $comment): self
-    {
-        if ($this->Comment->contains($comment)) {
-            $this->Comment->removeElement($comment);
-            // set the owning side to null (unless already changed)
-            if ($comment->getClient() === $this) {
-                $comment->setClient(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getMaxCredit(): ?float
     {
         return $this->MaxCredit;
@@ -275,37 +250,6 @@ class Client
     public function setIsActivated(bool $IsActivated): self
     {
         $this->IsActivated = $IsActivated;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Address[]
-     */
-    public function getAddresses(): Collection
-    {
-        return $this->Addresses;
-    }
-
-    public function addAddress(Address $address): self
-    {
-        if (!$this->Addresses->contains($address)) {
-            $this->Addresses[] = $address;
-            $address->setClient($this);
-        }
-
-        return $this;
-    }
-
-    public function removeAddress(Address $address): self
-    {
-        if ($this->Addresses->contains($address)) {
-            $this->Addresses->removeElement($address);
-            // set the owning side to null (unless already changed)
-            if ($address->getClient() === $this) {
-                $address->setClient(null);
-            }
-        }
 
         return $this;
     }
@@ -395,4 +339,184 @@ class Client
 
         return $this;
     }
+
+    public function getIsProspect(): ?bool
+    {
+        return $this->IsProspect;
+    }
+
+    public function setIsProspect(bool $IsProspect): self
+    {
+        $this->IsProspect = $IsProspect;
+
+        return $this;
+    }
+
+    public function getDenomination(): ?string
+    {
+        return $this->Denomination;
+    }
+
+    public function setDenomination(?string $Denomination): self
+    {
+        $this->Denomination = $Denomination;
+
+        return $this;
+    }
+
+    public function getFirstName(): ?string
+    {
+        return $this->FirstName;
+    }
+
+    public function setFirstName(string $FirstName): self
+    {
+        $this->FirstName = $FirstName;
+
+        return $this;
+    }
+
+    public function getLastName(): ?string
+    {
+        return $this->LastName;
+    }
+
+    public function setLastName(string $LastName): self
+    {
+        $this->LastName = $LastName;
+
+        return $this;
+    }
+    public function getEmail(): ?string
+    {
+        return $this->Email;
+    }
+
+    public function setEmail(string $Email): self
+    {
+        $this->Email = $Email;
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->Phone;
+    }
+
+    public function setPhone(?string $Phone): self
+    {
+        $this->Phone = $Phone;
+
+        return $this;
+    }
+
+    public function getFax(): ?string
+    {
+        return $this->Fax;
+    }
+
+    public function setFax(?string $Fax): self
+    {
+        $this->Fax = $Fax;
+
+        return $this;
+    }
+
+    public function getAddressName(): ?string
+    {
+        return $this->AddressName;
+    }
+
+    public function setAddressName(string $AddressName): self
+    {
+        $this->AddressName = $AddressName;
+
+        return $this;
+    }
+
+    public function getCity(): ?string
+    {
+        return $this->City;
+    }
+
+    public function setCity(string $City): self
+    {
+        $this->City = $City;
+
+        return $this;
+    }
+
+    public function getStreet(): ?string
+    {
+        return $this->Street;
+    }
+
+    public function setStreet(string $Street): self
+    {
+        $this->Street = $Street;
+
+        return $this;
+    }
+
+    public function getZipCode(): ?string
+    {
+        return $this->ZipCode;
+    }
+
+    public function setZipCode(string $ZipCode): self
+    {
+        $this->ZipCode = $ZipCode;
+
+        return $this;
+    }
+
+    public function getCountry(): ?string
+    {
+        return $this->Country;
+    }
+
+    public function setCountry(string $Country): self
+    {
+        $this->Country = $Country;
+
+        return $this;
+    }
+
+    public function getAddressComment(): ?string
+    {
+        return $this->AddressComment;
+    }
+
+    public function setAddressComment(?string $Comment): self
+    {
+        $this->AddressComment= $Comment;
+
+        return $this;
+    }
+
+    public function getClientComment(): ?string
+    {
+        return $this->ClientComment;
+    }
+
+    public function setClientComment(?string $Comment): self
+    {
+        $this->ClientComment= $Comment;
+
+        return $this;
+    }
+
+    public function getComment(): ?Comment
+    {
+        return $this->Comment;
+    }
+
+    public function setComment(?Comment $Comment): self
+    {
+        $this->Comment = $Comment;
+
+        return $this;
+    }
+
 }

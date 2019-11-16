@@ -24,19 +24,19 @@ class Role
     private $Name;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Action", inversedBy="roles")
-     */
-    private $Actions;
-
-    /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Agent", mappedBy="Roles")
      */
     private $agents;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\ActionRole", mappedBy="Role")
+     */
+    private $actionRoles;
+
     public function __construct()
     {
-        $this->Actions = new ArrayCollection();
         $this->agents = new ArrayCollection();
+        $this->actionRoles = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -52,32 +52,6 @@ class Role
     public function setName(string $Name): self
     {
         $this->Name = $Name;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Action[]
-     */
-    public function getActions(): Collection
-    {
-        return $this->Actions;
-    }
-
-    public function addActions(Action $Actions): self
-    {
-        if (!$this->Actions->contains($Actions)) {
-            $this->Actions[] = $Actions;
-        }
-
-        return $this;
-    }
-
-    public function removeActions(Action $Actions): self
-    {
-        if ($this->Actions->contains($Actions)) {
-            $this->Actions->removeElement($Actions);
-        }
 
         return $this;
     }
@@ -105,6 +79,37 @@ class Role
         if ($this->agents->contains($agent)) {
             $this->agents->removeElement($agent);
             $agent->removeRole($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ActionRole[]
+     */
+    public function getActionRoles(): Collection
+    {
+        return $this->actionRoles;
+    }
+
+    public function addActionRole(ActionRole $actionRole): self
+    {
+        if (!$this->actionRoles->contains($actionRole)) {
+            $this->actionRoles[] = $actionRole;
+            $actionRole->setRole($this);
+        }
+
+        return $this;
+    }
+
+    public function removeActionRole(ActionRole $actionRole): self
+    {
+        if ($this->actionRoles->contains($actionRole)) {
+            $this->actionRoles->removeElement($actionRole);
+            // set the owning side to null (unless already changed)
+            if ($actionRole->getRole() === $this) {
+                $actionRole->setRole(null);
+            }
         }
 
         return $this;

@@ -1,0 +1,18 @@
+td.details-control {
+  cursor: pointer;
+}
+
+td.details-control:before {
+  content: "\f49e";
+  position: relative;
+  top: 14;
+  left: 10px;
+}
+
+tr.details td.details-control:before {
+  content: "\f07c";
+  position: relative;
+  top: 0;
+  left: 10px;
+}
+/*# sourceMappingURL=base.css.map */

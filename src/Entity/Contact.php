@@ -2,9 +2,11 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Groups;
+use Doctrine\Common\Collections\Collection;
+use JMS\Serializer\Annotation\SerializedName;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ContactRepository")
@@ -15,67 +17,138 @@ class Contact
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"class_property"})
+     * @SerializedName("id")
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Client", inversedBy="contacts")
+     * @Groups({"relation_property"})
      */
     private $Client;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"class_property"})
+     * @SerializedName("FirstName")
      */
     private $Firstname;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"class_property"})
+     * @SerializedName("LastName")
      */
     private $LastName;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("Position")
      */
     private $Position;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"class_property"})
+     * @SerializedName("Email")
      */
     private $Email;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("Phone")
      */
     private $Phone;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("Mobile")
      */
     private $Mobile;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("Fax")
      */
     private $Fax;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Comment", cascade={"persist", "remove"})
+     * @Groups({"relation_property"})
      */
     private $Comment;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Provider", inversedBy="Contact")
+     * @Groups({"relation_property"})
      */
     private $provider;
 
+
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Address", mappedBy="contact")
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("IsPrincipal")
+     */
+    private $IsPrincipal;
+
+
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("ContentComment")
+     * */
+    private $ContentComment;
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("City")     * 
+     * */
+    private $City;
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("Street")     * 
+     * */
+    private $Street;
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("ZipCode")     * 
+     * */
+    private $ZipCode;
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("Country")     * 
+     * */
+    private $Country;
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("AddressComment")     * 
+     * */
+    private $AddressComment;
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("AddressName")     * 
+     * */
+    private $AddressName;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Address", cascade={"persist", "remove"})
+     * @Groups({"relation_property"})
      */
     private $Address;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\QuoteOrder", mappedBy="Contact")
+     */
+    private $quoteOrders;
+
+
     public function __construct()
     {
-        $this->Address = new ArrayCollection();
+        $this->quoteOrders = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -203,31 +276,139 @@ class Contact
         return $this;
     }
 
-    /**
-     * @return Collection|Address[]
-     */
-    public function getAddress(): Collection
+    public function getIsPrincipal(): ?bool
+    {
+        return $this->IsPrincipal;
+    }
+
+    public function setIsPrincipal(?bool $IsPrincipal): self
+    {
+        $this->IsPrincipal = $IsPrincipal;
+
+        return $this;
+    }
+
+    public function getAddress(): ?Address
     {
         return $this->Address;
     }
 
-    public function addAddress(Address $address): self
+    public function setAddress(?Address $Address): self
     {
-        if (!$this->Address->contains($address)) {
-            $this->Address[] = $address;
-            $address->setContact($this);
+        $this->Address = $Address;
+
+        return $this;
+    }
+
+    public function getContentComment(): ?string
+    {
+        return $this->ContentComment;
+    }
+
+    public function setContentComment(?string $ContentComment): self
+    {
+        $this->ContentComment = $ContentComment;
+
+        return $this;
+    }
+
+    public function getAddressName(): ?string
+    {
+        return $this->AddressName;
+    }
+
+    public function setAddressName(string $AddressName): self
+    {
+        $this->AddressName = $AddressName;
+
+        return $this;
+    }
+
+    public function getCity(): ?string
+    {
+        return $this->City;
+    }
+
+    public function setCity(string $City): self
+    {
+        $this->City = $City;
+
+        return $this;
+    }
+
+    public function getStreet(): ?string
+    {
+        return $this->Street;
+    }
+
+    public function setStreet(string $Street): self
+    {
+        $this->Street = $Street;
+
+        return $this;
+    }
+
+    public function getZipCode(): ?string
+    {
+        return $this->ZipCode;
+    }
+
+    public function setZipCode(string $ZipCode): self
+    {
+        $this->ZipCode = $ZipCode;
+
+        return $this;
+    }
+
+    public function getCountry(): ?string
+    {
+        return $this->Country;
+    }
+
+    public function setCountry(string $Country): self
+    {
+        $this->Country = $Country;
+
+        return $this;
+    }
+
+    public function getAddressComment(): ?string
+    {
+        return $this->AddressComment;
+    }
+
+    public function setAddressComment(?string $Comment): self
+    {
+        $this->AddressComment= $Comment;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|QuoteOrder[]
+     */
+    public function getQuoteOrders(): Collection
+    {
+        return $this->quoteOrders;
+    }
+
+    public function addQuoteOrder(QuoteOrder $quoteOrder): self
+    {
+        if (!$this->quoteOrders->contains($quoteOrder)) {
+            $this->quoteOrders[] = $quoteOrder;
+            $quoteOrder->setContact($this);
         }
 
         return $this;
     }
 
-    public function removeAddress(Address $address): self
+    public function removeQuoteOrder(QuoteOrder $quoteOrder): self
     {
-        if ($this->Address->contains($address)) {
-            $this->Address->removeElement($address);
+        if ($this->quoteOrders->contains($quoteOrder)) {
+            $this->quoteOrders->removeElement($quoteOrder);
             // set the owning side to null (unless already changed)
-            if ($address->getContact() === $this) {
-                $address->setContact(null);
+            if ($quoteOrder->getContact() === $this) {
+                $quoteOrder->setContact(null);
             }
         }
 

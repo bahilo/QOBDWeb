@@ -8,7 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class StatisticController extends Controller
 {
     /**
-     * @Route("/statistic", name="statistic")
+     * @Route("/admin/statistic", name="statistic")
      */
     public function index()
     {

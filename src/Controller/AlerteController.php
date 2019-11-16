@@ -8,7 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class AlerteController extends Controller
 {
     /**
-     * @Route("/alerte", name="alerte")
+     * @Route("/admin/alerte", name="alerte")
      */
     public function index()
     {

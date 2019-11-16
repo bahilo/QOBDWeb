@@ -1,0 +1,36 @@
+{% extends 'template_coreui.html.twig' %}
+
+{% block title %}Configuration de la Tax{% endblock %}
+
+{% block stylesheets %}
+
+{% endblock %}
+
+{% block body %}
+
+<div class="brand-wrapper">
+
+    <div class="container">
+        <h1>Création de la Tax !</h1>
+
+        {{ form_start(formTax) }}
+
+
+        {{ form_row(formTax.Type,{'label': 'désignation de la Tax', 'attr': {'placeholder': 'désignation de la Tax'}})
+        }}
+        {{ form_row(formTax.Value,{'label': 'Valeur', 'attr': {'placeholder': 'Valeur'}}) }}
+        {{ form_row(formTax.CommentContent,{'label': 'Commentiare', 'attr': {'placeholder': 'Commentaire'}}) }}
+        {{ form_row(formTax.IsCurrent, {'label': 'sélectionner cette tax'}) }}
+        {{ form_row(formTax.IsTVAMarge, {'label': 'TVA/Marge'}) }}
+
+        <button type="submit" class="btn btn-success">Ajouter la tax</button>
+
+        {{ form_end(formTax) }}
+    </div>
+
+</div>
+
+{% endblock %}
+{% block javascripts %}
+<!-- <script src="{#{  asset('client.js','qobd_web_js') }#}"></script> -->
+{% endblock %}

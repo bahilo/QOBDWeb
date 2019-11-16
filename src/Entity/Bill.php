@@ -49,11 +49,6 @@ class Bill
     private $Client;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\QuoteOrder", inversedBy="bills")
-     */
-    private $Order_;
-
-    /**
      * @ORM\Column(type="datetime")
      */
     private $CreatedAt;
@@ -83,10 +78,16 @@ class Bill
      */
     private $incomeStatistic;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\QuoteOrderDetail", mappedBy="Bill")
+     */
+    private $quoteOrderDetails;
+
     public function __construct()
     {
         $this->Client = new ArrayCollection();
         $this->alerts = new ArrayCollection();
+        $this->quoteOrderDetails = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -185,18 +186,6 @@ class Bill
         return $this;
     }
 
-    public function getOrder(): ?QuoteOrder
-    {
-        return $this->Order_;
-    }
-
-    public function setOrder(?QuoteOrder $Order_): self
-    {
-        $this->Order_ = $Order_;
-
-        return $this;
-    }
-
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->CreatedAt;
@@ -281,6 +270,37 @@ class Bill
     public function setIncomeStatistic(?IncomeStatistic $incomeStatistic): self
     {
         $this->incomeStatistic = $incomeStatistic;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|QuoteOrderDetail[]
+     */
+    public function getQuoteOrderDetails(): Collection
+    {
+        return $this->quoteOrderDetails;
+    }
+
+    public function addQuoteOrderDetail(QuoteOrderDetail $quoteOrderDetail): self
+    {
+        if (!$this->quoteOrderDetails->contains($quoteOrderDetail)) {
+            $this->quoteOrderDetails[] = $quoteOrderDetail;
+            $quoteOrderDetail->setBill($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQuoteOrderDetail(QuoteOrderDetail $quoteOrderDetail): self
+    {
+        if ($this->quoteOrderDetails->contains($quoteOrderDetail)) {
+            $this->quoteOrderDetails->removeElement($quoteOrderDetail);
+            // set the owning side to null (unless already changed)
+            if ($quoteOrderDetail->getBill() === $this) {
+                $quoteOrderDetail->setBill(null);
+            }
+        }
 
         return $this;
     }

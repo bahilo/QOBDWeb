@@ -8,7 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class ChatRoomController extends Controller
 {
     /**
-     * @Route("/chat/room", name="chat_room")
+     * @Route("/admin/chat/room", name="chat_room")
      */
     public function index()
     {

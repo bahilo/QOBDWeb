@@ -6,6 +6,8 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "friendsofsymfony/jsrouting-bundle": "^2.4",
+        "jms/serializer-bundle": "^3.4",
+        "linq/php-linq": "^1.0",
         "noiselabs/nusoap-bundle": "^0.2.2",
         "sensio/framework-extra-bundle": "^5.1",
         "symfony/apache-pack": "^1.0",

@@ -1,0 +1,42 @@
+{% extends 'template_coreui.html.twig' %}
+
+{% block title %}Nouvel Agent{% endblock %}
+
+{% block stylesheets %} 
+    <link rel="stylesheet" href="{{ asset('agent.css', 'qobd_web_css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <div class="agent-wrapper">
+        
+        <div class="container">
+            <h1>Création d'un Agent !</h1>
+
+            {{ form_start(formAgent) }}
+
+            
+            {{ form_row(formAgent.FirstName,{'label': 'Prénom','attr': {'placeholder': 'Prénom'}}) }}
+            {{ form_row(formAgent.LastName,{'label': 'Nom','attr': {'placeholder': 'Nom'}}) }}
+            {{ form_row(formAgent.Email,{'label': 'Email','attr': {'placeholder': 'Email...'}}) }}
+            {{ form_row(formAgent.UserName,{'label': 'Pseudo','attr': {'placeholder': 'Pseudo'}}) }}
+            {{ form_row(formAgent.Phone,{'label': 'Numéro de téléphone','attr': {'placeholder': 'Numéro de téléphone'}}) }}
+            {{ form_row(formAgent.Fax,{'label': 'Fax','attr': {'placeholder': 'Fax'}}) }}
+            {{ form_row(formAgent.PlainTextPassword,{'label': 'Mot de passe','attr': {'placeholder': 'mot de passe'}}) }}
+            {{ form_row(formAgent.Confirme_password,{'label': 'Confirmation du mot de passe','attr': {'placeholder': 'Veuillez répéter le mot de passe'}}) }}
+            {{ form_row(formAgent.Picture,{'label': 'Avatar', 'attr': {'placeholder': 'Avatar'}}) }}
+            {{ form_row(formAgent.ListSize,{'label': 'Taille par defaut des listes', 'attr': {'placeholder': 'Taille par defaut des listes'}}) }}
+            {{ form_row(formAgent.IsActivated) }}
+
+            <input type="file" name="photo" id="">
+            <button type="submit" class="btn btn-success">Ajouter l'agent</button>
+
+            {{ form_end(formAgent) }}
+        </div>
+
+    </div>
+
+{% endblock %}
+{% block javascripts %} 
+    <script src="{{  asset('agent.js','qobd_web_js') }}"></script>
+{% endblock %}

@@ -54,24 +54,18 @@ class Address
     private $Comment;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Client", inversedBy="Addresses")
-     */
-    private $client;
-
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Delivery", mappedBy="Address")
-     */
-    private $deliveries;
-
-    /**
      * @ORM\OneToMany(targetEntity="App\Entity\Bill", mappedBy="Address")
      */
     private $bills;
+    
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Contact", inversedBy="Address")
+     * @ORM\Column(type="boolean", nullable=true)
      */
-    private $contact;
+    private $IsPrincipal;
+
+    private $ContentComment;
+
 
     public function __construct()
     {
@@ -168,49 +162,6 @@ class Address
         return $this;
     }
 
-    public function getClient(): ?Client
-    {
-        return $this->client;
-    }
-
-    public function setClient(?Client $client): self
-    {
-        $this->client = $client;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Delivery[]
-     */
-    public function getDeliveries(): Collection
-    {
-        return $this->deliveries;
-    }
-
-    public function addDelivery(Delivery $delivery): self
-    {
-        if (!$this->deliveries->contains($delivery)) {
-            $this->deliveries[] = $delivery;
-            $delivery->setAddress($this);
-        }
-
-        return $this;
-    }
-
-    public function removeDelivery(Delivery $delivery): self
-    {
-        if ($this->deliveries->contains($delivery)) {
-            $this->deliveries->removeElement($delivery);
-            // set the owning side to null (unless already changed)
-            if ($delivery->getAddress() === $this) {
-                $delivery->setAddress(null);
-            }
-        }
-
-        return $this;
-    }
-
     /**
      * @return Collection|Bill[]
      */
@@ -242,14 +193,26 @@ class Address
         return $this;
     }
 
-    public function getContact(): ?Contact
+    public function getIsPrincipal(): ?bool
     {
-        return $this->contact;
+        return $this->IsPrincipal;
     }
 
-    public function setContact(?Contact $contact): self
+    public function setIsPrincipal(?bool $IsPrincipal): self
     {
-        $this->contact = $contact;
+        $this->IsPrincipal = $IsPrincipal;
+
+        return $this;
+    }
+
+    public function getContentComment(): ?string
+    {
+        return $this->ContentComment;
+    }
+
+    public function setContentComment(?string $ContentComment): self
+    {
+        $this->ContentComment = $ContentComment;
 
         return $this;
     }

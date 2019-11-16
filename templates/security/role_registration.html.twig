@@ -1,0 +1,27 @@
+{% extends 'template_coreui.html.twig' %}
+
+{% block title %}Hello HomeController!{% endblock %}
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+</style>
+
+<div class="agent-wrapper">
+        
+    <div class="container">
+        <h1>Création d'une role !</h1>
+
+        {{ form_start(formRole) }}
+
+        
+        {{ form_row(formRole.Name,{'label': 'Nom','attr': {'placeholder': 'Nom'}}) }}
+        
+        <button type="submit" class="btn btn-success">Ajouter l'agent</button>
+
+        {{ form_end(formRole) }}
+    </div>
+
+</div>
+{% endblock %}

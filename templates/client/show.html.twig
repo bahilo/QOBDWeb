@@ -1,0 +1,26 @@
+{% extends 'template_coreui.html.twig' %}
+
+{% block title %}page détail du client{% endblock %}
+
+{% block stylesheets %}
+
+{% endblock %}
+
+{% block body %}
+
+<div class="client-wrapper">
+
+    <h1>page detail client !</h1>
+    
+    <a href="{{ path("client_contact_registration", {idClient: client.id }) }}" class="btn btn-success">nouveau contact</a>
+
+    <table id="contact_table_js" style="width:100%">
+    </table>
+    <input type="hidden" id="contact_data_source" value="{{ contact_data_source }}">
+
+</div>
+
+{% endblock %}
+{% block javascripts %}
+<script src="{{  asset('client.js','qobd_web_js') }}"></script>
+{% endblock %}

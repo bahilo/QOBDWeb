@@ -10,14 +10,34 @@
         {% block stylesheets %} {% endblock %}
     </head>
     <body>
-        {% block body %}{% endblock %}
-            <script src="{{ asset('jquery-3.4.1.js','qobd_web_js') }}"></script>
-            <script src="{{ asset('bootstrap.js','bootstrap_js') }}"></script>
-            <script src="{{ asset('datatables.min.js','datatable_dir') }}"></script>
-            <script src="{{ asset('all.min.js','font_awsome_js') }}"></script>
-            <script src="{{ asset('bundles/fosjsrouting/js/router.min.js') }}"></script>
-            <script src="{{ asset('fos_js_routes.js','qobd_web_js') }}"></script>
-            <!-- <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>-->
+
+        <div class="container">
+            {% block body %}{% endblock %}
+
+            <template id="cart_btn">
+                <div class="input-group">
+                    <input type="text" data-id="$(cart_item_id)" name="cart_quantity_js" class="form-control cart-quantity" placeholder="Input group example" 
+                    aria-label="Input group example" aria-describedby="btnGroupAddon" value="$(cart_default_value)">
+                    <div class="input-group-append">
+                        <a href="$(cart_route)" data-id="$(cart_item_id)" class="cart_add_js"><div class="input-group-text"><i class="fa fa-cart-plus"></i></div></a>
+                    </div>
+                </div>
+            </template>
+
+        </div>
+
+        <script src="{{ asset('jquery-3.4.1.js','qobd_web_js') }}"></script>
+        <script src="{{ asset('bootstrap.js','bootstrap_js') }}"></script>
+        <script src="{{ asset('datatables.min.js','datatable_dir') }}"></script>
+        <script src="{{ asset('all.min.js','font_awsome_js') }}"></script>
+        <script src="{{ asset('lodash.min.js','qobd_web_js') }}"></script>
+        <script src="{{ asset('bundles/fosjsrouting/js/router.min.js') }}"></script>
+        <script src="{{ asset('fos_js_routes.js','qobd_web_js') }}"></script>
+        <script src="{{ asset('render_methods.js','qobd_web_js') }}"></script>
+        <script src="{{ asset('data_table.js','qobd_web_js') }}"></script>
+        <!-- <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>-->
+        
         {% block javascripts %} {% endblock %}
+
     </body>
 </html>

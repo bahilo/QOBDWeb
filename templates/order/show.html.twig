@@ -1,0 +1,294 @@
+{% extends 'template_coreui.html.twig' %}
+
+{% set target = {link: "", param: {id: 0, idStatus: 0 }} %}
+{% set page_title = "Détail Commande n° #" ~ order.id %}
+
+{% if status_preorder is defined %}
+{% set target = { link: "order_validation", param: [{id: order.id, idStatus: status_preorder.id}, {id: order.id, idStatus: status_prerefund.id}]} %}
+{% set page_title = "Détail Devis n° #" ~ order.id %}
+{% elseif status_order is defined %}
+{% set target = { link: "order_validation", param: [{id: order.id, idStatus: status_order.id}, {id: order.id, idStatus: status_valid.id}]} %}
+{% endif %}
+
+{% block title %} {{ page_title }} {% endblock %}
+
+{% block home_path %}
+<li class="breadcrumb-item">
+    <a href="#">Commande</a>
+</li>
+<li class="breadcrumb-item">
+    {{ page_title }}
+</li>
+{% endblock %}
+
+{% block body %}
+
+
+<div class="order-detail-wrapper">
+    <form name="order_detail_form" action="{{ path("order_detail_save", {id: order.id}) }}" method="POST">
+        <input type="hidden" name="order" value="{{ order.id }}">
+
+        
+
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active">
+                {% if status_preorder is defined %}
+                <a href="{{ path(target.link, target.param[0]) }}" class="btn btn-success">Convertir en commande</a>
+                <a href="{{ path(target.link, target.param[1]) }}" class="btn btn-danger">Convertir en avoir</a>
+                {% endif %}
+                
+                {% if status_order is defined %}
+                <a href="{{ path(target.link, target.param[0]) }}" class="btn btn-success">Convertir
+                    en commande</a>
+                <a href="{{ path(target.link, target.param[1]) }}" class="btn btn-warning">Re-valider avec le client</a>
+                {% endif %}
+            </li>
+            <!-- Breadcrumb Menu-->
+            <li class="breadcrumb-menu d-md-down-none">
+                <div class="btn-group" role="group" aria-label="Button group">
+                    <a class="btn" href="#">
+                        <i class="icon-speech"></i>
+                    </a>
+                    <input type="submit" class="fa fa-save" style="color: #20a8d8">
+                </div>
+            </li>
+        </ol>
+
+        <div class="animated fadeIn">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fa fa-align-justify"></i> Liste des produits et tarifs</div>
+                        <div class="card-body">
+                            <table id="order_detail_table_js" class="table table-responsive-md table-bordered table-striped table-md">
+                            </table>
+                            <nav>
+                                <ul class="pagination">
+                                    <li class="page-item">
+                                        <a class="page-link" href="#">Prev</a>
+                                    </li>
+                                    <li class="page-item active">
+                                        <a class="page-link" href="#">1</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#">2</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#">3</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#">4</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#">Next</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.col-->
+            </div>
+            
+            <div class="row">
+                <div class="col-sm-6 col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fa fa-align-justify"></i> commentaire(interne) 
+                        </div>
+                        <div class="card-body">
+                            <textarea name="order_detail_form[commentaire][prive]" id="" cols="30" rows="10">{{ order.PrivateComment.Content| default("") }}</textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-4">
+                    <div class="card border-danger">
+                        <div class="card-header">
+                            <i class="fa fa-align-justify"></i> commentaire visible par le client
+                        </div>
+                        <div class="card-body">
+                            <textarea name="order_detail_form[commentaire][public]" id="" cols="30" rows="10">{{ order.PublicComment.Content| default("") }}</textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fa fa-align-justify"></i> commentaire admin
+                        </div>
+                        <div class="card-body">
+                            <textarea name="order_detail_form[commentaire][admin]" id="" style="width: 100%" rows="10">{{ order.AdminComment.Content | default("") }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fa fa-align-justify"></i> Adresse de livraison
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <select name="order_detail_form[contact]" class="form-control">
+                                        {% for contact in order.Client.Contacts %}
+                                            {% if order.contact and contact.id == order.contact.id %}
+                                            <option value="{{ contact.id }}" selected>{{ contact.Firstname ~ " " ~ contact.LastName }}</option>
+                                            {% else %}
+                                            <option value="{{ contact.id }}">{{ contact.Firstname ~ " " ~ contact.LastName }}</option>
+                                            {% endif %}    
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="addres-wrapper">adresse deja enregistrée</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fa fa-align-justify"></i> settings
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input type="radio" name="order_detail_form[setting][devis][type]" id="rbDevis" value="devis" class="form-check-input">
+                                        <label for="rbDevis" class="orm-check-label">Devis</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="radio" name="order_detail_form[setting][devis][type]" id="rbProformat" value="proformat" class="form-check-input">
+                                        <label for="rbProformat" class="orm-check-label">Proformat</label>
+                                    </div>
+                                   <div class="form-check">
+                                        <input type="checkbox" name="order_detail_form[setting][devis][ref_visible]" id="chkRef" class="form-check-input">
+                                        <label for="chkRef" class="form-check-label">Référence visible sur le devis</label>
+                                    </div>                                
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="inptDuree">Duree de validité du devis</label>
+                                        <input type="number" name="order_detail_form[setting][devis][duree]" id="inptDuree" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>            
+        </form> 
+        <form action="" method="post">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fa fa-align-justify"></i> Création d'un bon de livraison
+                        </div>
+                        <div class="card-body">
+                            <table id="order_detail_delivery_table_js" class="table table-responsive-md table-bordered table-striped table-md">
+                            </table>
+                            <div class="form-group">
+                                <label for="order_detail_form[delivery][package]" class="">Nombre de colis</label>
+                                <input type="text" name="order_detail_form[delivery][package]" id="order_detail_form[delivery][package]" class="form-control">
+                            </div>
+                            <input type="submit" class="btn btn-danger" value="Etape: 1/3 Emettre un bon de livraison">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa fa-align-justify"></i> Création des factures
+                    </div>
+                    <div class="card-body">
+                        <table id="order_detail_bill_table_js"
+                            class="table table-responsive-md table-bordered table-striped table-md">
+                        </table>
+                        <div class="form-group">
+                            <label for="selectDeliveries" class="">Inclure dans la facture les BL suivants</label>
+                            <select name="order_detail_form[bill][delivery]" 
+                                id="selectDeliveries" class="form-control" multiple>
+                                <!-- {#% for delivery in deliveries %}
+                                    <option value="{{ delivery.id }}"> {{ delivery.id }}</option>
+                                {% endfor %#} -->
+                            </select>
+                        </div>
+                        <input type="submit" class="btn btn-warning" value="Etape 2/3 Création de la facture">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa fa-align-justify"></i> Bon(s) de livraison émis
+                    </div>
+                    <div class="card-body">
+                        <table id="delivery_table_js"
+                            class="table table-responsive-md table-bordered table-striped table-md">
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa fa-align-justify"></i> Factures émises
+                    </div>
+                    <div class="card-body">
+                        <table id="bill_table_js" class="table table-responsive-md table-bordered table-striped table-md">
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if status_preorder is defined %}
+        <form action="" method="post">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fa fa-align-justify"></i> Email
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+            
+                                    <div class="form-group">
+                                        <label for="emailSubject">Object</label>
+                                        <input type="text" name="order_detail_form[setting][email][subject]" id="emailSubject"
+                                            class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="emailBody">Message</label>
+                                        <textarea name="order_detail_form[setting][email][body]" id="" cols="30" rows="10"
+                                            class="form-control"></textarea>
+                                    </div>
+                                    <input type="submit" value="Envoyer" class="btn btn-danger">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+<input type="hidden" id="order_detail_data_source" value="{{ order_detail_data_source }}">
+{% endblock %}
+{% block javascripts %}
+<script src="{{  asset('order.js','qobd_web_js') }}"></script>
+{% endblock %}

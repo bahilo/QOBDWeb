@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -47,14 +49,14 @@ class Privilege
     private $CreatedAt;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Role", inversedBy="privilege", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity="App\Entity\ActionRole", mappedBy="Privilege")
      */
-    private $Role;
+    private $actionRoles;
 
-    /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Action", inversedBy="privilege", cascade={"persist", "remove"})
-     */
-    private $Action;
+    public function __construct()
+    {
+        $this->actionRoles = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -133,26 +135,33 @@ class Privilege
         return $this;
     }
 
-    public function getRole(): ?Role
+    /**
+     * @return Collection|ActionRole[]
+     */
+    public function getActionRoles(): Collection
     {
-        return $this->Role;
+        return $this->actionRoles;
     }
 
-    public function setRole(?Role $Role): self
+    public function addActionRole(ActionRole $actionRole): self
     {
-        $this->Role = $Role;
+        if (!$this->actionRoles->contains($actionRole)) {
+            $this->actionRoles[] = $actionRole;
+            $actionRole->setPrivilege($this);
+        }
 
         return $this;
     }
 
-    public function getAction(): ?Action
+    public function removeActionRole(ActionRole $actionRole): self
     {
-        return $this->Action;
-    }
-
-    public function setAction(?Action $Action): self
-    {
-        $this->Action = $Action;
+        if ($this->actionRoles->contains($actionRole)) {
+            $this->actionRoles->removeElement($actionRole);
+            // set the owning side to null (unless already changed)
+            if ($actionRole->getPrivilege() === $this) {
+                $actionRole->setPrivilege(null);
+            }
+        }
 
         return $this;
     }

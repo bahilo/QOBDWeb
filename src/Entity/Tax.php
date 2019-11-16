@@ -44,11 +44,6 @@ class Tax
     private $CreateAt;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\QuoteOrder", mappedBy="Tax")
-     */
-    private $orders;
-
-    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\IncomeStatistic", inversedBy="Tax")
      */
     private $incomeStatistic;
@@ -58,10 +53,24 @@ class Tax
      */
     private $items;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\QuoteOrderDetail", mappedBy="Tax")
+     */
+    private $quoteOrderDetails;
+
+
+    private $CommentContent;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $IsTVAMarge;
+
+
     public function __construct()
     {
-        $this->orders = new ArrayCollection();
         $this->items = new ArrayCollection();
+        $this->quoteOrderDetails = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -129,37 +138,6 @@ class Tax
         return $this;
     }
 
-    /**
-     * @return Collection|QuoteOrder[]
-     */
-    public function getOrders(): Collection
-    {
-        return $this->orders;
-    }
-
-    public function addOrder(QuoteOrder $order): self
-    {
-        if (!$this->orders->contains($order)) {
-            $this->orders[] = $order;
-            $order->setTax($this);
-        }
-
-        return $this;
-    }
-
-    public function removeOrder(QuoteOrder $order): self
-    {
-        if ($this->orders->contains($order)) {
-            $this->orders->removeElement($order);
-            // set the owning side to null (unless already changed)
-            if ($order->getTax() === $this) {
-                $order->setTax(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getIncomeStatistic(): ?IncomeStatistic
     {
         return $this->incomeStatistic;
@@ -199,6 +177,62 @@ class Tax
                 $item->setTax(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|QuoteOrderDetail[]
+     */
+    public function getQuoteOrderDetails(): Collection
+    {
+        return $this->quoteOrderDetails;
+    }
+
+    public function addQuoteOrderDetail(QuoteOrderDetail $quoteOrderDetail): self
+    {
+        if (!$this->quoteOrderDetails->contains($quoteOrderDetail)) {
+            $this->quoteOrderDetails[] = $quoteOrderDetail;
+            $quoteOrderDetail->setTax($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQuoteOrderDetail(QuoteOrderDetail $quoteOrderDetail): self
+    {
+        if ($this->quoteOrderDetails->contains($quoteOrderDetail)) {
+            $this->quoteOrderDetails->removeElement($quoteOrderDetail);
+            // set the owning side to null (unless already changed)
+            if ($quoteOrderDetail->getTax() === $this) {
+                $quoteOrderDetail->setTax(null);
+            }
+        }
+
+        return $this;
+    }
+   
+
+    public function getCommentContent(): ?string
+    {
+        return $this->CommentContent;
+    }
+
+    public function setCommentContent(?string $CommentContent): self
+    {
+        $this->CommentContent = $CommentContent;
+
+        return $this;
+    }
+
+    public function getIsTVAMarge(): ?bool
+    {
+        return $this->IsTVAMarge;
+    }
+
+    public function setIsTVAMarge(bool $IsTVAMarge): self
+    {
+        $this->IsTVAMarge = $IsTVAMarge;
 
         return $this;
     }

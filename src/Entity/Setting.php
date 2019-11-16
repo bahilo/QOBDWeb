@@ -26,6 +26,11 @@ class Setting
      */
     private $Value;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $Code;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -51,6 +56,18 @@ class Setting
     public function setValue(?string $Value): self
     {
         $this->Value = $Value;
+
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->Code;
+    }
+
+    public function setCode(string $Code): self
+    {
+        $this->Code = $Code;
 
         return $this;
     }

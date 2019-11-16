@@ -1,0 +1,35 @@
+{% extends 'template_coreui.html.twig' %}
+
+{% block title %}Configuration{% endblock %}
+
+{% block stylesheets %}
+
+{% endblock %}
+
+{% block body %}
+
+<div class="brand-wrapper">
+
+    <div>
+        <h1>Création de la configuration !</h1>
+
+        {{ form_start(formSetting) }}
+
+
+        {{ form_row(formSetting.Name,{'label': 'désignation de la config', 'attr': {'placeholder': 'désignation de la config'}})
+        }}
+        {{ form_row(formSetting.Value,{'label': 'Valeur', 'attr': {'placeholder': 'Valeur'}}) }}
+        {{ form_row(formSetting.Code,{'label': 'Catégorie', 'attr': {'placeholder': 'Catégorie'}}) }}
+
+        <button type="submit" class="btn btn-success">Ajouter la monnaie</button>
+
+        {{ form_end(formSetting) }}
+    </div>
+   
+
+</div>
+
+{% endblock %}
+{% block javascripts %}
+<!-- <script src="{#{  asset('client.js','qobd_web_js') }#}"></script> -->
+{% endblock %}

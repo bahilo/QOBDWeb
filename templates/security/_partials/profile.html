@@ -1,0 +1,172 @@
+<form action="{{ path('security_action_role') }}" method="POST">
+    <div class="form-group">
+        <table class="table">
+            <tr>
+                <th scope="col">Roles</th>
+                <th scope="col">Actions</th>
+                <th scope="col">IsRead</th>
+                <th scope="col">IsWrite</th>
+                <th scope="col">IsUpdate</th>
+                <th scope="col">IsDelete</th>
+                <th scope="col">IsSendEmail</th>
+            </tr>
+            {% for role in roles %}
+
+            {% for action in actions %}
+
+            <tr>
+                <td>{{ role.Name }}</td>
+                <td>{{ action.DisplayName }}</td>
+
+                <!-- IsRead -->
+
+                {% if action_roles | length > 0 %}
+                <td>
+                    <input type="hidden" name="privilege[{{ role.id }}][{{ action.id }}][IsRead]" />
+                    {% set bDisplayed = false %}
+                    {% for action_role in action_roles if action_role.role != null and action_role.role.id == role.id and action_role.action != null and action_role.action.id ==
+                    action.id %}
+
+                    {% if bDisplayed == false and action_role.privilege != null and action_role.privilege.IsRead %}
+                    {% set bDisplayed = true %}
+                    <input type="checkbox" class="form-control" name="privilege[{{ role.id }}][{{ action.id }}][IsRead]"
+                        checked />
+                    {% endif %}
+
+                    {% endfor %}
+                    {% if bDisplayed == false %}
+                    <input type="checkbox" class="form-control"
+                        name="privilege[{{ role.id }}][{{ action.id }}][IsRead]" />
+                    {% endif %}
+                </td>
+                {% else %}
+                <td>
+                    <input type="hidden" name="privilege[{{ role.id }}][{{ action.id }}][IsRead]" />
+                    <input type="checkbox" class="form-control"
+                        name="privilege[{{ role.id }}][{{ action.id }}][IsRead]" />
+                </td>
+                {% endif %}
+
+                <!-- IsWrite -->
+
+                {% if action_roles | length > 0 %}
+                <td>
+                    <input type="hidden" name="privilege[{{ role.id }}][{{ action.id }}][IsWrite]" />
+                    {% set bDisplayed = false %}
+                    {% for action_role in action_roles if action_role.role != null and action_role.role.id == role.id and action_role.action != null and action_role.action.id
+                    == action.id %}
+
+                    {% if bDisplayed == false and action_role.privilege != null and action_role.privilege.IsWrite %}
+                    {% set bDisplayed = true %}
+                    <input type="checkbox" class="form-control"
+                        name="privilege[{{ role.id }}][{{ action.id }}][IsWrite]" checked />
+                    {% endif %}
+
+                    {% endfor %}
+                    {% if bDisplayed == false %}
+                    <input type="checkbox" class="form-control"
+                        name="privilege[{{ role.id }}][{{ action.id }}][IsWrite]" />
+                    {% endif %}
+                </td>
+                {% else %}
+                <td>
+                    <input type="hidden" name="privilege[{{ role.id }}][{{ action.id }}][IsWrite]" />
+                    <input type="checkbox" class="form-control"
+                        name="privilege[{{ role.id }}][{{ action.id }}][IsWrite]" />
+                </td>
+                {% endif %}
+
+                <!-- IsUpdate -->
+
+                {% if action_roles | length > 0 %}
+                <td>
+                    <input type="hidden" name="privilege[{{ role.id }}][{{ action.id }}][IsUpdate]" />
+                    {% set bDisplayed = false %}
+                    {% for action_role in action_roles if action_role.role != null and action_role.role.id == role.id and action_role.action != null and action_role.action.id
+                    == action.id %}
+
+                    {% if bDisplayed == false and action_role.privilege != null and action_role.privilege.IsUpdate %}
+                    {% set bDisplayed = true %}
+                    <input type="checkbox" class="form-control"
+                        name="privilege[{{ role.id }}][{{ action.id }}][IsUpdate]" checked />
+                    {% endif %}
+
+                    {% endfor %}
+                    {% if bDisplayed == false %}
+                    <input type="checkbox" class="form-control"
+                        name="privilege[{{ role.id }}][{{ action.id }}][IsUpdate]" />
+                    {% endif %}
+                </td>
+                {% else %}
+                <td>
+                    <input type="hidden" name="privilege[{{ role.id }}][{{ action.id }}][IsUpdate]" />
+                    <input type="checkbox" class="form-control"
+                        name="privilege[{{ role.id }}][{{ action.id }}][IsUpdate]" />
+                </td>
+                {% endif %}
+
+                <!-- IsDelete -->
+
+                {% if action_roles | length > 0 %}
+                <td>
+                    <input type="hidden" name="privilege[{{ role.id }}][{{ action.id }}][IsDelete]" />
+                    {% set bDisplayed = false %}
+                    {% for action_role in action_roles if action_role.role != null and action_role.role.id == role.id and action_role.action != null and action_role.action.id
+                    == action.id %}
+
+                    {% if bDisplayed == false and action_role.privilege != null and action_role.privilege.IsDelete %}
+                    {% set bDisplayed = true %}
+                    <input type="checkbox" class="form-control"
+                        name="privilege[{{ role.id }}][{{ action.id }}][IsDelete]" checked />
+                    {% endif %}
+
+                    {% endfor %}
+                    {% if bDisplayed == false %}
+                    <input type="checkbox" class="form-control"
+                        name="privilege[{{ role.id }}][{{ action.id }}][IsDelete]" />
+                    {% endif %}
+                </td>
+                {% else %}
+                <td>
+                    <input type="hidden" name="privilege[{{ role.id }}][{{ action.id }}][IsDelete]" />
+                    <input type="checkbox" class="form-control"
+                        name="privilege[{{ role.id }}][{{ action.id }}][IsDelete]" />
+                </td>
+                {% endif %}
+
+                <!-- IsSendMail -->
+
+                {% if action_roles | length > 0 %}
+                <td>
+                    <input type="hidden" name="privilege[{{ role.id }}][{{ action.id }}][IsSendMail]" />
+                    {% set bDisplayed = false %}
+                    {% for action_role in action_roles if action_role.role != null and action_role.role.id == role.id and action_role.action != null and action_role.action.id
+                    == action.id %}
+
+                    {% if bDisplayed == false and action_role.privilege != null and action_role.privilege.IsSendMail %}
+                    {% set bDisplayed = true %}
+                    <input type="checkbox" class="form-control"
+                        name="privilege[{{ role.id }}][{{ action.id }}][IsSendMail]" checked />
+                    {% endif %}
+
+                    {% endfor %}
+                    {% if bDisplayed == false %}
+                    <input type="checkbox" class="form-control"
+                        name="privilege[{{ role.id }}][{{ action.id }}][IsSendMail]" />
+                    {% endif %}
+                </td>
+                {% else %}
+                <td>
+                    <input type="hidden" name="privilege[{{ role.id }}][{{ action.id }}][IsSendMail]" />
+                    <input type="checkbox" class="form-control"
+                        name="privilege[{{ role.id }}][{{ action.id }}][IsSendMail]" />
+                </td>
+                {% endif %}
+            </tr>
+
+            {% endfor %}
+            {% endfor %}
+        </table>
+    </div>
+    <button type="submit" class="btn btn-success">Valider !</button>
+</form>

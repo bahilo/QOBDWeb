@@ -3,7 +3,9 @@ $.fn.myTable  = function (options) {
     var table = null;
     var setting = $.extend({
         dataSource: "",
-        columns: []
+        columns: [],
+        initComplete: function (setting, json) { },
+        rowCallback: function (nRow, aData, index) {},
     }, options);
     
     if (setting.dataSource.length > 0) {
@@ -12,7 +14,18 @@ $.fn.myTable  = function (options) {
         if (dataSource && dataSource.length > 0) {
             table = $(this).DataTable({
                 data: dataSource,
-                columns: setting.columns
+                columns: setting.columns,
+                initComplete: setting.initComplete,
+                fnRowCallback: function (nRow, aData, index) { 
+                    setting.rowCallback(nRow, aData, index);
+                },
+                responsive: {
+                    details: {
+                        display: $.fn.dataTable.Responsive.display.childRowImmediate,
+                        type: 'none',
+                        target: ''
+                    }
+                }
             });
             return table;
         }

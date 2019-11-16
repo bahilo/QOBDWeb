@@ -107,6 +107,20 @@ class QuoteOrderDetail
      */
     private $ItemROICurrency;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("QuantityDelivery") 
+     */
+    private $QuantityDelivery;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("QuantityRecieved") 
+     */
+    private $QuantityRecieved;
+
 
     public function getId(): ?int
     {
@@ -279,6 +293,30 @@ class QuoteOrderDetail
     public function setItemROICurrency(?string $ItemROICurrency): self
     {
         $this->ItemROICurrency = $ItemROICurrency;
+
+        return $this;
+    }
+
+    public function getQuantityDelivery(): ?int
+    {
+        return $this->QuantityDelivery;
+    }
+
+    public function setQuantityDelivery(?int $QuantityDelivery): self
+    {
+        $this->QuantityDelivery = $QuantityDelivery;
+
+        return $this;
+    }
+
+    public function getQuantityRecieved(): ?int
+    {
+        return $this->QuantityRecieved;
+    }
+
+    public function setQuantityRecieved(?int $QuantityRecieved): self
+    {
+        $this->QuantityRecieved = $QuantityRecieved;
 
         return $this;
     }

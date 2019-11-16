@@ -1,0 +1,32 @@
+{% extends 'template_coreui.html.twig' %}
+
+{% block title %}Configuration du statut livraison{% endblock %}
+
+{% block stylesheets %}
+
+{% endblock %}
+
+{% block body %}
+
+<div class="brand-wrapper">
+
+    <div class="container">
+        <h1>Création du statut livraison !</h1>
+
+        {{ form_start(formStatus) }}
+
+
+        {{ form_row(formStatus.Name,{'label': 'désignation du statut', 'attr': {'placeholder': 'désignation du statut'}})
+        }}
+
+        <button type="submit" class="btn btn-success">Ajouter le statut</button>
+
+        {{ form_end(formStatus) }}
+    </div>
+
+</div>
+
+{% endblock %}
+{% block javascripts %}
+<!-- <script src="{#{  asset('client.js','qobd_web_js') }#}"></script> -->
+{% endblock %}

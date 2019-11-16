@@ -6,9 +6,11 @@ use App\Entity\Tax;
 use App\Entity\Comment;
 use App\Entity\Setting;
 use App\Entity\Currency;
+use App\Entity\DeliveryStatus;
 use App\Form\TaxRegistrationType;
 use App\Form\SettingRegistrationType;
 use App\Form\CurrencyRegistrationType;
+use App\Form\DeliveryStatusRegistrationType;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Routing\Annotation\Route;
@@ -85,6 +87,32 @@ class SettingController extends Controller
     }
 
     /**
+     * @Route("/admin/configuration/statut/livraison/inscription", options={"expose"=true}, name="setting_delivery_status_registration")
+     * @Route("/admin/configuration/statut/livraison/{id}/edit", options={"expose"=true}, name="setting_delivery_status_edit")
+     * 
+     */
+    public function deliveryStatusRegistration(DeliveryStatus $status = null, Request $request, ObjectManager $manager)
+    {
+        if (!$status)
+            $status = new DeliveryStatus();
+
+        $form = $this->createForm(DeliveryStatusRegistrationType::class, $status);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $manager->persist($status);
+            $manager->flush();
+
+            return $this->redirectToRoute('setting_home');
+        }
+
+        return $this->render('setting/delivery_status_registration.html.twig', [
+            'formStatus' => $form->createView()
+        ]);
+    }
+    
+    /**
      * @Route("/admin/configuration/tax/inscription", options={"expose"=true}, name="setting_tax_registration")
      * @Route("/admin/configuration/tax/{id}/edit", options={"expose"=true}, name="setting_tax_edit")
      * 
@@ -96,7 +124,7 @@ class SettingController extends Controller
         
         $comment = $tax->getComment();
         if($comment)
-            $Tax->getCommentContent($comment->getContent());
+            $tax->getCommentContent($comment->getContent());
 
         $form = $this->createForm(TaxRegistrationType::class, $tax);
 
@@ -160,6 +188,17 @@ class SettingController extends Controller
     public function taxDelete(Tax $tax, ObjectManager $manager)
     {
         $manager->remove($tax);
+        $manager->flush();
+
+        return $this->RedirectToRoute('setting_home');
+    }
+
+    /**
+     * @Route("/admin/configuration/statut/livraison/{id}/delete", name="setting_delivery_status_delete")
+     */
+    public function deliveryStatusDelete(DeliveryStatus $status, ObjectManager $manager)
+    {        
+        $manager->remove($status);
         $manager->flush();
 
         return $this->RedirectToRoute('setting_home');

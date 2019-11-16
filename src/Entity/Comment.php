@@ -36,11 +36,6 @@ class Comment
      */
     private $Order_;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Agent", inversedBy="Comment")
-     */
-    private $agent;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -102,18 +97,6 @@ class Comment
         if ($Order_->getPublicComment() !== $newPublicComment) {
             $Order_->setPublicComment($newPublicComment);
         }
-
-        return $this;
-    }
-
-    public function getAgent(): ?Agent
-    {
-        return $this->agent;
-    }
-
-    public function setAgent(?Agent $agent): self
-    {
-        $this->agent = $agent;
 
         return $this;
     }

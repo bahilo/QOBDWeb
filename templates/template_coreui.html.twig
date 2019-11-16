@@ -521,6 +521,20 @@
         <span>Created by</span>
         <a href="mailto:joel.dago@yahoo.fr">joel dago</a>
       </div>
+
+      <template id="cart_btn">
+        <div class="input-group">
+          <input type="text" data-id="$(cart_item_id)" name="cart_quantity_js" class="form-control cart-quantity"
+            placeholder="Input group example" aria-label="Input group example" aria-describedby="btnGroupAddon"
+            value="$(cart_default_value)">
+          <div class="input-group-append">
+            <a href="$(cart_route)" data-id="$(cart_item_id)" class="cart_add_js">
+              <div class="input-group-text"><i class="fa fa-cart-plus"></i></div>
+            </a>
+          </div>
+        </div>
+      </template>
+
     </footer>
     <!-- CoreUI and necessary plugins
     <script src="{{ asset('javascript/popovers.js','theme_coreui') }}"></script>-->
@@ -534,18 +548,7 @@
      <script src="node_modules/@coreui/coreui-plugin-chartjs-custom-tooltips/dist/js/custom-tooltips.min.js"></script> 
     <script src="{{ asset('javascript/main.js','theme_coreui') }}"></script>-->
   
-    <template id="cart_btn">
-        <div class="input-group">
-            <input type="text" data-id="$(cart_item_id)" name="cart_quantity_js" class="form-control cart-quantity"
-                placeholder="Input group example" aria-label="Input group example" aria-describedby="btnGroupAddon"
-                value="$(cart_default_value)">
-            <div class="input-group-append">
-                <a href="$(cart_route)" data-id="$(cart_item_id)" class="cart_add_js">
-                    <div class="input-group-text"><i class="fa fa-cart-plus"></i></div>
-                </a>
-            </div>
-        </div>
-    </template>
+    
 
     
     <!--<script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
@@ -561,6 +564,7 @@ crossorigin="anonymous"></script>-->
    
     
     <script src="{{ asset('datatables.min.js','datatable_dir') }}"></script>
+    <script src="{{ asset('dataTables.responsive.min.js','datatable_dir') }}"></script>
     <script src="{{ asset('all.min.js','font_awsome_js') }}"></script>
     <script src="{{ asset('lodash.min.js','qobd_web_js') }}"></script>
     <script src="{{ asset('bundles/fosjsrouting/js/router.min.js') }}"></script>

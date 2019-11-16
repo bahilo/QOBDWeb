@@ -135,7 +135,7 @@ class Agent implements UserInterface
     private $Discussion;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="agent")
+     * @ORM\OneToOne(targetEntity="App\Entity\Comment", cascade={"persist", "remove"})
      */
     private $Comment;
 
@@ -147,7 +147,6 @@ class Agent implements UserInterface
         $this->orders = new ArrayCollection();
         $this->messages = new ArrayCollection();
         $this->Discussion = new ArrayCollection();
-        $this->Comment = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -514,41 +513,22 @@ class Agent implements UserInterface
         return $this;
     }
 
-    /**
-     * @return Collection|Comment[]
-     */
-    public function getComment(): Collection
-    {
-        return $this->Comment;
-    }
-
-    public function addComment(Comment $comment): self
-    {
-        if (!$this->Comment->contains($comment)) {
-            $this->Comment[] = $comment;
-            $comment->setAgent($this);
-        }
-
-        return $this;
-    }
-
-    public function removeComment(Comment $comment): self
-    {
-        if ($this->Comment->contains($comment)) {
-            $this->Comment->removeElement($comment);
-            // set the owning side to null (unless already changed)
-            if ($comment->getAgent() === $this) {
-                $comment->setAgent(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getSalt(){}
 
     public function eraseCredentials(){
         $this->PlainTextPassword = null;
+    }
+
+    public function getComment(): ?Comment
+    {
+        return $this->Comment;
+    }
+
+    public function setComment(?Comment $Comment): self
+    {
+        $this->Comment = $Comment;
+
+        return $this;
     }
 
 }

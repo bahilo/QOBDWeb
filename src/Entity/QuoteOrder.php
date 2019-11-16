@@ -110,6 +110,21 @@ class QuoteOrder
      */
     private $CreatedAtToString;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $IsQuote;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $ValidityPeriode;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $IsRefVisible;
+
 
 
     public function __construct()
@@ -305,6 +320,42 @@ class QuoteOrder
     public function setContact(?Contact $Contact): self
     {
         $this->Contact = $Contact;
+
+        return $this;
+    }
+
+    public function getIsQuote(): ?bool
+    {
+        return $this->IsQuote;
+    }
+
+    public function setIsQuote(?bool $IsQuote): self
+    {
+        $this->IsQuote = $IsQuote;
+
+        return $this;
+    }
+
+    public function getValidityPeriode(): ?int
+    {
+        return $this->ValidityPeriode;
+    }
+
+    public function setValidityPeriode(?int $ValidityPeriode): self
+    {
+        $this->ValidityPeriode = $ValidityPeriode;
+
+        return $this;
+    }
+
+    public function getIsRefVisible(): ?bool
+    {
+        return $this->IsRefVisible;
+    }
+
+    public function setIsRefVisible(bool $IsRefVisible): self
+    {
+        $this->IsRefVisible = $IsRefVisible;
 
         return $this;
     }

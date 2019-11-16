@@ -2,19 +2,25 @@
 
 namespace App\Controller;
 
+use App\Entity\Comment;
+use App\Entity\Delivery;
 use App\Entity\QuoteOrder;
+use App\Dependency\Utility;
 use App\Entity\OrderStatus;
+use App\Entity\DeliveryStatus;
 use App\Services\OrderHydrate;
 use App\Entity\QuoteOrderDetail;
 use App\Services\QOBDSerializer;
 use App\Repository\TaxRepository;
 use App\Repository\ItemRepository;
 use App\Repository\ClientRepository;
+use App\Repository\ContactRepository;
 use JMS\Serializer\SerializerInterface;
 use App\Repository\QuoteOrderRepository;
 use JMS\Serializer\SerializationContext;
 use App\Form\OrderStatusRegistrationType;
 use App\Repository\OrderStatusRepository;
+use App\Repository\DeliveryStatusRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Security;
 use App\Repository\QuoteOrderDetailRepository;
@@ -42,17 +48,76 @@ class OrderController extends Controller
     }
 
     /**
-     * @Route("/admin/commande/{id}/detail/save", options={"expose"=true}, name="order_detail_save")
-     * @Route("/admin/commande/{id}/detail/save/error/{message}", options={"expose"=true}, name="order_detail_save_error")
+     * @Route("/admin/commande/{id}/detail/sauvegarde", options={"expose"=true}, name="order_detail_save")
+     * @Route("/admin/commande/{id}/detail/sauvegarde/error/{message}", options={"expose"=true}, name="order_detail_save_error")
      */
     public function save($message = null,
                          QuoteOrderRepository $orderRepo,
-                         OrderStatusRepository $statusRepo,
+                         QuoteOrderDetailRepository $orderDetailRepo,
                          Request $request,
-                         OrderHydrate $orderHydrate)
+                         OrderHydrate $orderHydrate,
+                         ObjectManager $manager)
     {
+        $form = $request->request->get('order_detail_form');
+        $order = $orderHydrate->hydrateQuoteOrderRelationFromForm($orderRepo->find($request->request->get('order')), $form);
+        $manager->persist($order);
+
+        foreach($form['tab'] as $key => $val){
+            $orderDetail = $orderHydrate->hydrateQuoteOrderDetailRelationFromForm($orderDetailRepo->find($key), $val);
+
+            $manager->persist($orderDetail->getItem());
+            $manager->persist($orderDetail);
+        }
+        $manager->flush();
+       return $this->RedirectToRoute("order_show", [
+           'id' => $order->getId()
+       ]);
+    }
+
+    /**
+     * @Route("/admin/commande/{id}/livraison/sauvegarde", options={"expose"=true}, name="order_delivery_save")
+     */
+    public function deliverySave(QuoteOrder $order, QuoteOrderRepository $orderRepo,
+                         QuoteOrderDetailRepository $orderDetailRepo,
+                         Request $request,
+                         DeliveryStatusRepository $delStatusRepo,
+                         OrderHydrate $orderHydrate,
+                         ObjectManager $manager)
+    {
+        //dump($request->request); die();
+        $form = $request->request->get('order_detail_form');
+        $delivery = new Delivery();
+        $delStatus = $delStatusRepo->findOneBy(['Name' => 'STATUS_NOT_BILLED']);
         
-       return $this->RedirectToRoute("order_home");
+        $delivery->setPackage($form['delivery']['package']);
+        $delivery->setCreatedAt(new \DateTime());        
+        $delivery->setStatus($delStatus);        
+        
+        $manager->persist($delivery);
+
+        foreach($orderDetailRepo->findByQuantityRecieved() as $orderDetail){
+            
+            $orderDetail->setDelivery($delivery);
+            
+            $qtDel = $orderDetail->getQuantityDelivery();
+            $qtRecieved = $orderDetail->getQuantityRecieved();
+
+            if(!$qtDel)
+                $qtDel = 0;
+
+            if($qtRecieved)
+                $qtDel += $orderDetail->getQuantityRecieved();
+
+            $orderDetail->setQuantityDelivery($qtDel);
+            $orderDetail->setQuantityRecieved(0);
+
+            $manager->persist($orderDetail);
+        }
+        $manager->flush();
+
+       return $this->RedirectToRoute("order_show", [
+           'id' => $order->getId()
+       ]);
     }
 
     /**
@@ -179,12 +244,29 @@ class OrderController extends Controller
                         QuoteOrderDetailRepository $orderDetailRepo,
                         QuoteOrderRepository $orderRepo,
                         SerializerInterface $serializer,
-                        OrderHydrate $orderHydrate)
+                        OrderHydrate $orderHydrate,
+                        Utility $utility)
     {
+        $deliveries = [];
+        $bills = [];
         $order = $orderRepo->find($id);
+        $orderDetails = $orderDetailRepo->findBy(['QuoteOrder' => $order]);
+
+        foreach($orderDetails as $detail){
+            $delivery = $detail->getDelivery();
+            if($delivery){
+                $deliveryStatus = $delivery->getStatus();
+                if ($deliveryStatus && $deliveryStatus->getName() == 'STATUS_NOT_BILLED' && !$utility->in_array($deliveries, $delivery))
+                    array_push($deliveries, $delivery);
+            }
+        }
+        
         return $this->render('order/show.html.twig', [
             'order_detail_data_source' => $serializer->serialize($orderHydrate->hydrateOrderDetail($orderDetailRepo->findBy(['QuoteOrder' => $order])), 'json', SerializationContext::create()->setGroups(array('class_property'))),
+            'order_detail_delivery_data_source' => $serializer->serialize($orderHydrate->hydrateOrderDetail($orderDetailRepo->findByQuantityRecieved()), 'json', SerializationContext::create()->setGroups(array('class_property'))),
+            'order_detail_bill_data_source' => $serializer->serialize($orderHydrate->hydrateOrderDetail($orderDetailRepo->findByBill()), 'json', SerializationContext::create()->setGroups(array('class_property'))),
             'order' => $order,
+            'deliveries' => $deliveries,
         ]);
     }
 
@@ -295,6 +377,7 @@ class OrderController extends Controller
             $order = new QuoteOrder();
             
             $order->setCreatedAt(new \DateTime());
+            $order->setIsRefVisible(false);
             $order->setStatus($status);
             $order->setClient($client); 
                         
@@ -334,8 +417,17 @@ class OrderController extends Controller
     {
 
         foreach($orderDetailRepo->findBy(['QuoteOrder' => $order]) as $orderDetail){
+
+            $bill = $orderDetail->getBill();
+            $delivery = $orderDetail->getDelivery();
+
+            if($bill)
+                $manager->remove($bill);
+
+            if($delivery)
+                $manager->remove($delivery);
+
             $manager->remove($orderDetail);
-            $manager->flush();
         }
         $manager->remove($order);
         $manager->flush();

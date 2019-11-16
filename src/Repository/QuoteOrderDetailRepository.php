@@ -22,6 +22,29 @@ class QuoteOrderDetailRepository extends ServiceEntityRepository
     // /**
     //  * @return QuoteOrderDetail[] Returns an array of QuoteOrderDetail objects
     //  */
+
+    public function findByQuantityRecieved(int $val = 0)
+    {
+        return $this->createQueryBuilder('q')
+            ->andWhere('q.QuantityRecieved > :val')
+            ->setParameter('val', $val)
+            ->orderBy('q.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findByBill($deliveryStatus = 'STATUS_NOT_BILLED')
+    {
+        return $this->createQueryBuilder('q')
+            ->leftJoin('q.Delivery', 'q_del')
+            ->leftJoin('q_del.Status','q_del_status')
+            ->andWhere('q_del_status.Name = :val')
+            ->setParameter('val', $deliveryStatus)
+            ->orderBy('q.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     /*
     public function findByExampleField($value)
     {

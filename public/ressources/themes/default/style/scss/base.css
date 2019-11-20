@@ -15,4 +15,8 @@ tr.details td.details-control:before {
   top: 0;
   left: 10px;
 }
+
+.breadcrumb-menu .btn {
+  font-size: 20px;
+}
 /*# sourceMappingURL=base.css.map */

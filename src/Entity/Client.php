@@ -171,10 +171,16 @@ class Client
      */
     private $Comment;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Bill", mappedBy="Client")
+     */
+    private $bills;
+
     public function __construct()
     {
         $this->orders = new ArrayCollection();
         $this->contacts = new ArrayCollection();
+        $this->bills = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -515,6 +521,37 @@ class Client
     public function setComment(?Comment $Comment): self
     {
         $this->Comment = $Comment;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Bill[]
+     */
+    public function getBills(): Collection
+    {
+        return $this->bills;
+    }
+
+    public function addBill(Bill $bill): self
+    {
+        if (!$this->bills->contains($bill)) {
+            $this->bills[] = $bill;
+            $bill->setClient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBill(Bill $bill): self
+    {
+        if ($this->bills->contains($bill)) {
+            $this->bills->removeElement($bill);
+            // set the owning side to null (unless already changed)
+            if ($bill->getClient() === $this) {
+                $bill->setClient(null);
+            }
+        }
 
         return $this;
     }

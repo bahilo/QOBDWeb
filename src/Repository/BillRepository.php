@@ -3,8 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Bill;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Dependency\Utility;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @method Bill|null find($id, $lockMode = null, $lockVersion = null)
@@ -14,27 +15,46 @@ use Doctrine\Common\Persistence\ManagerRegistry;
  */
 class BillRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    protected $utility;
+
+    public function __construct(ManagerRegistry $registry, Utility $utility)
     {
         parent::__construct($registry, Bill::class);
+        $this->utility = $utility;
     }
+
+    /*public function findByOrder($params)
+    {
+        $bills = [];
+        foreach ($this->utility->getOrderDeliveries($params['orderDetails'], $params['status']) as $delivery) {
+            if ($delivery) {
+                $deliveryStatus = $delivery->getStatus();
+                $bill = $delivery->getBill();
+                if ($bill && $deliveryStatus && $deliveryStatus->getName() == $params['status'] && !$this->utility->in_array($bills, $bill))
+                    array_push($bills, $bill);
+            }
+        }
+        return $bills;
+    }*/
 
     // /**
     //  * @return Bill[] Returns an array of Bill objects
     //  */
-    /*
-    public function findByExampleField($value)
+    
+    public function findByOrder($params)
     {
-        return $this->createQueryBuilder('b')
-            ->andWhere('b.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('b.id', 'ASC')
-            ->setMaxResults(10)
+        return $this->createQueryBuilder('q')
+            ->innerJoin('q.quantityDeliveries', 'q_qt_del')
+            ->innerJoin('q_qt_del.Delivery', 'q_qt_del_del')
+            ->innerJoin('q_qt_del_del.Status', 'q_qt_del_del_status')
+            ->andWhere('q_qt_del_del_status.Name = :val')
+            ->setParameter('val', $params['status'])
+            ->orderBy('q.id', 'ASC')
             ->getQuery()
-            ->getResult()
+            ->getResult();
         ;
     }
-    */
+    
 
     /*
     public function findOneBySomeField($value): ?Bill

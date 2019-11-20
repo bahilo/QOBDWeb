@@ -3,20 +3,28 @@
 namespace App\Services;
 
 use App\Entity\Comment;
+use App\Services\CatalogueHydrate;
 use App\Repository\ContactRepository;
 use JMS\Serializer\SerializerInterface;
+use Doctrine\Common\Persistence\ObjectManager;
 
 
 class OrderHydrate{
 
     protected $serializer; 
-    protected $contactRepo; 
+    protected $contactRepo;
+    protected $catHydrate;
+    protected $manager;
 
     public function __construct( SerializerInterface $serializer,
-                                ContactRepository $contactRepo){
+                                ContactRepository $contactRepo,
+                                CatalogueHydrate $catHydrate,
+                                ObjectManager $manager){
 
         $this->serializer = $serializer;
         $this->contactRepo = $contactRepo;
+        $this->catHydrate = $catHydrate;
+        $this->manager = $manager;
     }
 
     public function hydrateOrderDetail($orderDetails){
@@ -28,10 +36,17 @@ class OrderHydrate{
             $tax = $orderDetail->getTax();
 
             if($item){
+                $item = $this->catHydrate->hydrateItem([$item])[0];
+                //dump($item); die();
+                $orderDetail->setContentComment($item->getContentComment());
                 $orderDetail->setItemRef($item->getRef());
                 $orderDetail->setItemName($item->getName());
                 $orderDetail->setItemPurchasePrice($item->getPurchasePrice());
-                $orderDetail->setItemSellPrice($item->getSellPrice());
+                $sellPrice = $orderDetail->getItemSellPrice();
+                if(empty($sellPrice) || $sellPrice == 0){
+                    $orderDetail->setItemSellPrice($item->getSellPrice());
+                    $this->manager->persist($orderDetail);                    
+                }
                 $orderDetail->setItemSellPriceTotal($item->getSellPrice() * $orderDetail->getQuantity());
                 if($tax)
                     $orderDetail->setItemSellPriceVATTotal(($item->getSellPrice() * $orderDetail->getQuantity())*(1 + $Tax->getValue()));
@@ -41,7 +56,7 @@ class OrderHydrate{
                 $orderDetail->setItemROICurrency(($item->getSellPrice() - $item->getPurchasePrice()) * $orderDetail->getQuantity() );
                 
             }
-            
+            $this->manager->flush();
             array_push($output, $orderDetail);
         }
         return $output;

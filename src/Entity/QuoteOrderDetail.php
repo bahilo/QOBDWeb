@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Expose;
 use JMS\Serializer\Annotation\Groups;
@@ -39,18 +41,6 @@ class QuoteOrderDetail
      * @SerializedName("Quantity") 
      */
     private $Quantity;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Delivery", inversedBy="quoteOrderDetails")
-     * @Groups({"class_relation"})
-     */
-    private $Delivery;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Bill", inversedBy="quoteOrderDetails")
-     * @Groups({"class_relation"})
-     */
-    private $Bill;
     
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Tax", inversedBy="quoteOrderDetails")
@@ -73,11 +63,18 @@ class QuoteOrderDetail
 
     /**
      * @Groups({"class_property"})
+     * @SerializedName("ContentComment") 
+     */
+    private $ContentComment;
+
+    /**
+     * @Groups({"class_property"})
      * @SerializedName("ItemPurchasePrice") 
      */
     private $ItemPurchasePrice;
- 
+
     /**
+     * @ORM\Column(type="float")
      * @Groups({"class_property"})
      * @SerializedName("ItemSellPrice") 
      */
@@ -121,6 +118,17 @@ class QuoteOrderDetail
      */
     private $QuantityRecieved;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\QuantityDelivery", mappedBy="OrderDetail")
+     */
+    private $quantityDeliveries;
+
+
+    public function __construct()
+    {
+        $this->quantityDeliveries = new ArrayCollection();
+    }
+
 
     public function getId(): ?int
     {
@@ -163,30 +171,6 @@ class QuoteOrderDetail
         return $this;
     }
 
-    public function getDelivery(): ?Delivery
-    {
-        return $this->Delivery;
-    }
-
-    public function setDelivery(?Delivery $Delivery): self
-    {
-        $this->Delivery = $Delivery;
-
-        return $this;
-    }
-
-    public function getBill(): ?Bill
-    {
-        return $this->Bill;
-    }
-
-    public function setBill(?Bill $Bill): self
-    {
-        $this->Bill = $Bill;
-
-        return $this;
-    }
-
     public function getTax(): ?Tax
     {
         return $this->Tax;
@@ -225,6 +209,18 @@ class QuoteOrderDetail
         return $this;
     }
 
+    public function getContentComment(): ?string
+    {
+        return $this->ContentComment;
+    }
+
+    public function setContentComment(?string $ContentComment): self
+    {
+        $this->ContentComment = $ContentComment;
+
+        return $this;
+    }
+
     public function getItemPurchasePrice(): ?string
     {
         return $this->ItemPurchasePrice;
@@ -242,14 +238,14 @@ class QuoteOrderDetail
         return $this->ItemSellPrice;
     }
 
-    public function setItemSellPrice(?string $ItemSellPrice): self
+    public function setItemSellPrice(?float $ItemSellPrice): self
     {
         $this->ItemSellPrice = $ItemSellPrice;
 
         return $this;
     }
 
-    public function getItemSellPriceTotal(): ?string
+    public function getItemSellPriceTotal(): ?float
     {
         return $this->ItemSellPriceTotal;
     }
@@ -320,4 +316,37 @@ class QuoteOrderDetail
 
         return $this;
     }
+
+    /**
+     * @return Collection|QuantityDelivery[]
+     */
+    public function getQuantityDeliveries(): Collection
+    {
+        return $this->quantityDeliveries;
+    }
+
+    public function addQuantityDelivery(QuantityDelivery $quantityDelivery): self
+    {
+        if (!$this->quantityDeliveries->contains($quantityDelivery)) {
+            $this->quantityDeliveries[] = $quantityDelivery;
+            $quantityDelivery->setOrderDetail($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQuantityDelivery(QuantityDelivery $quantityDelivery): self
+    {
+        if ($this->quantityDeliveries->contains($quantityDelivery)) {
+            $this->quantityDeliveries->removeElement($quantityDelivery);
+            // set the owning side to null (unless already changed)
+            if ($quantityDelivery->getOrderDetail() === $this) {
+                $quantityDelivery->setOrderDetail(null);
+            }
+        }
+
+        return $this;
+    }
+    
+    /*------------------------------- */
 }

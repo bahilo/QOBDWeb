@@ -19,13 +19,13 @@ $.fn.myTable  = function (options) {
                 fnRowCallback: function (nRow, aData, index) { 
                     setting.rowCallback(nRow, aData, index);
                 },
-                responsive: {
+                /*responsive: {
                     details: {
                         display: $.fn.dataTable.Responsive.display.childRowImmediate,
                         type: 'none',
                         target: ''
                     }
-                }
+                }*/
             });
             return table;
         }

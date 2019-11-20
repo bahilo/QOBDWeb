@@ -4,7 +4,9 @@ namespace App\Entity;
 
 // use LinqFactory;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Groups;
 use Doctrine\Common\Collections\Collection;
+use JMS\Serializer\Annotation\SerializedName;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -22,32 +24,44 @@ class Agent implements UserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"class_property"})
+     * @SerializedName("id")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"class_property"})
+     * @SerializedName("FirstName")
      */
     private $FirstName;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"class_property"})
+     * @SerializedName("LastName")
      */
     private $LastName;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("Phone")
      */
     private $Phone;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("Fax")
      */
     private $Fax;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\Email(message = "l'email '{{ value }}' n'est pas valide.",checkMX = true)
+     * @Groups({"class_property"})
+     * @SerializedName("Email")
      * 
      */
     private $Email;
@@ -55,11 +69,15 @@ class Agent implements UserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\Length(min="6", minMessage="Votre pseudonyme doit faire minimun {{ limit }} caractères")
+     * @Groups({"class_property"})
+     * @SerializedName("UserName")
      */
     private $UserName;
 
     /**
      * @ORM\Column(type="string", length=300)
+     * @Groups({"class_property"})
+     * @SerializedName("Password")
      * 
      */
     private $Password;
@@ -76,66 +94,85 @@ class Agent implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("Picture")
      */
     private $Picture;
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"class_property"})
+     * @SerializedName("IsAdmin")
      */
     private $IsAdmin;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("IsOnline")
      */
     private $IsOnline;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("ListSize")
      */
     private $ListSize;
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"class_property"})
+     * @SerializedName("IsActivated")
      */
     private $IsActivated;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("IPAddress")
      */
     private $IPAddress;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Role", inversedBy="agents")
+     * @Groups({"class_relation"})
      */
     private $Roles;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\ActionTracker", mappedBy="Agent")
+     * @Groups({"class_relation"})
      */
     private $actionTrackers;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Client", mappedBy="agent")
+     * @Groups({"class_relation"})
      */
     private $Clients;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\QuoteOrder", mappedBy="Agent")
+     * @Groups({"class_relation"})
      */
     private $orders;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Message", mappedBy="Agent")
+     * @Groups({"class_relation"})
      */
     private $messages;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Discussion", inversedBy="agents")
+     * @Groups({"class_relation"})
      */
     private $Discussion;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Comment", cascade={"persist", "remove"})
+     * @Groups({"class_relation"})
      */
     private $Comment;
 

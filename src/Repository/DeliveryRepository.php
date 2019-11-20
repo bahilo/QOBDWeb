@@ -3,8 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\Delivery;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Entity\QuoteOrder;
+use App\Dependency\Utility;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @method Delivery|null find($id, $lockMode = null, $lockVersion = null)
@@ -14,10 +16,43 @@ use Doctrine\Common\Persistence\ManagerRegistry;
  */
 class DeliveryRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    protected $utility;
+
+    public function __construct(ManagerRegistry $registry, Utility $utility)
     {
         parent::__construct($registry, Delivery::class);
+        $this->utility = $utility;
     }
+
+    public function findByBillStatus($params)
+    {
+        return $this->createQueryBuilder('q')
+            ->innerJoin('q.quantityDeliveries', 'q_qt_del')
+            ->innerJoin('q_qt_del.OrderDetail', 'q_qt_del_detail')
+            ->innerJoin('q_qt_del_detail.QuoteOrder', 'q_qt_del_detail_order')
+            ->innerJoin('q.Status', 'q_del_status')
+            ->andWhere('q_del_status.Name = :status')
+            ->andWhere('q_qt_del_detail_order.id = :orderId')
+            ->setParameters(['status'=> $params['status'], 'orderId' => $params['order']->getId() ])
+            ->orderBy('q.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /*public function findByOrder()
+    {
+        $deliveries = [];
+        foreach ($params['orderDetails'] as $detail) {
+            foreach ($detail->getDelivery() as $delivery) {
+                if ($delivery) {
+                    $deliveryStatus = $delivery->getStatus();
+                    if ($deliveryStatus && $deliveryStatus->getName() == $params['status'] && !$this->utility->in_array($deliveries, $delivery))
+                        array_push($deliveries, $delivery);
+                }
+            }
+        }
+        return $deliveries;
+    }*/
 
     // /**
     //  * @return Delivery[] Returns an array of Delivery objects

@@ -1,20 +1,119 @@
 {% extends 'template_coreui.html.twig' %}
 
-{% block title %}Hello SettingController!{% endblock %}
+
+{% set data_table = ''%}
+{% set data_table_source = '' %}
+{% set source = '' %}
+{% set page_title = '' %}
+{% set create_url = '' %}
+
+{% if general_data_source is defined %}
+    {% set data_table = 'general_table_js'%}
+    {% set data_table_source = 'general_data_source' %}
+    {% set source = general_data_source %}
+    {% set create_url = 'setting_registration' %}
+    {% set edit_url = 'setting_edit' %}
+{% endif %}
+
+{% if currency_data_source is defined %}
+    {% set data_table = 'currency_table_js'%}
+    {% set data_table_source = 'currency_data_source' %}
+    {% set page_title = 'Monnaie' %}
+    {% set source = currency_data_source %}
+    {% set create_url = 'setting_currency_registration' %}
+    {% set edit_url = 'setting_currency_edit' %}
+{% endif %}
+
+{% if tax_data_source is defined %}
+    {% set data_table = 'tax_table_js'%}
+    {% set data_table_source = 'tax_data_source' %}
+    {% set page_title = 'Tax' %}
+    {% set source = tax_data_source %}
+    {% set create_url = 'setting_tax_registration' %}
+    {% set edit_url = 'setting_tax_edit' %}
+{% endif %}
+
+{% if delivery_status_data_source is defined %}
+    {% set data_table = 'delivery_status_table_js'%}
+    {% set data_table_source = 'delivery_status_data_source' %}
+    {% set page_title = 'Statut Facturation' %}
+    {% set source = delivery_status_data_source %}
+    {% set create_url = 'setting_delivery_status_registration' %}
+    {% set edit_url = 'setting_delivery_status_edit' %}
+{% endif %}
+
+{% if order_status_data_source is defined %}
+    {% set data_table = 'order_status_table_js'%}
+    {% set data_table_source = 'order_status_data_source' %}
+    {% set page_title = 'Statut Commande' %}
+    {% set source = order_status_data_source %}
+    {% set create_url = 'setting_order_status_registration' %}
+    {% set edit_url = 'setting_order_status_edit' %}
+{% endif %}
+
+{% if brand_data_source is defined %}
+    {% set data_table = 'brand_table_js'%}
+    {% set data_table_source = 'brand_data_source' %}
+    {% set page_title = 'Marque Produit' %}
+    {% set source = brand_data_source %}
+    {% set create_url = 'setting_brand_registration' %}
+    {% set edit_url = 'setting_brand_edit' %}
+{% endif %}
+
+{% if group_data_source is defined %}
+    {% set data_table = 'group_table_js'%}
+    {% set data_table_source = 'group_data_source' %}
+    {% set page_title = 'Famille Produit' %}
+    {% set source = group_data_source %}
+    {% set create_url = 'setting_group_registration' %}
+    {% set edit_url = 'setting_group_edit' %}
+{% endif %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block home_path %}
+<li class="breadcrumb-item">    
+    {% if not page_title %}
+        Configuration
+    {% else %}
+        <a href="#">Configuration</a>
+    {% endif %}
+</li>
+{% if page_title %}
+<li class="breadcrumb-item">
+    {{ page_title }}
+</li>
+{% endif %}
+{% endblock %}
+
+{% block body_header_right %}
+<a href="{{ path(create_url) }}" class="btn"><i class="fa fa-plus-square"></i></a>
+{% endblock %}
+
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
 
 <div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa fa-align-justify"></i> {{ page_title | default('Configuration') }}</div>
+                    <div class="card-body">                       
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'Z:/wamp/www/QOBDWeb/src/Controller/SettingController.php'|file_link(0) }}">src/Controller/SettingController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'Z:/wamp/www/QOBDWeb/templates/setting/index.html.twig'|file_link(0) }}">templates/setting/index.html.twig</a></code></li>
-    </ul>
+                        <table id="setting_target_table_js" class="table table-responsive-md table-bordered table-striped table-md">
+                        </table>
+                        <input type="hidden" id="setting_target" data-source="{{ data_table_source }}" value="{{ source }}">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+{% endblock %}
+
+{% block javascripts %} 
+<script src="{{ asset('setting.js','qobd_web_js') }}"></script>
 {% endblock %}

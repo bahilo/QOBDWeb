@@ -2,9 +2,11 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Groups;
+use Doctrine\Common\Collections\Collection;
+use JMS\Serializer\Annotation\SerializedName;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\BillRepository")
@@ -15,79 +17,101 @@ class Bill
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"class_property"})
+     * @SerializedName("id")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("PayMode")
      */
     private $PayMode;
 
     /**
      * @ORM\Column(type="float")
+     * @Groups({"class_property"})
+     * @SerializedName("Pay")
      */
     private $Pay;
 
     /**
      * @ORM\Column(type="float", nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("PayReceived")
      */
     private $PayReceived;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Comment", cascade={"persist", "remove"})
+     * @Groups({"class_relation"})
      */
     private $PrivateComment;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Comment", cascade={"persist", "remove"})
+     * @Groups({"class_relation"})
      */
     private $PublicComment;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Client", mappedBy="bill")
-     */
-    private $Client;
-
-    /**
      * @ORM\Column(type="datetime")
+     * @Groups({"class_property"})
+     * @SerializedName("CreatedAt")
      */
     private $CreatedAt;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("LimitDateAt")
      */
     private $LimitDateAt;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("PayedAt")
      */
     private $PayedAt;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Address", inversedBy="bills")
-     */
-    private $Address;
-
-    /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Alert", mappedBy="Bill")
+     * @Groups({"class_relation"})
      */
     private $alerts;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\IncomeStatistic", inversedBy="Bill")
+     * @Groups({"class_relation"})
      */
     private $incomeStatistic;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\QuoteOrderDetail", mappedBy="Bill")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Contact", inversedBy="bills")
+     * @Groups({"class_relation"})
      */
-    private $quoteOrderDetails;
+    private $Contact;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Client", inversedBy="bills")
+     * @Groups({"class_relation"})
+     */
+    private $Client;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\QuantityDelivery", mappedBy="Bill")
+     * @Groups({"class_relation"})
+     */
+    private $quantityDeliveries;
+    
 
     public function __construct()
     {
         $this->Client = new ArrayCollection();
         $this->alerts = new ArrayCollection();
-        $this->quoteOrderDetails = new ArrayCollection();
+        $this->quantityDeliveries = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -155,37 +179,6 @@ class Bill
         return $this;
     }
 
-    /**
-     * @return Collection|Client[]
-     */
-    public function getClient(): Collection
-    {
-        return $this->Client;
-    }
-
-    public function addClient(Client $client): self
-    {
-        if (!$this->Client->contains($client)) {
-            $this->Client[] = $client;
-            $client->setBill($this);
-        }
-
-        return $this;
-    }
-
-    public function removeClient(Client $client): self
-    {
-        if ($this->Client->contains($client)) {
-            $this->Client->removeElement($client);
-            // set the owning side to null (unless already changed)
-            if ($client->getBill() === $this) {
-                $client->setBill(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->CreatedAt;
@@ -218,18 +211,6 @@ class Bill
     public function setPayedAt(?\DateTimeInterface $PayedAt): self
     {
         $this->PayedAt = $PayedAt;
-
-        return $this;
-    }
-
-    public function getAddress(): ?Address
-    {
-        return $this->Address;
-    }
-
-    public function setAddress(?Address $Address): self
-    {
-        $this->Address = $Address;
 
         return $this;
     }
@@ -274,31 +255,55 @@ class Bill
         return $this;
     }
 
-    /**
-     * @return Collection|QuoteOrderDetail[]
-     */
-    public function getQuoteOrderDetails(): Collection
+    public function getContact(): ?Contact
     {
-        return $this->quoteOrderDetails;
+        return $this->Contact;
     }
 
-    public function addQuoteOrderDetail(QuoteOrderDetail $quoteOrderDetail): self
+    public function setContact(?Contact $Contact): self
     {
-        if (!$this->quoteOrderDetails->contains($quoteOrderDetail)) {
-            $this->quoteOrderDetails[] = $quoteOrderDetail;
-            $quoteOrderDetail->setBill($this);
+        $this->Contact = $Contact;
+
+        return $this;
+    }
+
+    public function getClient(): ?Client
+    {
+        return $this->Client;
+    }
+
+    public function setClient(?Client $Client): self
+    {
+        $this->Client = $Client;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|QuantityDelivery[]
+     */
+    public function getQuantityDeliveries(): Collection
+    {
+        return $this->quantityDeliveries;
+    }
+
+    public function addQuantityDelivery(QuantityDelivery $quantityDelivery): self
+    {
+        if (!$this->quantityDeliveries->contains($quantityDelivery)) {
+            $this->quantityDeliveries[] = $quantityDelivery;
+            $quantityDelivery->setBill($this);
         }
 
         return $this;
     }
 
-    public function removeQuoteOrderDetail(QuoteOrderDetail $quoteOrderDetail): self
+    public function removeQuantityDelivery(QuantityDelivery $quantityDelivery): self
     {
-        if ($this->quoteOrderDetails->contains($quoteOrderDetail)) {
-            $this->quoteOrderDetails->removeElement($quoteOrderDetail);
+        if ($this->quantityDeliveries->contains($quantityDelivery)) {
+            $this->quantityDeliveries->removeElement($quantityDelivery);
             // set the owning side to null (unless already changed)
-            if ($quoteOrderDetail->getBill() === $this) {
-                $quoteOrderDetail->setBill(null);
+            if ($quantityDelivery->getBill() === $this) {
+                $quantityDelivery->setBill(null);
             }
         }
 

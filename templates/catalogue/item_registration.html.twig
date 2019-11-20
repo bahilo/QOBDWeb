@@ -1,6 +1,6 @@
 {% extends 'template_coreui.html.twig' %}
 
-{% block title %}Nouvelle Adresse{% endblock %}
+{% block title %}Nouveau produit{% endblock %}
 
 {% block stylesheets %}
 
@@ -10,8 +10,13 @@
 
 <div class="item-wrapper">
 
-    <div class="container">
-        <h1>Création d'un produit !</h1>
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa fa-align-justify"></i> Création d'un produit</div>
+                    <div class="card-body">
 
         {{ form_start(formItem) }}
 
@@ -27,10 +32,13 @@
         {{ form_row(formItem.Stock,{'label': 'Stock', 'attr': {'placeholder': 'Stock'}}) }}
         {{ form_row(formItem.ContentComment,{'label': 'Commentaire', 'attr': {'placeholder': 'Commentaire'}}) }}
 
-        <button type="submit" class="btn btn-success">Ajouter l'agent</button>
+        <button type="submit" class="btn btn-success">Ajouter le produit</button>
 
         {{ form_end(formItem) }}
     </div>
+    </div>
+    </div>
+</div></div>
 
 </div>
 

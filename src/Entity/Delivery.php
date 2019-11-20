@@ -34,19 +34,14 @@ class Delivery
     private $Status;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\QuoteOrder", mappedBy="Delivery")
+     * @ORM\OneToMany(targetEntity="App\Entity\QuantityDelivery", mappedBy="Delivery")
      */
-    private $orders;
+    private $quantityDeliveries;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\QuoteOrderDetail", mappedBy="Delivery")
-     */
-    private $quoteOrderDetails;
 
     public function __construct()
     {
-        $this->orders = new ArrayCollection();
-        $this->quoteOrderDetails = new ArrayCollection();
+        $this->quantityDeliveries = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -91,61 +86,30 @@ class Delivery
     }
 
     /**
-     * @return Collection|QuoteOrder[]
+     * @return Collection|QuantityDelivery[]
      */
-    public function getOrders(): Collection
+    public function getQuantityDeliveries(): Collection
     {
-        return $this->orders;
+        return $this->quantityDeliveries;
     }
 
-    public function addOrder(QuoteOrder $order): self
+    public function addQuantityDelivery(QuantityDelivery $quantityDelivery): self
     {
-        if (!$this->orders->contains($order)) {
-            $this->orders[] = $order;
-            $order->setDelivery($this);
+        if (!$this->quantityDeliveries->contains($quantityDelivery)) {
+            $this->quantityDeliveries[] = $quantityDelivery;
+            $quantityDelivery->setDelivery($this);
         }
 
         return $this;
     }
 
-    public function removeOrder(QuoteOrder $order): self
+    public function removeQuantityDelivery(QuantityDelivery $quantityDelivery): self
     {
-        if ($this->orders->contains($order)) {
-            $this->orders->removeElement($order);
+        if ($this->quantityDeliveries->contains($quantityDelivery)) {
+            $this->quantityDeliveries->removeElement($quantityDelivery);
             // set the owning side to null (unless already changed)
-            if ($order->getDelivery() === $this) {
-                $order->setDelivery(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|QuoteOrderDetail[]
-     */
-    public function getQuoteOrderDetails(): Collection
-    {
-        return $this->quoteOrderDetails;
-    }
-
-    public function addQuoteOrderDetail(QuoteOrderDetail $quoteOrderDetail): self
-    {
-        if (!$this->quoteOrderDetails->contains($quoteOrderDetail)) {
-            $this->quoteOrderDetails[] = $quoteOrderDetail;
-            $quoteOrderDetail->setDelivery($this);
-        }
-
-        return $this;
-    }
-
-    public function removeQuoteOrderDetail(QuoteOrderDetail $quoteOrderDetail): self
-    {
-        if ($this->quoteOrderDetails->contains($quoteOrderDetail)) {
-            $this->quoteOrderDetails->removeElement($quoteOrderDetail);
-            // set the owning side to null (unless already changed)
-            if ($quoteOrderDetail->getDelivery() === $this) {
-                $quoteOrderDetail->setDelivery(null);
+            if ($quantityDelivery->getDelivery() === $this) {
+                $quantityDelivery->setDelivery(null);
             }
         }
 

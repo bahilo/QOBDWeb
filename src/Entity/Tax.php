@@ -2,9 +2,11 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Groups;
+use Doctrine\Common\Collections\Collection;
+use JMS\Serializer\Annotation\SerializedName;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TaxRepository")
@@ -15,21 +17,29 @@ class Tax
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"class_property"})
+     * @SerializedName("id")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"class_property"})
+     * @SerializedName("Type")
      */
     private $Type;
 
     /**
      * @ORM\Column(type="float")
+     * @Groups({"class_property"})
+     * @SerializedName("Value")
      */
     private $Value;
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"class_property"})
+     * @SerializedName("IsCurrent")
      */
     private $IsCurrent;
 
@@ -40,6 +50,8 @@ class Tax
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"class_property"})
+     * @SerializedName("CreateAt")
      */
     private $CreateAt;
 
@@ -58,11 +70,17 @@ class Tax
      */
     private $quoteOrderDetails;
 
-
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("CommentContent")
+     * 
+     */
     private $CommentContent;
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"class_property"})
+     * @SerializedName("IsTVAMarge")
      */
     private $IsTVAMarge;
 

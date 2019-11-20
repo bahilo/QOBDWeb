@@ -104,7 +104,8 @@ class ClientController extends Controller
     public function addressRegistration(Address $address = null,
                                        ContactRepository $contactRepo, 
                                        Request $request,
-                                       ClientHydrate $clientHydrate)
+                                       ClientHydrate $clientHydrate,
+                                       ObjectManager $manager)
     {
         if(!$address)
             $address = new Address();

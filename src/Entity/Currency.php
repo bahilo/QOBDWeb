@@ -2,9 +2,11 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Groups;
+use Doctrine\Common\Collections\Collection;
+use JMS\Serializer\Annotation\SerializedName;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CurrencyRepository")
@@ -15,46 +17,63 @@ class Currency
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"class_property"})
+     * @SerializedName("id")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"class_property"})
+     * @SerializedName("Name")
      */
     private $Name;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"class_property"})
+     * @SerializedName("Symbol")
      */
     private $Symbol;
 
     /**
      * @ORM\Column(type="float")
+     * @Groups({"class_property"})
+     * @SerializedName("Rate")
      */
     private $Rate;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"class_property"})
+     * @SerializedName("CountryCode")
      */
     private $CountryCode;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"class_property"})
+     * @SerializedName("Country")
      */
     private $Country;
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"class_property"})
+     * @SerializedName("IsDefault")
      */
     private $IsDefault;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"class_property"})
+     * @SerializedName("CreatedAt")
      */
     private $CreatedAt;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\QuoteOrder", mappedBy="Currency")
+     * @Groups({"class_relation"})
      */
     private $orders;
 

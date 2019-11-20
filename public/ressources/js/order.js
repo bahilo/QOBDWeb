@@ -56,6 +56,7 @@ $(function () {
             ],
             orderDetail:[
                 { data: 'id', visible: false },
+                { data: 'ContentComment', visible: false },
                 { data: 'null', title: "", class: "details-control", orderable: false, defaultContent: "" },
                 { data: 'ItemName', title: "Nom" },
                 { data: 'ItemRef', title: "Référence" },
@@ -86,6 +87,16 @@ $(function () {
                 { data: 'ItemROIPercent', title: "Marge (%)" },
                 { data: 'null', title: "", render: renderCancelBL },
                 { data: 'null', title: "", render: renderPDF },
+            ],
+            orderBill: [
+                { data: 'id', title: "Facture n°" },
+                { data: 'CreatedAt', title: "Date" },
+                { data: 'Pay', title: "Montant" },
+                { data: 'LimitDateAt', title: "Date" },
+                { data: 'null', title: "Facture", render: renderPDF },
+                { data: 'null', title: "", render: renderCancelBL },
+                { data: 'null', title: "", render: renderCancelBL },
+                { data: 'null', title: "", render: renderCancelBL },
             ]
         },
     }
@@ -114,9 +125,14 @@ $(function () {
         columns: api.column.orderDetailDelivery
     });
 
-    api.table.orderDetailBill= $("#order_detail_bill_table_js").myTable({
+    api.table.orderDetailBill = $("#order_detail_bill_table_js").myTable({
         dataSource: $("#order_detail_bill_data_source").val(),
         columns: api.column.orderDetailBill
+    });
+
+    api.table.orderBill = $("#bill_table_js").myTable({
+        dataSource: $("#bill_data_source").val(),
+        columns: api.column.orderBill
     });
 
 
@@ -155,7 +171,7 @@ $(function () {
             '<div class="row">' +
                 '<div class="col-md-6">' +
                     '<label for="comment' + row.id +'">Commentaire</label>'+
-                    '<textarea name="order_detail_form[tab][' + row.id + '][comment]" id="comment' + row.id+'" cols="30" rows="5" class="form-control"></textarea>' +
+            '<textarea name="order_detail_form[tab][' + row.id + '][comment]" id="comment' + row.id + '" cols="30" rows="5" class="form-control">' + row.ContentComment+'</textarea>' +
                 '</div>' +
                 '<div class="col-md-6">' +
                     '<label for="quantity' + row.id + '">Quantité reçu</label>' +

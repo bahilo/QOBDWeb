@@ -52,11 +52,6 @@ class Address
      * @ORM\OneToOne(targetEntity="App\Entity\Comment", inversedBy="address", cascade={"persist", "remove"})
      */
     private $Comment;
-
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Bill", mappedBy="Address")
-     */
-    private $bills;
     
 
     /**
@@ -69,8 +64,6 @@ class Address
 
     public function __construct()
     {
-        $this->deliveries = new ArrayCollection();
-        $this->bills = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -158,37 +151,6 @@ class Address
     public function setComment(?Comment $Comment): self
     {
         $this->Comment = $Comment;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Bill[]
-     */
-    public function getBills(): Collection
-    {
-        return $this->bills;
-    }
-
-    public function addBill(Bill $bill): self
-    {
-        if (!$this->bills->contains($bill)) {
-            $this->bills[] = $bill;
-            $bill->setAddress($this);
-        }
-
-        return $this;
-    }
-
-    public function removeBill(Bill $bill): self
-    {
-        if ($this->bills->contains($bill)) {
-            $this->bills->removeElement($bill);
-            // set the owning side to null (unless already changed)
-            if ($bill->getAddress() === $this) {
-                $bill->setAddress(null);
-            }
-        }
 
         return $this;
     }

@@ -182,9 +182,45 @@
                 <a class="nav-link nav-dropdown-toggle" href="#">
                     <i class="nav-icon icon-cursor"></i> Configuration</a>
                 <ul class="nav-dropdown-items">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ path("setting_home") }}">
-                            <i class="nav-icon icon-puzzle"></i> Options</a>
+                    <li class="nav-item nav-dropdown">
+                      <a class="nav-link nav-dropdown-toggle" href="#">
+                        <i class="nav-icon icon-puzzle"></i> Options</a>
+                      <ul class="nav-dropdown-items">
+                        <li class="nav-item">
+                          <a class="nav-link" href="{{ path("setting_home") }}">
+                            <i class="nav-icon icon-puzzle"></i> Générale</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="{{ path("setting_currency") }}">
+                            <i class="nav-icon icon-puzzle"></i> Monnaie</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="{{ path("setting_tax") }}">
+                            <i class="nav-icon icon-puzzle"></i> Taxe</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="{{ path("setting_delivery_status") }}">
+                            <i class="nav-icon icon-puzzle"></i> Status facturation</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="{{ path("setting_order_status") }}">
+                            <i class="nav-icon icon-puzzle"></i> Statut Commande</a>
+                        </li>
+                      </ul>
+                    </li>
+                    <li class="nav-item nav-dropdown">
+                      <a class="nav-link nav-dropdown-toggle" href="#">
+                        <i class="nav-icon icon-puzzle"></i> Produits</a>
+                      <ul class="nav-dropdown-items">
+                        <li class="nav-item">
+                          <a class="nav-link" href="{{ path("setting_catalogue_brand") }}">
+                            <i class="nav-icon icon-puzzle"></i> Marques</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="{{ path("setting_catalogue_group") }}">
+                            <i class="nav-icon icon-puzzle"></i> Familles</a>
+                        </li>
+                      </ul>
                     </li>
                 </ul>
             </li>
@@ -204,7 +240,9 @@
       <main class="main">
         <!-- Breadcrumb-->
         <ol class="breadcrumb">
-          <li class="breadcrumb-item">Home</li>
+          <li class="breadcrumb-item">
+            <a href="{{ path("home") }}">Home</a>
+          </li>
           <!-- <li class="breadcrumb-item active">Dashboard</li> -->
           {% block home_path %} {% endblock %}
           <!-- Breadcrumb Menu-->
@@ -213,15 +251,20 @@
               <a class="btn" href="#">
                 <i class="icon-speech"></i>
               </a>
-              <a class="btn" href="./">
-                <i class="icon-graph"></i>  Dashboard</a>
-              <a class="btn" href="#">
-                <i class="icon-settings"></i>  Settings</a>
+              {% block home_path_right %} {% endblock %}
             </div>
           </li>
         </ol>
         <div class="container-fluid">
           
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item active">
+              {% block body_header_left %}{% endblock %}
+            </li>
+            <li class="breadcrumb-menu d-md-down-none">
+              {% block body_header_right %}{% endblock %}
+            </li>
+          </ol>
             {% block body %}{% endblock %}
             
         </div>

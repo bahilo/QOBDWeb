@@ -2,9 +2,11 @@
 
 namespace App\Repository;
 
+use App\Entity\Delivery;
+use App\Entity\QuantityDelivery;
 use App\Entity\QuoteOrderDetail;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @method QuoteOrderDetail|null find($id, $lockMode = null, $lockVersion = null)
@@ -33,14 +35,28 @@ class QuoteOrderDetailRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findByBill($deliveryStatus = 'STATUS_NOT_BILLED')
+    public function findByBillStatus($deliveryStatus = 'STATUS_NOT_BILLED')
     {
         return $this->createQueryBuilder('q')
-            ->leftJoin('q.Delivery', 'q_del')
-            ->leftJoin('q_del.Status','q_del_status')
+            ->innerJoin('q.quantityDeliveries', 'q_qt_del')
+            ->innerJoin('q_qt_del.Delivery', 'q_del')
+            ->innerJoin('q_del.Status','q_del_status')
             ->andWhere('q_del_status.Name = :val')
             ->setParameter('val', $deliveryStatus)
             ->orderBy('q.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        //dump($res); die();
+    }
+
+    public function findByDelivery(Delivery $delivery)
+    {
+        return $this->createQueryBuilder('q')
+            ->innerJoin('q.quantityDeliveries', 'q_qt_del')
+            ->innerJoin('q_qt_del.Delivery', 'q_qt_del_del')
+            ->andWhere('q_qt_del_del.id = :val')
+            ->setParameter('val', $delivery->getId())
             ->getQuery()
             ->getResult();
     }
@@ -58,6 +74,16 @@ class QuoteOrderDetailRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function findOneByQuantityDelivery(QuantityDelivery $qtDelivery): ?QuoteOrderDetail
+    {
+        return $this->createQueryBuilder('q')
+            ->innerJoin('q.quantityDeliveries', 'q_qt_del')
+            ->andWhere('q_qt_del.id = :val')
+            ->setParameter('val', $qtDelivery->getId())
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 
     /*
     public function findOneBySomeField($value): ?QuoteOrderDetail

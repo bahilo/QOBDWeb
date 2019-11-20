@@ -145,10 +145,16 @@ class Contact
      */
     private $quoteOrders;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Bill", mappedBy="Contact")
+     */
+    private $bills;
+
 
     public function __construct()
     {
         $this->quoteOrders = new ArrayCollection();
+        $this->bills = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -409,6 +415,37 @@ class Contact
             // set the owning side to null (unless already changed)
             if ($quoteOrder->getContact() === $this) {
                 $quoteOrder->setContact(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Bill[]
+     */
+    public function getBills(): Collection
+    {
+        return $this->bills;
+    }
+
+    public function addBill(Bill $bill): self
+    {
+        if (!$this->bills->contains($bill)) {
+            $this->bills[] = $bill;
+            $bill->setContact($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBill(Bill $bill): self
+    {
+        if ($this->bills->contains($bill)) {
+            $this->bills->removeElement($bill);
+            // set the owning side to null (unless already changed)
+            if ($bill->getContact() === $this) {
+                $bill->setContact(null);
             }
         }
 

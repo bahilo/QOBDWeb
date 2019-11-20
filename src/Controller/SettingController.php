@@ -6,11 +6,27 @@ use App\Entity\Tax;
 use App\Entity\Comment;
 use App\Entity\Setting;
 use App\Entity\Currency;
+use App\Entity\Provider;
+use App\Entity\ItemBrand;
+use App\Entity\ItemGroupe;
+use App\Entity\OrderStatus;
+use App\Services\Serializer;
 use App\Entity\DeliveryStatus;
 use App\Form\TaxRegistrationType;
+use App\Repository\TaxRepository;
 use App\Form\SettingRegistrationType;
+use App\Repository\SettingRepository;
 use App\Form\CurrencyRegistrationType;
+use App\Repository\CurrencyRepository;
+use App\Repository\ProviderRepository;
+use App\Repository\ItemBrandRepository;
+use App\Repository\ItemGroupeRepository;
+use App\Repository\QuoteOrderRepository;
+use JMS\Serializer\SerializationContext;
+use App\Form\OrderStatusRegistrationType;
+use App\Repository\OrderStatusRepository;
 use App\Form\DeliveryStatusRegistrationType;
+use App\Repository\DeliveryStatusRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Routing\Annotation\Route;
@@ -21,10 +37,120 @@ class SettingController extends Controller
     /**
      * @Route("/admin/configuration", name="setting_home")
      */
-    public function home()
+    public function home(SettingRepository $settingRepo,
+                        Serializer $serializer)
     {
         return $this->render('setting/index.html.twig', [
-            'controller_name' => 'SettingController',
+            'general_data_source' => $serializer->serialize([
+                'object_array' => $settingRepo->findAll(),
+                'format' => 'json',
+                'group' => 'class_property'
+            ])
+        ]);
+    }
+
+    /**
+     * @Route("/admin/configuration/monnaie", options={"expose"=true}, name="setting_currency")
+     */
+    public function currency(CurrencyRepository $currencyRepo,
+                             Serializer $serializer)
+    {
+        return $this->render('setting/index.html.twig', [
+            'currency_data_source' => $serializer->serialize([
+                'object_array' => $currencyRepo->findAll(), 
+                'format' => 'json',
+                'group' =>'class_property'
+            ])
+        ]);
+    }
+
+    /**
+     * @Route("/admin/configuration/taxe", options={"expose"=true}, name="setting_tax")
+     */
+    public function tax(TaxRepository $taxRepo,
+                        Serializer $serializer)
+    {
+        return $this->render('setting/index.html.twig', [
+            'tax_data_source' => $serializer->serialize([
+                'object_array' => $taxRepo->findAll(),
+                'format' => 'json',
+                'group' => 'class_property'
+            ])
+        ]);
+    }
+
+    /**
+     * @Route("/admin/configuration/facturation/statut", options={"expose"=true}, name="setting_delivery_status")
+     */
+    public function deliveryStatus(DeliveryStatusRepository $delStatusRepo,
+                                   Serializer $serializer)
+    {
+        return $this->render('setting/index.html.twig', [
+            'delivery_status_data_source' => $serializer->serialize([
+                'object_array' => $delStatusRepo->findAll(),
+                'format' => 'json',
+                'group' => 'class_property'
+            ])
+        ]);
+    }
+
+    /**
+     * @Route("/admin/configuration/commande/statut", options={"expose"=true}, name="setting_order_status")
+     */
+    public function orderStatus(OrderStatusRepository $orderStatusRepo,
+                                Serializer $serializer)
+    {
+        return $this->render('setting/index.html.twig', [
+            'order_status_data_source' => $serializer->serialize([
+                'object_array' => $orderStatusRepo->findAll(),
+                'format' => 'json',
+                'group' => 'class_property'
+            ])
+        ]);
+    }
+
+    /**
+     * @Route("/admin/configuration/produit/marque", options={"expose"=true}, name="setting_catalogue_brand")
+     */
+    public function catalogueBrand(ItemBrandRepository $brandRepo,
+                                   Serializer $serializer)
+    {
+        return $this->render('setting/index.html.twig', [
+            'brand_data_source' => $serializer->serialize([
+                'object_array' => $brandRepo->findAll(),
+                'format' => 'json',
+                'group' => 'class_property'
+            ])
+        ]);
+    }
+
+    /**
+     * @Route("/admin/configuration/produit/famille", options={"expose"=true}, name="setting_catalogue_group")
+     */
+    public function catalogueGroup(ItemGroupeRepository $groupRepo,
+                                   Serializer $serializer)
+    {
+        return $this->render('setting/index.html.twig', [
+            'group_data_source' => $serializer->serialize([
+                'object_array' => $groupRepo->findAll(),
+                'format' => 'json',
+                'group' => 'class_property'
+            ])
+        ]);
+    }
+
+    /**
+     * @Route("/admin/configuration/produit/fournisseur", options={"expose"=true}, name="setting_catalogue_provider")
+     */
+    public function catalogueProvider(ProviderRepository $providerRepo,
+                                   Serializer $serializer)
+    {
+        return $this->render('setting/index.html.twig', [
+            'group_data_source' => $serializer->serialize([
+                'object_array' => $providerRepo->findAll(),
+                'format' => 'json',
+                'group' => 'class_property'
+            ])
         ]);
     }
 
@@ -161,7 +287,122 @@ class SettingController extends Controller
     }
 
     /**
-     * @Route("/admin/configuration/{id}/delete", name="setting_delete")
+     * @Route("/admin/configuration/marque/inscription", options={"expose"=true}, name="setting_brand_registration")
+     * @Route("/admin/configuration/marque/{id}/edit", options={"expose"=true}, name="setting_brand_edit")
+     * 
+     */
+    public function brandRegistration(ItemBrand $itemBrand = null, Request $request, ObjectManager $manager)
+    {
+        if (!$itemBrand)
+            $itemBrand = new ItemBrand();
+
+        $form = $this->createForm(ItemBrandRegistrationType::class, $itemBrand);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $itemBrand->setCreatedAt(new \DateTime());
+            $itemBrand->setIsEnabled(true);
+
+            $manager->persist($itemBrand);
+            $manager->flush();
+
+            return $this->redirectToRoute('setting_home');
+        }
+
+        return $this->render('setting/brand_registration.html.twig', [
+            'formBrand' => $form->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/admin/configuration/famille/inscription", options={"expose"=true}, name="setting_group_registration")
+     * @Route("/admin/configuration/famille/{id}/edit", options={"expose"=true}, name="setting_group_edit")
+     * 
+     */
+    public function groupRegistration(ItemGroupe $itemGroupe = null, Request $request, ObjectManager $manager)
+    {
+        if (!$itemGroupe)
+            $itemGroupe = new ItemGroupe();
+
+        $form = $this->createForm(ItemGroupeRegistrationType::class, $itemGroupe);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $itemGroupe->setIsEnabled(true);
+
+            $manager->persist($itemGroupe);
+            $manager->flush();
+
+            return $this->redirectToRoute('setting_home');
+        }
+
+        return $this->render('setting/group_registration.html.twig', [
+            'formGroup' => $form->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/admin/configuration/fournisseur/inscription", options={"expose"=true}, name="setting_provider_registration")
+     * @Route("/admin/configuration/fournisseur/{id}/edit", options={"expose"=true}, name="setting_provider_edit")
+     * 
+     */
+    public function providerRegistration(Provider $provider = null, Request $request, ObjectManager $manager)
+    {
+        if (!$provider)
+            $provider = new Provider();
+
+        $form = $this->createForm(ProviderRegistrationType::class, $provider);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $provider->setIsEnabled(true);
+
+            $manager->persist($provider);
+            $manager->flush();
+
+            return $this->redirectToRoute('setting_home');
+        }
+
+        return $this->render('setting/provider_registration.html.twig', [
+            'formProvider' => $form->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/admin/configuration/commande/statut/inscription", options={"expose"=true}, name="setting_order_status_registration")
+     * @Route("/admin/configuration/commande/statut/{id}/edit", options={"expose"=true}, name="setting_order_status_edit")
+     * 
+     */
+    public function orderStatusRegistration(OrderStatus $status = null, Request $request, ObjectManager $manager)
+    {
+        if (!$status)
+            $status = new OrderStatus();
+
+        $form = $this->createForm(OrderStatusRegistrationType::class, $status);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $manager->persist($status);
+            $manager->flush();
+
+            return $this->redirectToRoute('order_home');
+        }
+
+        return $this->render('order/status_registration.html.twig', [
+            'formStatus' => $form->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/admin/configuration/{id}/delete", options={"expose"=true}, name="setting_delete")
      */
     public function delete(Setting $setting, ObjectManager $manager)
     {
@@ -172,7 +413,7 @@ class SettingController extends Controller
     }
 
     /**
-     * @Route("/admin/configuration/currency/{id}/delete", name="setting_currency_delete")
+     * @Route("/admin/configuration/currency/{id}/delete", options={"expose"=true}, name="setting_currency_delete")
      */
     public function currencyDelete(Currency $currency, ObjectManager $manager)
     {
@@ -183,7 +424,7 @@ class SettingController extends Controller
     }
 
     /**
-     * @Route("/admin/configuration/tax/{id}/delete", name="setting_tax_delete")
+     * @Route("/admin/configuration/tax/{id}/delete", options={"expose"=true}, name="setting_tax_delete")
      */
     public function taxDelete(Tax $tax, ObjectManager $manager)
     {
@@ -194,7 +435,7 @@ class SettingController extends Controller
     }
 
     /**
-     * @Route("/admin/configuration/statut/livraison/{id}/delete", name="setting_delivery_status_delete")
+     * @Route("/admin/configuration/statut/livraison/{id}/delete", options={"expose"=true}, name="setting_delivery_status_delete")
      */
     public function deliveryStatusDelete(DeliveryStatus $status, ObjectManager $manager)
     {        
@@ -202,6 +443,56 @@ class SettingController extends Controller
         $manager->flush();
 
         return $this->RedirectToRoute('setting_home');
+    }
+
+    /**
+     * @Route("/admin/configuration/fournisseur/{id}/delete", options={"expose"=true}, name="setting_provider_delete")
+     */
+    public function providerDelete(Provider $provider, ObjectManager $manager)
+    {
+
+        $manager->remove($provider);
+        $manager->flush();
+
+        return $this->RedirectToRoute('setting_home');
+    }
+
+    /**
+     * @Route("/admin/configuration/famille/{id}/delete", options={"expose"=true}, name="setting_group_delete")
+     */
+    public function groupDelete(ItemGroupe $group, ObjectManager $manager)
+    {
+
+        $manager->remove($group);
+        $manager->flush();
+
+        return $this->RedirectToRoute('setting_home');
+    }
+
+    /**
+     * @Route("/admin/configuration/marque/{id}/delete", options={"expose"=true}, name="setting_brand_delete")
+     */
+    public function brandDelete(ItemBrand $brand, ObjectManager $manager)
+    {
+
+        $manager->remove($brand);
+        $manager->flush();
+
+        return $this->RedirectToRoute('setting_home');
+    }
+
+    /**
+     * @Route("/admin/configuration/commande/statut/{id}/delete", options={"expose"=true}, name="setting_order_status_delete")
+     */
+    public function orderStatusDelete(OrderStatus $status, QuoteOrderRepository $orderRepo, ObjectManager $manager)
+    {
+
+        if (count($orderRepo->findBy(['Status' => $status])) == 0) {
+            $manager->remove($status);
+            $manager->flush();
+            return $this->RedirectToRoute('order_home');
+        }
+        return $this->RedirectToRoute('order_home', ['message' => 'Le status ne peut pas être supprimé. Il est en cours d\'utilisation pour au moins une commande!']);
     }
 
 }

@@ -6,8 +6,11 @@ use App\Entity\Client;
 use App\Entity\Address;
 use App\Entity\Comment;
 use App\Entity\Contact;
+use App\Services\Utility;
 use App\Services\ClientHydrate;
+use App\Services\SecurityManager;
 use App\Form\ClientRegistrationType;
+use App\Repository\ActionRepository;
 use App\Repository\ClientRepository;
 use App\Form\AddressRegistrationType;
 use App\Form\ContactRegistrationType;
@@ -22,13 +25,27 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class ClientController extends Controller
 {
+    protected $securityUtility;
+    protected $actionRepo;
+
+
+    public function __construct(SecurityManager $securityUtility, ActionRepository $actionRepo)
+    {
+        $this->securityUtility = $securityUtility;
+        $this->actionRepo = $actionRepo;
+    }
+    
     /**
      * @Route("/admin/client", options={"expose"=true}, name="client_home")
      */
     public function home(SerializerInterface $serializer, 
                         ClientRepository $clientRepo,
-                        ClientHydrate $clientHydrate)
-    {
+                        ClientHydrate $clientHydrate) {
+
+        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
         return $this->render('client/index.html.twig', [
             'client_data_source' => $serializer->serialize($clientHydrate->hydrate($clientRepo->findAll()), 'json', SerializationContext::create()->setGroups(array('class_property'))),
         ]);
@@ -39,8 +56,12 @@ class ClientController extends Controller
      */
     public function show(Client $client,
                          SerializerInterface $serializer,
-                         ContactRepository $contactRepo)
-    {        
+                         ContactRepository $contactRepo) {
+
+        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
         return $this->render('client/show.html.twig', [
             'client' => $client,
             'contact_data_source' => $serializer->serialize($contactRepo->findBy(['Client' => $client]), 'json', SerializationContext::create()->setGroups(array('class_property'))),
@@ -52,6 +73,9 @@ class ClientController extends Controller
      */
     public function select($id, SessionInterface $session)
     {
+        if (!$this->securityUtility->checkHasUpdate($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
         $client = $session->get('client',[]);
 
         $client['id'] = $id;
@@ -69,8 +93,12 @@ class ClientController extends Controller
     public function registration(Client $client = null, 
                                 Request $request, 
                                 ObjectManager $manager,
-                                ClientHydrate $clientHydrate)
-    {
+                                ClientHydrate $clientHydrate) {
+
+        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
         if(!$client)
             $client = new Client();
         else
@@ -105,8 +133,12 @@ class ClientController extends Controller
                                        ContactRepository $contactRepo, 
                                        Request $request,
                                        ClientHydrate $clientHydrate,
-                                       ObjectManager $manager)
-    {
+                                       ObjectManager $manager) {
+
+        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
         if(!$address)
             $address = new Address();
 
@@ -139,8 +171,11 @@ class ClientController extends Controller
                                        ClientRepository $clientRepo, 
                                        Request $request,
                                        ClientHydrate $clientHydrate,
-                                       ObjectManager $manager)
-    {
+                                       ObjectManager $manager) {
+
+        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
        
         if(!$contact)
             $contact = new Contact();
@@ -172,8 +207,12 @@ class ClientController extends Controller
     /**
      * @Route("/admin/client/{id}/delete", options={"expose"=true}, name="client_delete")
      */
-    public function delete(Client $client, ObjectManager $manager)
-    {
+    public function delete(Client $client, ObjectManager $manager) {
+
+        if (!$this->securityUtility->checkHasDelete($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
         $manager->remove($client);
         $manager->flush();
 
@@ -184,8 +223,12 @@ class ClientController extends Controller
     /**
      * @Route("/admin/client/contact/{id}/delete", options={"expose"=true}, name="client_contact_delete")
      */
-    public function contactDelete(Contact $contact, ObjectManager $manager)
-    {
+    public function contactDelete(Contact $contact, ObjectManager $manager) {
+
+        if (!$this->securityUtility->checkHasDelete($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
         $manager->remove($contact);
         $manager->flush();
 

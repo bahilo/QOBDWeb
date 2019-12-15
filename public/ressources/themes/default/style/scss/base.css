@@ -1,22 +1,61 @@
-td.details-control {
+body {
+  table-layout: fixed;
+}
+
+body .app-body td.details-control {
   cursor: pointer;
 }
 
-td.details-control:before {
-  content: "\f49e";
+body .app-body td.details-control:before {
+  content: "\f044";
+  font-family: 'Font Awesome\ 5 Free';
   position: relative;
   top: 14;
   left: 10px;
 }
 
-tr.details td.details-control:before {
-  content: "\f07c";
+body .app-body tr.details td.details-control:before {
+  content: "\f057";
+  font-family: 'Font Awesome\ 5 Free';
   position: relative;
   top: 0;
   left: 10px;
 }
 
-.breadcrumb-menu .btn {
-  font-size: 20px;
+body .app-body .breadcrumb-menu .btn {
+  font-size: inherit;
+}
+
+body .app-body .body-header.breadcrumb {
+  background: none;
+}
+
+body .app-body .body-header.breadcrumb .breadcrumb-menu .btn:hover {
+  color: white;
+  background: #1b8eb7;
+}
+
+body .app-body .body-header.breadcrumb .breadcrumb-menu .btn {
+  padding: 4px 13px;
+  color: white;
+  background: #1b8eb7;
+}
+
+body .app-body ul.pagination .page-item {
+  cursor: pointer;
+}
+
+body .app-body .security-wrapper .input-control {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+body .app-body .setting-wrapper .switch-label {
+  width: 96px;
+}
+
+body .app-body .setting-wrapper .switch-wrapper label {
+  display: inline-block;
+  margin-bottom: -0.5rem;
 }
 /*# sourceMappingURL=base.css.map */

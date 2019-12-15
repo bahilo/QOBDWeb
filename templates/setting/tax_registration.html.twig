@@ -1,33 +1,48 @@
 {% extends 'template_coreui.html.twig' %}
 
-{% block title %}Configuration de la Tax{% endblock %}
+{% set page_title = 'Editer tax' %}
 
-{% block stylesheets %}
+{% block home_path %}
+<li class="breadcrumb-item">
+    <a href="{{ path("setting_home") }}">Configuration</a>
+</li>
+<li class="breadcrumb-item">
+    {{ page_title }}
+</li>
+{% endblock %}
 
+{% block body_header_right %}
+    <button form="global_form" type="submit" class="btn btn-"><i class="fa fa-save"></i></button>
 {% endblock %}
 
 {% block body %}
 
-<div class="brand-wrapper">
+<div class="tax-wrapper">
 
-    <div class="container">
-        <h1>Création de la Tax !</h1>
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa fa-align-justify"></i> {{ page_title }}</div>
+                    <div class="card-body">
 
-        {{ form_start(formTax) }}
+                        {{ form_start(formTax, { 'attr': {'id': 'global_form' }}) }}
 
 
-        {{ form_row(formTax.Type,{'label': 'désignation de la Tax', 'attr': {'placeholder': 'désignation de la Tax'}})
-        }}
-        {{ form_row(formTax.Value,{'label': 'Valeur', 'attr': {'placeholder': 'Valeur'}}) }}
-        {{ form_row(formTax.CommentContent,{'label': 'Commentiare', 'attr': {'placeholder': 'Commentaire'}}) }}
-        {{ form_row(formTax.IsCurrent, {'label': 'sélectionner cette tax'}) }}
-        {{ form_row(formTax.IsTVAMarge, {'label': 'TVA/Marge'}) }}
+                        {{ form_row(formTax.Type,{'label': 'désignation de la Tax', 'attr': {'placeholder': 'désignation de la Tax'}})
+                        }}
+                        {{ form_row(formTax.Value,{'label': 'Valeur', 'attr': {'placeholder': 'Valeur'}}) }}
+                        {{ form_row(formTax.CommentContent,{'label': 'Commentiare', 'attr': {'placeholder': 'Commentaire'}}) }}
+                        {{ form_row(formTax.IsCurrent, {'label': 'sélectionner cette tax'}) }}
+                        {{ form_row(formTax.IsTVAMarge, {'label': 'TVA/Marge'}) }}
 
-        <button type="submit" class="btn btn-success">Ajouter la tax</button>
-
-        {{ form_end(formTax) }}
+                        {{ form_end(formTax) }}
+                    </div> 
+                </div> 
+            </div> 
+        </div>
     </div>
-
 </div>
 
 {% endblock %}

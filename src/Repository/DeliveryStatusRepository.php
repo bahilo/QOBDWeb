@@ -2,9 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\Delivery;
 use App\Entity\DeliveryStatus;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @method DeliveryStatus|null find($id, $lockMode = null, $lockVersion = null)
@@ -36,6 +37,15 @@ class DeliveryStatusRepository extends ServiceEntityRepository
     }
     */
 
+    public function findOneByDelivery(Delivery $delivery): ?DeliveryStatus
+    {
+        return $this->createQueryBuilder('d')
+            ->innerJoin('d.deliveries','d_dl')
+            ->andWhere('d_dl.id = :deliveryId')
+            ->setParameter('deliveryId', $delivery->getId())
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
     /*
     public function findOneBySomeField($value): ?DeliveryStatus
     {

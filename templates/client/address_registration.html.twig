@@ -1,35 +1,42 @@
 {% extends 'template_coreui.html.twig' %}
 
-{% block title %}Nouvelle Adresse{% endblock %}
+{% set page_title = 'Nouvelle adresse' %}
 
-{% block stylesheets %}
-
+{% block home_path %}
+<li class="breadcrumb-item">
+    {{ page_title }}
+</li>
 {% endblock %}
 
 {% block body %}
 
 <div class="client-wrapper">
 
-    <div class="container">
-        <h1>Création d'une adresse !</h1>
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa fa-align-justify"></i> {{ page_title }}</div>
+                    <div class="card-body">
+                        {{ form_start(formAddress, { 'attr': {'id': 'global_form' }}) }}
 
-        {{ form_start(formAddress) }}
 
+                        {{ form_row(formAddress.Name,{'label': 'Intitulé de l\'address', 'attr': {'placeholder': 'Intitulé de l\'address'}})
+                        }}
+                        {{ form_row(formAddress.Street,{'label': 'Adresse', 'attr': {'placeholder': 'Adresse'}}) }}
+                        {{ form_row(formAddress.ZipCode,{'label': 'Code Postal', 'attr': {'placeholder': 'Code Postal'}}) }}
+                        {{ form_row(formAddress.City,{'label': 'Ville', 'attr': {'placeholder': 'Ville'}}) }}
+                        {{ form_row(formAddress.Country,{'label': 'Pays', 'attr': {'placeholder': 'Pays'}}) }}
+                        {{ form_row(formAddress.ContentComment,{'label': 'Commentaire', 'attr': {'placeholder': 'Commentaire'}})
+                        }}
 
-        {{ form_row(formAddress.Name,{'label': 'Intitulé de l\'address', 'attr': {'placeholder': 'Intitulé de l\'address'}})
-        }}
-        {{ form_row(formAddress.Street,{'label': 'Adresse', 'attr': {'placeholder': 'Adresse'}}) }}
-        {{ form_row(formAddress.ZipCode,{'label': 'Code Postal', 'attr': {'placeholder': 'Code Postal'}}) }}
-        {{ form_row(formAddress.City,{'label': 'Ville', 'attr': {'placeholder': 'Ville'}}) }}
-        {{ form_row(formAddress.Country,{'label': 'Pays', 'attr': {'placeholder': 'Pays'}}) }}
-        {{ form_row(formAddress.ContentComment,{'label': 'Commentaire', 'attr': {'placeholder': 'Commentaire'}})
-        }}
-
-        <button type="submit" class="btn btn-success">Ajouter l'agent</button>
-
-        {{ form_end(formAddress) }}
+                        {{ form_end(formAddress) }}
+                    </div> 
+                </div> 
+            </div> 
+        </div>
     </div>
-
 </div>
 
 {% endblock %}

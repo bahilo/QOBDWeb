@@ -8,6 +8,8 @@
 {% set page_title = "Détail Devis n° #" ~ order.id %}
 {% elseif status_order is defined %}
 {% set target = { link: "order_validation", param: [{id: order.id, idStatus: status_order.id}, {id: order.id, idStatus: status_valid.id}]} %}
+{% elseif status_refund is defined %}
+{% set target = { link: "order_validation", param: [{id: order.id, idStatus: status_refund.id}]} %}
 {% endif %}
 
 {% block title %} {{ page_title }} {% endblock %}
@@ -22,26 +24,43 @@
 {% endblock %}
 
 {% block body_header_left %}
-    {% if status_preorder is defined %}
-    <a href="{{ path(target.link, target.param[0]) }}" class="btn btn-success">Convertir en commande</a>
-    <a href="{{ path(target.link, target.param[1]) }}" class="btn btn-danger">Convertir en avoir</a>
-    {% endif %}
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="callout callout-info">
+            <small class="text-muted">Commande</small><br>
+            <strong class="h4">{{ status.displayname }}</strong>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <div class="callout callout" >
+            <!-- <small class="text-muted">Commande</small><br>
+            <strong class="h4">{{ status.displayname }}</strong> -->
+            <div class="">
+                Commande n°# {{ order.id }} du {{ order.createdat | date("Y/m/d") }} en cours pour la société <a href="#">{{ order.client.companyname }}</a> géré par 
+                {{ order.agent.Firstname }} {{ order.agent.LastName }}
+            </div>
+            {% if status_preorder is defined %}
+            <div class="btn-group">
+                <a href="{{ path(target.link, target.param[0]) }}" class="btn btn-success">Convertir en commande</a>
+                <a href="{{ path(target.link, target.param[1]) }}" class="btn btn-danger">Convertir en avoir</a>
+            </div>
+            {% endif %}
+            
+            {% if status_order is defined %}
+            <a href="{{ path(target.link, target.param[0]) }}" class="btn btn-success">Convertir en commande</a>
+            <a href="{{ path(target.link, target.param[1]) }}" class="btn btn-warning">Re-valider avec le client</a>
+            {% elseif status_refund is defined %}
+            <a href="{{ path(target.link, target.param[0]) }}" class="btn btn-success">Convertir en avoir</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
     
-    {% if status_order is defined %}
-    <a href="{{ path(target.link, target.param[0]) }}" class="btn btn-success">Convertir
-        en commande</a>
-    <a href="{{ path(target.link, target.param[1]) }}" class="btn btn-warning">Re-valider avec le client</a>
-    {% endif %}
+
 {% endblock %}
 
-{% block body_header_right %}
-    <div class="btn-group" role="group" aria-label="Button group">
-        <a class="btn" href="#">
-            <i class="icon-speech"></i>
-        </a>
-        <input form="global_form" type="submit" value="save" style="color: #20a8d8">
-    </div>
-{% endblock %}
 
 {% block body %}
 
@@ -59,37 +78,92 @@
                         <div class="card-body">
                             <table id="order_detail_table_js" class="table table-responsive-md table-bordered table-striped table-md">
                             </table>
-                            <nav>
-                                <ul class="pagination">
-                                    <li class="page-item">
-                                        <a class="page-link" href="#">Prev</a>
-                                    </li>
-                                    <li class="page-item active">
-                                        <a class="page-link" href="#">1</a>
-                                    </li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#">2</a>
-                                    </li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#">3</a>
-                                    </li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#">4</a>
-                                    </li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#">Next</a>
-                                    </li>
-                                </ul>
-                            </nav>
                         </div>
                     </div>
                 </div>
                 <!-- /.col-->
             </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card border border-info">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    <div class="callout callout-warning">
+                                        <small class="text-muted">Total HT</small>
+                                        <br>
+                                        <strong class="h4">78,623</strong>
+                                        <div class="chart-wrapper">
+                                            <canvas id="sparkline-chart-3" width="100" height="30"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.col-->
+                                <div class="col-sm-2">
+                                    <div class="callout callout-success">
+                                        <small class="text-muted">Total TTC</small>
+                                        <br>
+                                        <strong class="h4">49,123</strong>
+                                        <div class="chart-wrapper">
+                                            <canvas id="sparkline-chart-4" width="100" height="30"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.col-->
+                                <div class="col-sm-2">
+                                    <div class="callout callout-primary">
+                                        <small class="text-muted">Marge (%)</small>
+                                        <br>
+                                        <strong class="h4">49,123</strong>
+                                        <div class="chart-wrapper">
+                                            <canvas id="sparkline-chart-4" width="100" height="30"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.col-->
+                                <div class="col-sm-2">
+                                    <div class="callout callout-secondary">
+                                        <small class="text-muted">Marge ($)</small>
+                                        <br>
+                                        <strong class="h4">49,123</strong>
+                                        <div class="chart-wrapper">
+                                            <canvas id="sparkline-chart-4" width="100" height="30"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.col-->
+                                <div class="col-sm-2">
+                                    <div class="callout callout-danger">
+                                        <small class="text-muted">Montant TVA</small>
+                                        <br>
+                                        <strong class="h4">49,123</strong>
+                                        <div class="chart-wrapper">
+                                            <canvas id="sparkline-chart-4" width="100" height="30"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.col-->
+                                <div class="col-sm-2">
+                                    <div class="callout callout-info">
+                                        <small class="text-muted">TVA</small>
+                                        <br>
+                                        <strong class="h4">49,123</strong>
+                                        <div class="chart-wrapper">
+                                            <canvas id="sparkline-chart-4" width="100" height="30"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.col-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
             <div class="row">
                 <div class="col-sm-6 col-md-4">
-                    <div class="card">
+                    <div class="card border-primary">
                         <div class="card-header">
                             <i class="fa fa-align-justify"></i> commentaire(interne) 
                         </div>
@@ -109,7 +183,7 @@
                     </div>
                 </div>
                 <div class="col-sm-6 col-md-4">
-                    <div class="card">
+                    <div class="card  border-info">
                         <div class="card-header">
                             <i class="fa fa-align-justify"></i> commentaire admin
                         </div>
@@ -150,7 +224,7 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
-                            <i class="fa fa-align-justify"></i> settings
+                            <i class="fa fa-align-justify"></i> Devis
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -188,6 +262,9 @@
                                         <label for="inptDuree">Duree de validité du devis</label>
                                         <input type="number" name="order_detail_form[setting][devis][duree]" id="inptDuree" class="form-control" value="{{ order.ValidityPeriode | default(2) }}">
                                     </div>
+                                    <div class="btndevis-wrapper">
+                                        <a href="{{ path("order_pdf_quote", {id: order.id}) }}" class="btn btn-success">Générer le devis</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -195,7 +272,7 @@
                 </div>
             </div>            
         </form> 
-        {% if order_detail_delivery_data_source is defined %}
+        {% if order_detail_delivery_data_source is defined and order_detail_delivery_data_source != '[]' %}
         <form action="{{ path("order_delivery_save", { id: order.id }) }}" method="post">
             <div class="row">
                 <div class="col-md-12">
@@ -221,7 +298,7 @@
         </form>
         <input type="hidden" id="order_detail_delivery_data_source" value="{{ order_detail_delivery_data_source }}">
         {% endif %}
-        {% if order_detail_bill_data_source is defined %}
+        {% if order_detail_bill_data_source is defined and order_detail_bill_data_source != '[]' %}
         <form action="{{ path("order_bill_save", {id: order.id}) }}" method="post">
             <div class="row">
                 <div class="col-md-12">
@@ -250,6 +327,7 @@
         </form>
         <input type="hidden" id="order_detail_bill_data_source" value="{{ order_detail_bill_data_source }}">
         {% endif %}
+        {% if delivery_data_source is defined %}
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
@@ -264,6 +342,9 @@
                 </div>
             </div>
         </div>
+        <input type="hidden" id="delivery_data_source" value="{{ delivery_data_source }}">
+        {% endif %}
+        {% if bill_data_source is defined  %}
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
@@ -273,18 +354,12 @@
                     <div class="card-body">
                         <table id="bill_table_js" class="table table-responsive-md table-bordered table-striped table-md">
                         </table>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <textarea name="order_detail_form[bill][comment][private]" cols="30" rows="10"></textarea>
-                            </div>
-                            <div class="col-md-6">
-                                <textarea name="order_detail_form[bill][comment][public]" cols="30" rows="10"></textarea>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
+        <input type="hidden" id="bill_data_source" value="{{ bill_data_source }}">
+        {% endif %}
         {#% if status_preorder is defined %#}
         <form action="" method="post">
             <div class="row">
@@ -320,7 +395,11 @@
     </div>
     
 <input type="hidden" id="order_detail_data_source" value="{{ order_detail_data_source }}">
-<input type="hidden" id="bill_data_source" value="{{ bill_data_source }}">
+
+{% if status_refund is defined %}
+    <input type="hidden" id="status_refund" value="{{ status_refund.id }}">
+{% endif %}
+
 
 {% endblock %}
 {% block javascripts %}

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Agent;
+use App\Entity\Discussion;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
@@ -22,19 +23,20 @@ class AgentRepository extends ServiceEntityRepository
     // /**
     //  * @return Agent[] Returns an array of Agent objects
     //  */
-    /*
-    public function findByExampleField($value)
+    
+    public function findByDiscussion(Discussion $discussion)
     {
         return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
-            ->setParameter('val', $value)
+            ->innerJoin('a.agentDiscussions', 'a_ad')
+            ->innerJoin('a_ad.discussion', 'a_ad_d')
+            ->andWhere('a_ad_d.id = :id')
+            ->setParameter('id', $discussion->getId())
             ->orderBy('a.id', 'ASC')
-            ->setMaxResults(10)
             ->getQuery()
             ->getResult()
         ;
     }
-    */
+    
 
     /*
     public function findOneBySomeField($value): ?Agent

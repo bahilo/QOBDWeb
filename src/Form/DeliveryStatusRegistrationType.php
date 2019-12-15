@@ -13,6 +13,7 @@ class DeliveryStatusRegistrationType extends AbstractType
     {
         $builder
             ->add('Name')
+            ->add('DisplayName')
         ;
     }
 

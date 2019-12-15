@@ -13,7 +13,7 @@ class RoleRegistrationType extends AbstractType
     {
         $builder
             ->add('Name')
-            //->add('Actions')
+            ->add('DisplayName')
             //->add('agents')
         ;
     }

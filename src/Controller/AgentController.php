@@ -2,85 +2,55 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\Request;
-use Doctrine\Common\Persistence\ObjectManager;
-use App\Repository\AgentRepository;
 use App\Entity\Agent;
-use App\Services\QOBDSerializer;
+use App\Services\Utility;
+use App\Services\Serializer;
+use App\Services\SecurityManager;
+use App\Repository\AgentRepository;
+use App\Repository\ActionRepository;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 class AgentController extends Controller
 {
 
+    protected $securityUtility;
+    protected $actionRepo;
+
+
+    public function __construct(SecurityManager $securityUtility, ActionRepository $actionRepo)
+    {
+        $this->securityUtility = $securityUtility;
+        $this->actionRepo = $actionRepo;
+    }
+    
     /**
      * @Route("/admin/agent", name="agent_home")
      */
-    public function home(AgentRepository $agentRepo, QOBDSerializer $QOBDSerializer)
+    public function home(AgentRepository $agentRepo, Serializer $serializer, Utility $utility)
     {
+        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_AGENT']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
         return $this->render('agent/index.html.twig', [
-            'agents_data_source' => $QOBDSerializer->getSerializer()->serialize($agentRepo->findAll(), 'json'),
+            'agents_data_source' => $serializer->serialize(['object_array' => $agentRepo->findAll(), 'format' => 'json', 'group' => 'class_property']),
         ]);
     }
-
-    // /**
-    //  * @Route("/agent/create", name="agent_create")
-    //  * @Route("/agent/{id}/edit", options={"expose"=true}, name="agent_edit")
-    //  */
-    // public function create(Agent $agent = null,Request $request, ObjectManager $manager)
-    // {
-    //     if(!$agent){
-    //         $agent = new Agent();
-    //     }
-        
-    //     $form = $this->createFormBuilder($agent)
-    //                  ->add('FirstName')
-    //                  ->add('LastName')
-    //                  ->add('Phone')
-    //                  ->add('Fax')
-    //                  ->add('Email')
-    //                  ->add('UserName')
-    //                  ->add('Password')
-    //                  ->add('Confirme_password')
-    //                  ->add('Picture')
-    //                  ->add('IsActivated')
-    //                  ->getForm();
-
-    //     $form->handleRequest($request);
-
-    //     if($form->isSubmitted() && $form->isValid() ){
-    //         $agent->setIsAdmin(false);
-    //         $manager->persist($agent);
-    //         $manager->flush();
-
-    //         return $this->redirectToRoute('agent_home', [
-    //             'id' => $agent->getId()
-    //         ]);
-    //     }
-
-    //     return $this->render('agent/create.html.twig', [
-    //         'formAgent' => $form->createView()
-    //     ]);
-    // }
 
     /**
      * @Route("/admin/agent/{id}/show", options={"expose"=true}, name="agent_show")
      */
-    public function show(Agent $agent)
-    {
+    public function show(Agent $agent,
+        Utility $utility
+    ) {
+
+        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_AGENT']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+        
         return $this->render('agent/show.html.twig', [
             'agent' =>$agent,
         ]);
     }
-
-    // /**
-    //  * @Route("/agent/{id}/delete", options={"expose"=true}, name="agent_delete")
-    //  */
-    // public function delete(Agent $agent, ObjectManager $manager)
-    // {
-    //     $manager->remove($agent);
-    //     $manager->flush();
-
-    //     return $this->RedirectToRoute('agent_home');
-    // }
 }

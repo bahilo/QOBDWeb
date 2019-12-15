@@ -24,11 +24,6 @@ class Message
     private $Discussion;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Agent", inversedBy="messages")
-     */
-    private $Agent;
-
-    /**
      * @ORM\Column(type="string", length=255)
      */
     private $Content;
@@ -43,9 +38,13 @@ class Message
      */
     private $CreatedAt;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Agent", inversedBy="messages")
+     */
+    private $Agent;
+
     public function __construct()
     {
-        $this->Agent = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -61,32 +60,6 @@ class Message
     public function setDiscussion(?Discussion $Discussion): self
     {
         $this->Discussion = $Discussion;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Agent[]
-     */
-    public function getAgent(): Collection
-    {
-        return $this->Agent;
-    }
-
-    public function addAgent(Agent $agent): self
-    {
-        if (!$this->Agent->contains($agent)) {
-            $this->Agent[] = $agent;
-        }
-
-        return $this;
-    }
-
-    public function removeAgent(Agent $agent): self
-    {
-        if ($this->Agent->contains($agent)) {
-            $this->Agent->removeElement($agent);
-        }
 
         return $this;
     }
@@ -123,6 +96,18 @@ class Message
     public function setCreatedAt(\DateTimeInterface $CreatedAt): self
     {
         $this->CreatedAt = $CreatedAt;
+
+        return $this;
+    }
+
+    public function getAgent(): ?Agent
+    {
+        return $this->Agent;
+    }
+
+    public function setAgent(?Agent $Agent): self
+    {
+        $this->Agent = $Agent;
 
         return $this;
     }

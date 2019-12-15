@@ -2,9 +2,11 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Groups;
+use Doctrine\Common\Collections\Collection;
+use JMS\Serializer\Annotation\SerializedName;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\DeliveryRepository")
@@ -15,26 +17,34 @@ class Delivery
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"class_property"})
+     * @SerializedName("id")
      */
     private $id;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"class_property"})
+     * @SerializedName("Package")
      */
     private $Package;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"class_property"})
+     * @SerializedName("CreatedAt")
      */
     private $CreatedAt;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\DeliveryStatus", inversedBy="deliveries")
+     * @Groups({"class_relation"})
      */
     private $Status;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\QuantityDelivery", mappedBy="Delivery")
+     * @Groups({"class_relation"})
      */
     private $quantityDeliveries;
 

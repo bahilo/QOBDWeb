@@ -1,51 +1,60 @@
 {% extends 'template_coreui.html.twig' %}
 
-{% block title %}Page de Seurity{% endblock %}
 
-{% block stylesheets %} 
+{#% set model = {page_title: 'Privileges', page: 'security/_partials/security.html', security_target: 'home', route_plus: 'security_home'} %}
+
+{% if target_action is defined  and target_role is not defined %}
+    {% set model = {page_title: 'Actions', page: 'security/_partials/action.html', security_target: 'action', route_plus: 'security_action_registration' } %}
+{% elseif target_role is defined %}
+    {% set model = {page_title: 'Roles', page: 'security/_partials/role.html', security_target: 'role', route_plus: 'security_role_registration'} %}
+{% elseif target_profile is defined %}
+    {% set model = {page_title: 'Profile', page: 'security/_partials/profile.html', security_target: 'profile', route_plus: 'security_role_registration'} %}
+{% endif %#}
+
+
+{% block home_path %}
+<li class="breadcrumb-item">
+    <a href="#">Securité</a>
+</li>
+<li class="breadcrumb-item">
+    {{ page_title }}
+</li>
+{% endblock %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block body_header_right %}
+    {% if route_plus is defined %}
+        <a href="{{ route_plus }}" class="btn btn-primary"><i class="fa fa-plus"></i></a>
+    {% else %}
+        <button form="global_form" type="submit" class="btn btn-"><i class="fa fa-save"></i></button>
+    {% endif %}
 {% endblock %}
 
 {% block body %}
 
     <div class="security-wrapper">
         
-        <div class="container">
-            <h1>Page Security!</h1>
-           
+        <div class="animated fadeIn">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fa fa-align-justify"></i>{{ page_title }}</div>
+                        <div class="card-body">
 
-            <ul class="nav nav-tabs">
-                <li class="nav-item">
-                    <a class="nav-link active" href="#security" data-toggle="tab">Securité</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#profile" data-toggle="tab">Profile</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#action" data-toggle="tab">Actions</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#role" data-toggle="tab">Roles</a>
-                </li>
-            </ul>
+                            {% include page %}
 
-            <div class="tab-content">
-                <div class="tab-pane active" id="security">
-                    {% include 'security/_partials/index.html' %}                   
-                </div>
-                <div class="tab-pane" id="profile">
-                    {% include 'security/_partials/profile.html' %}
-                </div>
-                <div class="tab-pane" id="action">
-                    {% include 'security/_partials/action.html' %}
-                </div>
-                <div class="tab-pane" id="role">
-                    {% include 'security/_partials/role.html' %}
+                        </div>
+                    </div>
                 </div>
             </div>
-
         </div>
-
     </div>
+
+{% if security_target is defined %}
+    <input type="hidden" id="security_target" value="{{ security_target }}">
+{% endif %}
 
 {% endblock %}
 {% block javascripts %} 

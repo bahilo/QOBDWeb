@@ -2,9 +2,11 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Groups;
+use Doctrine\Common\Collections\Collection;
+use JMS\Serializer\Annotation\SerializedName;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\RoleRepository")
@@ -15,23 +17,36 @@ class Role
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"class_property"})
+     * @SerializedName("id")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"class_property"})
+     * @SerializedName("Name")
      */
     private $Name;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Agent", mappedBy="Roles")
+     * @Groups({"class_relation"})
      */
     private $agents;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\ActionRole", mappedBy="Role")
+     * @Groups({"class_relation"})
      */
     private $actionRoles;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("DisplayName")
+     */
+    private $DisplayName;
 
     public function __construct()
     {
@@ -111,6 +126,18 @@ class Role
                 $actionRole->setRole(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDisplayName(): ?string
+    {
+        return $this->DisplayName;
+    }
+
+    public function setDisplayName(?string $DisplayName): self
+    {
+        $this->DisplayName = $DisplayName;
 
         return $this;
     }

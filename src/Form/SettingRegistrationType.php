@@ -15,6 +15,7 @@ class SettingRegistrationType extends AbstractType
             ->add('Name')
             ->add('Value')
             ->add('Code')
+            ->add('IsFile')
         ;
     }
 

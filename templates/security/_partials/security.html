@@ -1,0 +1,30 @@
+
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link active" href="#security" data-toggle="tab">Securité</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#profile" data-toggle="tab">Profile</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#action" data-toggle="tab">Actions</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#role" data-toggle="tab">Roles</a>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane active" id="security">
+        {% include 'security/_partials/index.html' %}
+    </div>
+    <div class="tab-pane" id="profile">
+        {% include 'security/_partials/profile.html' %}
+    </div>
+    <div class="tab-pane" id="action">
+        {% include 'security/_partials/action.html' %}
+    </div>
+    <div class="tab-pane" id="role">
+        {% include 'security/_partials/role.html' %}
+    </div>
+</div>

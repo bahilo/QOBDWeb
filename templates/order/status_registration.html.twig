@@ -1,28 +1,45 @@
 {% extends 'template_coreui.html.twig' %}
 
-{% block title %}Nouvelle statut{% endblock %}
+{% set page_title = 'Nouveau statut commande' %}
 
-{% block stylesheets %}
+{% block home_path %}
+<li class="breadcrumb-item">
+    <a href="{{ path("order_home") }}">Commandes</a>
+</li>
+<li class="breadcrumb-item">
+    {{ page_title }}
+</li>
+{% endblock %}
 
+{% block title %}{{ page_title }} {% endblock %}
+
+{% block body_header_right %}
+    <button form="global_form" type="submit" class="btn btn-"><i class="fa fa-save"></i></button>
 {% endblock %}
 
 {% block body %}
 
-<div class="brand-wrapper">
+<div class="status-order-wrapper">
 
-    <div class="container">
-        <h1>Création d'un statut pour les commandes !</h1>
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa fa-align-justify"></i> {{ page_title }}</div>
+                    <div class="card-body">
 
-        {{ form_start(formStatus) }}
+                        {{ form_start(formStatus, { 'attr': {'id': 'global_form' }}) }}
 
-        {{ form_row(formStatus.Name,{'label': 'désignation du statut', 'attr': {'placeholder': 'désignation du statut'}})
-        }}
+                        {{ form_row(formStatus.Name,{'label': 'désignation du statut', 'attr': {'placeholder': 'désignation du statut'}}) }}
+                        {{ form_row(formStatus.DisplayName,{'label': 'description', 'attr': {'placeholder': 'description'}}) }}
 
-        <button type="submit" class="btn btn-success">Ajouter le statut</button>
-
-        {{ form_end(formStatus) }}
+                        {{ form_end(formStatus) }}
+                    </div> 
+                </div> 
+            </div> 
+        </div>
     </div>
-
 </div>
 
 {% endblock %}

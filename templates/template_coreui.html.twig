@@ -6,13 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>{% block title %}Welcome!{% endblock %}</title>
     <link rel="stylesheet" href="{{ asset('bootstrap.min.css', 'bootstrap_css') }}">
-    <link rel="stylesheet" href="https://unpkg.com/@coreui/coreui/dist/css/coreui.min.css">
-    <!-- <link rel="stylesheet" href="{{ asset('datatables.min.css', 'datatable_dir') }}"> -->
-    <link rel="stylesheet" href="{{ asset('all.min.css', 'font_awsome_css') }}">
+    <link rel="stylesheet" href="{{ asset('all.min.css', 'font_awsome_css') }}">   
+    <link rel="stylesheet" href="{{ asset('style/scss/coreui.css', 'theme_coreui') }}">       
     <link rel="stylesheet" href="{{ asset('style/scss/base.css', 'theme_default') }}">
-
-
-
 
     {% block stylesheets %} {% endblock %}
 </head>
@@ -23,7 +19,7 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <a class="navbar-brand" href="#">
-        <img class="navbar-brand-full" src="{{ asset('image/brand/logo.svg', 'theme_coreui') }}" width="89" height="25" alt="CoreUI Logo">
+        <img class="navbar-brand-full" src="{{ search.logo }}" width="89" height="25" alt="CoreUI Logo">
         <img class="navbar-brand-minimized" src="{{ asset('image/brand/sygnet.svg', 'theme_coreui') }}" width="30" height="30" alt="CoreUI Logo">
       </a>
       <button class="navbar-toggler sidebar-toggler d-md-down-none" type="button" data-toggle="sidebar-lg-show">
@@ -43,39 +39,43 @@
       <ul class="nav navbar-nav ml-auto">
         <li class="nav-item d-md-down-none">
           <a class="nav-link" href="#">
-            <i class="icon-bell"></i>
+            <i class="fa fa-bell"></i>
             <span class="badge badge-pill badge-danger">5</span>
           </a>
         </li>
         <li class="nav-item d-md-down-none">
           <a class="nav-link" href="#">
-            <i class="icon-list"></i>
+            <i class="fa fa-list"></i>
           </a>
         </li>
         <li class="nav-item d-md-down-none">
           <a class="nav-link" href="#">
-            <i class="icon-location-pin"></i>
+            <i class="fa fa-map-marker-alt"></i>
           </a>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-            <img class="img-avatar" src="{{ asset('image/avatars/6.jpg', 'theme_coreui') }}" alt="admin@bootstrapmaster.com">
+            {% if app.user.picture is not null %}
+            <img class="img-avatar" src="{{ asset('avatars/' ~ app.user.picture, 'download_dir') }}" alt="Image profile">
+            {% else %}
+            <img class="img-avatar" src="{{ asset('avatars/default.png', 'download_dir') }}" alt="Image profile">
+            {% endif %}
           </a>
           <div class="dropdown-menu dropdown-menu-right">
             <div class="dropdown-header text-center">
               <strong>Account</strong>
             </div>
             <a class="dropdown-item" href="#">
-              <i class="fa fa-envelope-o"></i> Messages
+              <i class="fa fa-envelope"></i> Messages
               <span class="badge badge-success">42</span>
             </a>
             <div class="dropdown-header text-center">
               <strong>Settings</strong>
             </div>
-            <a class="dropdown-item" href="#">
+            <a class="dropdown-item" href="{{ path("agent_show", {id: app.user.id}) }}">
               <i class="fa fa-user"></i> Profile</a>
-            <a class="dropdown-item" href="#">
-              <i class="fa fa-wrench"></i> Settings</a>
+            <!-- <a class="dropdown-item" href="#">
+              <i class="fa fa-cog"></i> Settings</a> -->
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="{{ path("security_logout") }}">
               <i class="fa fa-lock"></i> Logout</a>
@@ -94,15 +94,15 @@
         <nav class="sidebar-nav">
           <ul class="nav">
             <li class="nav-item">
-              <a class="nav-link" href="index.html">
-                <i class="nav-icon icon-speedometer"></i> Dashboard
+              <a class="nav-link" href="{{ path("home") }}">
+                <i class="fa fa-tachometer-alt"></i> Dashboard
                 <!-- <span class="badge badge-primary">NEW</span> -->
               </a>
             </li>
             <li class="nav-title">Catalogue</li>
             <li class="nav-item">
               <a class="nav-link" href="{{ path("catalogue_home") }}">
-                <i class="nav-icon icon-drop"></i> Produits</a>
+                <i class="fa fa-clone"></i> Produits</a>
             </li>
             <!-- <li class="nav-title">Devis</li>
             <li class="nav-item">
@@ -112,113 +112,147 @@
             <li class="nav-title">Commandes/Avoirs</li>
             <li class="nav-item nav-dropdown">
               <a class="nav-link nav-dropdown-toggle" href="#">
-                <i class="nav-icon icon-puzzle"></i> Commandes</a>
+                <i class="fa fa-align-justify"></i> Commandes</a>
               <ul class="nav-dropdown-items">
                 <li class="nav-item">
                   <a class="nav-link" href="{{ path("order_preorder") }}">
-                    <i class="nav-icon icon-puzzle"></i> A valider</a>
+                    <i class="fa fa-calendar"></i> A valider</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="{{ path("order_home") }}">
-                    <i class="nav-icon icon-puzzle"></i> validées</a>
+                    <i class="fa fa-clipboard-check"></i> validées</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="{{ path("order_customer_valid") }}">
-                    <i class="nav-icon icon-puzzle"></i> Revalidation client</a>
+                    <i class="fa fa-calendar-check"></i> Revalidation client</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="{{ path("order_bill") }}">
-                    <i class="nav-icon icon-puzzle"></i> Expédiées</a>
+                    <i class="fa fa-cubes"></i> Expédiées</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="{{ path("order_closed") }}">
-                    <i class="nav-icon icon-puzzle"></i> Cloturées</a>
+                    <i class="fa fa-closed-captioning"></i> Cloturées</a>
                 </li>
               </ul>
             </li>
             <li class="nav-item nav-dropdown">
               <a class="nav-link nav-dropdown-toggle" href="#">
-                <i class="nav-icon icon-cursor"></i> Avoirs</a>
+                <i class="fa fa-align-justify"></i> Avoirs</a>
               <ul class="nav-dropdown-items">
                 <li class="nav-item">
+                    <a class="nav-link" href="{{ path("order_prerefund") }}">
+                        <i class="fa fa-calendar"></i> A valider</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="{{ path("order_refund") }}">
-                        <i class="nav-icon icon-puzzle"></i> validées</a>
+                        <i class="fa fa-clipboard-check"></i> validés</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ path("order_bill_refund") }}">
-                        <i class="nav-icon icon-puzzle"></i> Expédiées</a>
+                        <i class="fa fa-cubes"></i> Expédiés</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ path("order_refund_closed") }}">
-                        <i class="nav-icon icon-puzzle"></i> Cloturées</a>
+                        <i class="fa fa-closed-captioning"></i> Cloturés</a>
                 </li>
               </ul>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="{{ path("order_quote")}}">
-                    <i class="nav-icon icon-puzzle"></i> Devis</a>
+                    <i class="fa fa-align-justify"></i> Devis</a>
             </li>
             <li class="nav-title">Suivi Clientèle</li>
             <li class="nav-item">
                 <a class="nav-link" href="{{ path("client_home") }}">
-                    <i class="nav-icon icon-drop"></i> Clients</a>
+                    <i class="fa fa-user"></i> Clients</a>
             </li>
             <li class="nav-title">Administration</li>
             <li class="nav-item nav-dropdown">
                 <a class="nav-link nav-dropdown-toggle" href="#">
-                    <i class="nav-icon icon-puzzle"></i> Securité</a>
+                    <i class="fa fa-user-secret"></i> Securité</a>
                 <ul class="nav-dropdown-items">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ path("agent_home") }}">
-                            <i class="nav-icon icon-puzzle"></i> Commerciaux</a>
+                    <li class="nav-item nav-dropdown">
+                        <!-- <a class="nav-link" href="{{ path("agent_home") }}">
+                            <i class="fa fa-user-lock"></i> Commerciaux</a> -->
+                            <a class="nav-link nav-dropdown-toggle" href="#">
+                              <i class="fa fa-user-lock"></i> Commerciaux</a>
+                            <ul class="nav-dropdown-items">
+                              <li class="nav-item">
+                                <a class="nav-link" href="{{ path("agent_home") }}">
+                                  <i class="fa fa-fingerprint"></i> Gérer</a>
+                              </li>
+                              <li class="nav-item">
+                                <a class="nav-link" href="{{ path("security_agent_role") }}">
+                                  <i class="fa fa-id-card"></i> Accès</a>
+                              </li>
+                            </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ path("security_home") }}">
-                            <i class="nav-icon icon-puzzle"></i> Roles</a>
+                    <li class="nav-item nav-dropdown">
+                        <a class="nav-link nav-dropdown-toggle" href="#">
+                            <i class="fa fa-id-card"></i> Privilege</a>
+                            <ul class="nav-dropdown-items">
+                              <li class="nav-item">
+                                <a class="nav-link" href="{{ path("security_action") }}">
+                                  <i class="fa fa-fingerprint"></i> Actions</a>
+                              </li>
+                              <li class="nav-item">
+                                <a class="nav-link" href="{{ path("security_role") }}">
+                                  <i class="fa fa-passport"></i> Roles</a>
+                              </li>
+                              <li class="nav-item">
+                                <a class="nav-link" href="{{ path("security_profile") }}">
+                                  <i class="fa fa-passport"></i> Profiles</a>
+                              </li>
+                            </ul>
                     </li>
                 </ul>
             </li>
             <li class="nav-item nav-dropdown">
                 <a class="nav-link nav-dropdown-toggle" href="#">
-                    <i class="nav-icon icon-cursor"></i> Configuration</a>
+                    <i class="fa fa-cog"></i> Configuration</a>
                 <ul class="nav-dropdown-items">
                     <li class="nav-item nav-dropdown">
                       <a class="nav-link nav-dropdown-toggle" href="#">
-                        <i class="nav-icon icon-puzzle"></i> Options</a>
+                        <i class="fa fa-toolbox"></i> Options</a>
                       <ul class="nav-dropdown-items">
                         <li class="nav-item">
                           <a class="nav-link" href="{{ path("setting_home") }}">
-                            <i class="nav-icon icon-puzzle"></i> Générale</a>
+                            <i class="fa fa-sliders-h"></i> Générale</a>
                         </li>
                         <li class="nav-item">
                           <a class="nav-link" href="{{ path("setting_currency") }}">
-                            <i class="nav-icon icon-puzzle"></i> Monnaie</a>
+                            <i class="fa fa-coins"></i> Monnaie</a>
                         </li>
                         <li class="nav-item">
                           <a class="nav-link" href="{{ path("setting_tax") }}">
-                            <i class="nav-icon icon-puzzle"></i> Taxe</a>
+                            <i class="fa fa-money-bill-wave-alt"></i> Taxe</a>
                         </li>
                         <li class="nav-item">
                           <a class="nav-link" href="{{ path("setting_delivery_status") }}">
-                            <i class="nav-icon icon-puzzle"></i> Status facturation</a>
+                            <i class="fa fa-star"></i> Status facturation</a>
                         </li>
                         <li class="nav-item">
                           <a class="nav-link" href="{{ path("setting_order_status") }}">
-                            <i class="nav-icon icon-puzzle"></i> Statut Commande</a>
+                            <i class="fa fa-star-half-alt"></i> Statut Commande</a>
                         </li>
                       </ul>
                     </li>
                     <li class="nav-item nav-dropdown">
                       <a class="nav-link nav-dropdown-toggle" href="#">
-                        <i class="nav-icon icon-puzzle"></i> Produits</a>
+                        <i class="fa fa-clone"></i> Produits</a>
                       <ul class="nav-dropdown-items">
                         <li class="nav-item">
                           <a class="nav-link" href="{{ path("setting_catalogue_brand") }}">
-                            <i class="nav-icon icon-puzzle"></i> Marques</a>
+                            <i class="fa fa-random"></i> Marques</a>
                         </li>
                         <li class="nav-item">
                           <a class="nav-link" href="{{ path("setting_catalogue_group") }}">
-                            <i class="nav-icon icon-puzzle"></i> Familles</a>
+                            <i class="fa fa-caret-square-down"></i> Familles</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="{{ path("setting_catalogue_provider") }}">
+                            <i class="fa fa-hourglass-half"></i> Fournisseurs</a>
                         </li>
                       </ul>
                     </li>
@@ -226,11 +260,11 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#">
-                    <i class="nav-icon icon-puzzle"></i> Notifications</a>
+                    <i class="fa fa-bell"></i> Notifications</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#">
-                    <i class="nav-icon icon-puzzle"></i> Statistiques</a>
+                    <i class="fa fa-signal"></i> Statistiques</a>
             </li>
                         
           </ul>
@@ -257,7 +291,7 @@
         </ol>
         <div class="container-fluid">
           
-          <ol class="breadcrumb">
+          <ol class="breadcrumb body-header">
             <li class="breadcrumb-item active">
               {% block body_header_left %}{% endblock %}
             </li>
@@ -269,291 +303,212 @@
             
         </div>
       </main>
-      <aside class="aside-menu">
-        <ul class="nav nav-tabs" role="tablist">
-          <li class="nav-item">
-            <a class="nav-link active" data-toggle="tab" href="#timeline" role="tab">
-              <i class="icon-list"></i>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#messages" role="tab">
-              <i class="icon-speech"></i>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#settings" role="tab">
-              <i class="icon-settings"></i>
-            </a>
-          </li>
-        </ul>
-        <!-- Tab panes-->
-        <div class="tab-content">
-          <div class="tab-pane active" id="timeline" role="tabpanel">
-            <div class="list-group list-group-accent">
-              <div class="list-group-item list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">Today</div>
-              <div class="list-group-item list-group-item-accent-warning list-group-item-divider">
-                <div class="avatar float-right">
-                  <img class="img-avatar" src="{{ asset('image/avatars/7.jpg', 'theme_coreui') }}" alt="admin@bootstrapmaster.com">
+      <div class="chat-wrapper">
+        <aside class="aside-menu">
+          <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" data-toggle="tab" href="#timeline" role="tab">
+                <i class="fa fa-list"></i>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="tab" href="#messages" role="tab">
+                <i class="fa fa-comments"></i>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="tab" href="#settings" role="tab">
+                <i class="fa fa-cog"></i>
+              </a>
+            </li>
+          </ul>
+          <!-- Tab panes-->
+          <div class="tab-content">
+            <div class="tab-pane active" id="timeline" role="tabpanel">
+              <div class="list-group list-group-accent">
+                <a class="btn btn-info discussion-create" href="{{ path("chat_discussion_register", {name: "test"}) }}"><i class="fa fa-plus-square"></i></a>
+                <div
+                  class="list-group-item list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">
+                  Discussions</div>
+        
+                <div class="discussion-home-wrapper">
+                  {% for discussion in chat.discussions %}
+                  {% set agentOwner = chat.discussion_owner(discussion) %}                  
+                    <div data-id="{{ discussion.id }}" class="list-group-item list-group-item-accent-warning list-group-item-divider">
+                      <div class="avatar float-right">
+                        <img class="img-avatar" src="{{ search.avatar_dir(agentOwner) }}" alt="admin@bootstrapmaster.com">
+                      </div>
+                      <a href="{{ path("chat_agent_discusion", {id: discussion.id }) }}" class="link-discussion"></a>
+                        <strong>{{ discussion.name }}</strong>
+                      </a>
+                      <small class="text-muted mr-3">
+                          {% if agentOwner %}
+                          <div>Créer par
+                            <strong>{{ agentOwner.username }}</strong>
+                          </div>
+                          {% endif %}
+                        <i class="fa fa-calendar"></i> {{ discussion.CreatedAtShort }}</small>
+                      <small class="text-muted mr-3">
+                        <a href="{{ path("chat_delete_discussion", {id: discussion.id}) }}">
+                          <i class="fa fa-trash"></i>
+                        </a>
+                      </small>
+                      {#<small class="text-muted">
+                                                             <i class="fa fa-map-marker-alt"></i>  Palo Alto, CA</small> #}
+                      {% for agent in chat.discussion_users(discussion) %}
+                      <div class="avatars-stack mt-2">
+                        <div class="avatar avatar-xs">
+                          <img class="img-avatar" src="{{ search.avatar_dir(agent) }}" alt="{{ agent.UserName }}">
+                        </div>
+                      </div>
+                      {% endfor %}
+                    </div>
+                  
+        
+                  {% endfor %}
                 </div>
-                <div>Meeting with
-                  <strong>Lucas</strong>
-                </div>
-                <small class="text-muted mr-3">
-                  <i class="icon-calendar"></i>  1 - 3pm</small>
-                <small class="text-muted">
-                  <i class="icon-location-pin"></i>  Palo Alto, CA</small>
+        
+                {# <div class="list-group-item list-group-item-accent-danger list-group-item-divider">
+                                        
+                      </div> #}
               </div>
-              <div class="list-group-item list-group-item-accent-info">
-                <div class="avatar float-right">
-                  <img class="img-avatar" src="{{ asset('image/avatars/4.jpg', 'theme_coreui') }}" alt="admin@bootstrapmaster.com">
-                </div>
-                <div>Skype with
-                  <strong>Megan</strong>
-                </div>
-                <small class="text-muted mr-3">
-                  <i class="icon-calendar"></i>  4 - 5pm</small>
-                <small class="text-muted">
-                  <i class="icon-social-skype"></i>  On-line</small>
-              </div>
-              <div class="list-group-item list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">Tomorrow</div>
-              <div class="list-group-item list-group-item-accent-danger list-group-item-divider">
-                <div>New UI Project -
-                  <strong>deadline</strong>
-                </div>
-                <small class="text-muted mr-3">
-                  <i class="icon-calendar"></i>  10 - 11pm</small>
-                <small class="text-muted">
-                  <i class="icon-home"></i>  creativeLabs HQ</small>
-                <div class="avatars-stack mt-2">
-                  <div class="avatar avatar-xs">
-                    <img class="img-avatar" src="{{ asset('image/avatars/2.jpg', 'theme_coreui') }}" alt="admin@bootstrapmaster.com">
-                  </div>
-                  <div class="avatar avatar-xs">
-                    <img class="img-avatar" src="{{ asset('image/avatars/3.jpg', 'theme_coreui') }}" alt="admin@bootstrapmaster.com">
-                  </div>
-                  <div class="avatar avatar-xs">
-                    <img class="img-avatar" src="{{ asset('image/avatars/4.jpg', 'theme_coreui') }}" alt="admin@bootstrapmaster.com">
-                  </div>
-                  <div class="avatar avatar-xs">
-                    <img class="img-avatar" src="{{ asset('image/avatars/5.jpg', 'theme_coreui') }}" alt="admin@bootstrapmaster.com">
-                  </div>
-                  <div class="avatar avatar-xs">
-                    <img class="img-avatar" src="{{ asset('image/avatars/6.jpg', 'theme_coreui') }}" alt="admin@bootstrapmaster.com">
+            </div>
+            <div class="tab-pane p-3" id="messages" role="tabpanel">
+        
+              {% for message in chat.current_discussion_messages %}
+              <div class="message">
+                <div class="py-3 pb-5 mr-3 float-left">
+                  <div class="avatar">
+                    <img class="img-avatar" src="{{ search.avatar_dir(message.agent) }}" alt="{{ message.agent.username }}">
+                    <span class="avatar-status badge-success"></span>
                   </div>
                 </div>
-              </div>
-              <div class="list-group-item list-group-item-accent-success list-group-item-divider">
                 <div>
-                  <strong>#10 Startups.Garden</strong> Meetup</div>
-                <small class="text-muted mr-3">
-                  <i class="icon-calendar"></i>  1 - 3pm</small>
-                <small class="text-muted">
-                  <i class="icon-location-pin"></i>  Palo Alto, CA</small>
+                  <small class="text-muted">{{ message.agent.username }}</small>
+                  <small class="text-muted float-right mt-1">{{ message.createdat | date('d/m/Y') }} <br />
+                    {{ message.createdat | date('H:m:s') }}</small>
+                </div>
+                <div class="text-truncate font-weight-bold">{{ message.content }}</div>
+                <small class="text-muted">{{ message.content }}</small>
               </div>
-              <div class="list-group-item list-group-item-accent-primary list-group-item-divider">
+              <hr>
+              {% endfor %}
+        
+              {% set last_discussion = chat.last_discussion %}
+              {% if last_discussion %}
+              <div class="char-room">
+                <form action="{{ path("chat_message_register") }}" method="post">
+                  <input type="hidden" name="chat_room[discussion]" value="{{ last_discussion.id }}">
+                  <textarea class="form-control" name="chat_room[message]" id="" style="width: 100%;"></textarea>
+                  <div class="control-wrapper">
+                    {# {% set currentDiscussion = user.lastdiscussion %} #}
+                    <button type="submit" class="btn btn-success"><i class="fa fa paper-plane"></i></button>
+                  </div>
+                </form>
+              </div>
+              {% endif %}
+        
+            </div>
+            <div class="tab-pane p-3" id="settings" role="tabpanel">
+              <h6>Settings</h6>
+              <div class="aside-options">
+                <div class="clearfix mt-4">
+                  <small>
+                    <b>Option 1</b>
+                  </small>
+                  <label class="switch switch-label switch-pill switch-success switch-sm float-right">
+                    <input class="switch-input" type="checkbox" checked="">
+                    <span class="switch-slider" data-checked="On" data-unchecked="Off"></span>
+                  </label>
+                </div>
                 <div>
-                  <strong>Team meeting</strong>
-                </div>
-                <small class="text-muted mr-3">
-                  <i class="icon-calendar"></i>  4 - 6pm</small>
-                <small class="text-muted">
-                  <i class="icon-home"></i>  creativeLabs HQ</small>
-                <div class="avatars-stack mt-2">
-                  <div class="avatar avatar-xs">
-                    <img class="img-avatar" src="{{ asset('image/avatars/2.jpg', 'theme_coreui') }}" alt="admin@bootstrapmaster.com">
-                  </div>
-                  <div class="avatar avatar-xs">
-                    <img class="img-avatar" src="{{ asset('image/avatars/3.jpg', 'theme_coreui') }}" alt="admin@bootstrapmaster.com">
-                  </div>
-                  <div class="avatar avatar-xs">
-                    <img class="img-avatar" src="{{ asset('image/avatars/4.jpg', 'theme_coreui') }}" alt="admin@bootstrapmaster.com">
-                  </div>
-                  <div class="avatar avatar-xs">
-                    <img class="img-avatar" src="{{ asset('image/avatars/5.jpg', 'theme_coreui') }}" alt="admin@bootstrapmaster.com">
-                  </div>
-                  <div class="avatar avatar-xs">
-                    <img class="img-avatar" src="{{ asset('image/avatars/6.jpg', 'theme_coreui') }}" alt="admin@bootstrapmaster.com">
-                  </div>
-                  <div class="avatar avatar-xs">
-                    <img class="img-avatar" src="{{ asset('image/avatars/7.jpg', 'theme_coreui') }}" alt="admin@bootstrapmaster.com">
-                  </div>
-                  <div class="avatar avatar-xs">
-                    <img class="img-avatar" src="{{ asset('image/avatars/8.jpg', 'theme_coreui') }}" alt="admin@bootstrapmaster.com">
-                  </div>
+                  <small class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
+                    incididunt ut labore et dolore magna aliqua.</small>
                 </div>
               </div>
+              <div class="aside-options">
+                <div class="clearfix mt-3">
+                  <small>
+                    <b>Option 2</b>
+                  </small>
+                  <label class="switch switch-label switch-pill switch-success switch-sm float-right">
+                    <input class="switch-input" type="checkbox">
+                    <span class="switch-slider" data-checked="On" data-unchecked="Off"></span>
+                  </label>
+                </div>
+                <div>
+                  <small class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
+                    incididunt ut labore et dolore magna aliqua.</small>
+                </div>
+              </div>
+              <div class="aside-options">
+                <div class="clearfix mt-3">
+                  <small>
+                    <b>Option 3</b>
+                  </small>
+                  <label class="switch switch-label switch-pill switch-success switch-sm float-right">
+                    <input class="switch-input" type="checkbox">
+                    <span class="switch-slider" data-checked="On" data-unchecked="Off"></span>
+                  </label>
+                </div>
+              </div>
+              <div class="aside-options">
+                <div class="clearfix mt-3">
+                  <small>
+                    <b>Option 4</b>
+                  </small>
+                  <label class="switch switch-label switch-pill switch-success switch-sm float-right">
+                    <input class="switch-input" type="checkbox" checked="">
+                    <span class="switch-slider" data-checked="On" data-unchecked="Off"></span>
+                  </label>
+                </div>
+              </div>
+              <hr>
+              <h6>System Utilization</h6>
+              <div class="text-uppercase mb-1 mt-4">
+                <small>
+                  <b>CPU Usage</b>
+                </small>
+              </div>
+              <div class="progress progress-xs">
+                <div class="progress-bar bg-info" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0"
+                  aria-valuemax="100"></div>
+              </div>
+              <small class="text-muted">348 Processes. 1/4 Cores.</small>
+              <div class="text-uppercase mb-1 mt-2">
+                <small>
+                  <b>Memory Usage</b>
+                </small>
+              </div>
+              <div class="progress progress-xs">
+                <div class="progress-bar bg-warning" role="progressbar" style="width: 70%" aria-valuenow="70" aria-valuemin="0"
+                  aria-valuemax="100"></div>
+              </div>
+              <small class="text-muted">11444GB/16384MB</small>
+              <div class="text-uppercase mb-1 mt-2">
+                <small>
+                  <b>SSD 1 Usage</b>
+                </small>
+              </div>
+              <div class="progress progress-xs">
+                <div class="progress-bar bg-danger" role="progressbar" style="width: 95%" aria-valuenow="95" aria-valuemin="0"
+                  aria-valuemax="100"></div>
+              </div>
+              <small class="text-muted">243GB/256GB</small>
+              <div class="text-uppercase mb-1 mt-2">
+                <small>
+                  <b>SSD 2 Usage</b>
+                </small>
+              </div>
+              <div class="progress progress-xs">
+                <div class="progress-bar bg-success" role="progressbar" style="width: 10%" aria-valuenow="10" aria-valuemin="0"
+                  aria-valuemax="100"></div>
+              </div>
+              <small class="text-muted">25GB/256GB</small>
             </div>
           </div>
-          <div class="tab-pane p-3" id="messages" role="tabpanel">
-            <div class="message">
-              <div class="py-3 pb-5 mr-3 float-left">
-                <div class="avatar">
-                  <img class="img-avatar" src="{{ asset('image/avatars/7.jpg', 'theme_coreui') }}" alt="admin@bootstrapmaster.com">
-                  <span class="avatar-status badge-success"></span>
-                </div>
-              </div>
-              <div>
-                <small class="text-muted">Lukasz Holeczek</small>
-                <small class="text-muted float-right mt-1">1:52 PM</small>
-              </div>
-              <div class="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
-              <small class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...</small>
-            </div>
-            <hr>
-            <div class="message">
-              <div class="py-3 pb-5 mr-3 float-left">
-                <div class="avatar">
-                  <img class="img-avatar" src="{{ asset('image/avatars/7.jpg', 'theme_coreui') }}" alt="admin@bootstrapmaster.com">
-                  <span class="avatar-status badge-success"></span>
-                </div>
-              </div>
-              <div>
-                <small class="text-muted">Lukasz Holeczek</small>
-                <small class="text-muted float-right mt-1">1:52 PM</small>
-              </div>
-              <div class="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
-              <small class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...</small>
-            </div>
-            <hr>
-            <div class="message">
-              <div class="py-3 pb-5 mr-3 float-left">
-                <div class="avatar">
-                  <img class="img-avatar" src="{{ asset('image/avatars/7.jpg', 'theme_coreui') }}" alt="admin@bootstrapmaster.com">
-                  <span class="avatar-status badge-success"></span>
-                </div>
-              </div>
-              <div>
-                <small class="text-muted">Lukasz Holeczek</small>
-                <small class="text-muted float-right mt-1">1:52 PM</small>
-              </div>
-              <div class="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
-              <small class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...</small>
-            </div>
-            <hr>
-            <div class="message">
-              <div class="py-3 pb-5 mr-3 float-left">
-                <div class="avatar">
-                  <img class="img-avatar" src="{{ asset('image/avatars/7.jpg', 'theme_coreui') }}" alt="admin@bootstrapmaster.com">
-                  <span class="avatar-status badge-success"></span>
-                </div>
-              </div>
-              <div>
-                <small class="text-muted">Lukasz Holeczek</small>
-                <small class="text-muted float-right mt-1">1:52 PM</small>
-              </div>
-              <div class="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
-              <small class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...</small>
-            </div>
-            <hr>
-            <div class="message">
-              <div class="py-3 pb-5 mr-3 float-left">
-                <div class="avatar">
-                  <img class="img-avatar" src="{{ asset('image/avatars/7.jpg', 'theme_coreui') }}" alt="admin@bootstrapmaster.com">
-                  <span class="avatar-status badge-success"></span>
-                </div>
-              </div>
-              <div>
-                <small class="text-muted">Lukasz Holeczek</small>
-                <small class="text-muted float-right mt-1">1:52 PM</small>
-              </div>
-              <div class="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
-              <small class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...</small>
-            </div>
-          </div>
-          <div class="tab-pane p-3" id="settings" role="tabpanel">
-            <h6>Settings</h6>
-            <div class="aside-options">
-              <div class="clearfix mt-4">
-                <small>
-                  <b>Option 1</b>
-                </small>
-                <label class="switch switch-label switch-pill switch-success switch-sm float-right">
-                  <input class="switch-input" type="checkbox" checked="">
-                  <span class="switch-slider" data-checked="On" data-unchecked="Off"></span>
-                </label>
-              </div>
-              <div>
-                <small class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</small>
-              </div>
-            </div>
-            <div class="aside-options">
-              <div class="clearfix mt-3">
-                <small>
-                  <b>Option 2</b>
-                </small>
-                <label class="switch switch-label switch-pill switch-success switch-sm float-right">
-                  <input class="switch-input" type="checkbox">
-                  <span class="switch-slider" data-checked="On" data-unchecked="Off"></span>
-                </label>
-              </div>
-              <div>
-                <small class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</small>
-              </div>
-            </div>
-            <div class="aside-options">
-              <div class="clearfix mt-3">
-                <small>
-                  <b>Option 3</b>
-                </small>
-                <label class="switch switch-label switch-pill switch-success switch-sm float-right">
-                  <input class="switch-input" type="checkbox">
-                  <span class="switch-slider" data-checked="On" data-unchecked="Off"></span>
-                </label>
-              </div>
-            </div>
-            <div class="aside-options">
-              <div class="clearfix mt-3">
-                <small>
-                  <b>Option 4</b>
-                </small>
-                <label class="switch switch-label switch-pill switch-success switch-sm float-right">
-                  <input class="switch-input" type="checkbox" checked="">
-                  <span class="switch-slider" data-checked="On" data-unchecked="Off"></span>
-                </label>
-              </div>
-            </div>
-            <hr>
-            <h6>System Utilization</h6>
-            <div class="text-uppercase mb-1 mt-4">
-              <small>
-                <b>CPU Usage</b>
-              </small>
-            </div>
-            <div class="progress progress-xs">
-              <div class="progress-bar bg-info" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>
-            <small class="text-muted">348 Processes. 1/4 Cores.</small>
-            <div class="text-uppercase mb-1 mt-2">
-              <small>
-                <b>Memory Usage</b>
-              </small>
-            </div>
-            <div class="progress progress-xs">
-              <div class="progress-bar bg-warning" role="progressbar" style="width: 70%" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>
-            <small class="text-muted">11444GB/16384MB</small>
-            <div class="text-uppercase mb-1 mt-2">
-              <small>
-                <b>SSD 1 Usage</b>
-              </small>
-            </div>
-            <div class="progress progress-xs">
-              <div class="progress-bar bg-danger" role="progressbar" style="width: 95%" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>
-            <small class="text-muted">243GB/256GB</small>
-            <div class="text-uppercase mb-1 mt-2">
-              <small>
-                <b>SSD 2 Usage</b>
-              </small>
-            </div>
-            <div class="progress progress-xs">
-              <div class="progress-bar bg-success" role="progressbar" style="width: 10%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>
-            <small class="text-muted">25GB/256GB</small>
-          </div>
-        </div>
-      </aside>
+        </aside>
+      </div>
     </div>
     <footer class="app-footer">
       <div>
@@ -565,7 +520,8 @@
         <a href="mailto:joel.dago@yahoo.fr">joel dago</a>
       </div>
 
-      <template id="cart_btn">
+      {# cart template #}
+      <template id="template-cart_btn">
         <div class="input-group">
           <input type="text" data-id="$(cart_item_id)" name="cart_quantity_js" class="form-control cart-quantity"
             placeholder="Input group example" aria-label="Input group example" aria-describedby="btnGroupAddon"
@@ -578,35 +534,63 @@
         </div>
       </template>
 
-    </footer>
-    <!-- CoreUI and necessary plugins
-    <script src="{{ asset('javascript/popovers.js','theme_coreui') }}"></script>-->
-    <!--<script src="{{ asset('bootstrap.js','bootstrap_js') }}"></script>
-      <script src="{{ asset('javascript/pace.js','theme_coreui') }}"></script> 
-        <script src="node_modules/perfect-scrollbar/dist/perfect-scrollbar.min.js"></script>
-        <script src="node_modules/@coreui/coreui/dist/js/coreui.min.js"></script>-->
-    <!-- Plugins and scripts required by this view-->
-        <script src="{{ asset('jquery-3.4.1.js','qobd_web_js') }}"></script>
-    <!--<script src="{{ asset('javascript/Charts.js','theme_coreui') }}"></script>
-     <script src="node_modules/@coreui/coreui-plugin-chartjs-custom-tooltips/dist/js/custom-tooltips.min.js"></script> 
-    <script src="{{ asset('javascript/main.js','theme_coreui') }}"></script>-->
-  
-    
+      <template id="template-discussion">        
+        <div data-id="$(discussion_id)" class="list-group-item list-group-item-accent-warning list-group-item-divider">
+          <div class="avatar float-right">
+            <img class="img-avatar" src="$(url_agent_owner_avatar)" alt="admin@bootstrapmaster.com">
+          </div>
+          <a href="$(url_chat_agent_discusion)" class="link-discussion">
+            <strong>$(discussion_name)</strong>
+          </a>
+          <small class="text-muted mr-3">
+            <div class="owner-wrapper"></div>
+            <i class="fa fa-calendar"></i> $(created_at)</small>
+          <small class="text-muted mr-3">
+            <a href="$(url_chat_delete_discussion)">
+              <i class="fa fa-trash"></i>
+            </a>
+          </small>
+          <div class="discussion-recip-wrapper"></div>
+        </div>        
+      </template>
 
+      <template id="template-discussion-recipients">
+        <div class="avatars-stack mt-2">
+          <div class="avatar avatar-xs">
+            <img class="img-avatar" src="$(url_agent_avatar)" alt="$(agent_username)">
+          </div>
+        </div>
+      </template>
+
+      {# Modal #}
+      <div id="discussion-register" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Modal title</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p>Modal body text goes here.</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary _mvalide">Save changes</button>
+              <button type="button" class="btn btn-secondary _mcancel">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </footer>
     
-    <!--<script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-crossorigin="anonymous"></script>-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    <script src="{{ asset('jquery-3.4.1.js','qobd_web_js') }}"></script>
+    <script src="{{ asset('javascript/popper.min.js','theme_coreui') }}"></script>
+    <script src="{{ asset('bootstrap.js','bootstrap_js') }}"></script>
+    <script src="{{ asset('javascript/coreui.min.js','theme_coreui') }}"></script>
         
-        crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
-        
-    crossorigin="anonymous"></script><!---->
-    <script src="https://unpkg.com/@coreui/coreui/dist/js/coreui.min.js"></script>
-   <!--  -->
-   
-    
-    <script src="{{ asset('datatables.min.js','datatable_dir') }}"></script>
+    <script src="{{ asset('datatables.js','datatable_dir') }}"></script>    
     <script src="{{ asset('dataTables.responsive.min.js','datatable_dir') }}"></script>
     <script src="{{ asset('all.min.js','font_awsome_js') }}"></script>
     <script src="{{ asset('lodash.min.js','qobd_web_js') }}"></script>
@@ -614,6 +598,8 @@ crossorigin="anonymous"></script>-->
     <script src="{{ asset('fos_js_routes.js','qobd_web_js') }}"></script>
     <script src="{{ asset('render_methods.js','qobd_web_js') }}"></script>
     <script src="{{ asset('data_table.js','qobd_web_js') }}"></script>
+    <script src="{{ asset('base.js','qobd_web_js') }}"></script>
+    <script src="{{ asset('chat.js','qobd_web_js') }}"></script>
     <!-- <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>-->
     
     {% block javascripts %} {% endblock %}

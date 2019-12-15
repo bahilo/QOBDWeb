@@ -2,9 +2,11 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Groups;
+use Doctrine\Common\Collections\Collection;
+use JMS\Serializer\Annotation\SerializedName;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ActionRepository")
@@ -15,21 +17,28 @@ class Action
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"class_property"})
+     * @SerializedName("id")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"class_property"})
+     * @SerializedName("Name")
      */
     private $Name;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"class_property"})
+     * @SerializedName("DisplayName")
      */
     private $DisplayName;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\ActionTracker", mappedBy="Action", cascade={"persist", "remove"})
+     * @Groups({"class_relation"})
      */
     private $actionTracker;
 

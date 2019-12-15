@@ -1,54 +1,85 @@
 {% extends 'template_coreui.html.twig' %}
 
-{% block title %}panier!{% endblock %}
+{% set page_title = 'Panier' %}
+
+{% block home_path %}
+<li class="breadcrumb-item">
+    <a href="{{ path("catalogue_home") }}">Produits</a>
+</li>
+<li class="breadcrumb-item">
+    {{ page_title }}
+</li>
+{% endblock %}
+
+{% block title %}{{ page_title }} {% endblock %}
+
+{% block body_header_left %}
+    {% if items | length > 0 %}
+    <a href="{{ path('client_home') }}" class="btn btn-warning">Choisir un client</a>
+    <a href="{{ path('order_registration') }}" class="btn btn-danger">Devis</a>
+    {% endif %}
+{% endblock %}
 
 {% block body %}
 
-<a href="{{ path('catalogue_home') }}" class="btn btn-success">Catalogue</a>
 
-{% if items | length > 0 %}
 
-<a href="{{ path('client_home') }}" class="btn btn-warning">Choisir un client</a>
-<a href="{{ path('order_registration') }}" class="btn btn-danger">Devis</a>
 
 {% if error_message %}
     <div class="error">{{ error_message }}</div>
 {% endif %}
 
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>produit</th>
-                    <th>Prix</th>
-                    <th>Quantity</th>
-                    <th>Total</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in items %}
-                <tr>
-                    <td>{{ item.product.Name }}</td>
-                    <td>{{ item.product.SellPrice }}</td>
-                    <td>{{ item.quantity }}</td>
-                    <td>{{ item.product.SellPrice * item.quantity }}</td>
-                    <td><a href="{{ path('cart_delete', {id: item.product.id})}}"><i class="fa fa-trash"></i></a></td>
-                </tr>
-                {% endfor %}
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td>total</td>
-                    <td>{{ total }}</td>
-                    <td></td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="cart-wrapper">
+    
+        <div class="animated fadeIn">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fa fa-align-justify"></i>{{ page_title }}</div>
+                        <div class="card-body">
+                        {% if items | length > 0 %}
+                            <table class="table table-responsive-md table-bordered table-striped table-md">
+                                <thead>
+                                    <tr>
+                                        <th>produit</th>
+                                        <th>Prix</th>
+                                        <th>Quantity</th>
+                                        <th>Total</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in items %}
+                                    <tr>
+                                        <td>{{ item.product.Name }}</td>
+                                        <td>{{ item.product.SellPrice }}</td>
+                                        <td>{{ item.quantity }}</td>
+                                        <td>{{ item.product.SellPrice * item.quantity }}</td>
+                                        <td><a href="{{ path('cart_delete', {id: item.product.id})}}"><i class="fa fa-trash"></i></a></td>
+                                    </tr>
+                                    {% endfor %}
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td>total</td>
+                                        <td>{{ total }}</td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
 
-    {% else %}
+                        {% else %}
 
-    <h3>Empty</h3>
+                        <h3>Empty</h3>
 
-    {% endif %}
+                        {% endif %}
+
+                    </div> 
+                </div> 
+            </div> 
+        </div> 
+    </div> 
+</div>
 
 {% endblock %}

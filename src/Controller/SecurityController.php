@@ -6,46 +6,162 @@ use App\Entity\Role;
 use App\Entity\Agent;
 use App\Entity\Action;
 use App\Entity\Privilege;
+use App\Services\Utility;
 use App\Entity\ActionRole;
-use App\Services\QOBDSerializer;
+use App\Services\Serializer;
+use App\Services\SecurityManager;
 use App\Form\RoleRegistrationType;
 use App\Repository\RoleRepository;
 use App\Form\AgentRegistrationType;
 use App\Repository\AgentRepository;
 use App\Form\ActionRegistrationType;
 use App\Repository\ActionRepository;
-use App\Repository\LicenseRepository;
-use App\Repository\PrivilegeRepository;
 use App\Repository\ActionRoleRepository;
-use App\Repository\ActionTrackerRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class SecurityController extends Controller
 {
-    /**
-     * @Route("/admin/security", name="security_home")
-     */
-    public function home( QOBDSerializer $QOBDSerializer, 
-                          ActionRoleRepository $actionRoleRepo, 
-                          AgentRepository $agentRepo, 
-                          RoleRepository $roleRepo, 
-                          ActionRepository $actionRepo, 
-                          PrivilegeRepository $privilegeRepo)
+
+    protected $securityUtility;
+    protected $actionRepo;
+
+
+    public function __construct(SecurityManager $securityUtility, ActionRepository $actionRepo)
     {
+        $this->securityUtility = $securityUtility;
+        $this->actionRepo = $actionRepo;
+    }
+    
+    // /**
+    //  * @Route("/admin/security", name="security_home")
+    //  */
+    // public function home( Serializer $serializer, 
+    //                      ActionRoleRepository $actionRoleRepo, 
+    //                      AgentRepository $agentRepo, 
+    //                      RoleRepository $roleRepo) {
+
+    //     if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
+    //         return $this->redirectToRoute('security_deny_access');
+    //     }
+        
+    //     $roles = $roleRepo->findAll();
+    //     $actions = $this->actionRepo->findAll();
+    //     return $this->render('security/index.html.twig', [
+    //         'agents' => $agentRepo->findAll(),
+    //         'roles' => $roles,
+    //         'actions' => $actions,
+    //         'action_roles' => $actionRoleRepo->findAll(),
+    //         'action_data_source' => $serializer->serialize(['object_array' => $actions, 'format' => 'json', 'group' => 'class_property']),
+    //         'role_data_source' => $serializer->serialize(['object_array' => $roles, 'format' => 'json', 'group' => 'class_property'], 'json')
+    //     ]);
+    // }
+    
+    /**
+     * @Route("/admin/security/commerciaux/role", name="security_agent_role")
+     */
+    public function agentRole( Serializer $serializer, 
+                         ActionRoleRepository $actionRoleRepo, 
+                         AgentRepository $agentRepo, 
+                         RoleRepository $roleRepo) {
+
+        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+        
         $roles = $roleRepo->findAll();
-        $actions = $actionRepo->findAll();
+        $actions = $this->actionRepo->findAll();
         return $this->render('security/index.html.twig', [
             'agents' => $agentRepo->findAll(),
             'roles' => $roles,
+            'page_title' => 'Roles commerciaux',
+            'page' => 'security/_partials/index.html'
+        ]);
+    }
+
+    /**
+     * @Route("/admin/security/action", options={"expose"=true}, name="security_action")
+     */
+    public function action( Serializer $serializer,
+                            ActionRepository $actionRepo) {
+
+
+        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+        
+        $actions = $actionRepo->findAll();
+        return $this->render('security/index.html.twig', [
+            'action_data_source' => $serializer->serialize(['object_array' => $actions, 'format' => 'json', 'group' => 'class_property']),
+            'page_title' => 'Action',
+            'page' => 'security/_partials/action.html',
+            'security_target' => 'action',
+            'route_plus' => $this->generateUrl('security_action_registration')
+       ]);
+    }
+
+    /**
+     * @Route("/admin/security/profile", options={"expose"=true}, name="security_profile")
+     */
+    public function profile(ActionRoleRepository $actionRoleRepo, 
+                            AgentRepository $agentRepo,
+                            RoleRepository $roleRepo,
+                            Utility $utility) {
+
+
+        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
+        $roles = $roleRepo->findAll();
+        $actions = $this->actionRepo->findAll();
+
+        return $this->render('security/index.html.twig', [
+            'agents' => $agentRepo->findAll(),
+            'target_profile' => true,
+            'roles' => $roles,
+            'roles_distinct' => $utility->getDistinct($roles),
             'actions' => $actions,
             'action_roles' => $actionRoleRepo->findAll(),
-            'action_data_source' => $QOBDSerializer->getSerializer()->serialize($actions, 'json'),
-            'role_data_source' => $QOBDSerializer->getSerializer()->serialize($roles, 'json')
+            'page_title' => 'Profile',
+            'page' => 'security/_partials/profile.html',
+            'security_target' => 'profile',
+            
         ]);
+    }
+
+    /**
+     * @Route("/admin/security/role", options={"expose"=true}, name="security_role")
+     */
+    public function role( Serializer $serializer, 
+                          RoleRepository $roleRepo ) {
+
+        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+        
+        $roles = $roleRepo->findAll();
+        return $this->render('security/index.html.twig', [
+            'role_data_source' => $serializer->serialize(['object_array' => $roles, 'format' => 'json', 'group' => 'class_property'], 'json'),
+            'page_title' => 'Role',
+            'page' => 'security/_partials/role.html',
+            'security_target' => 'role',
+            'route_plus' => $this->generateUrl('security_role_registration')
+        ]);
+    }
+
+    /**
+     * @Route("/admin/security/accesrefuse", name="security_deny_access")
+     */
+    public function denyAccess() {
+        
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        
+        return $this->render('security/access_deny.html.twig');
     }
 
     /*--------------------------------------------------------------------------------------------------
@@ -53,31 +169,55 @@ class SecurityController extends Controller
     ----------------------------------------------------------------------------------------------------*/
 
     /**
-     * @Route("/admin/security/agent/inscription", options={"expose"=true}, name="security_registration")
+     * @Route("/security/agent/inscription", options={"expose"=true}, name="security_registration")
      * @Route("/admin/security/agent/inscription/{id}/edit", options={"expose"=true}, name="security_edit")
      * 
      */
     public function agentRegistration(Agent $agent = null, 
                                       Request $request, 
                                       ObjectManager $manager, 
-                                      UserPasswordEncoderInterface $encoder)
+                                      UserPasswordEncoderInterface $encoder,
+                                      RoleRepository $roleRepo,
+                                      Utility $utility)
     {
+        
         $isEdit = true;
         if(!$agent){
             $agent = new Agent();
             $isEdit = false;
         }
+
         
         $form = $this->createForm(AgentRegistrationType::class, $agent);
 
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid() ){
+            
+            $role = $roleRepo->findOneBy(['Name' => 'ROLE_ANONYMOUS']);
+            
+            $file = $request->files->get('agent_registration')['PictureFile'];
+          
+            $fileName = $utility->uploadFile($file, $this->getParameter('file.agent.download_dir'));
+            if (!empty($fileName)) {
+                if(!empty($agent->getPicture())){
+                    unlink($this->getParameter('file.agent.download_dir') . '/'. $agent->getPicture());
+                }
+                $agent->setPicture($fileName);
+            }
+
             if($agent->getPlainTextPassword() !== null){
                 $hash = $encoder->encodePassword($agent, $agent->getPlainTextPassword());
                 $agent->setPassword($hash);
             }
+
             $agent->setIsAdmin(false);
+            
+            if(!$isEdit){
+                $agent->setIsActivated(false);
+                $agent->addRole($role);
+            }
+
             $manager->persist($agent);
             $manager->flush();
 
@@ -88,6 +228,37 @@ class SecurityController extends Controller
         }
 
         return $this->render('security/agent_registration.html.twig', [
+            'formAgent' => $form->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/admin/security/agent/{id}/activation", options={"expose"=true}, name="security_activate_agent")
+     */
+    public function activateAgent(Agent $agent, ObjectManager $manager)
+    {
+        if (!$this->securityUtility->checkHasUpdate($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
+        if($agent->getIsActivated())
+            $agent->setIsActivated(false);
+        else
+            $agent->setIsActivated(true);
+
+        $manager->persist($agent);
+        $manager->flush();
+        
+        return $this->RedirectToRoute('agent_home');
+    }
+
+    /**
+     * @Route("/security/agent/anonyme/inscription", options={"expose"=true}, name="security_anonymous_registration")
+     */
+    public function anonymousRegistration()
+    {
+        $form = $this->createForm(AgentRegistrationType::class, new Agent());
+        return $this->render('security/anonymous_registration.html.twig', [
             'formAgent' => $form->createView()
         ]);
     }
@@ -108,8 +279,12 @@ class SecurityController extends Controller
     /**
      * @Route("/admin/security/agent/{id}/delete", options={"expose"=true}, name="security_delete")
      */
-    public function delete(Agent $agent, ObjectManager $manager)
-    {
+    public function delete(Agent $agent, ObjectManager $manager) {
+
+        if (!$this->securityUtility->checkHasDelete($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
         $manager->remove($agent);
         $manager->flush();
 
@@ -127,7 +302,14 @@ class SecurityController extends Controller
                                ActionRoleRepository $actionRoleRepo, 
                                RoleRepository $roleRepo, 
                                ActionRepository $actionRepo, 
-                               ObjectManager $manager){
+                               ObjectManager $manager) {
+
+        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
+        //dump('Passed'); die();
+
          $privileges = $request->request->get('privilege');
           
          foreach($privileges as $keyRole => $oRole){
@@ -199,9 +381,9 @@ class SecurityController extends Controller
                 $actionRole->setAction($action);
                 $actionRole->setRole($role);    
                 
-                dump($privilege);
-                dump($action);
-                dump($role);
+                // dump($privilege);
+                // dump($action);
+                // dump($role);
 
                 if($bInitialized){                    
                     $manager->persist($privilege);
@@ -213,7 +395,7 @@ class SecurityController extends Controller
             }           
         }
 
-        return $this->RedirectToRoute('security_home');
+        return $this->RedirectToRoute('security_profile');
     }
 
     /**
@@ -223,7 +405,11 @@ class SecurityController extends Controller
     public function agentProfile(Request $request, 
                                  AgentRepository $agentRepo, 
                                  RoleRepository $roleRepo, 
-                                 ObjectManager $manager){
+                                 ObjectManager $manager) {
+
+        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
     
         $profile = $request->request->get('profile');
 
@@ -251,7 +437,7 @@ class SecurityController extends Controller
             }
         }
 
-        return $this->RedirectToRoute('security_home');
+        return $this->RedirectToRoute('security_agent_role');
 
     }
 
@@ -262,8 +448,12 @@ class SecurityController extends Controller
      */
     public function actionRegistration(Action $action = null, 
                                        Request $request, 
-                                       ObjectManager $manager)
-    {
+                                       ObjectManager $manager) {
+
+        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
         if(!$action){
             $action = new Action();
         }
@@ -277,7 +467,7 @@ class SecurityController extends Controller
             $manager->persist($action);
             $manager->flush();
 
-            return $this->redirectToRoute('security_home');
+            return $this->redirectToRoute('security_action');
         }
 
         return $this->render('security/action_registration.html.twig', [
@@ -288,12 +478,16 @@ class SecurityController extends Controller
     /**
      * @Route("/admin/security/action/{id}/delete", options={"expose"=true}, name="security_action_delete")
      */
-    public function actionDelete(Action $action, ObjectManager $manager)
-    {
+    public function actionDelete(Action $action, ObjectManager $manager) {
+
+        if (!$this->securityUtility->checkHasDelete($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
         $manager->remove($action);
         $manager->flush();
 
-        return $this->RedirectToRoute('security_home');
+        return $this->RedirectToRoute('security_action');
     }
 
     /**
@@ -301,14 +495,19 @@ class SecurityController extends Controller
      * @Route("/admin/security/role/{id}/edit", options={"expose"=true}, name="security_role_edit")
      * 
      */
-    public function roleRegistration(Role $role = null, Request $request, ObjectManager $manager)
-    {
+    public function roleRegistration(Role $role = null, Request $request, ObjectManager $manager) {
+
+        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+        
         if(!$role){
             $role = new Role();
         }
         
         $form = $this->createForm(RoleRegistrationType::class, $role);
-
+        // dump($request);
+        // die();
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid() ){
@@ -316,7 +515,7 @@ class SecurityController extends Controller
             $manager->persist($role);
             $manager->flush();
 
-            return $this->redirectToRoute('security_home');
+            return $this->redirectToRoute('security_role');
         }
 
         return $this->render('security/role_registration.html.twig', [
@@ -327,12 +526,16 @@ class SecurityController extends Controller
     /**
      * @Route("/admin/security/role/{id}/delete", options={"expose"=true}, name="security_role_delete")
      */
-    public function roleDelete(Role $role, ObjectManager $manager)
-    {
+    public function roleDelete(Role $role, ObjectManager $manager) {
+
+        if (!$this->securityUtility->checkHasDelete($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
         $manager->remove($role);
         $manager->flush();
 
-        return $this->RedirectToRoute('security_home');
+        return $this->RedirectToRoute('security_role');
     }
 
 }

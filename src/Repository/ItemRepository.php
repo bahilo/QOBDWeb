@@ -3,8 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\Item;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Entity\QuoteOrder;
+use App\Entity\QuoteOrderDetail;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @method Item|null find($id, $lockMode = null, $lockVersion = null)
@@ -22,8 +24,20 @@ class ItemRepository extends ServiceEntityRepository
     // /**
     //  * @return Item[] Returns an array of Item objects
     //  */
-    /*
-    public function findByExampleField($value)
+    
+    public function findByOrder(QuoteOrder $order)
+    {
+        return $this->createQueryBuilder('i')
+            ->innerJoin('i.quoteOrderDetails', 'q_ord_dtl')
+            ->andWhere('q_ord_dtl.QuoteOrder= :ord')
+            ->setParameter('ord', $order)
+            ->orderBy('i.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    /*public function findByExampleField($value)
     {
         return $this->createQueryBuilder('i')
             ->andWhere('i.exampleField = :val')
@@ -36,6 +50,16 @@ class ItemRepository extends ServiceEntityRepository
     }
     */
 
+    public function findOneByOrderDetail(QuoteOrderDetail $orderDetail): ?Item
+    {
+        return $this->createQueryBuilder('i')
+            ->innerJoin('i.quoteOrderDetails', 'q_ord_dtl')
+            ->andWhere('q_ord_dtl.id = :ord_dtl')
+            ->setParameter('ord_dtl', $orderDetail->getId())
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
     /*
     public function findOneBySomeField($value): ?Item
     {

@@ -58,6 +58,10 @@
 </li>
 {% endblock %}
 
+{% block body_header_right %}
+    <a href="{{ path("catalogue_home") }}" class="btn btn-primary"><i class="fa fa-plus"></i></a>
+{% endblock %}
+
 {% block body %}
 
 <div class="commande-wrapper">
@@ -80,28 +84,6 @@
                         <table id="order_table_js"
                             class="table table-responsive-md table-bordered table-striped table-md">
                         </table>
-                        <nav>
-                            <ul class="pagination">
-                                <li class="page-item">
-                                    <a class="page-link" href="#">Prev</a>
-                                </li>
-                                <li class="page-item active">
-                                    <a class="page-link" href="#">1</a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#">2</a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#">3</a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#">4</a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#">Next</a>
-                                </li>
-                            </ul>
-                        </nav>
                     </div>
                 </div>
             </div>

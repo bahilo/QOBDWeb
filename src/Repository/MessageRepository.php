@@ -2,9 +2,11 @@
 
 namespace App\Repository;
 
+use App\Entity\Agent;
+use App\Entity\Discussion;
 use App\Entity\Message;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @method Message|null find($id, $lockMode = null, $lockVersion = null)
@@ -22,19 +24,29 @@ class MessageRepository extends ServiceEntityRepository
     // /**
     //  * @return Message[] Returns an array of Message objects
     //  */
-    /*
-    public function findByExampleField($value)
+    
+    public function findByDiscussion(Discussion $discussion)
     {
-        return $this->createQueryBuilder('m')
-            ->andWhere('m.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('m.id', 'ASC')
-            ->setMaxResults(10)
+        return $this->createQueryBuilder('d')
+            ->andWhere('d.Discussion = :discussion')
+            ->setParameters(['discussion' => $discussion])
+            ->orderBy('d.id', 'ASC')
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
-    */
+    
+    public function findUnReadByAgent(Agent $agent)
+    {
+        return $this->createQueryBuilder('d')
+            ->innerJoin('d.Agent', 'd_a')
+            ->andWhere('d.IsRed = :read')
+            ->andWhere('d_a.id = :id')
+            ->setParameters(['id'=> $agent->getId(), 'read' => false])
+            ->orderBy('d.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+    
 
     /*
     public function findOneBySomeField($value): ?Message

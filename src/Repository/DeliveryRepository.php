@@ -2,9 +2,9 @@
 
 namespace App\Repository;
 
+use App\Entity\Bill;
 use App\Entity\Delivery;
 use App\Entity\QuoteOrder;
-use App\Dependency\Utility;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
@@ -16,12 +16,10 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
  */
 class DeliveryRepository extends ServiceEntityRepository
 {
-    protected $utility;
 
-    public function __construct(ManagerRegistry $registry, Utility $utility)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Delivery::class);
-        $this->utility = $utility;
     }
 
     public function findByBillStatus($params)
@@ -39,20 +37,42 @@ class DeliveryRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    /*public function findByOrder()
+    public function findByOrder($params)
     {
-        $deliveries = [];
-        foreach ($params['orderDetails'] as $detail) {
-            foreach ($detail->getDelivery() as $delivery) {
-                if ($delivery) {
-                    $deliveryStatus = $delivery->getStatus();
-                    if ($deliveryStatus && $deliveryStatus->getName() == $params['status'] && !$this->utility->in_array($deliveries, $delivery))
-                        array_push($deliveries, $delivery);
-                }
-            }
-        }
-        return $deliveries;
-    }*/
+        return $this->createQueryBuilder('q')
+            ->innerJoin('q.quantityDeliveries', 'q_qt_del')
+            ->innerJoin('q_qt_del.OrderDetail', 'q_qt_del_q_ord')
+            ->innerJoin('q_qt_del.Delivery', 'q_qt_del_del')
+            ->innerJoin('q_qt_del_del.Status', 'q_qt_del_del_status')
+            ->andWhere('q_qt_del_q_ord.QuoteOrder = :order')
+            ->andWhere('q_qt_del_del_status.Name = :status')
+            ->setParameters(['status' => $params['status'], 'order' => $params['order']])
+            ->orderBy('q.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findByBill(Bill $bill)
+    {
+        return $this->createQueryBuilder('q')
+            ->innerJoin('q.quantityDeliveries', 'q_qt_del')
+            ->andWhere('q_qt_del.Bill = :bill')
+            ->setParameter('bill', $bill)
+            ->orderBy('q.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findOneByBill(Bill $bill) : ?Delivery
+    {
+        return $this->createQueryBuilder('q')
+            ->innerJoin('q.quantityDeliveries', 'q_qt_del')
+            ->andWhere('q_qt_del.Bill = :bill')
+            ->setParameter('bill', $bill)
+            ->orderBy('q.id', 'ASC')
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 
     // /**
     //  * @return Delivery[] Returns an array of Delivery objects

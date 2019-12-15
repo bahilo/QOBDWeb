@@ -135,6 +135,10 @@ class Agent implements UserInterface
     private $IPAddress;
 
     /**
+     */
+    private $PictureFile;
+
+    /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Role", inversedBy="agents")
      * @Groups({"class_relation"})
      */
@@ -159,22 +163,20 @@ class Agent implements UserInterface
     private $orders;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Message", mappedBy="Agent")
-     * @Groups({"class_relation"})
-     */
-    private $messages;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Discussion", inversedBy="agents")
-     * @Groups({"class_relation"})
-     */
-    private $Discussion;
-
-    /**
      * @ORM\OneToOne(targetEntity="App\Entity\Comment", cascade={"persist", "remove"})
      * @Groups({"class_relation"})
      */
     private $Comment;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Message", mappedBy="Agent")
+     */
+    private $messages;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\AgentDiscussion", mappedBy="agent")
+     */
+    private $agentDiscussions;
 
     public function __construct()
     {
@@ -183,7 +185,7 @@ class Agent implements UserInterface
         $this->Clients = new ArrayCollection();
         $this->orders = new ArrayCollection();
         $this->messages = new ArrayCollection();
-        $this->Discussion = new ArrayCollection();
+        $this->agentDiscussions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -310,6 +312,17 @@ class Agent implements UserInterface
 
         return $this;
     }
+    public function getPictureFile(): ?string
+    {
+        return $this->PictureFile;
+    }
+
+    public function setPictureFile(?string $PictureFile): self
+    {
+        $this->PictureFile = $PictureFile;
+
+        return $this;
+    }
 
     public function getIsAdmin(): ?bool
     {
@@ -378,11 +391,11 @@ class Agent implements UserInterface
     {
         return $this->Roles;
     }
-    
+
     public function getRoles()
     {
-        return \array_map(\create_function('$role','return $role->getName();'), $this->Roles->toArray());
-        //return ["USER_ROLE"];
+        $roles =  \array_map(\create_function('$role', 'return $role->getName();'), $this->Roles->toArray());
+        return $roles;
     }
 
     public function addRole(Role $role): self
@@ -496,63 +509,11 @@ class Agent implements UserInterface
         return $this;
     }
 
-    /**
-     * @return Collection|Message[]
-     */
-    public function getMessages(): Collection
+    public function getSalt()
+    { }
+
+    public function eraseCredentials()
     {
-        return $this->messages;
-    }
-
-    public function addMessage(Message $message): self
-    {
-        if (!$this->messages->contains($message)) {
-            $this->messages[] = $message;
-            $message->addAgent($this);
-        }
-
-        return $this;
-    }
-
-    public function removeMessage(Message $message): self
-    {
-        if ($this->messages->contains($message)) {
-            $this->messages->removeElement($message);
-            $message->removeAgent($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Discussion[]
-     */
-    public function getDiscussion(): Collection
-    {
-        return $this->Discussion;
-    }
-
-    public function addDiscussion(Discussion $discussion): self
-    {
-        if (!$this->Discussion->contains($discussion)) {
-            $this->Discussion[] = $discussion;
-        }
-
-        return $this;
-    }
-
-    public function removeDiscussion(Discussion $discussion): self
-    {
-        if ($this->Discussion->contains($discussion)) {
-            $this->Discussion->removeElement($discussion);
-        }
-
-        return $this;
-    }
-
-    public function getSalt(){}
-
-    public function eraseCredentials(){
         $this->PlainTextPassword = null;
     }
 
@@ -568,4 +529,65 @@ class Agent implements UserInterface
         return $this;
     }
 
+    /**
+     * @return Collection|Message[]
+     */
+    public function getMessages(): Collection
+    {
+        return $this->messages;
+    }
+
+    public function addMessage(Message $message): self
+    {
+        if (!$this->messages->contains($message)) {
+            $this->messages[] = $message;
+            $message->setAgent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMessage(Message $message): self
+    {
+        if ($this->messages->contains($message)) {
+            $this->messages->removeElement($message);
+            // set the owning side to null (unless already changed)
+            if ($message->getAgent() === $this) {
+                $message->setAgent(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|AgentDiscussion[]
+     */
+    public function getAgentDiscussions(): Collection
+    {
+        return $this->agentDiscussions;
+    }
+
+    public function addAgentDiscussion(AgentDiscussion $agentDiscussion): self
+    {
+        if (!$this->agentDiscussions->contains($agentDiscussion)) {
+            $this->agentDiscussions[] = $agentDiscussion;
+            $agentDiscussion->setAgent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAgentDiscussion(AgentDiscussion $agentDiscussion): self
+    {
+        if ($this->agentDiscussions->contains($agentDiscussion)) {
+            $this->agentDiscussions->removeElement($agentDiscussion);
+            // set the owning side to null (unless already changed)
+            if ($agentDiscussion->getAgent() === $this) {
+                $agentDiscussion->setAgent(null);
+            }
+        }
+
+        return $this;
+    }
 }

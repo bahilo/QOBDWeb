@@ -1,5 +1,7 @@
 $(function () {
 
+    var detailRows = [];
+    var billDetailRows = [];
     var path = "";
 
     switch ($('#order_target').val()) {
@@ -13,7 +15,7 @@ $(function () {
             path = "order_show_preorder";
             break;
         case "prerefund_data_source":
-            path = "order_show";
+            path = "order_show_prerefund";
             break;
         case "refund_data_source":
             path = "order_show";
@@ -64,18 +66,18 @@ $(function () {
                 { data: 'ItemSellPrice', title: "P. vente", render: inputSellPriceForm },
                 { data: 'Quantity', title: "Quantité", render: inputQuantityForm },
                 { data: 'null', title: "Qt. en attente", render: renderQtEnAttente },
-                { data: 'ItemSellPriceTotal', title: "P. vente total" },
-                { data: 'ItemSellPriceVATTotal', title: "P. TTC total" },
-                { data: 'ItemROIPercent', title: "Marge (%)" },
-                { data: 'ItemROICurrency', title: "Marge" },
+                { data: 'ItemSellPriceTotal', title: "P. vente total", render: renderDigit },
+                { data: 'ItemSellPriceVATTotal', title: "P. TTC total", render: renderDigit },
+                { data: 'ItemROIPercent', title: "Marge (%)", render: renderDigit },
+                { data: 'ItemROICurrency', title: "Marge", render: renderDigit },
             ],
             orderDetailDelivery: [
                 { data: 'id', visible: false },
                 { data: 'ItemName', title: "Nom" },
                 { data: 'ItemRef', title: "Référence" },
                 { data: 'QuantityRecieved', title: "Qt en cours" },
-                { data: 'ItemSellPriceVATTotal', title: "P. TTC total" },
-                { data: 'ItemROIPercent', title: "Marge (%)" },
+                { data: 'ItemSellPriceVATTotal', title: "P. TTC total", render: renderDigit },
+                { data: 'ItemROIPercent', title: "Marge (%)", render: renderDigit },
                 { data: 'null', title: "", render: renderCancel },
             ],
             orderDetailBill: [
@@ -83,24 +85,25 @@ $(function () {
                 { data: 'ItemName', title: "Nom" },
                 { data: 'ItemRef', title: "Référence" },
                 { data: 'QuantityRecieved', title: "Qt en cours" },
-                { data: 'ItemSellPriceVATTotal', title: "P. TTC total" },
-                { data: 'ItemROIPercent', title: "Marge (%)" },
+                { data: 'ItemSellPriceVATTotal', title: "P. TTC total", render: renderDigit },
+                { data: 'ItemROIPercent', title: "Marge (%)", render: renderDigit },
                 { data: 'null', title: "", render: renderCancelBL },
                 { data: 'null', title: "", render: renderPDF },
             ],
             orderBill: [
+                { data: 'null', title: "", class: "details-control", orderable: false, defaultContent: "" },
                 { data: 'id', title: "Facture n°" },
                 { data: 'CreatedAt', title: "Date" },
                 { data: 'Pay', title: "Montant" },
-                { data: 'LimitDateAt', title: "Date" },
-                { data: 'null', title: "Facture", render: renderPDF },
-                { data: 'null', title: "", render: renderCancelBL },
-                { data: 'null', title: "", render: renderCancelBL },
-                { data: 'null', title: "", render: renderCancelBL },
+            ],
+            orderDelivery: [
+                { data: 'id', title: "BL n°" },
+                { data: 'CreatedAt', title: "Date" },
+                { data: 'Package', title: "Produit(s) expédié(s)" },
+                { data: 'null', title: "", render: renderDeliveryPDF },
             ]
         },
-    }
-        
+    }        
 
     api.table.order = $("#order_table_js").myTable({
         dataSource: $("#order_data_source").val(),
@@ -110,8 +113,11 @@ $(function () {
     api.table.orderDetail = $("#order_detail_table_js").myTable({
         dataSource: $("#order_detail_data_source").val(),
         columns: api.column.orderDetail,
-        initComplete: function(setting, json){
-            $('#order_detail_table_js tr td.details-control').trigger("click");
+        initComplete: function(setting, json, api){            
+            $(api.$('td.details-control')).each(function(index){
+                openTableChildRow(this, { TableApi: api, reccordRowTable: detailRows, rowFormat: format});
+            });
+            //$('#order_detail_table_js tr td.details-control')
             //alert('complete!');
         },
         rowCallback: function (nRow, aData, index) { 
@@ -132,38 +138,67 @@ $(function () {
 
     api.table.orderBill = $("#bill_table_js").myTable({
         dataSource: $("#bill_data_source").val(),
-        columns: api.column.orderBill
+        columns: api.column.orderBill,
+        initComplete: function (setting, json, api) {
+            $(api.$('td.details-control')).each(function (index) {
+                openTableChildRow(this, { TableApi: api, reccordRowTable: billDetailRows, rowFormat: billDetailformat});
+            });
+            //$('#order_detail_table_js tr td.details-control')
+            //alert('complete!');
+        },
+    });
+
+    api.table.orderDelivery = $("#delivery_table_js").myTable({
+        dataSource: $("#delivery_data_source").val(),
+        columns: api.column.orderDelivery
     });
 
 
     $(function () {
 
         // Array to track the ids of the details displayed rows
-        var detailRows = [];
+        
 
-        $('#order_detail_table_js tr td.details-control').on('click', function () {
-            var tr = $(this).closest('tr');
-            var row = api.table.orderDetail.row(tr);
-            var idx = $.inArray(tr.attr('id'), detailRows);
-
-            if (row.child.isShown()) {
-                tr.removeClass('details');
-                row.child.hide();
-
-                // Remove from the 'open' array
-                detailRows.splice(idx, 1);
-            }
-            else {
-                tr.addClass('details');
-                row.child(format(row.data())).show();
-
-                // Add to the 'open' array
-                if (idx === -1) {
-                    detailRows.push(tr.attr('id'));
-                }
-            }
+        $('#order_detail_table_js').on('click','td.details-control', function () {
+            openTableChildRow(this, { TableApi: api.table.orderDetail, reccordRowTable: detailRows, rowFormat: format});            
         });
+
+        
+        $('#bill_table_js tr td.details-control').on('click', function () {
+            openTableChildRow(this, { TableApi: api.table.orderBill, reccordRowTable: billDetailRows, rowFormat: billDetailformat});
+        });
+
     });
+
+    function openTableChildRow(elt, params){
+        var tr = $(elt).closest('tr');
+        var row = params.TableApi.row(tr);
+        var idx = $.inArray(tr.attr('id'), params.reccordRowTable);
+
+        if (row.child.isShown()) {
+            tr.removeClass('details');
+            row.child.hide();
+
+            // Remove from the 'open' array
+            params.reccordRowTable.splice(idx, 1);
+        }
+        else {
+            tr.addClass('details');
+            row.child(params.rowFormat(row.data())).show();
+
+            // Add to the 'open' array
+            if (idx === -1) {
+                params.reccordRowTable.push(tr.attr('id'));
+            }
+        }
+    }
+
+    function getPreOrderPreRefundRender(){
+        if ($('#status_refund').length() == 0)
+            return Renders.renderShow;
+        else
+            return 
+    }
     
 
     function format(row) {
@@ -179,6 +214,53 @@ $(function () {
                 '</div>' +
             '</div>' +
         '</div>'
+    }
+    
+
+    function billDetailformat(row) {
+        return '<div class="bill-produit">' +
+            
+            '<div class="row">' +
+                '<div class="col-md-6">' +
+                    '<div class="row">' +
+                        '<div class="col-md-6">' +
+                            '<label for="payed_amount' + row.id +'">Montant réglé</label>'+
+                            '<input type="number" name="order_detail_form[tab][bill][' + row.id + '][payed_amount]" id="payed_amount' + row.id + '" class="form-control">' +
+                        '</div>' +
+                        '<div class="col-md-6">' +
+                            '<label for="pay_date' + row.id + '">Date de paiement</label>' +
+                            '<input type="date" name="order_detail_form[tab][bill][' + row.id + '][pay_date]" id="pay_date' + row.id + '" class="form-control">' +
+                        '</div>' +                        
+                    '</div>' +
+                    '<div class="row">' +
+                        '<div class="col-md-12">' +
+                            '<label for="pay_mode' + row.id + '">Sous la forme</label>' +
+                            '<input type="text" name="order_detail_form[tab][bill][' + row.id + '][pay_mode]" id="pay_mode' + row.id + '" class="form-control">' +
+                        '</div>' +
+                    '</div>' +                    
+                '</div>' +
+                '<div class="col-md-6">' +
+                    '<div class="form-check">'+
+                        '<input type="checkbox" name="order_detail_form[tab][bill][' + row.id + '][ref_visible]" id="ref_visible' + row.id + '" class="form-check-input">' +
+                        '<label for="ref_visible' + row.id + '" class="form-check-label">Référence Visisble </label>' +
+                    '</div>'+
+                    '<a href="'+  Routing.generate('order_pdf_bill', { id: row.id }) +'" class="btn btn-dark">Générer PDF</a><br/>' +
+                    '<a href="mailto:toto@yahoo.fr" class="">Ouvrir un mail</a><br/>' +
+                    '<a href="'+  Routing.generate('order_bill_cancel', { id: row.id }) +'" class="btn btn-danger">Annuler cette facture</a>' +
+                '</div>' +
+            '</div>' +
+        '</div>'+
+        '<br />' +
+        '<div class="row">' +
+            '<div class="col-md-6">' +
+                '<label for="comment_private' + row.id +'">Commentaire interne</label>'+
+                '<textarea name="order_detail_form[tab][bill][' + row.id + '][comment_private]" id="comment_private' + row.id + '" cols="30" rows="5" class="form-control">' + row.ContentComment+'</textarea>' +
+            '</div>' +
+            '<div class="col-md-6">' +
+                '<label for="comment_public' + row.id + '">Commentaire public</label>' +
+                '<textarea name="order_detail_form[tab][bill][' + row.id + '][comment_public]" id="comment_public' + row.id + '" cols="30" rows="5" class="form-control">' + row.ContentComment+'</textarea>' +
+            '</div>' +
+        '</div>' 
     }
 
     
@@ -199,6 +281,13 @@ $(function () {
         return '<div class="form-group"><input type="text" value="' + data +'" name="order_detail_form[tab][' + row.id + '][quantity]" class="form-control"></div>';
     }
 
+    function renderDigit(data, type, row) {
+        var num = parseFloat(data);
+        if(!isNaN(num))
+            return num.toFixed(2);
+        return data;
+    }
+
     function rowDetail(data, type, row) {
         return '<div class="form-group"><input type="text" value="' + data +'" name="order_detail_form[tab][' + row.id + '][quantity]" class="form-control"></div>';
     }
@@ -213,6 +302,14 @@ $(function () {
 
     function renderPDF(data, type, row) {
         return '<a class="btn btn-dark" href="#">Générer le BL</a>';
+    }
+
+    function renderDeliveryPDF(data, type, row) {
+        return '<a class="btn btn-dark" href="' + Routing.generate('order_pdf_delivery', { id: row.id }) +'">Générer le BL</a>';
+    }
+
+    function renderPreRefundShow(data, type, row) {
+        return "<a href='" + Routing.generate('order_show_prerefund', { id: row.id }) + "'><i class='fa fa-eye'></i></a>";
     }
 
     function renderQtEnAttente(data, type, row) {

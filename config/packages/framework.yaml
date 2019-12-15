@@ -37,4 +37,6 @@ framework:
                 base_path: ressources/themes/coreui
             theme_default:
                 base_path: ressources/themes/default
+            download_dir:
+                base_path: ressources/download
 

@@ -1,39 +1,41 @@
-<form action="{{ path('security_agent_profile') }}" method="POST">
-    <div class="form-group">
-        <table class="table">
-            <tr>
-                <th scope="col">Agent</th>
-                {% for role in roles %}
-                <th scope="col">{{ role.Name }}</th>
-                {% endfor %}
-            </tr>
-            {% for agent in agents %}
-                        
-            <tr>
-                <td>{{ agent.FirstName }} {{ agent.LastName }} ({{ agent.UserName }})</td>
 
+    <form id="global_form" action="{{ path('security_agent_profile') }}" method="POST">
+        <div class="">
+            <table class="table table-responsive-md table-bordered table-striped table-md">
+                <tr>
+                    <th scope="col">Roles</th>
+                    {% for agent in agents %}
+                    <th scope="col"><span data-toggle="tooltip" data-placement="top" title="{{ agent.FirstName }} {{ agent.LastName }}"> <i class="fa fa-question-circle"></i></span> {{ agent.UserName }}</th>
+                    {% endfor %}
+                </tr>
                 {% for role in roles %}
+                            
+                <tr>
+                    <td><span data-toggle="tooltip" data-placement="top" title="{{ role.displayname }}"> <i
+                            class="fa fa-question-circle"></i></span> {{ role.Name }}</td>
 
-                    {% if agent.ObjectRoles | length > 0 %}
-                    <td>
-                        <input type="hidden" name="profile[{{ agent.id }}][{{ role.id }}]" />                    
-                        {% for agent_role in agent.ObjectRoles if agent_role != null and agent_role.id == role.id %}
-                            <input type="checkbox" class="form-control" name="profile[{{ agent.id }}][{{ role.id }}]" checked />                    
+                    {% for agent in agents %}
+                        {% if agent.ObjectRoles | length > 0 %}
+                        <td>
+                            <input type="hidden" name="profile[{{ agent.id }}][{{ role.id }}]" />                    
+                            {% for agent_role in agent.ObjectRoles if agent_role != null and agent_role.id == role.id %}
+                                <input type="checkbox" class="input-control" name="profile[{{ agent.id }}][{{ role.id }}]" checked />                    
+                                {% else %}
+                                <input type="checkbox" class="input-control" name="profile[{{ agent.id }}][{{ role.id }}]" />                                
+                            {% endfor %}
+                        </td>
                         {% else %}
-                            <input type="checkbox" class="form-control" name="profile[{{ agent.id }}][{{ role.id }}]" />
-                        {% endfor %}
-                    </td>
-                    {% else %}
-                    <td>
-                        <input type="hidden" name="profile[{{ agent.id }}][{{ role.id }}]" />
-                        <input type="checkbox" class="form-control" name="profile[{{ agent.id }}][{{ role.id }}]" />
-                    </td>
-                    {% endif %}
-                {% endfor %}               
-            </tr>
+                        <td>
+                            <input type="hidden" name="profile[{{ agent.id }}][{{ role.id }}]" />
+                            <input type="checkbox" class="input-control" name="profile[{{ agent.id }}][{{ role.id }}]" />
+                        </td>
+                        {% endif %}
+                    {% endfor %}               
+                </tr>
 
-            {% endfor %}
-        </table>
-    </div>
-    <button type="submit" class="btn btn-success">Valider !</button>
-</form>
+                {% endfor %}
+            </table>
+        </div>
+        <!-- <button type="submit" class="btn btn-success">Valider !</button> -->
+    </form>
+

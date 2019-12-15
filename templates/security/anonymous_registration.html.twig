@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<!--
+* CoreUI - Free Bootstrap Admin Template
+* @version v2.1.15
+* @link https://coreui.io
+* Copyright (c) 2018 creativeLabs Łukasz Holeczek
+* Licensed under MIT (https://coreui.io/license)
+-->
+
+<html lang="en">
+
+<head>
+    <base href="./">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta name="description" content="CoreUI - Open Source Bootstrap Admin Template">
+    <meta name="author" content="Łukasz Holeczek">
+    <meta name="keyword" content="Bootstrap,Admin,Template,Open,Source,jQuery,CSS,HTML,RWD,Dashboard">
+    
+    <title>CoreUI Free Bootstrap Admin Template</title>
+    <!-- Icons-->
+    <link rel="stylesheet" href="{{ asset('bootstrap.min.css', 'bootstrap_css') }}">
+    <link rel="stylesheet" href="{{ asset('all.min.css', 'font_awsome_css') }}">
+    <link rel="stylesheet" href="{{ asset('style/scss/coreui.css', 'theme_coreui') }}">
+    <link rel="stylesheet" href="{{ asset('style/scss/base.css', 'theme_default') }}">
+    
+</head>
+
+<body class="app flex-row align-items-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card mx-4">
+                    <div class="card-body p-4">
+                        <h1>Compte</h1>
+                        <p class="text-muted">Création de compte</p>
+                        
+
+                        {{ form_start(formAgent, {'action': path("security_registration"), 'enctype':'multipart/form-data', 'attr': {'id': 'global_form' }}) }}
+                        
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <i class="fa fa-chess-board"></i>
+                                </span>
+                            </div>
+                            {{ form_widget(formAgent.LastName,{'attr': {'placeholder': 'Nom'}}) }}
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <i class="fa fa-chess-board"></i>
+                                </span>
+                            </div>
+                            {{ form_widget(formAgent.FirstName,{'attr': {'placeholder': 'Prénom'}}) }}
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">@</span>
+                            </div>
+                            {{ form_widget(formAgent.Email,{'attr': {'placeholder': 'Email...'}}) }}
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <i class="fa fa-user"></i>
+                                </span>
+                            </div>
+                            {{ form_widget(formAgent.UserName,{'attr': {'placeholder': 'Pseudo'}}) }}
+                        </div>
+
+                        <div class="input-group mb-4">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <i class="fa fa-lock"></i>
+                                </span>
+                            </div>
+                            {{ form_widget(formAgent.PlainTextPassword,{'attr': {'placeholder': 'mot de passe'}}) }}
+                        </div>
+
+                        <div class="input-group mb-4">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <i class="fa fa-lock"></i>
+                                </span>
+                            </div>
+                            {{ form_widget(formAgent.Confirme_password,{'attr': {'placeholder': 'Veuillez répéter le mot de passe'}}) }}
+                        </div>
+
+                        <div class="form-group">
+                            {{ form_widget(formAgent.PictureFile,{'attr': {'placeholder': 'Avatar', 'class':'form-control'}}) }}
+                        </div>
+                        
+                        {{ form_widget(formAgent.Phone,{'attr': {'placeholder': 'Numéro de téléphone', 'style': 'display:none'}}) }}
+                        {{ form_widget(formAgent.Fax,{'attr': {'placeholder': 'Fax', 'style': 'display:none'}}) }}
+                        
+                        
+                        
+                        {{ form_widget(formAgent.ListSize,{'attr': {'placeholder': 'Taille par defaut des listes', 'style': 'display:none'}})
+                        }}
+                        
+                        
+                        <button type="submit" class="btn btn-block btn-success p-t-2">Créer votre compte</button>
+                        
+                        {{ form_end(formAgent) }}
+                        
+                    </div>
+                    <div class="card-footer p-4">
+                       Après inscription, un administrateur devra valider votre profil afin que vous puissiez avoir accés à l'application.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- CoreUI and necessary plugins-->
+    <script src="{{ asset('jquery-3.4.1.js','qobd_web_js') }}"></script>
+    <script src="{{ asset('javascript/popper.min.js','theme_coreui') }}"></script>
+    <script src="{{ asset('bootstrap.js','bootstrap_js') }}"></script>
+    <script src="{{ asset('javascript/coreui.min.js','theme_coreui') }}"></script>
+    
+    
+    <script src="{{ asset('datatables.js','datatable_dir') }}"></script>
+    <script src="{{ asset('dataTables.responsive.min.js','datatable_dir') }}"></script>
+    <script src="{{ asset('all.min.js','font_awsome_js') }}"></script>
+    <script src="{{ asset('lodash.min.js','qobd_web_js') }}"></script>
+    <script src="{{ asset('bundles/fosjsrouting/js/router.min.js') }}"></script>
+    <script src="{{ asset('fos_js_routes.js','qobd_web_js') }}"></script>
+    <script src="{{ asset('render_methods.js','qobd_web_js') }}"></script>
+    <script src="{{ asset('data_table.js','qobd_web_js') }}"></script>
+</body>
+
+</html>

@@ -35,6 +35,13 @@ class OrderStatus
      */
     private $orders;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("DisplayName")
+     */
+    private $DisplayName;
+
     public function __construct()
     {
         $this->orders = new ArrayCollection();
@@ -84,6 +91,18 @@ class OrderStatus
                 $order->setStatus(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDisplayName(): ?string
+    {
+        return $this->DisplayName;
+    }
+
+    public function setDisplayName(?string $DisplayName): self
+    {
+        $this->DisplayName = $DisplayName;
 
         return $this;
     }

@@ -3,20 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Item;
-use App\Entity\Comment;
-use App\Entity\Provider;
-use App\Entity\ItemBrand;
-use App\Entity\ItemGroupe;
+use App\Services\Utility;
 use App\Services\Serializer;
-use App\Services\QOBDSerializer;
+use App\Services\SecurityManager;
 use App\Form\ItemRegistrationType;
 use App\Repository\ItemRepository;
 use App\Services\CatalogueHydrate;
-use App\Form\ProviderRegistrationType;
-use App\Form\ItemBrandRegistrationType;
-use JMS\Serializer\SerializerInterface;
-use App\Form\ItemGroupeRegistrationType;
-use JMS\Serializer\SerializationContext;
+use App\Repository\ActionRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Routing\Annotation\Route;
@@ -25,6 +18,16 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class CatalogueController extends Controller
 {
+    protected $securityUtility;
+    protected $actionRepo;
+
+
+    public function __construct(SecurityManager $securityUtility, ActionRepository $actionRepo)
+    {
+        $this->securityUtility = $securityUtility;
+        $this->actionRepo = $actionRepo;
+    }
+    
     /**
      * @Route("/admin/catalogue", name="catalogue_home")
      */
@@ -32,7 +35,11 @@ class CatalogueController extends Controller
                           ItemRepository $itemRepo,
                           SessionInterface $session,
                           CatalogueHydrate $catHydrate)
-    {               
+    {
+        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_CATALOGUE']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
         return $this->render('catalogue/index.html.twig', [
             'item_data_source' => $serializer->serialize([ 'object_array' => $catHydrate->hydrateItem($itemRepo->findAll()), 'format' => 'json', 'group' => 'class_property']),
             'cart_total' => count($session->get('panier', []))
@@ -47,8 +54,12 @@ class CatalogueController extends Controller
     public function itemRegistration(Item $item = null, 
                                     Request $request, 
                                     ObjectManager $manager,
-                                    CatalogueHydrate $catHydrate)
-    {
+                                    CatalogueHydrate $catHydrate) {
+
+        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_CATALOGUE']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+    
         if(!$item)
             $item = new Item();
         
@@ -75,7 +86,11 @@ class CatalogueController extends Controller
     /**
      * @Route("/admin/catalogue/produit/{id}/delete", options={"expose"=true}, name="catalogue_delete")
      */
-    public function delete(Item $item, ObjectManager $manager){
+    public function delete(Item $item, ObjectManager $manager) {
+
+        if (!$this->securityUtility->checkHasDelete($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_CATALOGUE']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
 
         $manager->remove($item);
         $manager->flush();

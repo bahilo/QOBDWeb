@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Bill;
-use App\Dependency\Utility;
+use App\Entity\Delivery;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
@@ -15,27 +15,11 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
  */
 class BillRepository extends ServiceEntityRepository
 {
-    protected $utility;
 
-    public function __construct(ManagerRegistry $registry, Utility $utility)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Bill::class);
-        $this->utility = $utility;
     }
-
-    /*public function findByOrder($params)
-    {
-        $bills = [];
-        foreach ($this->utility->getOrderDeliveries($params['orderDetails'], $params['status']) as $delivery) {
-            if ($delivery) {
-                $deliveryStatus = $delivery->getStatus();
-                $bill = $delivery->getBill();
-                if ($bill && $deliveryStatus && $deliveryStatus->getName() == $params['status'] && !$this->utility->in_array($bills, $bill))
-                    array_push($bills, $bill);
-            }
-        }
-        return $bills;
-    }*/
 
     // /**
     //  * @return Bill[] Returns an array of Bill objects
@@ -45,16 +29,18 @@ class BillRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('q')
             ->innerJoin('q.quantityDeliveries', 'q_qt_del')
+            ->innerJoin('q_qt_del.OrderDetail', 'q_qt_del_q_ord')
             ->innerJoin('q_qt_del.Delivery', 'q_qt_del_del')
             ->innerJoin('q_qt_del_del.Status', 'q_qt_del_del_status')
-            ->andWhere('q_qt_del_del_status.Name = :val')
-            ->setParameter('val', $params['status'])
+            ->andWhere('q_qt_del_q_ord.QuoteOrder = :order')
+            ->andWhere('q_qt_del_del_status.Name = :status')
+            ->setParameters(['status'=> $params['status'], 'order' => $params['order']])
             ->orderBy('q.id', 'ASC')
             ->getQuery()
             ->getResult();
         ;
     }
-    
+
 
     /*
     public function findOneBySomeField($value): ?Bill
@@ -67,4 +53,14 @@ class BillRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function findOneByDelivery(Delivery $delivery): ?Bill
+    {
+        return $this->createQueryBuilder('q')
+            ->innerJoin('q.quantityDeliveries', 'q_qt_del')
+            ->andWhere('q_qt_del.Delivery = :delivery')
+            ->setParameter('delivery', $delivery)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

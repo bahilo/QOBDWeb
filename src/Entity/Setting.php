@@ -41,6 +41,11 @@ class Setting
      */
     private $Code;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $IsFile;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -78,6 +83,18 @@ class Setting
     public function setCode(string $Code): self
     {
         $this->Code = $Code;
+
+        return $this;
+    }
+
+    public function getIsFile(): ?bool
+    {
+        return $this->IsFile;
+    }
+
+    public function setIsFile(?bool $IsFile): self
+    {
+        $this->IsFile = $IsFile;
 
         return $this;
     }

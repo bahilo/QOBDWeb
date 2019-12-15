@@ -1,4 +1,4 @@
-import $ from 'jquery'
+
 
 /**
  * --------------------------------------------------------------------------
@@ -6,8 +6,12 @@ import $ from 'jquery'
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
+$(function(){
 
-$('[data-toggle="popover"]').popover()
-$('.popover-dismiss').popover({
-  trigger: 'focus'
+  $('[data-toggle="popover"]').popover()
+  $('.popover-dismiss').popover({
+    trigger: 'focus'
+  });
+
 })
+

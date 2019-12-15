@@ -49,7 +49,7 @@ class OrderHydrate{
                 }
                 $orderDetail->setItemSellPriceTotal($item->getSellPrice() * $orderDetail->getQuantity());
                 if($tax)
-                    $orderDetail->setItemSellPriceVATTotal(($item->getSellPrice() * $orderDetail->getQuantity())*(1 + $Tax->getValue()));
+                    $orderDetail->setItemSellPriceVATTotal(($item->getSellPrice() * $orderDetail->getQuantity())*(1 + $tax->getValue()));
                 else
                     $orderDetail->setItemSellPriceVATTotal($item->getSellPrice() * $orderDetail->getQuantity());
                 $orderDetail->setItemROIPercent((($item->getSellPrice() - $item->getPurchasePrice()) / $item->getSellPrice()) * 100);

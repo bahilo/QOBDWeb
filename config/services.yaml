@@ -4,6 +4,13 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
+    resource.download_dir: /ressources/download
+    file.download_dir: '../public/%resource.download_dir%'
+    file.agent.download_dir: '../public/%resource.download_dir%/avatars'
+    file.setting.download_dir: '../public/%resource.download_dir%/setting'
+    file.type.download_quote: 0
+    file.type.download_order: 1
+    file.type.download_refund: 2
 
 services:
     # default configuration for services in *this* file
@@ -13,6 +20,9 @@ services:
         public: false       # Allows optimizing the container by removing unused services; this also means
                             # fetching services directly from the container via $container->get() won't work.
                             # The best practice is to be explicit about your dependencies anyway.
+        bind:
+            $logo_dir: '%resource.download_dir%/setting'
+            $avatar_dir: '%resource.download_dir%/avatars'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name

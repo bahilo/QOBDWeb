@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Bill;
 use App\Entity\Delivery;
 use App\Entity\QuantityDelivery;
 use App\Entity\QuoteOrderDetail;
@@ -48,6 +49,17 @@ class QuoteOrderDetailRepository extends ServiceEntityRepository
             ->getResult();
 
         //dump($res); die();
+    }
+
+    public function findByBill(Bill $bill)
+    {
+        return $this->createQueryBuilder('q')
+            ->innerJoin('q.quantityDeliveries', 'q_qt_del')
+            ->andWhere('q_qt_del.Bill = :bill')
+            ->setParameter('bill', $bill)
+            ->orderBy('q.id', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     public function findByDelivery(Delivery $delivery)

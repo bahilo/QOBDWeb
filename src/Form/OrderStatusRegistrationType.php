@@ -13,6 +13,7 @@ class OrderStatusRegistrationType extends AbstractType
     {
         $builder
             ->add('Name')
+            ->add('DisplayName')
         ;
     }
 

@@ -11,11 +11,14 @@ class Serializer{
 
     public function __construct(SerializerInterface $serializer){
 
-        $this->serializer = $serializer;
+        $this->serializer = $serializer;      
 
     }
 
     public function serialize($params){
-        return $this->serializer->serialize($params['object_array'], $params['format'], SerializationContext::create()->setGroups(array($params['group'])));
+        $context = new SerializationContext();
+        $context->setSerializeNull(true);
+        $context->setGroups(array($params['group']));
+        return $this->serializer->serialize($params['object_array'], $params['format'], $context);
     }
 }

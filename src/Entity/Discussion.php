@@ -2,9 +2,11 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Groups;
+use Doctrine\Common\Collections\Collection;
+use JMS\Serializer\Annotation\SerializedName;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\DiscussionRepository")
@@ -15,33 +17,66 @@ class Discussion
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"class_property"})
+     * @SerializedName("id")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("Name")
      */
     private $Name;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"class_property"})
+     * @SerializedName("CreatedAt")
      */
     private $CreatedAt;
 
     /**
+     * @Groups({"class_property"})
+     * @SerializedName("CreatedAtShort")
+     */
+    private $CreatedAtShort;
+
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("Owner")
+     */
+    private $Owner;
+
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("PathAvatarDir")
+     */
+    private $PathAvatarDir;
+
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("Recipients")
+     */
+    private $Recipients;
+
+    /**
      * @ORM\OneToMany(targetEntity="App\Entity\Message", mappedBy="Discussion")
+     * @Groups({"class_relation"})
      */
     private $messages;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Agent", mappedBy="Discussion")
+     * @ORM\OneToMany(targetEntity="App\Entity\AgentDiscussion", mappedBy="discussion")
+     * @Groups({"class_relation"})
      */
-    private $agents;
+    private $agentDiscussions;
 
     public function __construct()
     {
         $this->messages = new ArrayCollection();
-        $this->agents = new ArrayCollection();
+        $this->agentDiscussions = new ArrayCollection();
+        $this->Recipients = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -57,6 +92,42 @@ class Discussion
     public function setName(?string $Name): self
     {
         $this->Name = $Name;
+
+        return $this;
+    }
+
+    public function getCreatedAtShort(): ?string
+    {
+        return $this->CreatedAtShort;
+    }
+
+    public function setCreatedAtShort(?string $CreatedAtShort): self
+    {
+        $this->CreatedAtShort = $CreatedAtShort;
+
+        return $this;
+    }
+
+    public function getOwner(): ?Agent
+    {
+        return $this->Owner;
+    }
+
+    public function setOwner(?Agent $Owner): self
+    {
+        $this->Owner = $Owner;
+
+        return $this;
+    }
+
+    public function getPathAvatarDir(): ?string
+    {
+        return $this->PathAvatarDir;
+    }
+
+    public function setPathAvatarDir(?string $PathAvatarDir): self
+    {
+        $this->PathAvatarDir = $PathAvatarDir;
 
         return $this;
     }
@@ -91,42 +162,58 @@ class Discussion
         return $this;
     }
 
-    public function removeMessage(Message $message): self
+    /**
+     * @return Collection|Agent[]
+     */
+    public function getRecipients(): Collection
     {
-        if ($this->messages->contains($message)) {
-            $this->messages->removeElement($message);
-            // set the owning side to null (unless already changed)
-            if ($message->getDiscussion() === $this) {
-                $message->setDiscussion(null);
-            }
+        return $this->Recipients;
+    }
+
+    public function addRecipient(Agent $Recipient): self
+    {
+        if (!$this->Recipients->contains($Recipient)) {
+            $this->Recipients[] = $Recipient;
+        }
+
+        return $this;
+    }
+
+    public function removeRecipient(Agent $Recipient): self
+    {
+        if ($this->Recipients->contains($Recipient)) {
+            $this->Recipients->removeElement($Recipient);
         }
 
         return $this;
     }
 
     /**
-     * @return Collection|Agent[]
+     * @return Collection|AgentDiscussion[]
      */
-    public function getAgents(): Collection
+    public function getAgentDiscussions(): Collection
     {
-        return $this->agents;
+        return $this->agentDiscussions;
     }
 
-    public function addAgent(Agent $agent): self
+    public function addAgentDiscussion(AgentDiscussion $agentDiscussion): self
     {
-        if (!$this->agents->contains($agent)) {
-            $this->agents[] = $agent;
-            $agent->addDiscussion($this);
+        if (!$this->agentDiscussions->contains($agentDiscussion)) {
+            $this->agentDiscussions[] = $agentDiscussion;
+            $agentDiscussion->setDiscussion($this);
         }
 
         return $this;
     }
 
-    public function removeAgent(Agent $agent): self
+    public function removeAgentDiscussion(AgentDiscussion $agentDiscussion): self
     {
-        if ($this->agents->contains($agent)) {
-            $this->agents->removeElement($agent);
-            $agent->removeDiscussion($this);
+        if ($this->agentDiscussions->contains($agentDiscussion)) {
+            $this->agentDiscussions->removeElement($agentDiscussion);
+            // set the owning side to null (unless already changed)
+            if ($agentDiscussion->getDiscussion() === $this) {
+                $agentDiscussion->setDiscussion(null);
+            }
         }
 
         return $this;

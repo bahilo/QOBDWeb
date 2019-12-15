@@ -1,49 +1,42 @@
 {% extends 'template_coreui.html.twig' %}
 
-{% block title %}Clients{% endblock %}
+{% set page_title = 'Clients' %}
 
-{% block stylesheets %}
-<!-- <link rel="stylesheet" href="{{ asset('client.css', 'qobd_web_css') }}"> -->
+{% block home_path %}
+<li class="breadcrumb-item">
+    {{ page_title }}
+</li>
+{% endblock %}
+
+{% block title %}{{ page_title }} {% endblock %}
+
+
+{% block body_header_right %}
+<a href="{{ path("client_registration") }}" class="btn"><i class="fa fa-plus"></i></a>
 {% endblock %}
 
 {% block body %}
 
-<div class="client-wrapper">
-
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item active">
-            
-        </li>
-        <!-- Breadcrumb Menu-->
-        <li class="breadcrumb-menu d-md-down-none">
-            <div class="btn-group" role="group" aria-label="Button group">
-                <a class="btn" href="#">
-                    <i class="icon-speech"></i>
-                </a>
-                <a href="{{ path("client_registration") }}" class="btn btn-danger"><i class="fa fa-plus"></i></a>
-            </div>
-        </li>
-    </ol>
-    
-    {% if client_data_source | length > 0 %}
+<div class="client-wrapper">    
     <div class="animated fadeIn">
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-header">
-                        <i class="fa fa-align-justify"></i> Clients</div>
+                        <i class="fa fa-align-justify"></i> {{ page_title }}</div>
                     <div class="card-body">
+
                         <table id="client_table_js" class="table table-responsive-md table-bordered table-striped table-md">
                         </table>
-                        <input type="hidden" id="client_data_source" value="{{ client_data_source }}">
+                        
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    {% endif %}
 </div>
 
+<input type="hidden" id="client_data_source" value="{{ client_data_source }}">
 {% endblock %}
 {% block javascripts %}
 <script src="{{  asset('client.js','qobd_web_js') }}"></script>

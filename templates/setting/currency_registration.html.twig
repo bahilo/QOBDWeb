@@ -1,33 +1,53 @@
 {% extends 'template_coreui.html.twig' %}
 
-{% block title %}Configuration de la Monnaie{% endblock %}
+{% set page_title = 'Editer monnaie' %}
 
-{% block stylesheets %}
+{% block home_path %}
+<li class="breadcrumb-item">
+    <a href="{{ path("setting_home") }}">Configuration</a>
+</li>
+<li class="breadcrumb-item">
+    <a href="{{ path("setting_currency") }}">Monnaies</a>
+</li>
+<li class="breadcrumb-item">
+    {{ page_title }}
+</li>
+{% endblock %}
 
+{% block title %}{{ page_title }} {% endblock %}
+
+{% block body_header_right %}
+    <button form="global_form" type="submit" class="btn btn-"><i class="fa fa-save"></i></button>
 {% endblock %}
 
 {% block body %}
 
 <div class="brand-wrapper">
 
-    <div class="container">
-        <h1>Création de la monnaie !</h1>
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa fa-align-justify"></i> {{ page_title }}</div>
+                    <div class="card-body">
 
-        {{ form_start(formCurrency) }}
+                        {{ form_start(formCurrency, { 'attr': {'id': 'global_form' }}) }}
 
 
-        {{ form_row(formCurrency.Name,{'label': 'désignation de la monnaie', 'attr': {'placeholder': 'désignation de la monnaie'}}) }}
-        {{ form_row(formCurrency.Symbol,{'label': 'Symbole', 'attr': {'placeholder': 'Symbole'}}) }}
-        {{ form_row(formCurrency.Rate,{'label': 'Taux', 'attr': {'placeholder': 'Taux'}}) }}
-        {{ form_row(formCurrency.CountryCode,{'label': 'Code du pays', 'attr': {'placeholder': 'Code du pays'}}) }}
-        {{ form_row(formCurrency.Country,{'label': 'Pays', 'attr': {'placeholder': 'Pays'}}) }}
-        {{ form_row(formCurrency.IsDefault) }}
-       
-        <button type="submit" class="btn btn-success">Ajouter la monnaie</button>
-
-        {{ form_end(formCurrency) }}
+                        {{ form_row(formCurrency.Name,{'label': 'désignation de la monnaie', 'attr': {'placeholder': 'désignation de la monnaie'}}) }}
+                        {{ form_row(formCurrency.Symbol,{'label': 'Symbole', 'attr': {'placeholder': 'Symbole'}}) }}
+                        {{ form_row(formCurrency.Rate,{'label': 'Taux', 'attr': {'placeholder': 'Taux'}}) }}
+                        {{ form_row(formCurrency.CountryCode,{'label': 'Code du pays', 'attr': {'placeholder': 'Code du pays'}}) }}
+                        {{ form_row(formCurrency.Country,{'label': 'Pays', 'attr': {'placeholder': 'Pays'}}) }}
+                        {{ form_row(formCurrency.IsDefault) }}
+                    
+                        {{ form_end(formCurrency) }}
+                    </div> 
+                </div> 
+            </div> 
+        </div>
     </div>
-
 </div>
 
 {% endblock %}

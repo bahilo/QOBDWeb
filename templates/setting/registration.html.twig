@@ -1,51 +1,75 @@
 {% extends 'template_coreui.html.twig' %}
 
-{% block title %}Configuration{% endblock %}
-
-{% block stylesheets %} {% endblock %}
+{% set page_title = 'Nouvelle configuration' %}
 
 {% block home_path %}
 <li class="breadcrumb-item">
-    <a href="#">Configuration</a>
+    <a href="{{ path("setting_home") }}">Configuration</a>
 </li>
 <li class="breadcrumb-item">
-    Générale
+    {{ page_title }}
 </li>
 {% endblock %}
 
 {% block body_header_right %}
-<input form="form_general" type="submit" value="save" style="color: #20a8d8">
+    <button form="global_form" type="submit" class="btn btn-"><i class="fa fa-save"></i></button>
 {% endblock %}
 
 {% block body %}
 
-<div class="brand-wrapper">
+<div class="setting-wrapper">
 
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="card">
-                <div class="card-header">
-                    <i class="fa fa-align-justify"></i> Liste des produits et tarifs</div>
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa fa-align-justify"></i> {{ page_title }}</div>
                     <div class="card-body">
 
-                        {{ form_start(formSetting, {'attr': {'id': 'form_general'}}) }}
+                        {{ form_start(formSetting, {'attr': {'enctype': "multipart/form-data", 'id': 'global_form'}}) }}
+                        
+                        <div class="switch-wrapper">
+                            <span class="badge badge-success">Text</span>
+                            <label class="switch switch-3d switch-primary">
+                                {% if formSetting.vars.data.IsFile %}
+                                <input name="setting[switch]" class="switch-input" type="checkbox">
+                                {% else %}
+                                <input name="setting[switch]" class="switch-input" type="checkbox" checked>
+                                {% endif %}
+                                <span class="switch-slider"></span>
+                            </label>
+                            <span class="badge badge-warning">Fichier</span>
+                        </div>
+                        <br/>
 
-
-                        {{ form_row(formSetting.Name,{'label': 'désignation de la config', 'attr': {'placeholder': 'désignation de la config'}})
-                        }}
-                        {{ form_row(formSetting.Value,{'label': 'Valeur', 'attr': {'placeholder': 'Valeur'}}) }}
-                        {{ form_row(formSetting.Code,{'label': 'Catégorie', 'attr': {'placeholder': 'Catégorie'}}) }}
-
-                        <button type="submit" class="btn btn-success">Ajouter la monnaie</button>
+                        {% if is_granted('ROLE_OPERATOR') %}
+                            {{ form_row(formSetting.Code,{'label': 'Catégorie', 'attr': {'placeholder': 'Catégorie'}}) }}
+                            {{ form_row(formSetting.Name,{'label': 'désignation de la config', 'attr': {'placeholder': 'désignation de la config'}}) }}
+                            {% else %}
+                            {{ form_row(formSetting.Code,{'label': 'Catégorie', 'attr': {'placeholder': 'Catégorie', 'disabled':'disabled'}}) }}
+                            {{ form_row(formSetting.Name,{'label': 'désignation de la config', 'attr': {'placeholder': 'désignation de la config', 'disabled':'disabled'}}) }}
+                            {% endif %}
+                        
+                        {{ form_row(formSetting.IsFile,{'label': 'désignation de la config', 'attr': {'placeholder': 'désignation de la config', 'style':'display:none'}}) }}
+                        <div class="value-wrapper">
+                            <div class="value-default">
+                                {{ form_row(formSetting.Value,{'label': 'Valeur', 'attr': {'placeholder': 'Valeur'}}) }}
+                            </div>
+                            <div class="value-file" style="display: none;">
+                                <input type="file" name="setting[file]">
+                            </div>
+                        </div>
 
                         {{ form_end(formSetting) }}
-                </div>
-            </div>
+                    </div> 
+                </div> 
+            </div> 
         </div>
-    </div>  
+    </div>
 </div>
 
 {% endblock %}
 {% block javascripts %}
-<!-- <script src="{#{  asset('client.js','qobd_web_js') }#}"></script> -->
+<script src="{{ asset('setting.js','qobd_web_js') }}"></script>
 {% endblock %}

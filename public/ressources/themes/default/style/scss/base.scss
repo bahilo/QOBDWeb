@@ -1,25 +1,73 @@
 
-td.details-control {
-    // background: url('../resources/details_open.png') no-repeat center center;
-    cursor: pointer;
-    &:before{
-        content: "\f49e";
-        position: relative;
-        top: 14;
-        left: 10px;
-    }
-}
-tr.details td.details-control {
-    // background: url('../resources/details_close.png') no-repeat center center;
-    &:before{
-        content: "\f07c";
-        position: relative;
-        top: 0;
-        left: 10px;
-    }
-}
+body {
+  table-layout: fixed;
 
-.breadcrumb-menu .btn{
-    //padding: 6px 12px;
-    font-size: 20px;
+  .app-body{
+    
+    td.details-control {
+        // background: url('../resources/details_open.png') no-repeat center center;
+        cursor: pointer;
+        &:before{
+            content: "\f044";
+            font-family: 'Font Awesome\ 5 Free';
+            position: relative;
+            top: 14;
+            left: 10px;
+        }
+    }
+    tr.details td.details-control {
+        // background: url('../resources/details_close.png') no-repeat center center;
+        &:before{
+            content: "\f057";
+            font-family: 'Font Awesome\ 5 Free';
+            position: relative;
+            top: 0;
+            left: 10px;
+        }
+    }
+
+    .breadcrumb-menu .btn{
+        //padding: 6px 12px;
+        font-size: inherit;
+    }
+
+    .body-header.breadcrumb{
+        background: none;
+        .breadcrumb-menu .btn:hover {
+            color: white;
+            background: #1b8eb7;
+        }
+        .breadcrumb-menu .btn {
+            padding: 4px 13px;
+            color: white;
+            background: #1b8eb7;
+        }
+    }
+
+    ul.pagination{
+        .page-item{
+            cursor:pointer;
+        }
+    }
+
+    .security-wrapper{
+        .input-control {
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+
+    .setting-wrapper{
+        .switch-label {
+            width: 96px;
+        }
+        .switch-wrapper{
+            label {
+                display: inline-block;
+                margin-bottom: -0.5rem;
+            }
+        }
+    }
+
+  }
 }

@@ -42,18 +42,30 @@ class OrderHydrate{
                 $orderDetail->setItemRef($item->getRef());
                 $orderDetail->setItemName($item->getName());
                 $orderDetail->setItemPurchasePrice($item->getPurchasePrice());
+
                 $sellPrice = $orderDetail->getItemSellPrice();
+                $purchasePrice = $orderDetail->getItemPurchasePrice();
+
                 if(empty($sellPrice) || $sellPrice == 0){
                     $orderDetail->setItemSellPrice($item->getSellPrice());
                     $this->manager->persist($orderDetail);                    
                 }
-                $orderDetail->setItemSellPriceTotal($item->getSellPrice() * $orderDetail->getQuantity());
+
+                if(empty($purchasePrice) || $purchasePrice == 0){
+                    $orderDetail->setItemPurchasePrice($item->getPurchasePrice());
+                    $this->manager->persist($orderDetail);                    
+                }
+
+                //dump($orderDetail->getItemSellPrice() * $orderDetail->getQuantity());
+                //dump($orderDetail);
+                //die();
+                $orderDetail->setItemSellPriceTotal($orderDetail->getItemSellPrice() * $orderDetail->getQuantity());
                 if($tax)
-                    $orderDetail->setItemSellPriceVATTotal(($item->getSellPrice() * $orderDetail->getQuantity())*(1 + $tax->getValue()));
+                    $orderDetail->setItemSellPriceVATTotal(($orderDetail->getItemSellPrice() * $orderDetail->getQuantity())*(1 + $tax->getValue() / 100));
                 else
-                    $orderDetail->setItemSellPriceVATTotal($item->getSellPrice() * $orderDetail->getQuantity());
-                $orderDetail->setItemROIPercent((($item->getSellPrice() - $item->getPurchasePrice()) / $item->getSellPrice()) * 100);
-                $orderDetail->setItemROICurrency(($item->getSellPrice() - $item->getPurchasePrice()) * $orderDetail->getQuantity() );
+                    $orderDetail->setItemSellPriceVATTotal($orderDetail->getItemSellPrice() * $orderDetail->getQuantity());
+                $orderDetail->setItemROIPercent((($orderDetail->getItemSellPrice() - $orderDetail->getItemPurchasePrice()) / $orderDetail->getItemSellPrice()) * 100);
+                $orderDetail->setItemROICurrency(($orderDetail->getItemSellPrice() - $orderDetail->getItemPurchasePrice()) * $orderDetail->getQuantity() );
                 
             }
             $this->manager->flush();
@@ -79,7 +91,7 @@ class OrderHydrate{
             
             $order->setCreatedAtToString(date_format($order->getCreatedAt(),"d/m/Y"));
 
-            array_push($output, $order);
+            $output[] = $order;
         }
 
         return $output;
@@ -158,7 +170,7 @@ class OrderHydrate{
         $item->setSellPrice($form['sell']);
 
         $orderDetail->setQuantity($form['quantity']);
-        if (!empty($form['quantity_recieved']))
+        if (!empty($form['quantity_recieved']) && $form['quantity_recieved'] <= $form['quantity'])
             $orderDetail->setQuantityRecieved($form['quantity_recieved']);
 
         return $orderDetail;

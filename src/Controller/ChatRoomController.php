@@ -4,10 +4,13 @@ namespace App\Controller;
 
 use App\Entity\Agent;
 use App\Entity\Message;
+use App\Services\Utility;
 use App\Entity\Discussion;
+use App\Services\ChatToView;
 use App\Services\Serializer;
 use App\Services\ChatManager;
 use App\Entity\AgentDiscussion;
+use App\Repository\AgentRepository;
 use App\Repository\MessageRepository;
 use App\Repository\DiscussionRepository;
 use App\Repository\AgentDiscussionRepository;
@@ -22,15 +25,24 @@ class ChatRoomController extends Controller
 {
 
     protected $serializer;
+    protected $chatManager;
+    protected $chatToView;
+    protected $adRepo;
 
-    public function __construct(Serializer $serializer)
+    public function __construct(Serializer $serializer, 
+                                ChatManager $chatManager, 
+                                ChatToView $chatToView,
+                                AgentDiscussionRepository $adRepo)
     {
         $this->serializer = $serializer;
-
+        $this->chatManager = $chatManager;
+        $this->chatToView = $chatToView;
+        $this->adRepo = $adRepo;
     }
 
+
     /**
-     * @Route("/admin/chat", name="chat_home")
+     * @Route("/admin/chat", options={"expose"=true}, name="chat_home")
      */
     public function home()
     {
@@ -40,59 +52,126 @@ class ChatRoomController extends Controller
     }
 
     /**
-     * @Route("/admin/chat/discussion/${name}/inscription", options={"expose"=true}, name="chat_discussion_register")
+     * @Route("/admin/chat/commerciaux", options={"expose"=true}, name="chat_agents")
      */
-    public function discussionRegister(?string $name, ObjectManager $manager, ChatManager $chatManager)
+    public function agents(AgentRepository $agentRepo, Utility $utility)
     {
-        $agent = $this->getUser();
-        $ad = new AgentDiscussion();
-        $discussion = new Discussion();
-        $discussion->setCreatedAt(new \DateTime());
-        $discussion->setName($name);
-
-        $ad->setIsOwner(true);
-        $ad->setDiscussion($discussion);
-        $ad->setAgent($agent);
-        $ad->setIsCurrent(false);
-
-        $manager->persist($discussion);
-        $manager->persist($ad);
-        $manager->flush();
-
-        $chatManager->setAsCurrentDiscussion($agent, $discussion);
-
-        //return $this->RedirectToRoute('home');
-        
         return new Response($this->serializer->serialize([
-            'object_array' => $chatManager->hydrateDiscussion([$discussion]),
+            'object_array' => ['PathAvatarDir' => $this->getParameter('resource.download_dir') . '/agent/avatars', 'agents' => $utility->removeFromArray( $agentRepo->findAll(), $this->getUser())],
             'format' => 'json',
             'group' => 'class_property'
         ]));
     }
 
     /**
-     * @Route("/admin/chat/message/inscription", options={"expose"=true}, name="chat_message_register")
+     * @Route("/admin/chat/discussion/{id}/messages", options={"expose"=true}, name="chat_discussion_message")
      */
-    public function messageRegister(Request $request,
+    public function discussionMessage(Discussion $discussion)
+    {
+        $agent = $this->getUser();
+
+        //reset discussion
+        $this->chatManager->setAsCurrentDiscussion($agent, $discussion);
+        $this->chatManager->setread($discussion, $this->getUser());
+        return new Response($this->serializer->serialize([
+            'object_array' => [ 'discussion' => [$discussion], 'messages' => $this->chatManager->hydrateMessage($this->chatToView->messages($discussion))],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]));
+    }
+
+    /**
+     * @Route("/admin/chat/discussion/{id}/messages/{nbSkip}/plus/{nbTake}", options={"expose"=true}, name="chat_load_message")
+     */
+    public function loadMoreMessages(Discussion $discussion, int $nbSkip, int $nbTake)
+    {
+        $this->chatManager->setread($discussion, $this->getUser());
+        return new Response($this->serializer->serialize([
+            'object_array' => [                
+                'discussion' => [$discussion], 
+                'messages' => [
+                    'total' => count($this->chatToView->messages($discussion)),
+                    'result' => $this->chatManager->hydrateMessage($this->chatToView->messages($discussion, $nbSkip, $nbTake))
+                    ]
+                ],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]));
+    }
+
+    /**
+     * @Route("/admin/chat/discussion/inscription", options={"expose"=true}, name="chat_discussion_register")
+     * @Route("/admin/chat/discussion/{id}/inscription", options={"expose"=true}, name="chat_discussion_edit")
+     */
+    public function discussionRegister(Discussion $discussion = null, Request $request, ObjectManager $manager, AgentRepository $agentRepo)
+    {
+        $agents = json_decode($request->query->get('agents'));
+        $agents[] = $this->getUser()->getid();
+
+        if(empty($discussion)){
+            $discussion = new Discussion();
+            $discussion->setCreatedAt(new \DateTime());
+        }
+
+        $discussion->setName($request->query->get('name'));
+        $manager->persist($discussion);
+
+        //dump($request); die();
+        foreach($agents as $id){
+
+            $mAgent = $agentRepo->find($id);
+
+            $ad = $this->adRepo->findOneBy(['discussion' => $discussion, 'agent' => $mAgent]);
+            if(empty($ad)){
+                $ad = new AgentDiscussion();
+            }
+
+            if($mAgent->getId() == $this->getUser()->getId())
+                $ad->setIsOwner(true);
+            else
+                $ad->setIsOwner(false);
+
+            $ad->setDiscussion($discussion);
+            $ad->setAgent($mAgent);
+            $ad->setIsCurrent(false);
+            
+            $manager->persist($ad);
+        }
+        $manager->flush();
+
+        $this->chatManager->setAsCurrentDiscussion($this->getUser(), $discussion);
+
+        //return $this->RedirectToRoute('home');
+        
+        return new Response($this->serializer->serialize([
+            'object_array' => $this->chatManager->hydrateDiscussion([$discussion]),
+            'format' => 'json',
+            'group' => 'class_property'
+        ]));
+    }
+
+    /**
+     * @Route("/admin/chat/message/{message}/{id}/inscription", options={"expose"=true}, name="chat_message_register")
+     */
+    public function messageRegister(Discussion $discussion, $message,
                                     DiscussionRepository $discussionRepo,
                                     ObjectManager $manager)
     {
-        $form = $request->request->get('chat_room');
-        if(!empty($form)){
-            $discussion = $discussionRepo->find($form["discussion"]);
-            $message = new Message();
-            $message->setIsRed(false);
-            $message->setCreatedAt(new \DateTime());
-            $message->setContent($form['message']);
-            $message->setDiscussion($discussion);
-            $message->setAgent($this->getUser());
+        $msg = new Message();
+        if(!empty($message) && !empty($discussion)){
+            $msg->setCreatedAt(new \DateTime());
+            $msg->setContent($message);
+            $msg->setDiscussion($discussion);
+            $msg->setAgent($this->getUser());
 
-            $manager->persist($message);
+            $manager->persist($msg);
             $manager->flush();
+
+            $this->chatManager->setUnread($discussion);
         }
 
         return new Response($this->serializer->serialize([
-            'object_array' => [$message],
+            'object_array' => $this->chatManager->hydrateMessage([$msg]),
             'format' => 'json',
             'group' => 'class_property'
         ]));
@@ -112,7 +191,7 @@ class ChatRoomController extends Controller
         $chatManager->setAsCurrentDiscussion($agent, $discussion);
 
         return new Response($this->serializer->serialize([
-            'object_array' => [$discussion],
+            'object_array' => $this->chatManager->hydrateDiscussion([$discussion]),
             'format' => 'json',
             'group' => 'class_property'
         ]));

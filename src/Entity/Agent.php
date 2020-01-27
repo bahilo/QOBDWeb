@@ -178,6 +178,19 @@ class Agent implements UserInterface
      */
     private $agentDiscussions;
 
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("LoggedAt")
+     */
+    private $LoggedAt;
+
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("TotalUnRead")
+     */
+    private $TotalUnRead;
+
     public function __construct()
     {
         $this->Roles = new ArrayCollection();
@@ -303,7 +316,7 @@ class Agent implements UserInterface
 
     public function getPicture(): ?string
     {
-        return $this->Picture;
+        return ((empty($this->Picture)) ? 'default.png' : $this->Picture);
     }
 
     public function setPicture(?string $Picture): self
@@ -587,6 +600,30 @@ class Agent implements UserInterface
                 $agentDiscussion->setAgent(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getLoggedAt(): ?\DateTimeInterface
+    {
+        return $this->LoggedAt;
+    }
+
+    public function setLoggedAt(\DateTimeInterface $LoggedAt): self
+    {
+        $this->LoggedAt = $LoggedAt;
+
+        return $this;
+    }
+
+    public function getTotalUnRead(): ?int
+    {
+        return $this->TotalUnRead;
+    }
+
+    public function setTotalUnRead(int $TotalUnRead): self
+    {
+        $this->TotalUnRead = $TotalUnRead;
 
         return $this;
     }

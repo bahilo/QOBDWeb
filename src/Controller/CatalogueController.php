@@ -11,6 +11,7 @@ use App\Repository\ItemRepository;
 use App\Services\CatalogueHydrate;
 use App\Repository\ActionRepository;
 use Symfony\Component\HttpFoundation\Request;
+use App\Repository\QuoteOrderDetailRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -54,7 +55,8 @@ class CatalogueController extends Controller
     public function itemRegistration(Item $item = null, 
                                     Request $request, 
                                     ObjectManager $manager,
-                                    CatalogueHydrate $catHydrate) {
+                                    CatalogueHydrate $catHydrate,
+                                    Utility $utility) {
 
         if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_CATALOGUE']))) {
             return $this->redirectToRoute('security_deny_access');
@@ -71,6 +73,18 @@ class CatalogueController extends Controller
 
             $item = $catHydrate->hydrateItemRelationFromForm($item, $request->request->get('item_registration'));
 
+            $file = $request->files->get('item_registration')['PictureFile'];
+
+            $fileName = $utility->uploadFile($file, $this->getParameter('file.setting.catalogue.download_dir'));
+            if (!empty($fileName)) {
+                if (!empty($item->getPicture())) {
+                    unlink($this->getParameter('file.setting.catalogue.download_dir') . '/' . $item->getPicture());
+                }
+                $item->setPicture($fileName);
+            }
+
+            $item->setIsErasable(true);
+
             $manager->persist($item->getComment());
             $manager->persist($item);
             $manager->flush();
@@ -86,14 +100,23 @@ class CatalogueController extends Controller
     /**
      * @Route("/admin/catalogue/produit/{id}/delete", options={"expose"=true}, name="catalogue_delete")
      */
-    public function delete(Item $item, ObjectManager $manager) {
+    public function delete(Item $item, 
+                           ObjectManager $manager,
+                           QuoteOrderDetailRepository $orderDetailRepo) {
 
         if (!$this->securityUtility->checkHasDelete($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_CATALOGUE']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
-        $manager->remove($item);
-        $manager->flush();
+        if($item->getIsErasable()){
+            if(!empty($item->getPicture()))
+                unlink($this->getParameter('file.setting.catalogue.download_dir').'/'.$item->getPicture());
+            
+            $manager->remove($item);            
+            $manager->flush();
+        } 
+
+        return $this->redirectToRoute('catalogue_home');
     }
 
 }

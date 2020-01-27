@@ -44,11 +44,20 @@ $(function () {
     $(function(){
 
         $(".bx_select").on('click', function(e){
-            if(!confirm("Confirmez-vous la sélection de ce client pour un devis ?")){
-                e.preventDefault();
-            }
+            e.preventDefault();
+            confirmSelection(this);
         });
 
+
+
     });
+
+    function confirmSelection(elt) {
+        $.fn.displayConfirm('Sélection client', 'Confirmez-vous la sélection de ce client pour un devis ?', function (response) {
+            if (response) {
+                window.location = $(elt).attr('href');
+            }
+        }, ['Valider', 'Annuler']);
+    }
 
 });

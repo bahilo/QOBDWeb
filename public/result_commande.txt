@@ -1,0 +1,17 @@
+Symfony\Component\HttpFoundation\ParameterBag Object
+(
+    [parameters:protected] => Array
+        (
+            [search] => Array
+                (
+                    [order] => 
+                    [bill] => 1
+                    [client] => 
+                    [agent] => 
+                    [dtDebut] => 
+                    [dtFin] => 
+                )
+
+        )
+
+)

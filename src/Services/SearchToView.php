@@ -10,19 +10,19 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class SearchToView{
 
-    protected $settingRepo;
+    protected $setting;
     protected $settingFileDir;
     protected $avatarFileDir;
     protected $chatManager;
     protected $chatUtility;
 
-    public function __construct(SettingRepository $settingRepo, 
+    public function __construct(SettingManager $setting, 
                                 $logo_dir,
                                 $avatar_dir,
                                 ChatManager $chatManager,
                                 ChatToView $chatUtility)
     {
-        $this->settingRepo = $settingRepo;
+        $this->setting = $setting;
         $this->settingFileDir = $logo_dir;
         $this->avatarFileDir = $avatar_dir;
         $this->chatManager = $chatManager;
@@ -31,7 +31,7 @@ class SearchToView{
 
     public function logo(){
 
-        $setting = $this->settingRepo->findOneBy(['Code' => 'SOCIETE', 'Name' => 'logo']);
+        $setting = $this->get_setting('SOCIETE', 'logo');
         if(!empty($setting)){
             return $this->settingFileDir . '/' . $setting->getValue();
         }
@@ -41,13 +41,16 @@ class SearchToView{
     public function avatar_dir(?Agent $agent){
 
         if(!empty($agent)){
-            return $this->avatarFileDir . '/' . $agent->getPicture();
+            return $this->avatarFileDir . '/' . ((!empty($agent->getPicture())) ? $agent->getPicture() : 'default.png') ;
         }
         return "";
     }
 
     public function discussions(){
-
         return $this->chatManager->hydrateDiscussion($this->chatUtility->discussions());
+    }
+
+    public function get_setting($code, $name){
+        return $setting = $this->setting->get($code, $name);
     }
 }

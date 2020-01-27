@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Bill;
 use App\Entity\Delivery;
+use App\Entity\QuoteOrder;
 use App\Entity\QuantityDelivery;
 use App\Entity\QuoteOrderDetail;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -26,24 +27,28 @@ class QuoteOrderDetailRepository extends ServiceEntityRepository
     //  * @return QuoteOrderDetail[] Returns an array of QuoteOrderDetail objects
     //  */
 
-    public function findByQuantityRecieved(int $val = 0)
+    public function findByQuantityRecieved(QuoteOrder $order, int $val = 0)
     {
         return $this->createQueryBuilder('q')
+            ->innerJoin('q.QuoteOrder', 'q_ord')
             ->andWhere('q.QuantityRecieved > :val')
-            ->setParameter('val', $val)
+            ->andWhere('q_ord.id = :orderId')
+            ->setParameters(['val' => $val, "orderId" => $order->getId()])
             ->orderBy('q.id', 'ASC')
             ->getQuery()
             ->getResult();
     }
 
-    public function findByBillStatus($deliveryStatus = 'STATUS_NOT_BILLED')
+    public function findByBillStatus(QuoteOrder $order, $deliveryStatus = 'STATUS_NOT_BILLED')
     {
         return $this->createQueryBuilder('q')
+            ->innerJoin('q.QuoteOrder', 'q_ord')
             ->innerJoin('q.quantityDeliveries', 'q_qt_del')
             ->innerJoin('q_qt_del.Delivery', 'q_del')
             ->innerJoin('q_del.Status','q_del_status')
-            ->andWhere('q_del_status.Name = :val')
-            ->setParameter('val', $deliveryStatus)
+            ->andWhere('q_del_status.Name = :status')
+            ->andWhere('q_ord.id = :orderId')
+            ->setParameters(['status'=> $deliveryStatus, "orderId" => $order->getId()])
             ->orderBy('q.id', 'ASC')
             ->getQuery()
             ->getResult();
@@ -56,19 +61,21 @@ class QuoteOrderDetailRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('q')
             ->innerJoin('q.quantityDeliveries', 'q_qt_del')
             ->andWhere('q_qt_del.Bill = :bill')
-            ->setParameter('bill', $bill)
+            ->setParameters(['bill' => $bill])
             ->orderBy('q.id', 'ASC')
             ->getQuery()
             ->getResult();
     }
 
-    public function findByDelivery(Delivery $delivery)
+    public function findByDelivery(QuoteOrder $order, Delivery $delivery)
     {
         return $this->createQueryBuilder('q')
+            ->innerJoin('q.QuoteOrder', 'q_ord')
             ->innerJoin('q.quantityDeliveries', 'q_qt_del')
             ->innerJoin('q_qt_del.Delivery', 'q_qt_del_del')
             ->andWhere('q_qt_del_del.id = :val')
-            ->setParameter('val', $delivery->getId())
+            ->andWhere('q_ord.id = :orderId')
+            ->setParameters(['val' => $delivery->getId(), "orderId" => $order->getId()])
             ->getQuery()
             ->getResult();
     }
@@ -87,12 +94,14 @@ class QuoteOrderDetailRepository extends ServiceEntityRepository
     }
     */
 
-    public function findOneByQuantityDelivery(QuantityDelivery $qtDelivery): ?QuoteOrderDetail
+    public function findOneByQuantityDelivery(QuoteOrder $order, QuantityDelivery $qtDelivery): ?QuoteOrderDetail
     {
         return $this->createQueryBuilder('q')
+            ->innerJoin('q.QuoteOrder', 'q_ord')
             ->innerJoin('q.quantityDeliveries', 'q_qt_del')
             ->andWhere('q_qt_del.id = :val')
-            ->setParameter('val', $qtDelivery->getId())
+            ->andWhere('q_ord.id = :orderId')
+            ->setParameters(['val'=> $qtDelivery->getId(), "orderId" => $order->getId()])
             ->getQuery()
             ->getOneOrNullResult();
     }

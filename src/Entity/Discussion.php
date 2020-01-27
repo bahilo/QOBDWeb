@@ -56,6 +56,18 @@ class Discussion
 
     /**
      * @Groups({"class_property"})
+     * @SerializedName("IsOwner")
+     */
+    private $IsOwner;
+
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("IsCurrent")
+     */
+    private $IsCurrent;
+
+    /**
+     * @Groups({"class_property"})
      * @SerializedName("Recipients")
      */
     private $Recipients;
@@ -71,6 +83,12 @@ class Discussion
      * @Groups({"class_relation"})
      */
     private $agentDiscussions;
+
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("TotalUnRead")
+     */
+    private $TotalUnRead;
 
     public function __construct()
     {
@@ -92,6 +110,30 @@ class Discussion
     public function setName(?string $Name): self
     {
         $this->Name = $Name;
+
+        return $this;
+    }
+
+    public function getIsOwner(): ?bool
+    {
+        return $this->IsOwner;
+    }
+
+    public function setIsOwner(?bool $IsOwner): self
+    {
+        $this->IsOwner = $IsOwner;
+
+        return $this;
+    }
+
+    public function getIsCurrent(): ?bool
+    {
+        return $this->IsCurrent;
+    }
+
+    public function setIsCurrent(?bool $IsCurrent): self
+    {
+        $this->IsCurrent = $IsCurrent;
 
         return $this;
     }
@@ -172,6 +214,9 @@ class Discussion
 
     public function addRecipient(Agent $Recipient): self
     {
+        if(empty($this->Recipients))
+            $this->Recipients = new ArrayCollection();
+
         if (!$this->Recipients->contains($Recipient)) {
             $this->Recipients[] = $Recipient;
         }
@@ -181,6 +226,9 @@ class Discussion
 
     public function removeRecipient(Agent $Recipient): self
     {
+        if (empty($this->Recipients))
+            $this->Recipients = new ArrayCollection();
+            
         if ($this->Recipients->contains($Recipient)) {
             $this->Recipients->removeElement($Recipient);
         }
@@ -215,6 +263,18 @@ class Discussion
                 $agentDiscussion->setDiscussion(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getTotalUnRead(): ?int
+    {
+        return $this->TotalUnRead;
+    }
+
+    public function setTotalUnRead(int $TotalUnRead): self
+    {
+        $this->TotalUnRead = $TotalUnRead;
 
         return $this;
     }

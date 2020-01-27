@@ -69,9 +69,51 @@ class ChatManager{
             }
             $discussion->setPathAvatarDir($this->avatar_dir);
             $discussion->setCreatedAtShort($this->utility->getWhenFromToday($discussion->getCreatedAt()));
+            
+            $ad = $this->adRepo->findOneBy(['discussion' => $discussion, 'agent' => $this->token->getUser()]);
+            if(!empty($ad)){
+                $discussion->setIsCurrent($ad->getIsCurrent());
+                $discussion->setIsOwner($ad->getIsOwner());
+                if(!empty($ad->getUnread()))
+                    $discussion->setTotalUnRead($ad->getUnread());
+            }
+            
             $result[] = $discussion;
         }
         return $result;
+    }
+
+    public function hydrateMessage(array $messages){
+        $result = [];
+        foreach($messages as $message){            
+            $message->setPathAvatarDir($this->avatar_dir);
+            $message->setCreatedAtShort($this->utility->getWhenFromToday($message->getCreatedAt()));
+                        
+            $result[] = $message;
+        }
+        return $result;
+    }
+
+    public function setUnread(Discussion $discussion){
+        $ads = $this->adRepo->findBy(['discussion' => $discussion]);
+        foreach($ads as $ad){
+           if($this->token->getUser()->getId() != $ad->getAgent()->getId()){
+                $ur = $ad->getUnread();
+                if (empty($ur))
+                    $ur =  0;
+
+                $ad->setUnread($ur + 1);
+                $this->manager->persist($ad);
+           }
+        }
+        $this->manager->flush();
+    }
+
+    public function setread(Discussion $discussion, Agent $agent){
+        $ad = $this->adRepo->findOneBy(['discussion' => $discussion, 'agent' => $agent]);
+        $ad->setUnread(0);
+        $this->manager->persist($ad);
+        $this->manager->flush();
     }
 
 

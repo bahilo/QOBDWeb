@@ -6,7 +6,11 @@ use App\Entity\Comment;
 
 class CatalogueHydrate{
 
-    public function __construct(){
+protected $catalogue_dir;
+
+    public function __construct($catalogue_dir){
+
+        $this->catalogue_dir = $catalogue_dir;
 
     }
 
@@ -34,6 +38,9 @@ class CatalogueHydrate{
             else
                 $item->setContentComment("");
             
+            if(!empty($item->getPicture()))
+                $item->setFullPathPicture($this->catalogue_dir .'/'. $item->getPicture());
+
             array_push($output, $item);
         }
         return $output;

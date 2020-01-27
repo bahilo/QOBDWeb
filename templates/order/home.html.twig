@@ -1,52 +1,6 @@
 {% extends 'template_coreui.html.twig' %}
 
 
-
-{% set source = [] %}
-{% set page_title = "" %}
-{% set target = "" %}
-{% if order_data_source is defined %}
-{% set source = order_data_source %}
-{% set page_title = "Commandes" %}
-{% set target = "order_data_source" %}
-{% elseif quote_data_source is defined %}
-{% set source = quote_data_source %}
-{% set page_title = "Devis" %}
-{% set target = "quote_data_source" %}
-{% elseif preorder_data_source is defined %}
-{% set source = preorder_data_source %}
-{% set page_title = "Commande à valider" %}
-{% set target = "preorder_data_source" %}
-{% elseif prerefund_data_source is defined %}
-{% set source = prerefund_data_source %}
-{% set page_title = "Avoirs à valider" %}
-{% set target = "prerefund_data_source" %}
-{% elseif refund_data_source is defined %}
-{% set source = refund_data_source %}
-{% set page_title = "Avoirs" %}
-{% set target = "refund_data_source" %}
-{% elseif bill_data_source is defined %}
-{% set source = bill_data_source %}
-{% set page_title = "Factures expédiées" %}
-{% set target = "bill_data_source" %}
-{% elseif bill_refund_data_source is defined %}
-{% set source = bill_refund_data_source %}
-{% set page_title = "Avoirs Expédiés" %}
-{% set target = "bill_refund_data_source" %}
-{% elseif customer_valid_data_source is defined %}
-{% set source = customer_valid_data_source %}
-{% set page_title = "Commandes à re-valider avec le client" %}
-{% set target = "customer_valid_data_source" %}
-{% elseif closed_data_source is defined %}
-{% set source = closed_data_source %}
-{% set page_title = "Commandes cloturées" %}
-{% set target = "closed_data_source" %}
-{% elseif refund_closed_data_source is defined %}
-{% set source = refund_closed_data_source %}
-{% set page_title = "Avoirs cloturés" %}
-{% set target = "refund_closed_data_source" %}
-{% endif %}
-
 {% block title %} {{ page_title }} {% endblock %}
 
 {% block home_path %}

@@ -15,8 +15,31 @@
 
 {% block body_header_left %}
     {% if items | length > 0 %}
-    <a href="{{ path('client_home') }}" class="btn btn-warning">Choisir un client</a>
-    <a href="{{ path('order_registration') }}" class="btn btn-danger">Devis</a>
+    <!-- <div class="btn-group">
+        <a href="{{ path('client_home') }}" class="btn btn-warning">Choisir un client</a>
+        <a href="{{ path('order_registration') }}" class="btn btn-danger">Devis</a>
+    </div>     -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="callout callout-info">
+                <small class="text-muted">Mon panier</small><br>
+                <!-- <strong class="h4">Le contenu de mon panier.</strong> -->
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="callout callout">
+                <div class="">
+                    Ci-dessous le contenu de votre panier.
+                    Je sélectionne un client pour le devis.
+                    
+                </div>
+                <div class="btn-group">
+                    <a href="{{ path('client_home') }}" class="btn btn-success">Choisir un client</a>
+                    <a href="{{ path('order_registration') }}" class="btn btn-danger">Devis</a>
+                </div>
+            </div>
+        </div>
+    </div>
     {% endif %}
 {% endblock %}
 

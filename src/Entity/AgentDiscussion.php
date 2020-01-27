@@ -36,6 +36,11 @@ class AgentDiscussion
      */
     private $isOwner;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $Unread;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -85,6 +90,18 @@ class AgentDiscussion
     public function setIsOwner(?bool $isOwner): self
     {
         $this->isOwner = $isOwner;
+
+        return $this;
+    }
+
+    public function getUnread(): ?int
+    {
+        return $this->Unread;
+    }
+
+    public function setUnread(?int $Unread): self
+    {
+        $this->Unread = $Unread;
 
         return $this;
     }

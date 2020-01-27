@@ -1,0 +1,25 @@
+<html>
+    <head>
+        <title> 
+            {% block title %}{% endblock title %}
+        </title>
+        {% block head %}{% endblock head %}
+        <style>
+            .email-wrapper{
+                font-family: Arial, Helvetica, sans-serif;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="email-wrapper">
+            {% block body %}{% endblock body %}
+        </div>
+    </body>
+    <footer>
+        <div class="email-wrapper">
+            {% block footer %}
+            condition générale d'utilisation!
+            {% endblock footer %}
+        </div>        
+    </footer>
+</html>

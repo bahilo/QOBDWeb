@@ -25,14 +25,29 @@ class MessageRepository extends ServiceEntityRepository
     //  * @return Message[] Returns an array of Message objects
     //  */
     
-    public function findByDiscussion(Discussion $discussion)
+    public function findByDiscussion(Discussion $discussion, int $nbSkip = 0, int $nbTake = 0)
     {
-        return $this->createQueryBuilder('d')
-            ->andWhere('d.Discussion = :discussion')
-            ->setParameters(['discussion' => $discussion])
-            ->orderBy('d.id', 'ASC')
-            ->getQuery()
-            ->getResult();
+        $result = [];
+        if($nbTake > 0){
+            $result = $this->createQueryBuilder('d')
+                ->andWhere('d.Discussion = :discussion')
+                ->setParameters(['discussion' => $discussion])
+                ->orderBy('d.id', 'DESC')
+                ->setMaxResults($nbTake)
+                ->setFirstResult($nbSkip)
+                ->getQuery()
+                ->getResult();
+        }
+        else{
+            $result = $this->createQueryBuilder('d')
+                ->andWhere('d.Discussion = :discussion')
+                ->setParameters(['discussion' => $discussion])
+                ->orderBy('d.id', 'DESC')
+                ->getQuery()
+                ->getResult();
+        }
+
+        return $result;
     }
     
     public function findUnReadByAgent(Agent $agent)

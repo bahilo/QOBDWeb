@@ -131,6 +131,14 @@ class Item
      */
     private $quoteOrderDetails;
 
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("FullPathPicture")
+     */
+    private $FullPathPicture;
+
+    private $PictureFile;
+
 
     public function __construct()
     {
@@ -379,4 +387,29 @@ class Item
 
         return $this;
     }
+
+    public function getPictureFile(): ?string
+    {
+        return $this->PictureFile;
+    }
+
+    public function setPictureFile(?string $PictureFile): self
+    {
+        $this->PictureFile = $PictureFile;
+
+        return $this;
+    }
+
+    public function getFullPathPicture(): ?string
+    {
+        return $this->FullPathPicture;
+    }
+
+    public function setFullPathPicture(?string $FullPathPicture): self
+    {
+        $this->FullPathPicture = $FullPathPicture;
+
+        return $this;
+    }
+    
 }

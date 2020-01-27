@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Tax;
+use App\Entity\Item;
 use App\Entity\Comment;
 use App\Entity\Setting;
 use App\Entity\Currency;
@@ -32,6 +33,7 @@ use App\Form\OrderStatusRegistrationType;
 use App\Repository\OrderStatusRepository;
 use App\Form\DeliveryStatusRegistrationType;
 use App\Repository\DeliveryStatusRepository;
+use App\Services\SettingManager;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Routing\Annotation\Route;
@@ -42,12 +44,16 @@ class SettingController extends Controller
 
     protected $securityUtility;
     protected $actionRepo;
+    protected $settingManager;
 
 
-    public function __construct(SecurityManager $securityUtility, ActionRepository $actionRepo)
+    public function __construct(SecurityManager $securityUtility, 
+                                ActionRepository $actionRepo,
+                                SettingManager $settingManager)
     {
         $this->securityUtility = $securityUtility;
         $this->actionRepo = $actionRepo;
+        $this->settingManager = $settingManager;
     }
     
     /*______________________________________________________________________________________________________________________ 
@@ -261,12 +267,42 @@ class SettingController extends Controller
         ]);
     }
 
+    /**
+     * @Route("/admin/configuration/email", options={"expose"=true}, name="setting_email")
+     * @Route("/admin/configuration/email/erreur/{message}/{statut}", options={"expose"=true}, name="setting_email_report")
+     */
+    public function showEmail(string $message = null, $statut = null){
+        
+        return $this->render('email/index.html.twig', [
+            'quote' => file_get_contents($this->getParameter('file.setting.email') . '/' . 'devis.txt'),
+            'bill' => file_get_contents($this->getParameter('file.setting.email') . '/' . 'facture.txt'),
+            'first_reminder' => file_get_contents($this->getParameter('file.setting.email').'/'. 'relance_paiement_1.txt'),
+            'seconde_reminder' => file_get_contents($this->getParameter('file.setting.email') . '/' . 'relance_paiement_2.txt'),
+            'validate' => file_get_contents($this->getParameter('file.setting.email') . '/' . 'validation_commande.txt'),
+            'inscription' => file_get_contents($this->getParameter('file.setting.email') . '/' . 'inscription.txt'),
+            'message' => $message,
+            'status' => $statut
+        ]);
+    }
+
+    /**
+     * @Route("/admin/configuration/produit/import", options={"expose"=true}, name="setting_catalogue_import")
+     * @Route("/admin/configuration/produit/import/erreur/{message}/{statut}", options={"expose"=true}, name="setting_catalogue_import_report")
+     */
+    public function import(string $message = null, $statut = null){
+        
+        return $this->render('setting/import_registration.html.twig', [
+            'message' => $message,
+            'status' => $statut
+        ]);
+    }
+
     /*______________________________________________________________________________________________________________________ 
     --------------------------------------------[ Registrations ]--------------------------------------------------------*/
 
     /**
      * @Route("/admin/configuration/inscription", options={"expose"=true}, name="setting_registration")
-     * @Route("/admin/configuration/{id}/edit", options={"expose"=true}, name="setting_edit")
+     * @Route("/admin/configuration/{id}/edit", options={"expose"=true}, name="setting_edit", requirements={"id"="\d+"})
      * 
      */
     public function registration(Setting $setting = null, 
@@ -292,10 +328,10 @@ class SettingController extends Controller
             
             if(empty($request->files->get('setting')['switch'])){
                 $file = $request->files->get('setting')['file'];
-                $fileName = $utility->uploadFile($file, $this->getParameter('file.setting.download_dir'));
+                $fileName = $utility->uploadFile($file, $this->getParameter('file.setting.image.download_dir'));
                 if (!empty($fileName)) {
                     if ( $setting->getIsFile() && !empty($setting->getValue())) {
-                        unlink($this->getParameter('file.setting.download_dir').'/'. $setting->getValue());
+                        unlink($this->getParameter('file.setting.image.download_dir').'/'. $setting->getValue());
                     }
                     $setting->setValue($fileName);
                     $setting->setIsFile(true);
@@ -318,7 +354,7 @@ class SettingController extends Controller
 
     /**
      * @Route("/admin/configuration/currency/inscription", options={"expose"=true}, name="setting_currency_registration")
-     * @Route("/admin/configuration/currency/{id}/edit", options={"expose"=true}, name="setting_currency_edit")
+     * @Route("/admin/configuration/currency/{id}/edit", options={"expose"=true}, name="setting_currency_edit", requirements={"id"="\d+"})
      * 
      */
     public function currencyRegistration(Currency $currency = null, 
@@ -355,7 +391,7 @@ class SettingController extends Controller
 
     /**
      * @Route("/admin/configuration/statut/livraison/inscription", options={"expose"=true}, name="setting_delivery_status_registration")
-     * @Route("/admin/configuration/statut/livraison/{id}/edit", options={"expose"=true}, name="setting_delivery_status_edit")
+     * @Route("/admin/configuration/statut/livraison/{id}/edit", options={"expose"=true}, name="setting_delivery_status_edit", requirements={"id"="\d+"})
      * 
      */
     public function deliveryStatusRegistration(DeliveryStatus $status = null, 
@@ -384,10 +420,10 @@ class SettingController extends Controller
             'formStatus' => $form->createView()
         ]);
     }
-    
+
     /**
      * @Route("/admin/configuration/tax/inscription", options={"expose"=true}, name="setting_tax_registration")
-     * @Route("/admin/configuration/tax/{id}/edit", options={"expose"=true}, name="setting_tax_edit")
+     * @Route("/admin/configuration/tax/{id}/edit", options={"expose"=true}, name="setting_tax_edit", requirements={"id"="\d+"})
      * 
      */
     public function taxRegistration(Tax $tax = null, 
@@ -441,7 +477,7 @@ class SettingController extends Controller
 
     /**
      * @Route("/admin/configuration/marque/inscription", options={"expose"=true}, name="setting_brand_registration")
-     * @Route("/admin/configuration/marque/{id}/edit", options={"expose"=true}, name="setting_brand_edit")
+     * @Route("/admin/configuration/marque/{id}/edit", options={"expose"=true}, name="setting_brand_edit", requirements={"id"="\d+"})
      * 
      */
     public function brandRegistration(ItemBrand $itemBrand = null, 
@@ -477,7 +513,7 @@ class SettingController extends Controller
 
     /**
      * @Route("/admin/configuration/famille/inscription", options={"expose"=true}, name="setting_group_registration")
-     * @Route("/admin/configuration/famille/{id}/edit", options={"expose"=true}, name="setting_group_edit")
+     * @Route("/admin/configuration/famille/{id}/edit", options={"expose"=true}, name="setting_group_edit", requirements={"id"="\d+"})
      * 
      */
     public function groupRegistration(ItemGroupe $itemGroupe = null, 
@@ -512,7 +548,7 @@ class SettingController extends Controller
 
     /**
      * @Route("/admin/configuration/fournisseur/inscription", options={"expose"=true}, name="setting_provider_registration")
-     * @Route("/admin/configuration/fournisseur/{id}/edit", options={"expose"=true}, name="setting_provider_edit")
+     * @Route("/admin/configuration/fournisseur/{id}/edit", options={"expose"=true}, name="setting_provider_edit", requirements={"id"="\d+"})
      * 
      */
     public function providerRegistration(Provider $provider = null, 
@@ -547,7 +583,7 @@ class SettingController extends Controller
 
     /**
      * @Route("/admin/configuration/commande/statut/inscription", options={"expose"=true}, name="setting_order_status_registration")
-     * @Route("/admin/configuration/commande/statut/{id}/edit", options={"expose"=true}, name="setting_order_status_edit")
+     * @Route("/admin/configuration/commande/statut/{id}/edit", options={"expose"=true}, name="setting_order_status_edit", requirements={"id"="\d+"})
      * 
      */
     public function orderStatusRegistration(OrderStatus $status = null, 
@@ -578,11 +614,81 @@ class SettingController extends Controller
         ]);
     }
 
+    /**
+     * @Route("/admin/configuration/produit/import/sauvegarde", options={"expose"=true}, name="setting_catalogue_import_registration")
+     */
+    public function importRegistration(
+        Utility $utility,
+        Request $request,
+        ObjectManager $manager
+    ) {
+
+        $error = [
+            'statut' => 0,
+            'message' => ''
+        ];
+
+        $form = $request->files->get('catalogue_upload');
+        if(!empty($form['item']))
+            $error = $this->settingManager->importCatalogueItem($form['item'], $this->getParameter('file.setting.catalogue.download_dir'));
+        
+        if (!empty($form['provider']) && $error['statut'] == 0)
+            $error = $this->settingManager->importCatalogueProvider($form['provider'], $this->getParameter('file.setting.catalogue.download_dir'));
+
+        if (!empty($form['categorie']) && $error['statut'] == 0)
+            $error = $this->settingManager->importCatalogueCategorie($form['categorie'], $this->getParameter('file.setting.catalogue.download_dir'));
+
+        if (!empty($form['brand']) && $error['statut'] == 0)
+            $error = $this->settingManager->importCatalogueBrand($form['brand'], $this->getParameter('file.setting.catalogue.download_dir'));
+
+        return $this->redirectToRoute('setting_catalogue_import_report', [
+            'message' => ($error['statut'] == 0) ?  'Vos éléments ont été importés avec succès!' : $error['message'],
+            'statut' => ($error['statut'] == 0) ? 200 : $error['statut']
+        ]);
+    }
+
+    /**
+     * @Route("/admin/configuration/email/edit", options={"expose"=true}, name="setting_email_edit") 
+     */
+    public function emailRegistration(Request $request) {
+
+        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
+        $error = [
+            'statut' => 0,
+            'message' => ''
+        ];
+
+        $form = $request->request->get('emails');
+
+        if(!empty($form)){
+            file_put_contents($this->getParameter('file.setting.email') . '/' . 'devis.txt',trim($form['quote'], ' \t'));
+            file_put_contents($this->getParameter('file.setting.email') . '/' . 'facture.txt', trim($form['bill'], ' \t'));
+            file_put_contents($this->getParameter('file.setting.email') . '/' . 'relance_paiement_1.txt', trim($form['first_reminder'], ' \t'));
+            file_put_contents($this->getParameter('file.setting.email') . '/' . 'relance_paiement_2.txt', trim($form['seconde_reminder'], ' \t'));
+            file_put_contents($this->getParameter('file.setting.email') . '/' . 'validation_commande.txt', trim($form['validate'], ' \t'));
+            file_put_contents($this->getParameter('file.setting.email') . '/' . 'inscription.txt', trim($form['inscription'], ' \t'));
+        }
+        else{
+            $error =  [
+                'message' => 'Une erreur s\'est produite lors de l\'enregistrement de vos modèles d\'email!',
+                'statut' => 500
+            ];
+        }
+        
+        return $this->redirectToRoute('setting_email_report', [
+            'message' => ($error['statut'] == 0) ?  'Vos modèles d\'email ont été sauvegardés avec succès!' : $error['message'],
+            'statut' => ($error['statut'] == 0) ? 200 : $error['statut']
+        ]);
+    }
+
     /*______________________________________________________________________________________________________________________ 
     --------------------------------------------[ Deletes ]--------------------------------------------------------*/
 
     /**
-     * @Route("/admin/configuration/{id}/delete", options={"expose"=true}, name="setting_delete")
+     * @Route("/admin/configuration/{id}/delete", options={"expose"=true}, name="setting_delete", requirements={"id"="\d+"})
      */
     public function delete(Setting $setting, ObjectManager $manager)
     {
@@ -597,7 +703,7 @@ class SettingController extends Controller
     }
 
     /**
-     * @Route("/admin/configuration/currency/{id}/delete", options={"expose"=true}, name="setting_currency_delete")
+     * @Route("/admin/configuration/currency/{id}/delete", options={"expose"=true}, name="setting_currency_delete", requirements={"id"="\d+"})
      */
     public function currencyDelete(Currency $currency, ObjectManager $manager)
     {
@@ -612,7 +718,7 @@ class SettingController extends Controller
     }
 
     /**
-     * @Route("/admin/configuration/tax/{id}/delete", options={"expose"=true}, name="setting_tax_delete")
+     * @Route("/admin/configuration/tax/{id}/delete", options={"expose"=true}, name="setting_tax_delete", requirements={"id"="\d+"})
      */
     public function taxDelete(Tax $tax, ObjectManager $manager)
     {
@@ -627,7 +733,7 @@ class SettingController extends Controller
     }
 
     /**
-     * @Route("/admin/configuration/statut/livraison/{id}/delete", options={"expose"=true}, name="setting_delivery_status_delete")
+     * @Route("/admin/configuration/statut/livraison/{id}/delete", options={"expose"=true}, name="setting_delivery_status_delete", requirements={"id"="\d+"})
      */
     public function deliveryStatusDelete(DeliveryStatus $status, ObjectManager $manager)
     {
@@ -642,7 +748,7 @@ class SettingController extends Controller
     }
 
     /**
-     * @Route("/admin/configuration/fournisseur/{id}/delete", options={"expose"=true}, name="setting_provider_delete")
+     * @Route("/admin/configuration/fournisseur/{id}/delete", options={"expose"=true}, name="setting_provider_delete", requirements={"id"="\d+"})
      */
     public function providerDelete(Provider $provider, ObjectManager $manager)
     {
@@ -658,7 +764,7 @@ class SettingController extends Controller
     }
 
     /**
-     * @Route("/admin/configuration/famille/{id}/delete", options={"expose"=true}, name="setting_group_delete")
+     * @Route("/admin/configuration/famille/{id}/delete", options={"expose"=true}, name="setting_group_delete", requirements={"id"="\d+"})
      */
     public function groupDelete(ItemGroupe $group, ObjectManager $manager)
     {
@@ -674,7 +780,7 @@ class SettingController extends Controller
     }
 
     /**
-     * @Route("/admin/configuration/marque/{id}/delete", options={"expose"=true}, name="setting_brand_delete")
+     * @Route("/admin/configuration/marque/{id}/delete", options={"expose"=true}, name="setting_brand_delete", requirements={"id"="\d+"})
      */
     public function brandDelete(ItemBrand $brand, ObjectManager $manager)
     {
@@ -690,7 +796,7 @@ class SettingController extends Controller
     }
 
     /**
-     * @Route("/admin/configuration/commande/statut/{id}/delete", options={"expose"=true}, name="setting_order_status_delete")
+     * @Route("/admin/configuration/commande/statut/{id}/delete", options={"expose"=true}, name="setting_order_status_delete", requirements={"id"="\d+"})
      */
     public function orderStatusDelete(OrderStatus $status, QuoteOrderRepository $orderRepo, ObjectManager $manager)
     {

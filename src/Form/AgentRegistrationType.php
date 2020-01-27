@@ -25,7 +25,7 @@ class AgentRegistrationType extends AbstractType
             ->add('Confirme_password', PasswordType::class, ['required'   => false])
             ->add('ListSize')
             ->add('PictureFile', FileType::class, [
-                'label' => 'Brochure (PDF file)',
+                'label' => 'avatar',
 
                 // unmapped means that this field is not associated to any entity property
                 'mapped' => false,

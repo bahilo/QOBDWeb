@@ -27,23 +27,26 @@
       </button>
       <ul class="nav navbar-nav d-md-down-none">
         <li class="nav-item px-3">
-          <a class="nav-link" href="/">Dashboard</a>
+          <a class="nav-link" href="{{ path("home") }}">Tableau de bord</a>
         </li>
         <li class="nav-item px-3">
-          <a class="nav-link" href="#">Users</a>
+          <a class="nav-link" href="{{ path("catalogue_home") }}">Catalogue</a>
         </li>
         <li class="nav-item px-3">
-          <a class="nav-link" href="#">Settings</a>
+          <a class="nav-link" href="{{ path("order") }}">Recherche</a>
         </li>
       </ul>
       <ul class="nav navbar-nav ml-auto">
         <li class="nav-item d-md-down-none">
-          <a class="nav-link" href="#">
+          {% set unread_messages = chat.unread_messages %}
+          {% if unread_messages and unread_messages > 0 %}
+          <a class="nav-link btnMessageNotif" href="#">
             <i class="fa fa-bell"></i>
-            <span class="badge badge-pill badge-danger">5</span>
+            <span class="badge badge-pill badge-danger">{{ unread_messages }}</span>
           </a>
+          {% endif %}
         </li>
-        <li class="nav-item d-md-down-none">
+        {# <li class="nav-item d-md-down-none">
           <a class="nav-link" href="#">
             <i class="fa fa-list"></i>
           </a>
@@ -52,13 +55,13 @@
           <a class="nav-link" href="#">
             <i class="fa fa-map-marker-alt"></i>
           </a>
-        </li>
+        </li> #}
         <li class="nav-item dropdown">
           <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
             {% if app.user.picture is not null %}
-            <img class="img-avatar" src="{{ asset('avatars/' ~ app.user.picture, 'download_dir') }}" alt="Image profile">
+            <img class="img-avatar" src="{{ asset('agent/avatars/' ~ app.user.picture, 'download_dir') }}" alt="Image profile">
             {% else %}
-            <img class="img-avatar" src="{{ asset('avatars/default.png', 'download_dir') }}" alt="Image profile">
+            <img class="img-avatar" src="{{ asset('agent/avatars/default.png', 'download_dir') }}" alt="Image profile">
             {% endif %}
           </a>
           <div class="dropdown-menu dropdown-menu-right">
@@ -95,7 +98,7 @@
           <ul class="nav">
             <li class="nav-item">
               <a class="nav-link" href="{{ path("home") }}">
-                <i class="fa fa-tachometer-alt"></i> Dashboard
+                <i class="fa fa-tachometer-alt"></i> Tableau de bord
                 <!-- <span class="badge badge-primary">NEW</span> -->
               </a>
             </li>
@@ -236,6 +239,10 @@
                           <a class="nav-link" href="{{ path("setting_order_status") }}">
                             <i class="fa fa-star-half-alt"></i> Statut Commande</a>
                         </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="{{ path("setting_email") }}">
+                            <i class="fa fa-star-half-alt"></i> Emails</a>
+                        </li>
                       </ul>
                     </li>
                     <li class="nav-item nav-dropdown">
@@ -254,18 +261,22 @@
                           <a class="nav-link" href="{{ path("setting_catalogue_provider") }}">
                             <i class="fa fa-hourglass-half"></i> Fournisseurs</a>
                         </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="{{ path("setting_catalogue_import") }}">
+                            <i class="fa fa-upload"></i> Imports</a>
+                        </li>
                       </ul>
                     </li>
                 </ul>
             </li>
-            <li class="nav-item">
+            {# <li class="nav-item">
                 <a class="nav-link" href="#">
                     <i class="fa fa-bell"></i> Notifications</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#">
                     <i class="fa fa-signal"></i> Statistiques</a>
-            </li>
+            </li> #}
                         
           </ul>
         </nav>
@@ -312,12 +323,12 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" data-toggle="tab" href="#messages" role="tab">
+              <a class="nav-link" data-toggle="tab" href="#messages" role="tab" style="display: none">
                 <i class="fa fa-comments"></i>
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" data-toggle="tab" href="#settings" role="tab">
+              <a class="nav-link" data-toggle="tab" href="#settings" role="tab" style="display: none">
                 <i class="fa fa-cog"></i>
               </a>
             </li>
@@ -332,14 +343,20 @@
                   Discussions</div>
         
                 <div class="discussion-home-wrapper">
-                  {% for discussion in chat.discussions %}
+                  {#{ dump(chat.discussions ) }#}
+                  {% for discussion in search.discussions %}
                   {% set agentOwner = chat.discussion_owner(discussion) %}                  
-                    <div data-id="{{ discussion.id }}" class="list-group-item list-group-item-accent-warning list-group-item-divider">
+                    <div data-id="{{ discussion.id }}"  data-current="{{ discussion.iscurrent }}" data-owner="{{ discussion.isowner }}" class="list-group-item list-group-item-accent-{% if discussion.iscurrent %}danger{% else %}warning{% endif %} list-group-item-divider dvDiscussion">
                       <div class="avatar float-right">
-                        <img class="img-avatar" src="{{ search.avatar_dir(agentOwner) }}" alt="admin@bootstrapmaster.com">
+                        <img class="img-avatar" src="{{ search.avatar_dir(agentOwner) }}" alt="admin@bootstrapmaster.com" data-toggle="tooltip" data-placement="top" title="{{ agentOwner.UserName }}">
                       </div>
-                      <a href="{{ path("chat_agent_discusion", {id: discussion.id }) }}" class="link-discussion"></a>
-                        <strong>{{ discussion.name }}</strong>
+                      <a href="{{ path("chat_agent_discusion", {id: discussion.id }) }}" class="link-discussion">
+                        <strong class="DiscName">{{ discussion.name }}</strong> {% if discussion.TotalUnRead > 0 %}<span class="badge badge-pill badge-danger">{{ discussion.TotalUnRead }}</span>{% endif %}
+                        {% if agentOwner.id == app.user.id %}
+                          <a href="#" class="btnDiscSetting">
+                            <i class="fa fa-cog"></i>
+                          </a>
+                        {% endif %}
                       </a>
                       <small class="text-muted mr-3">
                           {% if agentOwner %}
@@ -349,19 +366,17 @@
                           {% endif %}
                         <i class="fa fa-calendar"></i> {{ discussion.CreatedAtShort }}</small>
                       <small class="text-muted mr-3">
-                        <a href="{{ path("chat_delete_discussion", {id: discussion.id}) }}">
+                        <a href="{{ path("chat_delete_discussion", {id: discussion.id}) }}" class="btnDelete">
                           <i class="fa fa-trash"></i>
                         </a>
                       </small>
-                      {#<small class="text-muted">
-                                                             <i class="fa fa-map-marker-alt"></i>  Palo Alto, CA</small> #}
-                      {% for agent in chat.discussion_users(discussion) %}
                       <div class="avatars-stack mt-2">
+                      {% for agent in chat.discussion_users(discussion) %}
                         <div class="avatar avatar-xs">
-                          <img class="img-avatar" src="{{ search.avatar_dir(agent) }}" alt="{{ agent.UserName }}">
+                          <img class="img-avatar" data-id-agent="{{ agent.id }}" src="{{ search.avatar_dir(agent) }}" alt="{{ agent.UserName }}" data-toggle="tooltip" data-placement="top" title="{{ agent.UserName }}">
                         </div>
+                        {% endfor %}
                       </div>
-                      {% endfor %}
                     </div>
                   
         
@@ -373,40 +388,59 @@
                       </div> #}
               </div>
             </div>
-            <div class="tab-pane p-3" id="messages" role="tabpanel">
-        
-              {% for message in chat.current_discussion_messages %}
-              <div class="message">
-                <div class="py-3 pb-5 mr-3 float-left">
-                  <div class="avatar">
-                    <img class="img-avatar" src="{{ search.avatar_dir(message.agent) }}" alt="{{ message.agent.username }}">
-                    <span class="avatar-status badge-success"></span>
-                  </div>
+            <div class="tab-pane" id="messages" role="tabpanel">
+              <div data-id-discussion="" class="messages-home-wrapper">
+              <div class="lstDiscussion list-group-item list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">                
+              </div>  
+              <a href="#" class="loadMessages">
+                <div
+                  class="list-group-item list-group-item-accent-warning bg-light text-center font-weight-bold text-muted text-uppercase small">
+                  Messages plus anciens...
                 </div>
-                <div>
-                  <small class="text-muted">{{ message.agent.username }}</small>
-                  <small class="text-muted float-right mt-1">{{ message.createdat | date('d/m/Y') }} <br />
-                    {{ message.createdat | date('H:m:s') }}</small>
-                </div>
-                <div class="text-truncate font-weight-bold">{{ message.content }}</div>
-                <small class="text-muted">{{ message.content }}</small>
-              </div>
-              <hr>
-              {% endfor %}
-        
-              {% set last_discussion = chat.last_discussion %}
-              {% if last_discussion %}
-              <div class="char-room">
-                <form action="{{ path("chat_message_register") }}" method="post">
-                  <input type="hidden" name="chat_room[discussion]" value="{{ last_discussion.id }}">
-                  <textarea class="form-control" name="chat_room[message]" id="" style="width: 100%;"></textarea>
-                  <div class="control-wrapper">
-                    {# {% set currentDiscussion = user.lastdiscussion %} #}
-                    <button type="submit" class="btn btn-success"><i class="fa fa paper-plane"></i></button>
+              </a>
+              <div class="p-3">
+                  <div class="message-area-wrapper">
+                    {#% for message in chat.current_discussion_messages %}
+                    <div class="message">
+                      <div class="mr-3 float-left">
+                        <div class="avatar">
+                          <img class="img-avatar" src="{{ search.avatar_dir(message.agent) }}" alt="{{ message.agent.username }}">
+                          <span class="avatar-status badge-primary"></span>
+                        </div>
+                      </div>
+                      <div>
+                        <small class="text-muted">{{ message.agent.username }}</small>
+                        <small class="text-muted float-right mt-1">{{ message.createdat | date('d/m/Y') }} <br />
+                          {{ message.createdat | date('H:m:s') }}</small>
+                      </div>
+                      <div class="text-truncate font-weight-bold">{{ message.content }}</div>
+                      <small class="text-muted">{{ message.content }}</small>
+                    </div>
+                    <hr>
+                    {% endfor %#}
                   </div>
-                </form>
+                
+                  <div class="char-room">
+
+                    <div class="card border-info">
+                      <div class="card-body">
+                        <form method="post">
+                          <input type="hidden" name="chat_room[discussion]">
+                          <textarea class="form-control" name="chat_room[message]" id="" style="width: 100%; height: 100px;"></textarea>
+                          <div class="control-wrapper">
+                            {# {% set currentDiscussion = user.lastdiscussion %} #}
+                            <br/>
+                            <button type="submit" class="float-right btn btn-success"><i class="fa fa-paper-plane"></i></button>
+                          </div>
+                        </form>                        
+                      </div>
+                    </div>
+
+                    
+                  </div>
+
+                </div>
               </div>
-              {% endif %}
         
             </div>
             <div class="tab-pane p-3" id="settings" role="tabpanel">
@@ -520,7 +554,8 @@
         <a href="mailto:joel.dago@yahoo.fr">joel dago</a>
       </div>
 
-      {# cart template #}
+      {#=============================== templates ================================#}
+
       <template id="template-cart_btn">
         <div class="input-group">
           <input type="text" data-id="$(cart_item_id)" name="cart_quantity_js" class="form-control cart-quantity"
@@ -535,7 +570,7 @@
       </template>
 
       <template id="template-discussion">        
-        <div data-id="$(discussion_id)" class="list-group-item list-group-item-accent-warning list-group-item-divider">
+        <div data-id="$(discussion_id)" data-current="$(is_current)" data-owner="$(is_owner)" class="list-group-item list-group-item-accent-warning list-group-item-divider">
           <div class="avatar float-right">
             <img class="img-avatar" src="$(url_agent_owner_avatar)" alt="admin@bootstrapmaster.com">
           </div>
@@ -546,25 +581,76 @@
             <div class="owner-wrapper"></div>
             <i class="fa fa-calendar"></i> $(created_at)</small>
           <small class="text-muted mr-3">
-            <a href="$(url_chat_delete_discussion)">
+            <a href="$(url_chat_delete_discussion)" class="btnDelete">
               <i class="fa fa-trash"></i>
             </a>
           </small>
-          <div class="discussion-recip-wrapper"></div>
+          <div class="avatars-stack mt-2 discussion-recip-wrapper"></div>
         </div>        
       </template>
 
-      <template id="template-discussion-recipients">
-        <div class="avatars-stack mt-2">
-          <div class="avatar avatar-xs">
-            <img class="img-avatar" src="$(url_agent_avatar)" alt="$(agent_username)">
+      <template id="template-discussion-new"> 
+        <div class="discussion-new-wrapper">
+          <a href="#" class="float-right btnDelete">
+            <i class="fa fa-trash"></i>
+          </a>
+          <div class="form-group">
+            <label for="recipient-name" class="col-form-label">Titre de la discussion</label>
+            <input type="text" class="form-control discussion-name">
+          </div>
+          <div class="form-group">
+            <label for="recipient-name" class="col-form-label">Commerciaux</label>
+            <div class="ctrlAgents" style="height: 300px; overflow-y: scroll"></div>
           </div>
         </div>
       </template>
+      
+      <template id="template-discussion-agents">
+        <div class="message" style="margin-top: 10px;">
+          <div class="mr-3 float-left">
+            <div class="input-group">
+              <input type="checkbox" data-id-agent="$(agent_id)" class="input-control mr-3 chxAgent">
+              <div class="avatar">              
+                <img class="img-avatar" src="$(url_agent_avatar)" alt="$(agent_username)" style="max-height: 50px; ">
+                <span class="avatar-status badge-$(status)"></span>
+              </div>
+            </div>
+          </div>        
+          <div>
+            <small class="text-muted">$(agent_username)</small>
+            <small class="text-muted float-right mt-1">der. connection <br/>$(last_connected)</small>
+          </div>
+        </div>
+        <hr>
+      </template>
+
+      <template id="template-discussion-recipients">
+        <div class="avatar avatar-xs">
+          <img class="img-avatar" src="$(url_agent_avatar)" alt="$(agent_username)" data-toggle="tooltip" data-placement="top" title="$(agent_username)">
+        </div>
+      </template>
+
+      <template id="template-message">
+        <div class="message">
+          <div class="mr-3 float-left">
+            <div class="avatar">
+              <img class="img-avatar" src="$(url_agent_avatar)" alt="$(agent_username)">
+              <span class="avatar-status badge-$(status)"></span>
+            </div>
+          </div>
+          <div>
+            <small class="text-muted">$(agent_username)</small>
+            <small class="text-muted float-right mt-1">$(created_at)</small>
+          </div>
+          <div class="text-truncate font-weight-bold">$(message_content)</div>
+          <small class="text-muted">$(message_content)</small>
+        </div>
+        <hr>
+      </template>
 
       {# Modal #}
-      <div id="discussion-register" class="modal fade" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+      <div id="mdlDefault" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered border-primary" role="document">
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title">Modal title</h5>
@@ -576,19 +662,20 @@
               <p>Modal body text goes here.</p>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-primary _mvalide">Save changes</button>
-              <button type="button" class="btn btn-secondary _mcancel">Close</button>
+              
             </div>
           </div>
         </div>
       </div>
 
-    </footer>
-    
+      {#=============================== javascripts ================================#}
+
     <script src="{{ asset('jquery-3.4.1.js','qobd_web_js') }}"></script>
     <script src="{{ asset('javascript/popper.min.js','theme_coreui') }}"></script>
     <script src="{{ asset('bootstrap.js','bootstrap_js') }}"></script>
+    <script src="{{ asset('javascript/charts.2.8.0.js','theme_coreui') }}"></script>
     <script src="{{ asset('javascript/coreui.min.js','theme_coreui') }}"></script>
+    <script src="{{ asset('javascript/charts.js','theme_coreui') }}"></script>
         
     <script src="{{ asset('datatables.js','datatable_dir') }}"></script>    
     <script src="{{ asset('dataTables.responsive.min.js','datatable_dir') }}"></script>
@@ -596,13 +683,16 @@
     <script src="{{ asset('lodash.min.js','qobd_web_js') }}"></script>
     <script src="{{ asset('bundles/fosjsrouting/js/router.min.js') }}"></script>
     <script src="{{ asset('fos_js_routes.js','qobd_web_js') }}"></script>
+    <script src="{{ asset('global.js','qobd_web_js') }}"></script>
     <script src="{{ asset('render_methods.js','qobd_web_js') }}"></script>
     <script src="{{ asset('data_table.js','qobd_web_js') }}"></script>
-    <script src="{{ asset('base.js','qobd_web_js') }}"></script>
     <script src="{{ asset('chat.js','qobd_web_js') }}"></script>
+    <script src="{{ asset('base.js','qobd_web_js') }}"></script>
     <!-- <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>-->
     
     {% block javascripts %} {% endblock %}
+
+    {% block message_pool %}{% endblock %}
 
 </body>
 

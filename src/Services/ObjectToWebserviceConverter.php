@@ -93,7 +93,7 @@ class ObjectToWebserviceConverter{
             array_push($output['order_item'], $this->convertOrderDetailToObject($orderDetail));
         }
 
-        //dump($output['order_item']); die();
+        //dump($order); die();
         if(!empty($bill))
             $output['bill'] = $this->convertBillToObject($bill, $order, $order->getClient());
         else
@@ -566,7 +566,7 @@ class ObjectToWebserviceConverter{
             $obj['OrderId'] = $orderDetail->getQuoteOrder()->getId();
             $obj['ItemId'] = $orderDetail->getItem()->getId();
             $obj['Item_ref'] = $orderDetail->getItem()->getRef();
-            $obj['Quantity'] = $orderDetail->getQuantityDelivery();
+            $obj['Quantity'] = $orderDetail->getQuantity();
             $obj['Quantity_delivery'] = $orderDetail->getQuantityDelivery();
             $obj['Quantity_current'] = $orderDetail->getQuantityRecieved();
             $obj['Price'] = $orderDetail->getItemSellPrice();

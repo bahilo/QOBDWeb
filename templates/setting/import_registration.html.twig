@@ -1,0 +1,125 @@
+{% extends 'template_coreui.html.twig' %}
+
+{% set page_title = 'Import' %}
+
+{% block home_path %}
+<li class="breadcrumb-item">
+    <a href="{{ path("setting_home") }}">Configuration</a>
+</li>
+<li class="breadcrumb-item">
+    Produits
+</li>
+<li class="breadcrumb-item">
+    {{ page_title }}
+</li>
+{% endblock %}
+
+{% block title %}{{ page_title }} {% endblock %}
+
+{% block body_header_right %}
+<button form="global_form" type="submit" class="btn btn-"><i class="fa fa-save"></i></button>
+{% endblock %}
+
+{% block body %}
+
+<div class="brand-wrapper">
+
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-lg-12">
+                <form id="global_form" action="{{ path("setting_catalogue_import_registration") }}" enctype="multipart/form-data" method="POST">
+                
+                    <!-- import produits -->
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fa fa-align-justify"></i> import produits</div>
+                        <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="form-group">
+                                            <label>Veuillez choisir un fichier (csv)</label>
+                                            <input type="file" name="catalogue_upload[item]">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        Télécharger le document de référence: <a
+                                            href="{{ asset('setting/catalogue/model_import_produits.csv', 'download_dir') }}">ici</a>
+                                    </div>
+                                </div>                            
+                        </div>
+                    </div>
+
+                    <!-- import Fournisseurs -->
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fa fa-align-justify"></i> import Fournisseurs</div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        <label>Veuillez choisir un fichier (csv)</label>
+                                        <input type="file" name="catalogue_upload[provider]">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    Télécharger le document de référence: <a
+                                        href="{{ asset('setting/catalogue/model_import.csv', 'download_dir') }}">ici</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- import Marques -->
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fa fa-align-justify"></i> import Marques</div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        <label>Veuillez choisir un fichier (csv)</label>
+                                        <input type="file" name="catalogue_upload[brand]">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    Télécharger le document de référence: <a
+                                        href="{{ asset('setting/catalogue/model_import.csv', 'download_dir') }}">ici</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- import famille produits -->
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fa fa-align-justify"></i> import famille produits</div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        <label>Veuillez choisir un fichier (csv)</label>
+                                        <input type="file" name="catalogue_upload[categorie]">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    Télécharger le document de référence: <a
+                                        href="{{ asset('setting/catalogue/model_import.csv', 'download_dir') }}">ici</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block javascripts %}
+<script src="{{ asset('setting.js','qobd_web_js') }}"></script>
+{% endblock %}
+
+{% block message_pool %}
+<input type="hidden" name="report-feedback" class="report-feedback" value="{{ message }}">
+<input type="hidden" name="report-status" class="report-status" value="{{ status }}">
+{% endblock %}

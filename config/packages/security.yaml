@@ -24,11 +24,16 @@ security:
                 login_path: security_login
                 check_path: security_login
                 default_target_path: home
+                success_handler: App\Services\SecurityManager
 
             logout:
                 path: security_logout
                 target: security_login
+                handlers: [App\Services\SecurityManager]
             
+            # remember_me:
+            #     lifetime: 604800 # 1 week in seconds
+            #     always_remember_me: false
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#firewalls-authentication

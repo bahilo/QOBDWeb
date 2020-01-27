@@ -25,18 +25,48 @@ class QuoteOrderRepository extends ServiceEntityRepository
     //  * @return QuoteOrder[] Returns an array of QuoteOrder objects
     //  */
     /*
-    public function findByExampleField($value)
+    */
+    public function findCustomBy($form)
     {
-        return $this->createQueryBuilder('q')
-            ->andWhere('q.exampleField = :val')
-            ->setParameter('val', $value)
+        $queryBuilder = $this->createQueryBuilder('q');
+        $parameters = [];
+        if (!empty($form['order'])) {
+            $queryBuilder->andWhere('q.id = :id');
+            $parameters['id'] = $form['order'];
+        }
+        if (!empty($form['bill'])) {
+            $queryBuilder->innerJoin('q.quoteOrderDetails', 'q_ord_dtl');
+            $queryBuilder->innerJoin('q_ord_dtl.quantityDeliveries', 'q_ord_dtl_qtdel');
+            $queryBuilder->innerJoin('q_ord_dtl_qtdel.Bill', 'q_ord_dtl_qtdel_bill');
+            $queryBuilder->andWhere('q_ord_dtl_qtdel_bill.id = :billid');
+            $parameters['billid'] = $form['bill'];
+        }
+        if (!empty($form['client'])) {
+            $queryBuilder->innerJoin('q.Client', 'q_c');
+            $queryBuilder->andWhere('q_c.id = :clientid');
+            $parameters['clientid'] = $form['client'];
+        }
+        if (!empty($form['agent'])) {
+            $queryBuilder->innerJoin('q.Agent', 'q_a');
+            $queryBuilder->andWhere('q_a.id = :agentid');
+            $parameters['agentid'] = $form['agent'];
+        }
+        if (!empty($form['dtDebut'])) {
+            $queryBuilder->andWhere('q.CreatedAt >= :dtDebut');
+            $parameters['dtDebut'] = $form['dtDebut'];
+        }
+        if (!empty($form['dtFin'])) {
+            $queryBuilder->andWhere('q.CreatedAt <= :dtFin');
+            $parameters['dtFin'] = $form['dtFin'] . ' 23:59:59';
+        }
+
+        return $queryBuilder
+            ->setParameters($parameters)
             ->orderBy('q.id', 'ASC')
-            ->setMaxResults(10)
             ->getQuery()
             ->getResult()
         ;
     }
-    */
 
     public function findOneByBill(Bill $bill): ?QuoteOrder
     {

@@ -6,3 +6,4 @@ twig:
     globals:
         search: '@App\Services\SearchToView'
         chat: '@App\Services\ChatToView'
+        email_dir: '%file.setting.file.download_dir%'

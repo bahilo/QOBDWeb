@@ -31,9 +31,15 @@ var RenderMethod = function(args){
     }
 
     this.renderDelete = function (data, type, row) {
-        if (!vars.routeDelete)
+        var canDelete = true;
+
+        if (typeof row.IsErasable != 'undefined' && !row.IsErasable)
+            canDelete = false;
+
+        if (!vars.routeDelete || !canDelete)
             return '';
-        return '<a href="' + Routing.generate(vars.routeDelete.route, { id: row.id }) + '" class="btn btn-danger" data-toggle="tooltip" data-placement="top" title="Supprimer">'+
+
+        return '<a href="' + Routing.generate(vars.routeDelete.route, { id: row.id }) + '" class="btnDelete btn btn-danger" data-toggle="tooltip" data-placement="top" title="Supprimer">'+
                     '<i class="fa ' + vars.routeDelete.logo + '"></i>'+
                 '</a>';
     }
@@ -71,8 +77,8 @@ var RenderMethod = function(args){
     this.renderSelect = function (data, type, row) {
         
         return '<a href="' + Routing.generate('client_select', { id: row.id })
-        +'" class="bx_select"><i data-id="' + row['id'] 
-        +'" class="fa fa-plus-square"></i></a>';
+            + '" class="bx_select" data-toggle="tooltip" data-placement="top" title="Sélectionner la société ' + row.CompanyName +' pour un devis"><i data-id="' + row['id'] 
+        +'" class="fa fa-check"></i></a>';
     }
 
     this.construct(args);

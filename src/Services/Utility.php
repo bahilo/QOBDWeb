@@ -19,9 +19,20 @@ class Utility{
         $this->serializer = $serializer;
     }
    
+    public function getMonthOfYear($date){
+        //Convert the date string into a unix timestamp.
+        $unixTimestamp = strtotime($date->format('Y-m-d H:i:s'));
+        
+        //Get the month of the year using PHP's date function.
+        $monthOfYear = date("F", $unixTimestamp);
+        
+        //Print out the month that our date fell on.
+        return  $monthOfYear;
+    }
+   
     public function getDayOfWeek($date){
        //Convert the date string into a unix timestamp.
-        $unixTimestamp = strtotime($date);
+        $unixTimestamp = strtotime($date->format('Y-m-d H:i:s'));
         
         //Get the day of the week using PHP's date function.
         $dayOfWeek = date("l", $unixTimestamp);
@@ -30,23 +41,47 @@ class Utility{
         return  $dayOfWeek;
     }
    
-    public function getWhenFromToday($date){
-        $_date = mktime(0, 0, 0, $date->format("m"), $date->format("d"), $date->format("Y"));
-        $oneWeek = mktime(0, 0, 0, date("m"), date("d") -7, date("Y"));
-        $oneDayAgo = mktime(0, 0, 0, date("m"), date("d") - 1, date("Y"));
-        $today = date("d/m/Y");
+    public function getWeekOfYear($date){
+       //Convert the date string into a unix timestamp.
+        $unixTimestamp = strtotime($date->format('Y-m-d H:i:s'));
 
-        if ($_date < $oneWeek) {
-            return $this->getDayOfWeek($date) + ' ' + $date->format('H:i:s');
-        }
-        elseif($_date < $oneDayAgo){
-            return 'Hier ' + $date->format('H:i:s');
-        }
-        elseif($date->format('d/m/Y') == $today){
-            return $date->format('H:i:s');
+        //Get the week of the year using PHP's date function.
+        $weekOfYear = date("W", $unixTimestamp);
+        
+        //Print out the week that our date fell on.
+        return  $weekOfYear;
+    }
+   
+    public function getYear($date){
+       //Convert the date string into a unix timestamp.
+        $unixTimestamp = strtotime($date->format('Y-m-d H:i:s'));
+
+        //Get the week of the year using PHP's date function.
+        $weekOfYear = date("Y", $unixTimestamp);
+        
+        //Print out the week that our date fell on.
+        return  $weekOfYear;
+    }
+   
+    public function getWhenFromToday(\DateTime $date){
+        if(!empty($date)){
+            $_date = mktime(0, 0, 0, $date->format("m"), $date->format("d"), $date->format("Y"));
+            $oneWeek = mktime(0, 0, 0, date("m"), date("d") - 7, date("Y"));
+            $oneDayAgo = mktime(0, 0, 0, date("m"), date("d") - 1, date("Y"));
+            $today = date("d/m/Y");
+
+            if ($date->format('d/m/Y') == $today) {
+                return $date->format('H:i:s');
+            }elseif ($_date >= $oneDayAgo) {
+                return 'Hier ' . $date->format('H:i:s');                
+            }elseif ($_date >= $oneWeek) {
+                    return $this->getDayOfWeek($date) . ' '  . $date->format('d') . ', ' . $date->format('H:i:s');
+            }else {
+                 return $date->format('d/m/Y H:i:s');
+            }
         }
         else{
-            return $date->format('d/m/Y H:i:s');
+            return $date;
         }
     }
 
@@ -61,7 +96,7 @@ class Utility{
     }
 
     public function uploadFile($file, string $saveDir){
-
+        //dump($file);die();
         if ($file) {
             $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
 
@@ -82,14 +117,41 @@ class Utility{
         return null;
     }
 
+    /**
+     * Vérifie si un object exist dans un array
+     */
     public function in_array($sourceArray, $object){        
         foreach($sourceArray as $key => $obj){
             if($obj->getId() == $object->getId())
-                return true;
+                return $key;
         }
-        return false;
+        return -1;
     }
 
+    /**
+     * Vérifie si un string exist dans un array
+     */
+    public function str_in_array($sourceArray, $string){        
+        foreach($sourceArray as $key => $obj){
+            if($obj == $string)
+                return $key;
+        }
+        return -1;
+    }
+
+    /**
+     * supprime un object d'un array
+     */
+    public function removeFromArray($sourceArray, $object){
+        $index = $this->in_array($sourceArray, $object);
+        if ($index != -1)
+            unset($sourceArray[$index]);
+        return $sourceArray;
+    }
+
+    /**
+     * Vérifie si un setting exist dans un array
+     */
     public function in_arrayByCode($sourceArray, $object){        
         foreach($sourceArray as $key => $code){
             if($code == $object->getCode())
@@ -98,6 +160,9 @@ class Utility{
         return false;
     }
 
+    /**
+     * Récupère les données d'un array sans doublon
+     */
     public function getDistinct($sourceArray){
         $outputArray = [];
         foreach($sourceArray as $key => $obj){
@@ -107,6 +172,9 @@ class Utility{
         return $outputArray;
     }
 
+    /**
+     * Récupère les données du setting sans doublon
+     */
     public function getDistinctByCode($sourceArray){
         $outputArray = [];
         foreach($sourceArray as $key => $obj){
@@ -116,6 +184,9 @@ class Utility{
         return $outputArray;
     }
 
+    /**
+     * Extract data du setting général
+     */
     public function extractData($sourceArray){
         $outputArray = [];
         foreach($sourceArray as $key => $obj){

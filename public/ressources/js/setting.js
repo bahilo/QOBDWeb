@@ -1,7 +1,7 @@
 $(function(){
     
+/*================================[ Init ]==================================*/
 
-    
     api = {
         table: [],
         column: {
@@ -50,22 +50,18 @@ $(function(){
         },
     };
 
+/*==========================[ début programme ]================================*/
 
     $(function(){
 
-        if ($('#setting_target_tables').val()) {
-            var tables_target = JSON.parse($('#setting_target_tables').val());
-            for (var i = 0; i < tables_target.length; i++ ){
-                api.table[tables_target[i]] = $("#" + tables_target[i] +"_setting_target_table_js").myTable({
-                    dataSource: $("#" + tables_target[i] +"_setting_target").val(),
-                    columns: getColumn(api)
-                });
-            }            
-        }        
-
+        loadSettings();
+        
     });
 
+/*================================[ Events ]==================================*/
+
     $(function(){
+
         $('input.switch-input','.switch-wrapper').on('click', function(){
              if($(this).prop('checked')){
                  $('.value-file','.value-wrapper').hide();
@@ -76,8 +72,22 @@ $(function(){
                  $('.value-default', '.value-wrapper').hide();
              }
         });
+        
     });
 
+/*================================[ Functions ]==================================*/
+
+    function loadSettings(){
+        if ($('#setting_target_tables').val()) {
+            var tables_target = JSON.parse($('#setting_target_tables').val());
+            for (var i = 0; i < tables_target.length; i++) {
+                api.table[tables_target[i]] = $("#" + tables_target[i] + "_setting_target_table_js").myTable({
+                    dataSource: $("#" + tables_target[i] + "_setting_target").val(),
+                    columns: getColumn(api)
+                });
+            }
+        }
+    } 
 
     function getRender(){
         var route = getRoute();

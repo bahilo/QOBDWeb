@@ -1,0 +1,11 @@
+{% extends 'email_template.html.twig' %}
+
+{% block body %}
+
+<div class="row">
+    <div class="col-md-12">
+        <pre>{% include 'email/files/devis.txt' with {'nom_client': contact_name, 'nom_societe': company } %}</pre>
+    </div>
+</div>
+
+{% endblock body %}

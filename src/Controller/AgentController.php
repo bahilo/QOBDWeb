@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Agent;
 use App\Services\Utility;
+use App\Entity\Agent;
 use App\Services\Serializer;
 use App\Services\SecurityManager;
 use App\Repository\AgentRepository;

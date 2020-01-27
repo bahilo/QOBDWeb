@@ -3,14 +3,15 @@ $(function () {
     var Renders = new RenderMethod({
         routeShow: {},
         routeEdit: { route: 'catalogue_item_edit', logo: 'fa-edit' },
-        routeDelete: {}
+        routeDelete: { route: 'catalogue_delete', logo: 'fa-trash' }
     });
 
     $("#item_table_js").myTable({
         dataSource: $("#item_data_source").val(),
         columns: [
             { data: 'id', title: "", visible: false },
-            { data: 'Picture', title: "", render: Renders.renderPicture },
+            { data: 'IsErasable', title: "", visible: false },
+            { data: 'FullPathPicture', title: "", render: Renders.renderPicture },
             { data: 'Ref', title: "Réf." },
             { data: 'Name', title: "Désignation" },
             { data: 'ItemBrandName', title: "Marque" }, 
@@ -18,6 +19,7 @@ $(function () {
             { data: 'PurchasePrice', title: "P. Achat" },
             { data: 'SellPrice', title: "P. Vente" },
             { data: 'id', title: "Modif.", render: Renders.renderEdit },
+            { data: 'id', title: "Supp.", render: Renders.renderDelete },
             { data: 'id', title: "Ajouter", render: Renders.renderAddCart },
         ]
     });

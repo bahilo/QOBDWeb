@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Role;
 use App\Entity\Agent;
 use App\Entity\Action;
+use App\Services\Mailer;
 use App\Entity\Privilege;
 use App\Services\Utility;
 use App\Entity\ActionRole;
@@ -178,7 +179,8 @@ class SecurityController extends Controller
                                       ObjectManager $manager, 
                                       UserPasswordEncoderInterface $encoder,
                                       RoleRepository $roleRepo,
-                                      Utility $utility)
+                                      Utility $utility,
+                                      Mailer $mailer)
     {
         
         $isEdit = true;
@@ -221,11 +223,17 @@ class SecurityController extends Controller
             $manager->persist($agent);
             $manager->flush();
 
+            $mailer->send(
+                $agent->getEmail(),
+                'Inscription',
+                $this->renderView('email/registration.html.twig',['agent' => $agent])
+            );
+
             if(!$isEdit)
                 return $this->redirectToRoute('security_login');
             else
                 return $this->redirectToRoute('agent_home');
-        }
+        }        
 
         return $this->render('security/agent_registration.html.twig', [
             'formAgent' => $form->createView()
@@ -274,7 +282,7 @@ class SecurityController extends Controller
     /**
      * @Route("/admin/security/agent/deconnexion", options={"expose"=true}, name="security_logout")
      */
-    public function logout() {}
+    public function logout(ObjectManager $manager) {}
 
     /**
      * @Route("/admin/security/agent/{id}/delete", options={"expose"=true}, name="security_delete")

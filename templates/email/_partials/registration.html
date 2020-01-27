@@ -1,0 +1,11 @@
+{% extends 'email_template.html.twig' %}
+
+{% block body %}
+
+    <div class="row">
+        <div class="col-md-12">            
+            <pre>{% include 'email/files/inscription.txt' with {'pseudo': app.user.username, 'company': 'BNOME' } %}</pre>
+        </div>
+    </div>
+
+{% endblock body %}

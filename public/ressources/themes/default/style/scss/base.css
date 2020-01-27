@@ -2,6 +2,14 @@ body {
   table-layout: fixed;
 }
 
+body .app-body {
+  /*___________________[ Pagination ]*/
+}
+
+body .app-body .breadcrumb {
+  margin-bottom: 0;
+}
+
 body .app-body td.details-control {
   cursor: pointer;
 }
@@ -57,5 +65,44 @@ body .app-body .setting-wrapper .switch-label {
 body .app-body .setting-wrapper .switch-wrapper label {
   display: inline-block;
   margin-bottom: -0.5rem;
+}
+
+body .app-body .img-avatar, body .app-body .avatar > img, body .app-body .img-circle {
+  max-width: 64%;
+}
+
+body .app-body .messages-home-wrapper .loadMessages {
+  cursor: pointer;
+}
+
+body .app-body .messages-home-wrapper .isDisabled {
+  color: currentColor;
+  cursor: not-allowed;
+  opacity: 0.5;
+  text-decoration: none;
+}
+
+body .app-body table img {
+  max-width: 50px;
+}
+
+body .app-body .bottom.nav-wrapper .ul a, body .app-body .bottom.nav-wrapper .ul .ellipsis {
+  position: relative;
+  display: inline-block;
+  padding: 0.5rem 0.75rem;
+  margin-left: -1px;
+  line-height: 1.25;
+  color: #20a8d8;
+  background-color: #fff;
+  border: 1px solid #c8ced3;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+body .app-body .bottom.nav-wrapper .ul a.current, body .app-body .bottom.nav-wrapper .ul .ellipsis.current {
+  z-index: 1;
+  color: #fff;
+  background-color: #20a8d8;
+  border-color: #20a8d8;
 }
 /*# sourceMappingURL=base.css.map */

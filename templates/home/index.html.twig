@@ -13,12 +13,10 @@
                             <i class="icon-settings"></i>
                         </button>
                         <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" href="#">Action</a>
-                            <a class="dropdown-item" href="#">Another action</a>
-                            <a class="dropdown-item" href="#">Something else here</a>
+                            <a class="dropdown-item" href="{{ path("order_home") }}">Détail</a>
                         </div>
                     </div>
-                    <div class="text-value">9.823</div>
+                    <div class="text-value">{{ nb_order }}</div>
                     <div>Commandes</div>
                 </div>
                 <div class="chart-wrapper mt-3 mx-3" style="height:70px;">
@@ -36,12 +34,10 @@
                             <i class="icon-settings"></i>
                         </button>
                         <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" href="#">Action</a>
-                            <a class="dropdown-item" href="#">Another action</a>
-                            <a class="dropdown-item" href="#">Something else here</a>
+                            <a class="dropdown-item" href="{{ path("order_quote") }}">Détail</a>
                         </div>
                     </div>
-                    <div class="text-value">9.823</div>
+                    <div class="text-value">{{ nb_quote }}</div>
                     <div>Devis</div>
                 </div>
                 <div class="chart-wrapper mt-3" style="height:70px;">
@@ -59,12 +55,10 @@
                             <i class="icon-settings"></i>
                         </button>
                         <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" href="#">Action</a>
-                            <a class="dropdown-item" href="#">Another action</a>
-                            <a class="dropdown-item" href="#">Something else here</a>
+                            <a class="dropdown-item" href="{{ path("order_refund") }}">Détail</a>
                         </div>
                     </div>
-                    <div class="text-value">9.823</div>
+                    <div class="text-value">{{ nb_refund }}</div>
                     <div>Avoirs</div>
                 </div>
                 <div class="chart-wrapper mt-3" style="height:70px;">
@@ -82,12 +76,10 @@
                             <i class="icon-settings"></i>
                         </button>
                         <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" href="#">Action</a>
-                            <a class="dropdown-item" href="#">Another action</a>
-                            <a class="dropdown-item" href="#">Something else here</a>
+                            <a class="dropdown-item" href="{{ path("order_customer_valid") }}">Détail</a>
                         </div>
                     </div>
-                    <div class="text-value">9.823</div>
+                    <div class="text-value">{{ nb_validation }}</div>
                     <div>Revalidation client</div>
                 </div>
                 <div class="chart-wrapper mt-3 mx-3" style="height:70px;">
@@ -102,11 +94,45 @@
 {% block body %}
 
 
-<div class="example-wrapper">
+<div class="home-wrapper">
     <div class="animated fadeIn">
         
-        <!-- /.row-->
         <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div >
+                                <h4 class="card-title mb-0">Commandes</h4>
+                                <div class="small text-muted">{{ "now"|date("F\\, Y") }}</div>
+                            </div>
+                            <div class="btn-toolbar d-none d-md-block" role="toolbar" aria-label="Toolbar with buttons">
+                                <div class="btn-date-select btn-group btn-group-toggle mx-3" data-toggle="buttons">
+                                    <label class="btn btn-outline-secondary">
+                                        <input id="optionWeek" type="radio" name="options" autocomplete="off"> Semaine
+                                    </label>
+                                    <label class="btn btn-outline-secondary active">
+                                        <input id="optionMonth" type="radio" name="options" autocomplete="off" checked=""> Mois
+                                    </label>
+                                    <label class="btn btn-outline-secondary">
+                                        <input id="optionYear" type="radio" name="options" autocomplete="off"> Année
+                                    </label>
+                                </div>
+                                {# <button class="btn btn-primary" type="button">
+                                    <svg class="c-icon">
+                                        <use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-cloud-download"></use>
+                                    </svg>
+                                </button> #}
+                            </div>
+                            
+                        </div> 
+                        <canvas id="myChart0"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.row-->
+        {# <div class="row">
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">Traffic & Ventes sur une semaine</div>
@@ -116,7 +142,7 @@
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <div class="callout callout-info">
-                                            <small class="text-muted">New Clients</small>
+                                            <small class="text-muted">Clients</small>
                                             <br>
                                             <strong class="h4">9,123</strong>
                                             <div class="chart-wrapper">
@@ -602,7 +628,7 @@
                 </div>
             </div>
             <!-- /.col-->
-        </div>
+        </div> #}
         <!-- /.row-->
     </div>
 </div>

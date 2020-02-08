@@ -106,6 +106,7 @@ class SettingController extends Controller
             'data_table_source' => 'currency_data_source',
             'page_title' => 'Monnaie',
             'source' => $source,
+            'codes' => ["CURRENCY"],
             'create_url' => $this->generateUrl('setting_currency_registration'),
             'page' => 'setting/_partials/index.html',
         ]);
@@ -158,6 +159,7 @@ class SettingController extends Controller
             'data_table_source' => 'delivery_status_data_source',
             'page_title' => 'Statut Facturation',
             'source' => $source,
+            'codes' => ["STATUS"],
             'create_url' => $this->generateUrl('setting_delivery_status_registration'),
             'page' => 'setting/_partials/index.html',
         ]);
@@ -179,11 +181,13 @@ class SettingController extends Controller
             'group' => 'class_property'
         ]);
 
+        //dump($orderStatusRepo->findAll());die();
         return $this->render('setting/index.html.twig', [
-            'data_table' => 'order_status_table_js',
+            'data_table' => 'status_table_js',
             'data_table_source' => 'order_status_data_source',
             'page_title' => 'Statut Commande',
             'source' => $source,
+            'codes' => ["STATUS"],
             'create_url' => $this->generateUrl('setting_order_status_registration'),
             'page' => 'setting/_partials/index.html',
         ]);
@@ -302,7 +306,7 @@ class SettingController extends Controller
 
     /**
      * @Route("/admin/configuration/inscription", options={"expose"=true}, name="setting_registration")
-     * @Route("/admin/configuration/{id}/edit", options={"expose"=true}, name="setting_edit", requirements={"id"="\d+"})
+     * @Route("/admin/configuration/{id}/edit", options={"expose"=true}, requirements={"id"="\d+"}, name="setting_edit")
      * 
      */
     public function registration(Setting $setting = null, 
@@ -354,7 +358,7 @@ class SettingController extends Controller
 
     /**
      * @Route("/admin/configuration/currency/inscription", options={"expose"=true}, name="setting_currency_registration")
-     * @Route("/admin/configuration/currency/{id}/edit", options={"expose"=true}, name="setting_currency_edit", requirements={"id"="\d+"})
+     * @Route("/admin/configuration/currency/{id}/edit", options={"expose"=true}, requirements={"id"="\d+"}, name="setting_currency_edit")
      * 
      */
     public function currencyRegistration(Currency $currency = null, 
@@ -391,7 +395,7 @@ class SettingController extends Controller
 
     /**
      * @Route("/admin/configuration/statut/livraison/inscription", options={"expose"=true}, name="setting_delivery_status_registration")
-     * @Route("/admin/configuration/statut/livraison/{id}/edit", options={"expose"=true}, name="setting_delivery_status_edit", requirements={"id"="\d+"})
+     * @Route("/admin/configuration/statut/livraison/{id}/edit", options={"expose"=true}, requirements={"id"="\d+"}, name="setting_delivery_status_edit")
      * 
      */
     public function deliveryStatusRegistration(DeliveryStatus $status = null, 
@@ -423,7 +427,7 @@ class SettingController extends Controller
 
     /**
      * @Route("/admin/configuration/tax/inscription", options={"expose"=true}, name="setting_tax_registration")
-     * @Route("/admin/configuration/tax/{id}/edit", options={"expose"=true}, name="setting_tax_edit", requirements={"id"="\d+"})
+     * @Route("/admin/configuration/tax/{id}/edit", options={"expose"=true}, requirements={"id"="\d+"}, name="setting_tax_edit")
      * 
      */
     public function taxRegistration(Tax $tax = null, 
@@ -477,7 +481,7 @@ class SettingController extends Controller
 
     /**
      * @Route("/admin/configuration/marque/inscription", options={"expose"=true}, name="setting_brand_registration")
-     * @Route("/admin/configuration/marque/{id}/edit", options={"expose"=true}, name="setting_brand_edit", requirements={"id"="\d+"})
+     * @Route("/admin/configuration/marque/{id}/edit", options={"expose"=true}, requirements={"id"="\d+"}, name="setting_brand_edit")
      * 
      */
     public function brandRegistration(ItemBrand $itemBrand = null, 
@@ -513,7 +517,7 @@ class SettingController extends Controller
 
     /**
      * @Route("/admin/configuration/famille/inscription", options={"expose"=true}, name="setting_group_registration")
-     * @Route("/admin/configuration/famille/{id}/edit", options={"expose"=true}, name="setting_group_edit", requirements={"id"="\d+"})
+     * @Route("/admin/configuration/famille/{id}/edit", options={"expose"=true}, requirements={"id"="\d+"}, name="setting_group_edit")
      * 
      */
     public function groupRegistration(ItemGroupe $itemGroupe = null, 
@@ -548,7 +552,7 @@ class SettingController extends Controller
 
     /**
      * @Route("/admin/configuration/fournisseur/inscription", options={"expose"=true}, name="setting_provider_registration")
-     * @Route("/admin/configuration/fournisseur/{id}/edit", options={"expose"=true}, name="setting_provider_edit", requirements={"id"="\d+"})
+     * @Route("/admin/configuration/fournisseur/{id}/edit", options={"expose"=true}, requirements={"id"="\d+"}, name="setting_provider_edit")
      * 
      */
     public function providerRegistration(Provider $provider = null, 
@@ -583,7 +587,7 @@ class SettingController extends Controller
 
     /**
      * @Route("/admin/configuration/commande/statut/inscription", options={"expose"=true}, name="setting_order_status_registration")
-     * @Route("/admin/configuration/commande/statut/{id}/edit", options={"expose"=true}, name="setting_order_status_edit", requirements={"id"="\d+"})
+     * @Route("/admin/configuration/commande/statut/{id}/edit", options={"expose"=true}, requirements={"id"="\d+"}, name="setting_order_status_edit")
      * 
      */
     public function orderStatusRegistration(OrderStatus $status = null, 
@@ -688,7 +692,7 @@ class SettingController extends Controller
     --------------------------------------------[ Deletes ]--------------------------------------------------------*/
 
     /**
-     * @Route("/admin/configuration/{id}/delete", options={"expose"=true}, name="setting_delete", requirements={"id"="\d+"})
+     * @Route("/admin/configuration/{id}/delete", options={"expose"=true}, requirements={"id"="\d+"}, name="setting_delete")
      */
     public function delete(Setting $setting, ObjectManager $manager)
     {
@@ -718,7 +722,7 @@ class SettingController extends Controller
     }
 
     /**
-     * @Route("/admin/configuration/tax/{id}/delete", options={"expose"=true}, name="setting_tax_delete", requirements={"id"="\d+"})
+     * @Route("/admin/configuration/tax/{id}/delete", options={"expose"=true}, requirements={"id"="\d+"}, name="setting_tax_delete")
      */
     public function taxDelete(Tax $tax, ObjectManager $manager)
     {
@@ -733,7 +737,7 @@ class SettingController extends Controller
     }
 
     /**
-     * @Route("/admin/configuration/statut/livraison/{id}/delete", options={"expose"=true}, name="setting_delivery_status_delete", requirements={"id"="\d+"})
+     * @Route("/admin/configuration/statut/livraison/{id}/delete", options={"expose"=true}, requirements={"id"="\d+"}, name="setting_delivery_status_delete")
      */
     public function deliveryStatusDelete(DeliveryStatus $status, ObjectManager $manager)
     {
@@ -748,7 +752,7 @@ class SettingController extends Controller
     }
 
     /**
-     * @Route("/admin/configuration/fournisseur/{id}/delete", options={"expose"=true}, name="setting_provider_delete", requirements={"id"="\d+"})
+     * @Route("/admin/configuration/fournisseur/{id}/delete", options={"expose"=true}, requirements={"id"="\d+"}, name="setting_provider_delete")
      */
     public function providerDelete(Provider $provider, ObjectManager $manager)
     {
@@ -764,7 +768,7 @@ class SettingController extends Controller
     }
 
     /**
-     * @Route("/admin/configuration/famille/{id}/delete", options={"expose"=true}, name="setting_group_delete", requirements={"id"="\d+"})
+     * @Route("/admin/configuration/famille/{id}/delete", options={"expose"=true}, requirements={"id"="\d+"}, name="setting_group_delete")
      */
     public function groupDelete(ItemGroupe $group, ObjectManager $manager)
     {
@@ -780,7 +784,7 @@ class SettingController extends Controller
     }
 
     /**
-     * @Route("/admin/configuration/marque/{id}/delete", options={"expose"=true}, name="setting_brand_delete", requirements={"id"="\d+"})
+     * @Route("/admin/configuration/marque/{id}/delete", options={"expose"=true}, requirements={"id"="\d+"}, name="setting_brand_delete")
      */
     public function brandDelete(ItemBrand $brand, ObjectManager $manager)
     {
@@ -796,7 +800,7 @@ class SettingController extends Controller
     }
 
     /**
-     * @Route("/admin/configuration/commande/statut/{id}/delete", options={"expose"=true}, name="setting_order_status_delete", requirements={"id"="\d+"})
+     * @Route("/admin/configuration/commande/statut/{id}/delete", options={"expose"=true}, requirements={"id"="\d+"}, name="setting_order_status_delete")
      */
     public function orderStatusDelete(OrderStatus $status, QuoteOrderRepository $orderRepo, ObjectManager $manager)
     {

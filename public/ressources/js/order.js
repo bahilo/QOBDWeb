@@ -363,11 +363,11 @@ $(function () {
             '<div class="row">' +
                 '<div class="col-md-6">' +
                     '<label for="comment' + row.id +'">Commentaire</label>'+
-            '<textarea name="order_detail_form[tab][' + row.id + '][comment]" id="comment' + row.id + '" cols="30" rows="5" class="form-control">' + row.ContentComment+'</textarea>' +
+            '<textarea name="order_detail_form[tab][items][' + row.id + '][comment]" id="comment' + row.id + '" cols="30" rows="5" class="form-control">' + row.ContentComment+'</textarea>' +
                 '</div>' +
                 '<div class="col-md-6">' +
                     '<label for="quantity' + row.id + '">Quantité reçu</label>' +
-                    '<input type="number" name="order_detail_form[tab][' + row.id + '][quantity_recieved]" id="quantity' + row.id + '" class="form-control">' +
+                    '<input type="number" name="order_detail_form[tab][items][' + row.id + '][quantity_recieved]" id="quantity' + row.id + '" class="form-control">' +
                 '</div>' +
             '</div>' +
         '</div>'
@@ -427,15 +427,15 @@ $(function () {
     }
 
     function inputPurchasePriceForm(data, type, row) {
-        return '<div class="form-group"><input type="text" value="' + data +'" name="order_detail_form[tab][' + row.id + '][purchase]" class="form-control"></div>';
+        return '<div class="form-group"><input type="text" value="' + data +'" name="order_detail_form[tab][items][' + row.id + '][purchase]" class="form-control"></div>';
     }
 
     function inputSellPriceForm(data, type, row) {
-        return '<div class="form-group"><input type="text" value="' + data +'" name="order_detail_form[tab][' + row.id + '][sell]" class="form-control"></div>';
+        return '<div class="form-group"><input type="text" value="' + data +'" name="order_detail_form[tab][items][' + row.id + '][sell]" class="form-control"></div>';
     }
 
     function inputQuantityForm(data, type, row) {
-        return '<div class="form-group"><input type="text" value="' + data +'" name="order_detail_form[tab][' + row.id + '][quantity]" class="form-control"></div>';
+        return '<div class="form-group"><input type="text" value="' + data +'" name="order_detail_form[tab][items][' + row.id + '][quantity]" class="form-control"></div>';
     }
 
     function renderDigit(data, type, row) {
@@ -446,7 +446,7 @@ $(function () {
     }
 
     function rowDetail(data, type, row) {
-        return '<div class="form-group"><input type="text" value="' + data +'" name="order_detail_form[tab][' + row.id + '][quantity]" class="form-control"></div>';
+        return '<div class="form-group"><input type="text" value="' + data +'" name="order_detail_form[tab][items][' + row.id + '][quantity]" class="form-control"></div>';
     }
 
     function renderCancel(data, type, row) {

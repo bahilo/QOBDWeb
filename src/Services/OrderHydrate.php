@@ -3,8 +3,11 @@
 namespace App\Services;
 
 use App\Entity\Comment;
+use App\Entity\QuoteOrder;
+use App\Repository\TaxRepository;
 use App\Services\CatalogueHydrate;
 use App\Repository\ContactRepository;
+use App\Repository\CurrencyRepository;
 use JMS\Serializer\SerializerInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
@@ -13,31 +16,39 @@ class OrderHydrate{
 
     protected $serializer; 
     protected $contactRepo;
+    protected $currencyRepo;
+    protected $taxRepo;
     protected $catHydrate;
     protected $manager;
 
     public function __construct( SerializerInterface $serializer,
                                 ContactRepository $contactRepo,
+                                CurrencyRepository $currencyRepo,
+                                TaxRepository $taxRepo,
                                 CatalogueHydrate $catHydrate,
                                 ObjectManager $manager){
 
         $this->serializer = $serializer;
         $this->contactRepo = $contactRepo;
+        $this->currencyRepo = $currencyRepo;
+        $this->taxRepo = $taxRepo;
         $this->catHydrate = $catHydrate;
         $this->manager = $manager;
     }
 
-    public function hydrateOrderDetail($orderDetails){
+    public function hydrateOrderDetail($orderDetails, QuoteOrder $order){
 
         $output = [];
         foreach( $orderDetails as $orderDetail){
             
             $item = $orderDetail->getItem();
-            $tax = $orderDetail->getTax();
-
+            $tax = empty($orderDetail->getTax()) || empty($orderDetail->getTax()->getValue()) ? $order->getTax() : $orderDetail->getTax();
+            // dump($orderDetail->getTax()); 
+            // dump($order->getTax()); 
+            // die();
             if($item){
                 $item = $this->catHydrate->hydrateItem([$item])[0];
-                //dump($item); die();
+                
                 $orderDetail->setContentComment($item->getContentComment());
                 $orderDetail->setItemRef($item->getRef());
                 $orderDetail->setItemName($item->getName());
@@ -71,6 +82,9 @@ class OrderHydrate{
             $this->manager->flush();
             array_push($output, $orderDetail);
         }
+        //dump($output[0]->getTax()); 
+        //dump($output); 
+        //die();
         return $output;
     }
 
@@ -97,7 +111,7 @@ class OrderHydrate{
         return $output;
     }
 
-    public function hydrateQuoteOrderRelationFromForm($order, $form)
+    public function hydrateQuoteOrderRelationFromForm(QuoteOrder $order, $form)
     {
 
         $agent = $order->getAgent();
@@ -143,6 +157,14 @@ class OrderHydrate{
         else
             $order->setIsRefVisible(false); 
 
+        if(!empty($form['currency'])){
+            $order->setCurrency($this->currencyRepo->find($form['currency']));
+        }
+
+        if(!empty($form['tax'])){
+            $order->setTax($this->taxRepo->find($form['tax']));
+        }
+
         $order->setPrivateComment($privateComment);
         $order->setPublicComment($publicComment);
         $order->setAdminComment($adminComment);
@@ -167,8 +189,8 @@ class OrderHydrate{
         }
 
         $item->setPurchasePrice($form['purchase']);
-        $item->setSellPrice($form['sell']);
 
+        $orderDetail->setItemSellPrice($form['sell']);
         $orderDetail->setQuantity($form['quantity']);
         if (!empty($form['quantity_recieved']) && $form['quantity_recieved'] <= $form['quantity'])
             $orderDetail->setQuantityRecieved($form['quantity_recieved']);

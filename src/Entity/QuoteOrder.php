@@ -125,6 +125,11 @@ class QuoteOrder
      */
     private $IsRefVisible;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Tax", inversedBy="quoteOrders")
+     */
+    private $Tax;
+
 
 
     public function __construct()
@@ -356,6 +361,18 @@ class QuoteOrder
     public function setIsRefVisible(bool $IsRefVisible): self
     {
         $this->IsRefVisible = $IsRefVisible;
+
+        return $this;
+    }
+
+    public function getTax(): ?Tax
+    {
+        return $this->Tax;
+    }
+
+    public function setTax(?Tax $Tax): self
+    {
+        $this->Tax = $Tax;
 
         return $this;
     }

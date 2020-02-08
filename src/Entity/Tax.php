@@ -84,11 +84,17 @@ class Tax
      */
     private $IsTVAMarge;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\QuoteOrder", mappedBy="Tax")
+     */
+    private $quoteOrders;
+
 
     public function __construct()
     {
         $this->items = new ArrayCollection();
         $this->quoteOrderDetails = new ArrayCollection();
+        $this->quoteOrders = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -251,6 +257,37 @@ class Tax
     public function setIsTVAMarge(bool $IsTVAMarge): self
     {
         $this->IsTVAMarge = $IsTVAMarge;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|QuoteOrder[]
+     */
+    public function getQuoteOrders(): Collection
+    {
+        return $this->quoteOrders;
+    }
+
+    public function addQuoteOrder(QuoteOrder $quoteOrder): self
+    {
+        if (!$this->quoteOrders->contains($quoteOrder)) {
+            $this->quoteOrders[] = $quoteOrder;
+            $quoteOrder->setTax($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQuoteOrder(QuoteOrder $quoteOrder): self
+    {
+        if ($this->quoteOrders->contains($quoteOrder)) {
+            $this->quoteOrders->removeElement($quoteOrder);
+            // set the owning side to null (unless already changed)
+            if ($quoteOrder->getTax() === $this) {
+                $quoteOrder->setTax(null);
+            }
+        }
 
         return $this;
     }

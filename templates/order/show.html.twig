@@ -30,7 +30,7 @@
 <div class="row">
     <div class="col-md-3">
         <div class="callout callout-info">
-            <small class="text-muted">Commande</small><br>
+            {# <small class="text-muted">Commande</small><br> #}
             <strong class="h4">{{ status.displayname }}</strong>
         </div>
     </div>
@@ -39,7 +39,7 @@
             <!-- <small class="text-muted">Commande</small><br>
             <strong class="h4">{{ status.displayname }}</strong> -->
             <div class="">
-                Commande n°# {{ order.id }} du {{ order.createdat | date("Y/m/d") }} en cours pour la société <a href="#">{{ order.client.companyname }}</a> géré par 
+                {{ status.displayname }} n°#{{ order.id }} du {{ order.createdat | date("Y/m/d") }} en cours pour la société <a href="#">{{ order.client.companyname }}</a><br/> géré par 
                 {{ order.agent.Firstname }} {{ order.agent.LastName }}
             </div>
             {% if status_preorder is defined %}
@@ -50,8 +50,10 @@
             {% endif %}
             
             {% if status_order is defined %}
-            <a href="{{ path(target.link, target.param[0]) }}" class="btn btn-success">Convertir en commande</a>
-            <a href="{{ path(target.link, target.param[1]) }}" class="btn btn-warning">Re-valider avec le client</a>
+            <div class="btn-group">
+               <a href="{{ path(target.link, target.param[0]) }}" class="btn btn-success">Convertir en commande</a>
+                <a href="{{ path(target.link, target.param[1]) }}" class="btn btn-warning">Re-valider avec le client</a>
+            </div>            
             {% elseif status_refund is defined %}
             <a href="{{ path(target.link, target.param[0]) }}" class="btn btn-success">Convertir en avoir</a>
             {% endif %}
@@ -73,6 +75,8 @@
         <input type="hidden" name="order" value="{{ order.id }}">
 
         <div class="animated fadeIn">
+
+            {# Produits #}
             <div class="row">
                 <div class="col-lg-12">
                     <div class="card">
@@ -84,9 +88,9 @@
                         </div>
                     </div>
                 </div>
-                <!-- /.col-->
             </div>
 
+            {# Statistic #}
             <div class="row">
                 <div class="col-md-12">
                     <div class="card border border-info">
@@ -94,7 +98,7 @@
                             <div class="row">
                                 <div class="col-sm-2">
                                     <div class="callout callout-warning">
-                                        <small class="text-muted">Total HT</small>
+                                        <small class="text-muted">Total HT ({{ order.currency.symbol }})</small>
                                         <br>
                                         <strong class="h4">{{ info.total_HT }}</strong>
                                         <div class="chart-wrapper">
@@ -105,7 +109,7 @@
                                 <!-- /.col-->
                                 <div class="col-sm-2">
                                     <div class="callout callout-success">
-                                        <small class="text-muted">Total TTC</small>
+                                        <small class="text-muted">Total TTC ({{ order.currency.symbol }})</small>
                                         <br>
                                         <strong class="h4">{{ info.total_TTC }}</strong>
                                         <div class="chart-wrapper">
@@ -127,7 +131,7 @@
                                 <!-- /.col-->
                                 <div class="col-sm-2">
                                     <div class="callout callout-secondary">
-                                        <small class="text-muted">Marge ($)</small>
+                                        <small class="text-muted">Marge ({{ order.currency.symbol }})</small>
                                         <br>
                                         <strong class="h4">{{ info.marge_amount }}</strong>
                                         <div class="chart-wrapper">
@@ -138,7 +142,7 @@
                                 <!-- /.col-->
                                 <div class="col-sm-2">
                                     <div class="callout callout-danger">
-                                        <small class="text-muted">Montant TVA</small>
+                                        <small class="text-muted">Montant TVA ({{ order.currency.symbol }})</small>
                                         <br>
                                         <strong class="h4">{{ info.VAT_amount }}</strong>
                                         <div class="chart-wrapper">
@@ -151,7 +155,7 @@
                                     <div class="callout callout-info">
                                         <small class="text-muted">TVA</small>
                                         <br>
-                                        <strong class="h4">{{ info.VAT }}%</strong>
+                                        <strong class="h4">{{ order.tax.value }}%</strong>
                                         <div class="chart-wrapper">
                                             <canvas id="sparkline-chart-4" width="100" height="30"></canvas>
                                         </div>
@@ -163,7 +167,58 @@
                     </div>
                 </div>
             </div>
+
+            {# Devise & TVA #}
+            <div class="row">
+
+                {# TVA #}
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fa fa-align-justify"></i> TVA
+                        </div>
+                        <div class="card-body">
+                            <select name="order_detail_form[tax]" class="form-control">
+                                <option value="">Veuillez selectionner une TVA</option>
+                                {% for tax in taxes %}
+                                    {% if order.tax is not null and tax.id == order.tax.id %}
+                                    <option value="{{ tax.id }}" selected>{{ tax.value ~ "% - " ~ tax.type }}</option>
+                                    {% else %}
+                                    <option value="{{ tax.id }}">{{ tax.value ~ "% - " ~ tax.type }}</option>
+                                    {% endif %}    
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                {# Devise #}
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fa fa-align-justify"></i> Devise
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <select name="order_detail_form[currency]" class="form-control">
+                                        <option value="">Veuillez selectionner une devise</option>
+                                        {% for currency in currencies %}
+                                            {% if order.currency is not null and currency.id == order.currency.id %}
+                                            <option value="{{ currency.id }}" selected>{{ currency.symbol ~ " - " ~ currency.name }}</option>
+                                            {% else %}
+                                            <option value="{{ currency.id }}">{{ currency.symbol ~ " - " ~ currency.Country }}</option>
+                                            {% endif %}    
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>                
+            </div>
             
+            {# Commentaires #}
             <div class="row">
                 <div class="col-sm-6 col-md-4">
                     <div class="card border-primary">
@@ -196,6 +251,8 @@
                     </div>
                 </div>
             </div>
+
+            {# Adresse de livraison #}
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
@@ -206,6 +263,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <select name="order_detail_form[contact]" class="form-control">
+                                        <option value="">Veuillez selectionner un contact</option>
                                         {% for contact in order.Client.Contacts %}
                                             {% if order.contact and contact.id == order.contact.id %}
                                             <option value="{{ contact.id }}" selected>{{ contact.Firstname ~ " " ~ contact.LastName }}</option>
@@ -216,13 +274,23 @@
                                     </select>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="addres-wrapper">adresse deja enregistrée</div>
+                                    <div class="adresse-wrapper">
+                                    {% if order.contact %}
+                                    {{ order.contact.Address.Street  }}<br />
+                                    {{ order.contact.Address.ZipCode ~ " " ~ order.contact.Address.City }}<br />
+                                    {{ order.contact.Address.Country }}
+                                    {% else %}
+                                    Veuillez renseigner un contact pour l'adresse de livraison
+                                    {% endif %}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            
+            {# Devis #}
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
@@ -273,8 +341,11 @@
                         </div>
                     </div>
                 </div>
-            </div>            
+            </div> 
+
         </form> 
+
+        {# Creation bon de livraison #}
         {% if order_detail_delivery_data_source is defined and order_detail_delivery_data_source != '[]' %}
         <form action="{{ path("order_delivery_save", { id: order.id }) }}" method="post">
             <div class="row">
@@ -301,6 +372,8 @@
         </form>
         <input type="hidden" id="order_detail_delivery_data_source" value="{{ order_detail_delivery_data_source }}">
         {% endif %}
+
+        {# Creation factures #}
         {% if order_detail_bill_data_source is defined and order_detail_bill_data_source != '[]' %}
         <form action="{{ path("order_bill_save", {id: order.id}) }}" method="post">
             <div class="row">
@@ -330,6 +403,8 @@
         </form>
         <input type="hidden" id="order_detail_bill_data_source" value="{{ order_detail_bill_data_source }}">
         {% endif %}
+
+        {# Bons de livraison #}
         {% if delivery_data_source is defined %}
         <div class="row">
             <div class="col-md-12">
@@ -347,6 +422,8 @@
         </div>
         <input type="hidden" id="delivery_data_source" value="{{ delivery_data_source }}">
         {% endif %}
+
+        {# Factures emises #}
         {% if bill_data_source is defined  %}
         <div class="row">
             <div class="col-md-12">
@@ -363,6 +440,8 @@
         </div>
         <input type="hidden" id="bill_data_source" value="{{ bill_data_source }}">
         {% endif %}
+
+        {# Email devis #}
         {% if status.name == "STATUS_QUOTE" %}
         <form action="{{ path("order_email_quote",{id: order.id }) }}" method="post">
             <div class="row">
@@ -395,7 +474,8 @@
         </form>
         {% endif %}
 
-        {% if status.name == "STATUS_ORDER" and bills is defined and bills|length > 0 %}
+        {# Email Commande #}
+        {% if (status.name == "STATUS_ORDER" or status.name == "STATUS_REFUND") and bills is defined and bills|length > 0 %}
         <form action="{{ path("order_email_bill",{id: order.id }) }}" method="post">
             <div class="row">
                 <div class="col-md-12">
@@ -436,7 +516,8 @@
         </form>
         {% endif %}
 
-        {% if status.name == "STATUS_ORDER" %}
+        {# Cloture commande #}
+        {% if (status.name == "STATUS_ORDER" or status.name == "STATUS_ORDER")  and order_detail_delivery_data_source == '[]' and order_detail_bill_data_source == '[]'  %}
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
@@ -444,13 +525,14 @@
                         <i class="fa fa-align-justify"></i> Clôture de la commande
                     </div>
                     <div class="card-body">                        
-                        <a href="#" class="btn btn-danger">Etape 3/3 Confirmer l'expédition de tous les élements</a>
+                        <a href="{{  path("order_validation", {id: order.id, idStatus: 1 })}}" class="btn btn-danger">Etape 3/3 Confirmer l'expédition de tous les élements</a>
                         
                     </div>
                 </div>
             </div>
         </div>
         {% endif %}
+
     </div>
     
 <input type="hidden" id="order_detail_data_source" value="{{ order_detail_data_source }}">

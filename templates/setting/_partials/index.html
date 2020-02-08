@@ -1,3 +1,5 @@
-<table id="setting_target_table_js" class="table table-responsive-md table-bordered table-striped table-md">
+{% set code = codes[0] %}
+<table id="{{ code }}_setting_target_table_js" class="table table-responsive-md table-bordered table-striped table-md">
 </table>
-<input type="hidden" id="setting_target" data-source="{{ data_table_source }}" value="{{ source }}">
+<input type="hidden" id="{{ code }}_setting_target" data-source="{{ data_table_source }}" value="{{ source }}">
+<input type="hidden" id="setting_target_tables" value="{{ codes | json_encode() }}">

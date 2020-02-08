@@ -4,10 +4,10 @@ namespace App\Services;
 
 use App\Entity\Bill;
 use App\Entity\Delivery;
-use App\Entity\QuoteOrder;
 use App\Services\Utility;
+use App\Entity\QuoteOrder;
+use App\Services\SettingManager;
 use App\Repository\BillRepository;
-use App\Repository\SettingRepository;
 use App\Repository\DeliveryRepository;
 use App\Repository\QuoteOrderRepository;
 use App\Repository\DeliveryStatusRepository;
@@ -15,8 +15,8 @@ use App\Services\ObjectToWebserviceConverter;
 
 class PdfWebService{
 
-    protected $client;
-    protected $settingRepo;
+    protected $apiManager;
+    protected $settingManager;
     protected $orderRepo;
     protected $utility;
     protected $wsConverter;
@@ -24,39 +24,28 @@ class PdfWebService{
     protected $statusRepo;
     protected $deliveryRepo;
 
-    public function __construct(SettingRepository $settingRepo,
+    public function __construct(SettingManager $settingManager,
                                 QuoteOrderRepository $orderRepo,
+                                ApiManager $apiManager,
                                 DeliveryStatusRepository $statusRepo,
                                 DeliveryRepository $deliveryRepo,
                                 BillRepository $billRepo,
                                 ObjectToWebserviceConverter $wsConverter,
                                 Utility $utility)
     {
-        $this->settingRepo = $settingRepo;
+        $this->settingManager = $settingManager;
         $this->orderRepo = $orderRepo;
         $this->utility = $utility;
         $this->wsConverter = $wsConverter;
         $this->billRepo = $billRepo;
         $this->deliveryRepo = $deliveryRepo;
         $this->statusRepo = $statusRepo;
+        $this->apiManager = $apiManager;
 
-        $settingPDF = $this->settingRepo->findOneBy(['Code' => 'WEBSERVICE', 'Name' => 'PDF']);
-        $settingUserName = $this->settingRepo->findOneBy(['Code' => 'WEBSERVICE', 'Name' => 'Username']);
-        $settingPassword = $this->settingRepo->findOneBy(['Code' => 'WEBSERVICE', 'Name' => 'Password']);
+        $settingPDF = $this->settingManager->get('WEBSERVICE', 'PDF');
+        $settingUserName = $this->settingManager->get('WEBSERVICE', 'Username');
+        $settingPassword = $this->settingManager->get('WEBSERVICE', 'Password');
 
-        if(!empty($settingPDF)){
-            $this->client = new \nusoap_client($settingPDF->getValue(), true);
-            if(!empty($settingUserName) && !empty($settingPassword))
-                $this->client->setCredentials($settingUserName->getValue(), $settingPassword->getValue(), 'basic');
-        }
-    }
-
-    public function call($method, $params){
-        if(!empty($this->client)){
-            $result = $this->client->call($method, $params, 'http://localhost/QOBD/server.php');
-            //dump($this->client);die();
-            return $result;
-        }            
     }
 
     public function downloadBill(Bill $bill, $downloadDir, int $target, int $refundTarget){
@@ -73,12 +62,12 @@ class PdfWebService{
             'bill' => $bill
         ];
 
-        $response = $this->call($param['ws_method'], $param['ws_params']);
+        $response = $this->apiManager->execPdfRequest($param['ws_method'], $param['ws_params']);
         $res = $this->utility->restoreSpecialChars($response);
 
         $fileName = 'Facture00' . $param['bill']->getId() . '.pdf';
 
-        $setting = $this->settingRepo->findOneBy(['Code' => 'FACTURE', 'Name' => 'prefix']);
+        $setting = $this->settingManager->get('FACTURE', 'prefix');
         if (!empty($setting)) {
             $fileName = $setting->getValue() . $param['bill']->getId() . '.pdf';
         }
@@ -97,12 +86,12 @@ class PdfWebService{
             'order' => $order
         ];
 
-        $response = $this->call($param['ws_method'], $param['ws_params']);
+        $response = $this->apiManager->execPdfRequest($param['ws_method'], $param['ws_params']);
         $res = $this->utility->restoreSpecialChars($response);
 
         $fileName = 'Devis00' . $param['order']->getId() . '.pdf';
 
-        $setting = $this->settingRepo->findOneBy(['Code' => 'DEVIS', 'Name' => 'prefix']);
+        $setting = $this->settingManager->get('DEVIS', 'prefix');
         if (!empty($setting)) {
             $fileName = $setting->getValue() . $param['order']->getId() . '.pdf';
         }
@@ -123,12 +112,12 @@ class PdfWebService{
             'delivery' => $delivery
         ];
 
-        $response = $this->call($param['ws_method'], $param['ws_params']);
+        $response = $this->apiManager->execPdfRequest($param['ws_method'], $param['ws_params']);
         $res = $this->utility->restoreSpecialChars($response);
 
         $fileName = 'BL00' . $param['delivery']->getId() . '.pdf';
 
-        $setting = $this->settingRepo->findOneBy(['Code' => 'LIVRAISON', 'Name' => 'prefix']);
+        $setting = $this->settingManager->get('LIVRAISON', 'prefix');
         if (!empty($setting)) {
             $fileName = $setting->getValue() . $param['delivery']->getId() . '.pdf';
         }

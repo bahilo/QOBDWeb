@@ -231,13 +231,27 @@
                           <a class="nav-link" href="{{ path("setting_tax") }}">
                             <i class="fa fa-money-bill-wave-alt"></i> Taxe</a>
                         </li>
-                        <li class="nav-item">
+                        {# <li class="nav-item">
                           <a class="nav-link" href="{{ path("setting_delivery_status") }}">
                             <i class="fa fa-star"></i> Status facturation</a>
                         </li>
                         <li class="nav-item">
                           <a class="nav-link" href="{{ path("setting_order_status") }}">
                             <i class="fa fa-star-half-alt"></i> Statut Commande</a>
+                        </li> #}
+                        <li class="nav-item nav-dropdown">
+                          <a class="nav-link nav-dropdown-toggle" href="#">
+                            <i class="fa fa-id-card"></i> Statuts</a>
+                            <ul class="nav-dropdown-items">
+                              <li class="nav-item">
+                                <a class="nav-link" href="{{ path("setting_delivery_status") }}">
+                                  <i class="fa fa-star"></i> Statut Facturation</a>
+                              </li>
+                              <li class="nav-item">
+                                <a class="nav-link" href="{{ path("setting_order_status") }}">
+                                  <i class="fa fa-star-half-alt"></i> Statut Commande</a>
+                              </li>
+                            </ul>
                         </li>
                         <li class="nav-item">
                           <a class="nav-link" href="{{ path("setting_email") }}">
@@ -675,7 +689,7 @@
     <script src="{{ asset('bootstrap.js','bootstrap_js') }}"></script>
     <script src="{{ asset('javascript/charts.2.8.0.js','theme_coreui') }}"></script>
     <script src="{{ asset('javascript/coreui.min.js','theme_coreui') }}"></script>
-    <script src="{{ asset('javascript/charts.js','theme_coreui') }}"></script>
+    {# <script src="{{ asset('javascript/charts.js','theme_coreui') }}"></script> #}
         
     <script src="{{ asset('datatables.js','datatable_dir') }}"></script>    
     <script src="{{ asset('dataTables.responsive.min.js','datatable_dir') }}"></script>

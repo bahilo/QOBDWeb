@@ -12,6 +12,7 @@ use App\Services\OrderManager;
 use App\Services\PdfWebService;
 use App\Entity\QuantityDelivery;
 use App\Entity\QuoteOrderDetail;
+use App\Services\SettingManager;
 use App\Repository\TaxRepository;
 use App\Services\SecurityManager;
 use App\Repository\BillRepository;
@@ -19,6 +20,7 @@ use App\Repository\ItemRepository;
 use App\Repository\AgentRepository;
 use App\Repository\ActionRepository;
 use App\Repository\ClientRepository;
+use App\Repository\CurrencyRepository;
 use App\Repository\DeliveryRepository;
 use App\Repository\QuoteOrderRepository;
 use App\Repository\OrderStatusRepository;
@@ -27,7 +29,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Security;
 use App\Repository\QuantityDeliveryRepository;
 use App\Repository\QuoteOrderDetailRepository;
-use App\Services\SettingManager;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -243,14 +244,16 @@ class OrderController extends Controller
     }
 
     /**
-     * @Route("/admin/commande/detail/{id}", options={"expose"=true}, name="order_show", requirements={"id"="\d+"})
-     * @Route("/admin/commande/detail/{id}/erreur/{message}/{statut}", options={"expose"=true}, name="order_show_report")
+     * @Route("/admin/commande/detail/{id}", options={"expose"=true}, requirements={"id"="\d+"}, name="order_show")
+     * @Route("/admin/commande/detail/{id}/erreur/{message}/{statut}", requirements={"id"="\d+"}, options={"expose"=true}, name="order_show_report")
      */
     public function show(
         QuoteOrder $order,
         DeliveryRepository $deliveryRepo,
         BillRepository $billRepo,
         OrderManager $orderManager,
+        CurrencyRepository $currRepo,
+        TaxRepository $tvaRepo,
         string $message = null,
         $statut = null) {
 
@@ -259,19 +262,22 @@ class OrderController extends Controller
         }
 
         $bills = $billRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']);
-        $orderDetrail = $this->orderHydrate->hydrateOrderDetail($this->orderDetailRepo->findBy(['QuoteOrder' => $order]));
-
+        $orderDetrail = $this->orderHydrate->hydrateOrderDetail($this->orderDetailRepo->findBy(['QuoteOrder' => $order]), $order);
+        ///dump($orderDetrail);die();
         return $this->render('order/show.html.twig', [
             'order_detail_data_source' => $this->serializer->serialize(['object_array' => $orderDetrail, 'format' => 'json', 'group' => 'class_property']),
-            'order_detail_delivery_data_source' => $this->serializer->serialize(['object_array' => $this->orderHydrate->hydrateOrderDetail($this->orderDetailRepo->findByQuantityRecieved($order)), 'format' => 'json', 'group' => 'class_property']),
-            'order_detail_bill_data_source' => $this->serializer->serialize(['object_array' => $this->orderHydrate->hydrateOrderDetail($this->orderDetailRepo->findByBillStatus($order)), 'format' => 'json', 'group' => 'class_property']),
+            'order_detail_delivery_data_source' => $this->serializer->serialize(['object_array' => $this->orderHydrate->hydrateOrderDetail($this->orderDetailRepo->findByQuantityRecieved($order), $order), 'format' => 'json', 'group' => 'class_property']),
+            'order_detail_bill_data_source' => $this->serializer->serialize(['object_array' => $this->orderHydrate->hydrateOrderDetail($this->orderDetailRepo->findByBillStatus($order), $order), 'format' => 'json', 'group' => 'class_property']),
             'bill_data_source' => $this->serializer->serialize(['object_array' => $bills, 'format' => 'json', 'group' => 'class_property']),
             'delivery_data_source' => $this->serializer->serialize(['object_array' => $deliveryRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']), 'format' => 'json', 'group' => 'class_property']),
             'status' => $order->getStatus(),
             'order' => $order,
+            'currencies' => $currRepo->findAll(),
+            'taxes' => $tvaRepo->findAll(),
+            'status_close' => $this->statusRepo->findOneBy(['Name' => 'STATUS_CLOSED']),
             'bills' => $bills,
             'deliveries' => $deliveryRepo->findByBillStatus(['order' => $order, 'status' => 'STATUS_NOT_BILLED']),
-            'info' => $orderManager->getCommandeInfo($orderDetrail),
+            'info' => $orderManager->getCommandeInfo($orderDetrail, $order),
             'can_open_row' => true,
             'email_content' => file_get_contents($this->getParameter('file.setting.email') . '/' . 'facture.txt'),
             'code_message' => $message,
@@ -286,6 +292,8 @@ class OrderController extends Controller
     public function showQuote(int $id, 
                               OrderManager $orderManager, 
                               string $message = null, 
+                              CurrencyRepository $currRepo,
+                              TaxRepository $tvaRepo,
                               $statut = null) {
 
         if (!$this->securityUtility->checkHasUpdate($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_QUOTE']))) {
@@ -295,12 +303,14 @@ class OrderController extends Controller
         $orderDetails = $this->orderDetailRepo->findBy(['QuoteOrder' => $order]);
 
         return $this->render('order/show.html.twig', [
-            'order_detail_data_source' => $this->serializer->serialize(['object_array' => $this->orderHydrate->hydrateOrderDetail($orderDetails), 'format' => 'json', 'group' => 'class_property']),
+            'order_detail_data_source' => $this->serializer->serialize(['object_array' => $this->orderHydrate->hydrateOrderDetail($orderDetails, $order), 'format' => 'json', 'group' => 'class_property']),
             'status_prerefund' => $this->statusRepo->findOneBy(['Name' => 'STATUS_PREREFUND']),
             'status_preorder' => $this->statusRepo->findOneBy(['Name' => 'STATUS_PREORDER']),
             'order' => $order,
+            'currencies' => $currRepo->findAll(),
+            'taxes' => $tvaRepo->findAll(),
             'status' => $order->getStatus(),
-            'info' => $orderManager->getCommandeInfo($orderDetails),
+            'info' => $orderManager->getCommandeInfo($orderDetails, $order),
             'email_content' => file_get_contents($this->getParameter('file.setting.email') . '/' . 'devis.txt'),
             'code_message' => $message,
             'code_status' => $statut
@@ -313,7 +323,9 @@ class OrderController extends Controller
      */
     public function showPreOrder(int $id, 
                                 OrderManager $orderManager, 
-                                string $message = null, 
+                                string $message = null,
+                                CurrencyRepository $currRepo,
+                                TaxRepository $tvaRepo, 
                                 $statut = null) {
 
         if (!$this->securityUtility->checkHasUpdate($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_PREORDER']))) {
@@ -323,12 +335,15 @@ class OrderController extends Controller
         $order = $this->orderRepo->find($id);
         $orderDetails = $this->orderDetailRepo->findBy(['QuoteOrder' => $order]);
         return $this->render('order/show.html.twig', [
-            'order_detail_data_source' => $this->serializer->serialize(['object_array' => $this->orderHydrate->hydrateOrderDetail($orderDetails), 'format' => 'json', 'group' => 'class_property']),
+            'order_detail_data_source' => $this->serializer->serialize(['object_array' => $this->orderHydrate->hydrateOrderDetail($orderDetails, $order), 'format' => 'json', 'group' => 'class_property']),
             'status_order' => $this->statusRepo->findOneBy(['Name' => 'STATUS_ORDER']),
             'status_valid' => $this->statusRepo->findOneBy(['Name' => 'STATUS_VALID']),
+            'status_close' => $this->statusRepo->findOneBy(['Name' => 'STATUS_CLOSED']),
             'order' => $order,
+            'currencies' => $currRepo->findAll(),
+            'taxes' => $tvaRepo->findAll(),
             'status' => $order->getStatus(),
-            'info' => $orderManager->getCommandeInfo($orderDetails),
+            'info' => $orderManager->getCommandeInfo($orderDetails, $order),
             'code_message' => $message,
             'code_status' => $statut
         ]);
@@ -341,6 +356,8 @@ class OrderController extends Controller
     public function showPreRefund(int $id, 
                                   OrderManager $orderManager,
                                   string $message = null,
+                                  CurrencyRepository $currRepo,
+                                  TaxRepository $tvaRepo,
                                   $statut = null) {
 
         if (!$this->securityUtility->checkHasUpdate($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_REFUND']))) {
@@ -350,11 +367,13 @@ class OrderController extends Controller
         $order = $this->orderRepo->find($id);
         $orderDetails = $this->orderDetailRepo->findBy(['QuoteOrder' => $order]);
         return $this->render('order/show.html.twig', [
-            'order_detail_data_source' => $this->serializer->serialize(['object_array' => $this->orderHydrate->hydrateOrderDetail($orderDetails), 'format' => 'json', 'group' => 'class_property']),
+            'order_detail_data_source' => $this->serializer->serialize(['object_array' => $this->orderHydrate->hydrateOrderDetail($orderDetails, $order), 'format' => 'json', 'group' => 'class_property']),
             'status_refund' => $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUND']),
             'order' => $order,
+            'currencies' => $currRepo->findAll(),
+            'taxes' => $tvaRepo->findAll(),
             'status' => $order->getStatus(),
-            'info' => $orderManager->getCommandeInfo($orderDetails),
+            'info' => $orderManager->getCommandeInfo($orderDetails, $order),
             'code_message' => $message,
             'code_status' => $statut
         ]);
@@ -385,13 +404,14 @@ class OrderController extends Controller
 
         switch($status->getName()) {
             case 'STATUS_REFUND':
-                return $this->redirectToRoute('order_refund');
-            case 'STATUS_PREREFUND':
-                return $this->redirectToRoute('order_prerefund');
             case 'STATUS_VALID':
-                return $this->redirectToRoute('order_customer_valid');
+                return $this->redirectToRoute('order_show', ['id' => $order->getId()]);
+            case 'STATUS_PREREFUND':
+                return $this->redirectToRoute('order_show_prerefund', ['id' => $order->getId()]);
+            // case 'STATUS_VALID':
+            //     return $this->redirectToRoute('order_show', ['id' => $order->getId()]);
             case 'STATUS_PREORDER':
-                return $this->redirectToRoute('order_preorder');
+                return $this->redirectToRoute('order_show_preorder', ['id' => $order->getId()]);
         }
 
         return $this->redirectToRoute('order_home');
@@ -406,6 +426,7 @@ class OrderController extends Controller
     public function registration(
         ClientRepository $clientRepo,
         ItemRepository $itemRepo,
+        CurrencyRepository $currencyRepo,
         SessionInterface $session,
         ObjectManager $manager,
         Security $security,
@@ -424,7 +445,14 @@ class OrderController extends Controller
             $client = $clientRepo->find($clientSession['id']);
             $status = $this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE']);
             $tax = $taxRepo->findOneBy(['IsCurrent' => true]);
+            $currency = $currencyRepo->findOneBy(['IsDefault' => true]);
             $order = new QuoteOrder();
+
+            if(!empty($tax))
+                $order->setTax($tax);
+
+            if(!empty($currency))
+                $order->setCurrency($currency);
 
             $order->setCreatedAt(new \DateTime());
             $order->setIsRefVisible(false);
@@ -442,8 +470,8 @@ class OrderController extends Controller
 
                 $orderDetail->setQuoteOrder($order);
 
-                if ($tax)
-                    $orderDetail->setTax($tax);
+                //if(!empty($tax))
+                //    $orderDetail->setTax($tax);
 
                 $manager->persist($order);
                 $manager->persist($item);
@@ -456,9 +484,9 @@ class OrderController extends Controller
             $session->set('panier', []);
             $session->set('client', []);
 
-            return $this->RedirectToRoute('order_quote');
+            return $this->RedirectToRoute('order_show_quote', ['id' => $order->getId()]);
         }
-        return $this->RedirectToRoute('cart_home_error', ['message' => "Veuillez renseigner le client !"]);
+        return $this->RedirectToRoute('cart_home_error', ['message' => "Veuillez renseigner un client !"]);
     }
 
     /*______________________________________________________________________________________________________________________ 
@@ -565,7 +593,8 @@ class OrderController extends Controller
      * @Route("/admin/commande/{id}/detail/sauvegarde", options={"expose"=true}, name="order_detail_save", requirements={"id"="\d+"})
      * @Route("/admin/commande/{id}/detail/sauvegarde/error/{message}", options={"expose"=true}, name="order_detail_save_error", requirements={"id"="\d+"})
      */
-    public function save($message = null,
+    public function save(QuoteOrder $order,
+                         $message = null,
                          Request $request,
                          ObjectManager $manager) {
 
@@ -574,10 +603,12 @@ class OrderController extends Controller
         }
 
         $form = $request->request->get('order_detail_form');
-        $order = $this->orderHydrate->hydrateQuoteOrderRelationFromForm($this->orderRepo->find($request->request->get('order')), $form);
+        $order = $this->orderHydrate->hydrateQuoteOrderRelationFromForm($order, $form);
         $manager->persist($order);
 
-        foreach($form['tab'] as $key => $val){
+        //dump($order);
+        //dump($form);die();
+        foreach($form['tab']['items'] as $key => $val){
             $orderDetail = $this->orderHydrate->hydrateQuoteOrderDetailRelationFromForm($this->orderDetailRepo->find($key), $val);
 
             $manager->persist($orderDetail->getItem());

@@ -52,8 +52,8 @@ class StatisticManager{
         $moments = []; 
         $output = [];
         foreach ($this->orderRepo->findBy(['Status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_ORDER'])]) as $order) {
-            $orderDetrail = $this->orderHydrate->hydrateOrderDetail($this->orderDetailRepo->findBy(['QuoteOrder' => $order]));
-            $info = $this->orderManager->getCommandeInfo($orderDetrail);
+            $orderDetrail = $this->orderHydrate->hydrateOrderDetail($this->orderDetailRepo->findBy(['QuoteOrder' => $order]), $order);
+            $info = $this->orderManager->getCommandeInfo($orderDetrail, $order);
             $moment = $this->getMomentOfYearArray($target, $order);
 
             if ($this->utility->str_in_array($moments, $moment) == -1) {

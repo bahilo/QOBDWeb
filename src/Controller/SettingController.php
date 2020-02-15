@@ -36,6 +36,7 @@ use App\Repository\DeliveryStatusRepository;
 use App\Services\SettingManager;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Persistence\ObjectManager;
+use Hoa\Event\Test\Unit\Source;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -132,6 +133,7 @@ class SettingController extends Controller
             'data_table' => 'tax_table_js',
             'data_table_source' => 'tax_data_source',
             'page_title' => 'Tax',
+            'codes' => ["TAX"],
             'source' => $source,
             'create_url' => $this->generateUrl('setting_tax_registration'),
             'page' => 'setting/_partials/index.html',
@@ -214,6 +216,7 @@ class SettingController extends Controller
             'data_table_source' => 'brand_data_source',
             'page_title' => 'Marque Produit',
             'source' => $source,
+            'codes' => ["BRAND"],
             'create_url' => $this->generateUrl('setting_brand_registration'),
             'page' => 'setting/_partials/index.html',
         ]);
@@ -240,6 +243,7 @@ class SettingController extends Controller
             'data_table_source' => 'group_data_source',
             'page_title' => 'Famille Produit',
             'source' => $source,
+            'codes' => ["GROUP"],
             'create_url' => $this->generateUrl('setting_group_registration'),
             'page' => 'setting/_partials/index.html',
         ]);
@@ -261,11 +265,14 @@ class SettingController extends Controller
             'group' => 'class_property'
         ]);
 
+        //dump($source); die();
+
         return $this->render('setting/index.html.twig', [
             'data_table' => 'provider_table_js',
             'data_table_source' => 'provider_data_source',
             'page_title' => 'Fournisseur Produit',
             'source' => $source,
+            'codes' => ["PROVIDER"],
             'create_url' => $this->generateUrl('setting_provider_registration'),
             'page' => 'setting/_partials/index.html',
         ]);
@@ -613,7 +620,7 @@ class SettingController extends Controller
             return $this->redirectToRoute('setting_order_status');
         }
 
-        return $this->render('order/status_registration.html.twig', [
+        return $this->render('setting/status_registration.html.twig', [
             'formStatus' => $form->createView()
         ]);
     }

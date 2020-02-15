@@ -79,7 +79,7 @@ class StatisticManager{
         $output = [];
         foreach ($this->orderRepo->findAll() as $order) {
 
-            $orderDetails = $this->orderHydrate->hydrateOrderDetail($this->orderDetailRepo->findBy(['QuoteOrder' => $order]));
+            $orderDetails = $this->orderHydrate->hydrateOrderDetail($this->orderDetailRepo->findBy(['QuoteOrder' => $order]), $order);
 
             foreach ($orderDetails as $orderDetail) {
                 foreach ($orderDetail->getQuantityDeliveries() as $qtdel) {
@@ -128,7 +128,7 @@ class StatisticManager{
                 $output[] = $this->getBillPayedByYear();
                 break;
         }
-
+        
         return $output;
     }
 

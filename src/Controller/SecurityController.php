@@ -120,12 +120,12 @@ class SecurityController extends Controller
 
         $roles = $roleRepo->findAll();
         $actions = $this->actionRepo->findAll();
-
+        
         return $this->render('security/index.html.twig', [
             'agents' => $agentRepo->findAll(),
             'target_profile' => true,
             'roles' => $roles,
-            'roles_distinct' => $utility->getDistinct($roles),
+            'roles_distinct' => $roles,
             'actions' => $actions,
             'action_roles' => $actionRoleRepo->findAll(),
             'page_title' => 'Profile',

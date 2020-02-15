@@ -105,6 +105,24 @@ class Bill
      * @Groups({"class_relation"})
      */
     private $quantityDeliveries;
+
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("ItemSellPriceVATTotal") 
+     */
+    private $ItemSellPriceVATTotal;
+
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("BillPublicComment") 
+     */
+    private $BillPublicComment;
+
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("BillPrivateComment") 
+     */
+    private $BillPrivateComment;
     
 
     public function __construct()
@@ -306,6 +324,42 @@ class Bill
                 $quantityDelivery->setBill(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getItemSellPriceVATTotal(): ?string
+    {
+        return $this->ItemSellPriceVATTotal;
+    }
+
+    public function setItemSellPriceVATTotal(?string $ItemSellPriceVATTotal): self
+    {
+        $this->ItemSellPriceVATTotal = $ItemSellPriceVATTotal;
+
+        return $this;
+    }
+
+    public function getBillPublicComment(): ?string
+    {
+        return $this->BillPublicComment;
+    }
+
+    public function setBillPublicComment(?string $BillPublicComment): self
+    {
+        $this->BillPublicComment = $BillPublicComment;
+
+        return $this;
+    }
+
+    public function getBillPrivateComment(): ?string
+    {
+        return $this->BillPrivateComment;
+    }
+
+    public function setBillPrivateComment(?string $BillPrivateComment): self
+    {
+        $this->BillPrivateComment = $BillPrivateComment;
 
         return $this;
     }

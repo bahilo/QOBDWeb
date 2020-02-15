@@ -30,14 +30,11 @@
 <div class="row">
     <div class="col-md-3">
         <div class="callout callout-info">
-            {# <small class="text-muted">Commande</small><br> #}
             <strong class="h4">{{ status.displayname }}</strong>
         </div>
     </div>
     <div class="col-md-9">
         <div class="callout callout" >
-            <!-- <small class="text-muted">Commande</small><br>
-            <strong class="h4">{{ status.displayname }}</strong> -->
             <div class="">
                 {{ status.displayname }} n°#{{ order.id }} du {{ order.createdat | date("Y/m/d") }} en cours pour la société <a href="#">{{ order.client.companyname }}</a><br/> géré par 
                 {{ order.agent.Firstname }} {{ order.agent.LastName }}
@@ -48,7 +45,7 @@
                 <a href="{{ path(target.link, target.param[1]) }}" class="btn btn-danger">Convertir en avoir</a>
             </div>
             {% endif %}
-            
+           
             {% if status_order is defined %}
             <div class="btn-group">
                <a href="{{ path(target.link, target.param[0]) }}" class="btn btn-success">Convertir en commande</a>
@@ -57,6 +54,14 @@
             {% elseif status_refund is defined %}
             <a href="{{ path(target.link, target.param[0]) }}" class="btn btn-success">Convertir en avoir</a>
             {% endif %}
+
+            {% if order.status.name == "STATUS_ORDER" %}
+            <div class="btn-group">
+                <a href="{{ path("order_validation", { id: order.id, idStatus: order_status_quote.id }) }}" class="btn btn-success">Convertir en devis</a>
+                <a href="{{ path("order_validation", { id: order.id, idStatus: order_status_refund.id }) }}" class="btn btn-danger">Convertir en avoir</a>
+            </div>
+            {% endif %}
+
         </div>
     </div>
 </div>
@@ -169,6 +174,7 @@
             </div>
 
             {# Devise & TVA #}
+            {% if order.status.name != "STATUS_CLOSED" and order.status.name != "STATUS_CLOSED" %}
             <div class="row">
 
                 {# TVA #}
@@ -205,7 +211,7 @@
                                         <option value="">Veuillez selectionner une devise</option>
                                         {% for currency in currencies %}
                                             {% if order.currency is not null and currency.id == order.currency.id %}
-                                            <option value="{{ currency.id }}" selected>{{ currency.symbol ~ " - " ~ currency.name }}</option>
+                                            <option value="{{ currency.id }}" selected>{{ currency.symbol ~ " - " ~ currency.Country }}</option>
                                             {% else %}
                                             <option value="{{ currency.id }}">{{ currency.symbol ~ " - " ~ currency.Country }}</option>
                                             {% endif %}    
@@ -217,6 +223,7 @@
                     </div>
                 </div>                
             </div>
+            {% endif %}
             
             {# Commentaires #}
             <div class="row">
@@ -246,7 +253,7 @@
                             <i class="fa fa-align-justify"></i> commentaire admin
                         </div>
                         <div class="card-body">
-                            <textarea name="order_detail_form[commentaire][admin]" id="" style="width: 100%" rows="10">{{ order.AdminComment.Content | default("") }}</textarea>
+                            <textarea name="order_detail_form[commentaire][admin]" id="" rows="10">{{ order.AdminComment.Content | default("") }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -291,6 +298,7 @@
             </div>
             
             {# Devis #}
+            {% if order.status.name != "STATUS_CLOSED" and order.status.name != "STATUS_CLOSED" %}
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
@@ -310,14 +318,14 @@
                                     </div>
                                     <div class="form-check">
                                         {% if not order.IsQuote and order.IsQuote is not null %}
-                                        <input type="radio" name="order_detail_form[setting][devis][type]" id="rbProformat" value="proformat"
+                                        <input type="radio" name="order_detail_form[setting][devis][type]" id="rbProformat" value="pro forma"
                                             class="form-check-input" checked>
                                         {% else %}
-                                        <input type="radio" name="order_detail_form[setting][devis][type]" id="rbProformat" value="proformat"
+                                        <input type="radio" name="order_detail_form[setting][devis][type]" id="rbProformat" value="pro forma"
                                             class="form-check-input">
                                         {% endif %}
                                         
-                                        <label for="rbProformat" class="orm-check-label">Proformat</label>
+                                        <label for="rbProformat" class="orm-check-label">Pro forma</label>
                                     </div>
                                    <div class="form-check">
                                        {% if order.IsRefVisible %}
@@ -342,7 +350,7 @@
                     </div>
                 </div>
             </div> 
-
+            {% endif %}
         </form> 
 
         {# Creation bon de livraison #}
@@ -457,7 +465,7 @@
                                     <div class="form-group">
                                         <label for="emailSubject">Object</label>
                                         <input type="text" name="order_detail_form[setting][email][subject]" id="emailSubject"
-                                            class="form-control" value="** {{ search.get_setting("SOCIETE","societe").value }} Votre devis n° #{{ order.id }}**">
+                                            class="form-control" value="** {{ search.get_setting("SOCIETE","SOCIETE_NOM").value }} Votre devis n° #{{ order.id }}**">
                                     </div>
                                     <div class="form-group">
                                         <label for="emailBody">Message</label>
@@ -491,7 +499,7 @@
                                         <label for="emailSubject">Object</label>
                                         <input type="text" name="order_detail_form[setting][email][subject]" id="emailSubject"
                                             class="form-control"
-                                            value="** {{ search.get_setting("SOCIETE","societe").value }} Votre facture **">
+                                            value="** {{ search.get_setting("SOCIETE","SOCIETE_NOM").value }} Votre facture **">
                                     </div>
                                     <div class="form-group">
                                         <label for="emailBody">Message</label>
@@ -502,7 +510,7 @@
                                         <label for="emailBody">Factures</label>
                                         <select name="order_detail_form[setting][email][bill]" class="form-control">
                                             {% for bill in bills %}
-                                            <option value="{{ bill.id }}">{{ search.get_setting("FACTURE","prefix").value ~ bill.id }}</option>
+                                            <option value="{{ bill.id }}">{{ search.get_setting("PDF","FACTURE_PREFIX").value ~ bill.id }}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
@@ -517,7 +525,7 @@
         {% endif %}
 
         {# Cloture commande #}
-        {% if (status.name == "STATUS_ORDER" or status.name == "STATUS_ORDER")  and order_detail_delivery_data_source == '[]' and order_detail_bill_data_source == '[]'  %}
+        {% if (status.name == "STATUS_ORDER" or status.name == "STATUS_ORDER")  and bill_data_source != '[]' %}
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
@@ -525,7 +533,7 @@
                         <i class="fa fa-align-justify"></i> Clôture de la commande
                     </div>
                     <div class="card-body">                        
-                        <a href="{{  path("order_validation", {id: order.id, idStatus: 1 })}}" class="btn btn-danger">Etape 3/3 Confirmer l'expédition de tous les élements</a>
+                        <a href="{{  path("order_validation", {id: order.id, idStatus: status_close.id })}}" class="btn btn-danger btnValidation">Etape 3/3 Confirmer l'expédition de tous les élements</a>
                         
                     </div>
                 </div>

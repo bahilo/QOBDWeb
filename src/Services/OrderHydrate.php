@@ -20,15 +20,18 @@ class OrderHydrate{
     protected $taxRepo;
     protected $catHydrate;
     protected $manager;
+    protected $webApi;
 
     public function __construct( SerializerInterface $serializer,
                                 ContactRepository $contactRepo,
-                                CurrencyRepository $currencyRepo,
+                                CurrencyRepository $currencyRepo,  
+                                ApiManager $webApi,
                                 TaxRepository $taxRepo,
                                 CatalogueHydrate $catHydrate,
                                 ObjectManager $manager){
 
         $this->serializer = $serializer;
+        $this->webApi = $webApi;
         $this->contactRepo = $contactRepo;
         $this->currencyRepo = $currencyRepo;
         $this->taxRepo = $taxRepo;
@@ -39,20 +42,18 @@ class OrderHydrate{
     public function hydrateOrderDetail($orderDetails, QuoteOrder $order){
 
         $output = [];
+
         foreach( $orderDetails as $orderDetail){
             
             $item = $orderDetail->getItem();
             $tax = empty($orderDetail->getTax()) || empty($orderDetail->getTax()->getValue()) ? $order->getTax() : $orderDetail->getTax();
-            // dump($orderDetail->getTax()); 
-            // dump($order->getTax()); 
-            // die();
+            
             if($item){
                 $item = $this->catHydrate->hydrateItem([$item])[0];
                 
                 $orderDetail->setContentComment($item->getContentComment());
                 $orderDetail->setItemRef($item->getRef());
                 $orderDetail->setItemName($item->getName());
-                $orderDetail->setItemPurchasePrice($item->getPurchasePrice());
 
                 $sellPrice = $orderDetail->getItemSellPrice();
                 $purchasePrice = $orderDetail->getItemPurchasePrice();
@@ -66,10 +67,7 @@ class OrderHydrate{
                     $orderDetail->setItemPurchasePrice($item->getPurchasePrice());
                     $this->manager->persist($orderDetail);                    
                 }
-
-                //dump($orderDetail->getItemSellPrice() * $orderDetail->getQuantity());
-                //dump($orderDetail);
-                //die();
+                
                 $orderDetail->setItemSellPriceTotal($orderDetail->getItemSellPrice() * $orderDetail->getQuantity());
                 if($tax)
                     $orderDetail->setItemSellPriceVATTotal(($orderDetail->getItemSellPrice() * $orderDetail->getQuantity())*(1 + $tax->getValue() / 100));
@@ -82,9 +80,7 @@ class OrderHydrate{
             $this->manager->flush();
             array_push($output, $orderDetail);
         }
-        //dump($output[0]->getTax()); 
-        //dump($output); 
-        //die();
+
         return $output;
     }
 
@@ -106,6 +102,57 @@ class OrderHydrate{
             $order->setCreatedAtToString(date_format($order->getCreatedAt(),"d/m/Y"));
 
             $output[] = $order;
+        }
+
+        return $output;
+    }
+
+    public function hydrateQuantityDelivery($quantityDeliveries, QuoteOrder $order){
+        $output = [];
+
+        foreach ($quantityDeliveries as $qtDelivery) {
+
+            $item = $qtDelivery->getOrderDetail()->getItem();
+            
+            $tax = empty($qtDelivery->getOrderDetail()->getTax()) || empty($qtDelivery->getOrderDetail()->getTax()->getValue()) ? $order->getTax() : $qtDelivery->getOrderDetail()->getTax();
+
+            $qtDelivery->setItemRef($qtDelivery->getOrderDetail()->getItem()->getRef());
+            $qtDelivery->setItemName($qtDelivery->getOrderDetail()->getItem()->getName());
+            $qtDelivery->setItemSellPriceVATTotal(($qtDelivery->getQuantity() * $qtDelivery->getOrderDetail()->getItemSellPrice()) * (1 + $tax->getValue()/100));
+            $qtDelivery->setItemROIPercent(($qtDelivery->getOrderDetail()->getItemSellPrice() - $item->getPurchasePrice()) / $qtDelivery->getOrderDetail()->getItemSellPrice() * 100);
+
+            array_push($output, $qtDelivery);
+        }
+
+        return $output;
+    }
+
+    public function hydrateBill($bills, QuoteOrder $order){
+        $output = [];
+
+        foreach ($bills as $bill) {
+            $total = 0;
+            foreach ($bill->getQuantityDeliveries() as $qtDelivery) {
+                $tax = empty($qtDelivery->getOrderDetail()->getTax()) || empty($qtDelivery->getOrderDetail()->getTax()->getValue()) ? $order->getTax() : $qtDelivery->getOrderDetail()->getTax();
+
+                $total += ($qtDelivery->getQuantity() * $qtDelivery->getOrderDetail()->getItemSellPrice()) * (1 + $tax->getValue() / 100);
+            }
+
+            $bill->setItemSellPriceVATTotal(round($total, 2));
+
+            if(empty($bill->getPayMode())){
+                $bill->setPayMode("");
+            }
+
+            $bill->setBillPublicComment("");
+            $bill->setBillPrivateComment("");
+
+            if(!empty($bill->getPublicComment()))
+                $bill->setBillPublicComment($bill->getPublicComment()->getContent());
+            if (!empty($bill->getPrivateComment()))
+                $bill->setBillPrivateComment($bill->getPrivateComment()->getContent());
+
+            array_push($output, $bill);
         }
 
         return $output;
@@ -188,12 +235,23 @@ class OrderHydrate{
             $item->setComment($comment);
         }
 
-        $item->setPurchasePrice($form['purchase']);
-
         $orderDetail->setItemSellPrice($form['sell']);
         $orderDetail->setQuantity($form['quantity']);
-        if (!empty($form['quantity_recieved']) && $form['quantity_recieved'] <= $form['quantity'])
-            $orderDetail->setQuantityRecieved($form['quantity_recieved']);
+        if (!empty($form['quantity_recieved']) ){
+            if(!empty($orderDetail->getQuantityRecieved())){
+                if ($form['quantity_recieved'] + $orderDetail->getQuantityRecieved() <= $form['quantity']) {
+                    $orderDetail->setQuantityRecieved($form['quantity_recieved']);
+                } else {
+                    $orderDetail->setQuantityRecieved($form['quantity'] - $orderDetail->getQuantityRecieved());
+                }
+            }
+            elseif($form['quantity_recieved'] <= $form['quantity']){
+                $orderDetail->setQuantityRecieved($form['quantity_recieved']);
+            }
+            else{
+                $orderDetail->setQuantityRecieved($form['quantity']);
+            }
+        }            
 
         return $orderDetail;
     }

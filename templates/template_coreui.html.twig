@@ -19,7 +19,11 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <a class="navbar-brand" href="#">
+        {% if search.logo %}
         <img class="navbar-brand-full" src="{{ search.logo }}" width="89" height="25" alt="CoreUI Logo">
+        {% else %}
+        {{ search.get_setting("SOCIETE","SOCIETE_NOM").value }}
+        {% endif %}
         <img class="navbar-brand-minimized" src="{{ asset('image/brand/sygnet.svg', 'theme_coreui') }}" width="30" height="30" alt="CoreUI Logo">
       </a>
       <button class="navbar-toggler sidebar-toggler d-md-down-none" type="button" data-toggle="sidebar-lg-show">
@@ -65,10 +69,10 @@
             {% endif %}
           </a>
           <div class="dropdown-menu dropdown-menu-right">
-            <div class="dropdown-header text-center">
-              <strong>Account</strong>
+             <div class="dropdown-header text-center">
+              <strong>Compte</strong>
             </div>
-            <a class="dropdown-item" href="#">
+            <!--<a class="dropdown-item" href="#">
               <i class="fa fa-envelope"></i> Messages
               <span class="badge badge-success">42</span>
             </a>
@@ -76,12 +80,12 @@
               <strong>Settings</strong>
             </div>
             <a class="dropdown-item" href="{{ path("agent_show", {id: app.user.id}) }}">
-              <i class="fa fa-user"></i> Profile</a>
+              <i class="fa fa-user"></i> Profile</a> -->
             <!-- <a class="dropdown-item" href="#">
               <i class="fa fa-cog"></i> Settings</a> -->
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="{{ path("security_logout") }}">
-              <i class="fa fa-lock"></i> Logout</a>
+              <i class="fa fa-lock"></i> Déconnexion</a>
           </div>
         </li>
       </ul>
@@ -560,7 +564,7 @@
     </div>
     <footer class="app-footer">
       <div>
-        <a href="https://coreui.io">QOBD</a>
+        <a href="#">QOBD</a>
         <span>&copy; Management. Version 1.0.1</span>
       </div>
       <div class="ml-auto">

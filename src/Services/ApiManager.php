@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use GuzzleHttp\Client;
 use App\Repository\SettingRepository;
 use App\Repository\CurrencyRepository;
 use Symfony\Component\HttpClient\HttpClient;
@@ -32,13 +33,13 @@ class ApiManager{
     }
 
     public function execCurrencyRequest($currencySymbol){
-        $settingPDF = $this->settingManager->get('WEBSERVICE', 'QOBD_URL');
         $currencyURL = $this->settingManager->get('WEBSERVICE', 'CURRENCY_URL');
         $token = $this->settingManager->get('WEBSERVICE', 'CURRENCY_TOKEN');
 
         $currency = $this->currencyRepo->findOneBy(['IsDefault' => true]);
-
-        $this->currencyClient = new \GuzzleHttp\Client();
+        // dump($currency);
+        // die();
+        $this->currencyClient = new Client();
         $response = $this->currencyClient->request('GET', $currencyURL->getValue() . $token->getValue() . '&base='. $currency->getSymbol() .'&symbols='.$currencySymbol);
         $data = \json_decode($response->getBody());
         //dump($data->rates->{$currencySymbol});die();

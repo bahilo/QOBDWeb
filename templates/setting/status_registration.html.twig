@@ -1,0 +1,66 @@
+{% extends 'template_coreui.html.twig' %}
+
+{% set page_title = 'Nouveau statut commande' %}
+
+{% block home_path %}
+<li class="breadcrumb-item">
+    <a href="{{ path("order_home") }}">Commandes</a>
+</li>
+<li class="breadcrumb-item">
+    {{ page_title }}
+</li>
+{% endblock %}
+
+{% block title %}{{ page_title }} {% endblock %}
+
+{% block body_header_right %}
+    <button form="global_form" type="submit" class="btn btn-"><i class="fa fa-save"></i></button>
+{% endblock %}
+
+{% block body %}
+
+<div class="status-order-wrapper">
+
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa fa-align-justify"></i> {{ page_title }}</div>
+                    <div class="card-body">
+
+                        {{ form_start(formStatus, { 'attr': {'id': 'global_form' }}) }}
+
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top"
+                                    title="Clé utilisée dans le code pour faire référence à la configuration">
+                                    <span class="fa fa-chess-board"></span>
+                                </span>
+                            </div>
+                            {{ form_widget(formStatus.Name,{'label': 'désignation du statut', 'attr': {'placeholder': 'désignation du statut'}}) }}
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top"
+                                    title="Decription">
+                                    <span class="fa fa-layer-group"></span>
+                                </span>
+                            </div>
+                            {{ form_widget(formStatus.DisplayName,{'label': 'description', 'attr': {'placeholder': 'description'}}) }}
+                        </div>
+                        
+
+                        {{ form_end(formStatus) }}
+                    </div> 
+                </div> 
+            </div> 
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block javascripts %}
+<!-- <script src="{#{  asset('client.js','qobd_web_js') }#}"></script> -->
+{% endblock %}

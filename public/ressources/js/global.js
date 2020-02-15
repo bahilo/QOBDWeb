@@ -49,6 +49,31 @@ $(document).ready(function(){
         });
     }
 
+    //-----------------------------------------------------------------------------
+    //-- demande de confirmation de la supression
+    //-----------------------------------------------------------------------------
+    $.fn.initEventBtnDelete = function(){
+        $('.btnDelete').on('click', function (e) {
+            e.preventDefault();
+            $.fn.confirmDelete($(this));
+        });
+    }
+
+    //-----------------------------------------------------------------------------
+    //-- demande de confirmation la validation
+    //-----------------------------------------------------------------------------
+    $.fn.initEventBtnValidation = function(){
+        $('.btnValidation').on('click', function (e) {
+            e.preventDefault();
+            $.fn.displayConfirm('Validation', 'Comfirmez-vous votre requête?', function (response) {
+                if (response) {
+                    window.location = $(elt).attr('href');
+                }
+            }, ['valider', 'Annuler']);
+        });
+    }
+
+
     $.fn.confirmDelete = function (elt) {
         $.fn.displayConfirm('Suppression', 'Validez-vous la supression', function (response) {
             if (response) {

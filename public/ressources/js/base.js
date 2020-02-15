@@ -39,10 +39,8 @@ $(document).ready(function ($) {
                 generateGeneralChart(api.order.year);
         });
 
-        $('.btnDelete').on('click', function (e) {
-            e.preventDefault();
-            $.fn.confirmDelete($(this));
-        });
+        $.fn.initEventBtnDelete();
+        $.fn.initEventBtnValidation();
 
     });
     

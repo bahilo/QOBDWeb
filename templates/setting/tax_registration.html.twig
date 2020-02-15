@@ -29,12 +29,38 @@
 
                         {{ form_start(formTax, { 'attr': {'id': 'global_form' }}) }}
 
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top"
+                                    title="Clé utilisée dans le code pour faire référence à la configuration">
+                                    <span class="fa fa-chess-board"></span>
+                                </span>
+                            </div>
+                            {{ form_widget(formTax.Type,{'label': 'désignation de la Tax', 'attr': {'placeholder': 'désignation de la Tax'}})
+                            }}
+                        </div>
 
-                        {{ form_row(formTax.Type,{'label': 'désignation de la Tax', 'attr': {'placeholder': 'désignation de la Tax'}})
-                        }}
-                        {{ form_row(formTax.Value,{'label': 'Valeur', 'attr': {'placeholder': 'Valeur'}}) }}
-                        {{ form_row(formTax.CommentContent,{'label': 'Commentiare', 'attr': {'placeholder': 'Commentaire'}}) }}
-                        {{ form_row(formTax.IsCurrent, {'label': 'sélectionner cette tax'}) }}
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top"
+                                    title="Clé utilisée dans le code pour faire référence à la configuration">
+                                    <span class="fa fa-copyright"></span>
+                                </span>
+                            </div>
+                            {{ form_widget(formTax.Value,{'label': 'Valeur', 'attr': {'placeholder': 'Valeur'}}) }}
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top"
+                                    title="Clé utilisée dans le code pour faire référence à la configuration">
+                                    <span class="fa fa-layer-group"></span>
+                                </span>
+                            </div>
+                            {{ form_widget(formTax.CommentContent,{'label': 'Commentiare', 'attr': {'placeholder': 'Commentaire'}}) }}
+                        </div>
+
+                        {{ form_row(formTax.IsCurrent, {'label': 'TVA par défaut'}) }}
                         {{ form_row(formTax.IsTVAMarge, {'label': 'TVA/Marge'}) }}
 
                         {{ form_end(formTax) }}

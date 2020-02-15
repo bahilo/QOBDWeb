@@ -80,6 +80,18 @@ class QuoteOrderDetailRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function findByOrder(QuoteOrder $order)
+    {
+        return $this->createQueryBuilder('q')
+            ->innerJoin('q.QuoteOrder', 'q_ord')
+            ->innerJoin('q.quantityDeliveries', 'q_qt_del')
+            ->innerJoin('q_qt_del.Delivery', 'q_qt_del_del')
+            ->andWhere('q_ord.id = :orderId')
+            ->setParameters([ "orderId" => $order->getId()])
+            ->getQuery()
+            ->getResult();
+    }
+
     /*
     public function findByExampleField($value)
     {

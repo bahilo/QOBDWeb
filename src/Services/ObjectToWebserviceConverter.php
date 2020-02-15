@@ -16,26 +16,31 @@ use App\Entity\QuoteOrder;
 use App\Services\OrderHydrate;
 use App\Entity\QuantityDelivery;
 use App\Entity\QuoteOrderDetail;
+use App\Services\SettingManager;
 use App\Repository\TaxRepository;
 use App\Repository\ItemRepository;
-use App\Repository\SettingRepository;
 use App\Repository\CurrencyRepository;
 use App\Repository\DeliveryRepository;
 use App\Repository\QuantityDeliveryRepository;
+use App\Repository\SettingRepository;
 
 class ObjectToWebserviceConverter{
 
     protected $qtDeliveryRepo;
     protected $deliveryRepo;
+    protected $settingManager;
     protected $settingRepo;
     protected $currencyRepo;
     protected $taxRepo;
     protected $orderHydrate;
     protected $itemRepo;
+    protected $webApi;
 
     public function __construct(DeliveryRepository $deliveryRepo, 
                                 QuantityDeliveryRepository $qtDelivery,
-                                SettingRepository $settingRepo,
+                                SettingManager $settingManager,  
+                                SettingRepository $settingRepo,  
+                                ApiManager $webApi,
                                 TaxRepository $taxRepo,
                                 CurrencyRepository $currencyRepo,
                                 OrderHydrate $orderHydrate,
@@ -43,9 +48,11 @@ class ObjectToWebserviceConverter{
     {
         $this->qtDeliveryRepo = $qtDelivery;
         $this->deliveryRepo = $deliveryRepo;
+        $this->settingManager = $settingManager;
         $this->settingRepo = $settingRepo;
         $this->currencyRepo = $currencyRepo;
         $this->taxRepo = $taxRepo;
+        $this->webApi = $webApi;
         $this->orderHydrate = $orderHydrate;
         $this->itemRepo = $itemRepo;
     }
@@ -84,13 +91,12 @@ class ObjectToWebserviceConverter{
             }
         }
         
-       
         foreach ($this->settingRepo->findBy(['Code' => 'SOCIETE']) as $setting) {
             array_push($output['info'], $this->convertSettingToObject($setting));
         }
         
         foreach ($order->getQuoteOrderDetails() as $orderDetail) {
-            array_push($output['order_item'], $this->convertOrderDetailToObject($orderDetail));
+            array_push($output['order_item'], $this->convertOrderDetailToObject($orderDetail, $order));
         }
 
         //dump($order); die();
@@ -105,7 +111,7 @@ class ObjectToWebserviceConverter{
         $output['bill_address']=$this->convertAddressToObject($order->getContact()->getAddress(), $order->getClient());
         $output['agent']=$this->convertAgentToObject($order->getAgent());
         $output['tax']=$this->convertTaxToObject($this->taxRepo->findOneBy(['IsCurrent' => true]));
-        $output['tax_order']=$this->convertTaxToObject($this->taxRepo->findOneBy(['IsCurrent' => true]));
+        $output['tax_order']=$this->convertTaxToObject($order->getTax());
 
         return $output;
     }
@@ -375,7 +381,7 @@ class ObjectToWebserviceConverter{
     {
         $obj = [];
         if (!empty($contact)) {
-
+//dump($contact->getPhone());die();
             $obj['ID'] = $contact->getId();
             $obj['AgentId'] = $agent->getId();
             $obj['FirstName'] = $contact->getFirstname();
@@ -491,7 +497,7 @@ class ObjectToWebserviceConverter{
             $obj['ID'] = $currency->getId();
             $obj['Name'] = $currency->getName();
             $obj['Symbol'] = $currency->getSymbol();
-            $obj['Rate'] = $currency->getRate();
+            $obj['Rate'] = $this->webApi->execCurrencyRequest($currency->getSymbol());
             $obj['Country_code'] = $currency->getCountryCode();
             $obj['Currency_code'] = '';
             $obj['Country'] = $currency->getCountry();
@@ -557,11 +563,11 @@ class ObjectToWebserviceConverter{
         return $obj;
     }
 
-    public function convertOrderDetailToObject(?QuoteOrderDetail $orderDetail)
+    public function convertOrderDetailToObject(?QuoteOrderDetail $orderDetail, QuoteOrder $order)
     {
         $obj = [];
         if (!empty($orderDetail)) {
-            $orderDetail = $this->orderHydrate->hydrateOrderDetail([$orderDetail])[0];
+            $orderDetail = $this->orderHydrate->hydrateOrderDetail([$orderDetail], $order)[0];
             $obj['ID'] = $orderDetail->getId();
             $obj['OrderId'] = $orderDetail->getQuoteOrder()->getId();
             $obj['ItemId'] = $orderDetail->getItem()->getId();

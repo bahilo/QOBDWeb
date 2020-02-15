@@ -62,10 +62,10 @@ $(function () {
                 orderDetail: [
                     { data: 'id', visible: false },
                     { data: 'ContentComment', visible: false },
+                    { data: 'ItemPurchasePrice', visible: false },
                     { data: 'null', title: "", class: "details-control", orderable: false, defaultContent: "" },
                     { data: 'ItemName', title: "Nom" },
                     { data: 'ItemRef', title: "Référence" },
-                    { data: 'ItemPurchasePrice', title: "P. achat", render: inputPurchasePriceForm },
                     { data: 'ItemSellPrice', title: "P. vente", render: inputSellPriceForm },
                     { data: 'Quantity', title: "Quantité", render: inputQuantityForm },
                     { data: 'null', title: "Qt. en attente", render: renderQtEnAttente },
@@ -87,21 +87,26 @@ $(function () {
                     { data: 'id', visible: false },
                     { data: 'ItemName', title: "Nom" },
                     { data: 'ItemRef', title: "Référence" },
-                    { data: 'QuantityRecieved', title: "Qt en cours" },
+                    { data: 'Quantity', title: "Qt en cours" },
                     { data: 'ItemSellPriceVATTotal', title: "P. TTC total", render: renderDigit },
                     { data: 'ItemROIPercent', title: "Marge (%)", render: renderDigit },
                     { data: 'null', title: "", render: renderCancelBL },
                     { data: 'null', title: "", render: renderPDF },
                 ],
                 orderBill: [
+                    { data: 'PayReceived', visible: false },
+                    { data: 'PayedAt', visible: false },
+                    { data: 'PayMode', visible: false },
+                    { data: 'BillPrivateComment', visible: false },
+                    { data: 'BillPublicComment', visible: false },
                     { data: 'null', title: "", class: "details-control", orderable: false, defaultContent: "" },
                     { data: 'id', title: "Facture n°" },
-                    { data: 'CreatedAt', title: "Date" },
-                    { data: 'Pay', title: "Montant" },
+                    { data: 'CreatedAt', title: "Date", render: renderDate },
+                    { data: 'ItemSellPriceVATTotal', title: "Montant" },
                 ],
                 orderDelivery: [
                     { data: 'id', title: "BL n°" },
-                    { data: 'CreatedAt', title: "Date" },
+                    { data: 'CreatedAt', title: "Date", render: renderDate },
                     { data: 'Package', title: "Produit(s) expédié(s)" },
                     { data: 'null', title: "", render: renderDeliveryPDF },
                 ]
@@ -250,12 +255,8 @@ $(function () {
                             if ($("#control_can_open_row").length > 0)
                                 openTableChildRow(this, { TableApi: api, reccordRowTable: detailRows, rowFormat: format });
                         });
-                        //$('#order_detail_table_js tr td.details-control')
-                        //alert('complete!');
                     },
                     rowCallback: function (nRow, aData, index) {
-                        //alert('row  !');
-                        //addTableChil(nRow, aData, index);
                     }
                 });
             }
@@ -272,7 +273,10 @@ $(function () {
         if ($("#order_detail_delivery_table_js").length > 0) {
             api.table.orderDetailDelivery = $("#order_detail_delivery_table_js").myTable({
                 dataSource: $("#order_detail_delivery_data_source").val(),
-                columns: api.column.orderDetailDelivery
+                columns: api.column.orderDetailDelivery,
+                initComplete: function (setting, json, api) {
+                    $.fn.initEventBtnDelete();
+                }
             });
         }
     }
@@ -284,7 +288,10 @@ $(function () {
         if ($("#order_detail_bill_table_js").length > 0) {
             api.table.orderDetailBill = $("#order_detail_bill_table_js").myTable({
                 dataSource: $("#order_detail_bill_data_source").val(),
-                columns: api.column.orderDetailBill
+                columns: api.column.orderDetailBill,
+                initComplete: function (setting, json, api) {
+                    $.fn.initEventBtnDelete();
+                }
             });
         }
     }
@@ -302,8 +309,7 @@ $(function () {
                         if ($("#control_can_open_row").length > 0)
                             openTableChildRow(this, { TableApi: api, reccordRowTable: billDetailRows, rowFormat: billDetailformat });
                     });
-                    //$('#order_detail_table_js tr td.details-control')
-                    //alert('complete!');
+                    $.fn.initEventBtnDelete();
                 },
             });
         }
@@ -316,7 +322,10 @@ $(function () {
         if ($("#delivery_table_js").length > 0) {
             api.table.orderDelivery = $("#delivery_table_js").myTable({
                 dataSource: $("#delivery_data_source").val(),
-                columns: api.column.orderDelivery
+                columns: api.column.orderDelivery,
+                initComplete: function (setting, json, api) {
+                    $.fn.initEventBtnDelete();
+                }
             });
         }
     }
@@ -331,20 +340,24 @@ $(function () {
         var row = params.TableApi.row(tr);
         var idx = $.inArray(tr.attr('id'), params.reccordRowTable);
 
-        if (row.child.isShown()) {
-            tr.removeClass('details');
-            row.child.hide();
+        var data = row.data();
 
-            // Remove from the 'open' array
-            params.reccordRowTable.splice(idx, 1);
-        }
-        else {
-            tr.addClass('details');
-            row.child(params.rowFormat(row.data())).show();
+        if (typeof data.ItemSellPrice == typeof undefined || renderQtEnAttente(null, null, data) > 0){
+            if (row.child.isShown()) {
+                tr.removeClass('details');
+                row.child.hide();
 
-            // Add to the 'open' array
-            if (idx === -1) {
-                params.reccordRowTable.push(tr.attr('id'));
+                // Remove from the 'open' array
+                params.reccordRowTable.splice(idx, 1);
+            }
+            else {
+                tr.addClass('details');
+                row.child(params.rowFormat(row.data())).show();
+
+                // Add to the 'open' array
+                if (idx === -1) {
+                    params.reccordRowTable.push(tr.attr('id'));
+                }
             }
         }
     }
@@ -375,6 +388,8 @@ $(function () {
     
 
     function billDetailformat(row) {
+        var payedDate = new Date(row.PayedAt);
+
         return '<div class="bill-produit">' +
             
             '<div class="row">' +
@@ -382,17 +397,17 @@ $(function () {
                     '<div class="row">' +
                         '<div class="col-md-6">' +
                             '<label for="payed_amount' + row.id +'">Montant réglé</label>'+
-                            '<input type="number" name="order_detail_form[tab][bill][' + row.id + '][payed_amount]" id="payed_amount' + row.id + '" class="form-control">' +
+                            '<input type="number" name="order_detail_form[tab][bill][' + row.id + '][payed_amount]" id="payed_amount' + row.id + '" class="form-control" value="'+ row.PayReceived +'">' +
                         '</div>' +
                         '<div class="col-md-6">' +
                             '<label for="pay_date' + row.id + '">Date de paiement</label>' +
-                            '<input type="date" name="order_detail_form[tab][bill][' + row.id + '][pay_date]" id="pay_date' + row.id + '" class="form-control">' +
+                            '<input type="date" name="order_detail_form[tab][bill][' + row.id + '][pay_date]" id="pay_date' + row.id + '" class="form-control" value="' + payedDate.getDate() + '/' + (payedDate.getMonth() +1) + '/' + payedDate.getFullYear() +'">' +
                         '</div>' +                        
                     '</div>' +
                     '<div class="row">' +
                         '<div class="col-md-12">' +
                             '<label for="pay_mode' + row.id + '">Sous la forme</label>' +
-                            '<input type="text" name="order_detail_form[tab][bill][' + row.id + '][pay_mode]" id="pay_mode' + row.id + '" class="form-control">' +
+                            '<input type="text" name="order_detail_form[tab][bill][' + row.id + '][pay_mode]" id="pay_mode' + row.id + '" class="form-control" value="'+ row.PayMode +'">' +
                         '</div>' +
                     '</div>' +                    
                 '</div>' +
@@ -403,7 +418,7 @@ $(function () {
                     '</div>'+
                     '<a href="'+  Routing.generate('order_pdf_bill', { id: row.id }) +'" class="btn btn-dark">Générer PDF</a><br/>' +
                     '<a href="mailto:toto@yahoo.fr" class="">Ouvrir un mail</a><br/>' +
-                    '<a href="'+  Routing.generate('order_bill_cancel', { id: row.id }) +'" class="btn btn-danger">Annuler cette facture</a>' +
+            '<a href="' + Routing.generate('order_bill_cancel', { id: row.id }) +'" class="btn btn-danger btnDelete">Annuler cette facture</a>' +
                 '</div>' +
             '</div>' +
         '</div>'+
@@ -411,13 +426,13 @@ $(function () {
         '<div class="row">' +
             '<div class="col-md-6">' +
                 '<label for="comment_private' + row.id +'">Commentaire interne</label>'+
-                '<textarea name="order_detail_form[tab][bill][' + row.id + '][comment_private]" id="comment_private' + row.id + '" cols="30" rows="5" class="form-control">' + row.ContentComment+'</textarea>' +
+                '<textarea name="order_detail_form[tab][bill][' + row.id + '][comment_private]" id="comment_private' + row.id + '" cols="30" rows="5" class="form-control">' + row.BillPrivateComment+'</textarea>' +
             '</div>' +
             '<div class="col-md-6">' +
                 '<label for="comment_public' + row.id + '">Commentaire public</label>' +
-                '<textarea name="order_detail_form[tab][bill][' + row.id + '][comment_public]" id="comment_public' + row.id + '" cols="30" rows="5" class="form-control">' + row.ContentComment+'</textarea>' +
+                '<textarea name="order_detail_form[tab][bill][' + row.id + '][comment_public]" id="comment_public' + row.id + '" cols="30" rows="5" class="form-control">' + row.BillPublicComment+'</textarea>' +
             '</div>' +
-        '</div>' 
+        '</div>';        
     }
 
     
@@ -450,11 +465,11 @@ $(function () {
     }
 
     function renderCancel(data, type, row) {
-        return '<a class="btn btn-danger" href="#">Reinitialiser cette ref.</a>';
+        return '<a class="btn btn-danger btnDelete" href="' + Routing.generate("order_delivery_reset", { id: row.id }) +'">Reinitialiser cette ref.</a>';
     }
 
     function renderCancelBL(data, type, row) {
-        return '<a class="btn btn-danger" href="#">Annuler ce BL</a>';
+        return '<a class="btn btn-danger btnDelete" href="' + Routing.generate("order_delivery_cancel", { id: row.id }) +'">Annuler ce BL</a>';
     }
 
     function renderPDF(data, type, row) {
@@ -467,6 +482,11 @@ $(function () {
 
     function renderPreRefundShow(data, type, row) {
         return "<a href='" + Routing.generate('order_show_prerefund', { id: row.id }) + "'><i class='fa fa-eye'></i></a>";
+    }
+
+    function renderDate(data, type, row) {
+        var myDate = new Date(data);
+        return myDate.getDate() + '/' + (myDate.getMonth()+1) + '/' + myDate.getFullYear();
     }
 
     function renderQtEnAttente(data, type, row) {

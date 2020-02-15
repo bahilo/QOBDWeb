@@ -13,7 +13,7 @@ class ProviderRegistrationType extends AbstractType
     {
         $builder
             ->add('Name')
-            ->add('RIB')
+            // ->add('RIB')
             //->add('items')
         ;
     }

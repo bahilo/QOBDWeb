@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Bill;
 use App\Entity\Delivery;
+use App\Entity\QuoteOrder;
 use App\Entity\QuantityDelivery;
 use App\Entity\QuoteOrderDetail;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -44,6 +45,23 @@ class QuantityDeliveryRepository extends ServiceEntityRepository
             ->orderBy('q.id', 'ASC')
             ->getQuery()
             ->getResult();
+    }
+
+    public function findByBillStatus(QuoteOrder $order, $deliveryStatus = 'STATUS_NOT_BILLED')
+    {
+        return $this->createQueryBuilder('q')
+            ->innerJoin('q.OrderDetail', 'q_orddtl')
+            ->innerJoin('q_orddtl.QuoteOrder', 'q_q_orddtl_ord')
+            ->innerJoin('q.Delivery', 'q_del')
+            ->innerJoin('q_del.Status', 'q_del_status')
+            ->andWhere('q_del_status.Name = :status')
+            ->andWhere('q_q_orddtl_ord.id = :orderId')
+            ->setParameters(['status' => $deliveryStatus, "orderId" => $order->getId()])
+            ->orderBy('q.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        //dump($res); die();
     }
 
     /*

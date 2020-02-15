@@ -94,19 +94,28 @@ $(function(){
         var oRender = null;
         switch(target){
             case ETarget.item_group:
-                oRender = getRender(target);
+                oRender = new RenderMethod({
+                    routeEdit: { route: "setting_group_edit", logo: 'fa-edit' },
+                    routeDelete: { route: "setting_group_delete", logo: 'fa-trash-alt' }
+                });
                 break;
             case ETarget.item_brand:
-                oRender = getRender(target);
+                oRender = new RenderMethod({
+                    routeEdit: { route: "setting_brand_edit", logo: 'fa-edit' },
+                    routeDelete: { route: "setting_brand_delete", logo: 'fa-trash-alt' }
+                });
                 break;
             case ETarget.item_provider:
-                oRender = getRender(target);
+                oRender = new RenderMethod({
+                    routeEdit: { route: "setting_provider_edit", logo: 'fa-edit' },
+                    routeDelete: { route: "setting_provider_delete", logo: 'fa-trash-alt' }
+                });
                 break;
         }
         return [
             { data: 'id', visible: false },
+            { data: 'IsEnabled', visible: false },
             { data: 'Name', title: "Nom" },
-            { data: 'IsEnabled', title: "Actif" },
             { data: 'null', title: "Modif.", render: oRender.renderEdit },
             { data: 'null', title: "Supp.", render: oRender.renderDelete },
         ];
@@ -188,6 +197,10 @@ $(function(){
             { data: 'null', title: "Modif.", render: oRender.renderEdit },
             { data: 'null', title: "Supp.", render: oRender.renderDelete },
         ];
+    }
+
+    function getRender(){
+
     }
 
 });

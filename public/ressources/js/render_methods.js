@@ -37,7 +37,7 @@ var RenderMethod = function(args){
             canDelete = false;
 
         if (!vars.routeDelete || !canDelete)
-            return '';
+            return '<a href="#" class="btn btn-danger"><i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="Produit utilisé dans une commande"></i></a>';
 
         return '<a href="' + Routing.generate(vars.routeDelete.route, { id: row.id }) + '" class="btnDelete btn btn-danger" data-toggle="tooltip" data-placement="top" title="Supprimer">'+
                     '<i class="fa ' + vars.routeDelete.logo + '"></i>'+

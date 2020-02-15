@@ -44,17 +44,56 @@
                         <br/>
 
                         {% if is_granted('ROLE_OPERATOR') %}
-                            {{ form_row(formSetting.Code,{'label': 'Catégorie', 'attr': {'placeholder': 'Catégorie'}}) }}
-                            {{ form_row(formSetting.Name,{'label': 'désignation de la config', 'attr': {'placeholder': 'désignation de la config'}}) }}
-                            {% else %}
-                            {{ form_row(formSetting.Code,{'label': 'Catégorie', 'attr': {'placeholder': 'Catégorie', 'disabled':'disabled'}}) }}
-                            {{ form_row(formSetting.Name,{'label': 'désignation de la config', 'attr': {'placeholder': 'désignation de la config', 'disabled':'disabled'}}) }}
-                            {% endif %}
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Clé utilisée dans le code pour faire référence à la configuration">
+                                    <span class="fa fa-key"></span>
+                                </span>
+                            </div>
+                            {{ form_widget(formSetting.Code,{'label': 'Catégorie', 'attr': {'placeholder': 'Catégorie'}}) }}
+                        </div>
                         
-                        {{ form_row(formSetting.IsFile,{'label': 'désignation de la config', 'attr': {'placeholder': 'désignation de la config', 'style':'display:none'}}) }}
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Nom de la configuration">
+                                    <span class="fa fa-comment-dots"></span>
+                                </span>
+                            </div>
+                            {{ form_widget(formSetting.Name,{'label': 'Nom de la configuration', 'attr': {'placeholder': 'Nom de la configuration'}})
+                            }}
+                        </div>
+                        
+                        {% else %}
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Clé utilisée dans le code pour faire référence à la configuration">
+                                    <span class="fa fa-key"></span>
+                                </span>
+                            </div>
+                            {{ form_widget(formSetting.Code,{'label': 'Catégorie', 'attr': {'placeholder': 'Catégorie', 'disabled':'disabled'}}) }}
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Nom de la configuration">
+                                    <span class="fa fa-comment-dots"></span>
+                                </span>
+                            </div>
+                            {{ form_widget(formSetting.Name,{'label': 'Nom de la configuration', 'attr': {'placeholder': 'Nom de la configuration', 'disabled':'disabled'}})
+                            }}
+                        </div>
+                        {% endif %}                        
+                        
                         <div class="value-wrapper">
                             <div class="value-default">
-                                {{ form_row(formSetting.Value,{'label': 'Valeur', 'attr': {'placeholder': 'Valeur'}}) }}
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Valeur">
+                                            <span class="fa fa-chess-board"></span>
+                                        </span>
+                                    </div>
+                                    {{ form_widget(formSetting.Value,{'label': 'Valeur', 'attr': {'placeholder': 'Valeur'}}) }}
+                                </div>                                
                             </div>
                             <div class="value-file" style="display: none;">
                                 <input type="file" name="setting[file]">

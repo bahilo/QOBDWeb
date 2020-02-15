@@ -31,11 +31,11 @@ class SearchToView{
 
     public function logo(){
 
-        $setting = $this->get_setting('SOCIETE', 'logo');
-        if(!empty($setting)){
+        $setting = $this->get_setting('SOCIETE', 'SOCIETE_LOGO');
+        if(!empty($setting) && !empty($setting->getValue())){
             return $this->settingFileDir . '/' . $setting->getValue();
         }
-        return "";
+        return null;
     }
 
     public function avatar_dir(?Agent $agent){

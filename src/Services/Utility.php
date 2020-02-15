@@ -232,7 +232,7 @@ class Utility{
     {
         $object = array();
         foreach ($array_in as $key => $value) {
-            if (!is_object($value) && !is_array($value)  && !is_numeric($value)) {
+            if (!is_object($value) && !is_array($value)) {
                 $object[$key] = base64_encode($value);
             } 
             elseif(is_object($value)){

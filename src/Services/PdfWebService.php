@@ -42,10 +42,6 @@ class PdfWebService{
         $this->statusRepo = $statusRepo;
         $this->apiManager = $apiManager;
 
-        $settingPDF = $this->settingManager->get('WEBSERVICE', 'PDF');
-        $settingUserName = $this->settingManager->get('WEBSERVICE', 'Username');
-        $settingPassword = $this->settingManager->get('WEBSERVICE', 'Password');
-
     }
 
     public function downloadBill(Bill $bill, $downloadDir, int $target, int $refundTarget){
@@ -67,8 +63,8 @@ class PdfWebService{
 
         $fileName = 'Facture00' . $param['bill']->getId() . '.pdf';
 
-        $setting = $this->settingManager->get('FACTURE', 'prefix');
-        if (!empty($setting)) {
+        $setting = $this->settingManager->get('PDF', 'FACTURE_PREFIX');
+        if (!empty($setting) && !empty($setting->getValue())) {
             $fileName = $setting->getValue() . $param['bill']->getId() . '.pdf';
         }
         file_put_contents($param['download_dir'] .'/'. $fileName, $res[0]['Value']);
@@ -91,7 +87,7 @@ class PdfWebService{
 
         $fileName = 'Devis00' . $param['order']->getId() . '.pdf';
 
-        $setting = $this->settingManager->get('DEVIS', 'prefix');
+        $setting = $this->settingManager->get('PDF', 'DEVIS_PREFIX');
         if (!empty($setting)) {
             $fileName = $setting->getValue() . $param['order']->getId() . '.pdf';
         }
@@ -117,7 +113,7 @@ class PdfWebService{
 
         $fileName = 'BL00' . $param['delivery']->getId() . '.pdf';
 
-        $setting = $this->settingManager->get('LIVRAISON', 'prefix');
+        $setting = $this->settingManager->get('PDF', 'LIVRAISON_PREFIX');
         if (!empty($setting)) {
             $fileName = $setting->getValue() . $param['delivery']->getId() . '.pdf';
         }
@@ -128,10 +124,10 @@ class PdfWebService{
 
     private function getSource(QuoteOrder $order, ?Bill $bill, $target){
         $objArray = $this->wsConverter->getObjectFromOrder($order, $bill);
-
+        //dump($order->getIsRefVisible());die();
         $source = array(
             "Lang"              => "fr",
-            "TaxType"           => 'TTC',
+            "TaxType"           => $this->getTaxType($order),
             "Delay"             => $order->getValidityPeriode(),
             "Status"            => $target,
             "refv"              => $order->getIsRefVisible() ? 1 : 0,
@@ -147,8 +143,18 @@ class PdfWebService{
             "BillAddress"       => $this->utility->replaceSpecialChars($objArray['bill_address']),
             "Agent"             => $this->utility->replaceSpecialChars($objArray['agent']),
             "Order_items"       => $this->utility->replaceSpecialChars($objArray['order_item']),
-            "Tax"               => $this->utility->replaceSpecialChars($objArray['tax'])
+            "Tax"               => $this->utility->replaceSpecialChars($objArray['tax_order'])
         );
         return $source;
+    }
+
+    private function getTaxType(QuoteOrder $order){
+        $tax = $order->getTax();
+        if($tax->getIsTVAMarge())
+            return 2;
+        elseif($tax->getValue() == 0)
+            return 0;
+        else   
+            return 1;
     }
 }

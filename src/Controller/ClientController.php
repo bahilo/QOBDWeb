@@ -42,7 +42,7 @@ class ClientController extends Controller
                         ClientRepository $clientRepo,
                         ClientHydrate $clientHydrate) {
 
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -58,7 +58,7 @@ class ClientController extends Controller
                          SerializerInterface $serializer,
                          ContactRepository $contactRepo) {
 
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -73,7 +73,7 @@ class ClientController extends Controller
      */
     public function select($id, SessionInterface $session)
     {
-        if (!$this->securityUtility->checkHasUpdate($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
+        if (!$this->securityUtility->checkHasUpdate($this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
             return $this->redirectToRoute('security_deny_access');
         }
         $client = $session->get('client',[]);
@@ -95,7 +95,7 @@ class ClientController extends Controller
                                 ObjectManager $manager,
                                 ClientHydrate $clientHydrate) {
 
-        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -135,7 +135,7 @@ class ClientController extends Controller
                                        ClientHydrate $clientHydrate,
                                        ObjectManager $manager) {
 
-        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -173,7 +173,7 @@ class ClientController extends Controller
                                        ClientHydrate $clientHydrate,
                                        ObjectManager $manager) {
 
-        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
             return $this->redirectToRoute('security_deny_access');
         }
        
@@ -209,7 +209,7 @@ class ClientController extends Controller
      */
     public function delete(Client $client, ObjectManager $manager) {
 
-        if (!$this->securityUtility->checkHasDelete($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
+        if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -225,7 +225,7 @@ class ClientController extends Controller
      */
     public function contactDelete(Contact $contact, ObjectManager $manager) {
 
-        if (!$this->securityUtility->checkHasDelete($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
+        if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 

@@ -27,16 +27,31 @@
                 <div class="row">
                     <div class="col-md-12">
                         <form id="global_search_form" method="POST" action="{{ path("order_search") }}">
-                            <div class="form-group">
-                                <label>N° de commande/avoir/devis</label>
-                                <input type="number" name="search[order]" class="form-control" />
+
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="N° de commande/avoir/devis">
+                                        <span class="fa fa-folder"></span>
+                                    </span>
+                                </div>
+                                <input type="number" name="search[order]" class="form-control" placeholder="N° de commande/avoir/devis" />
                             </div>
-                            <div class="form-group">
-                                <label>N° de Facture</label>
-                                <input type="number" name="search[bill]" class="form-control" />
+
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="N° de Facture">
+                                        <span class="fa fa-money-bill"></span>
+                                    </span>
+                                </div>
+                                <input type="number" name="search[bill]" class="form-control" placeholder="N° de Facture" />
                             </div>
-                            <div class="form-group">
-                                <label>Société</label>
+
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Veuillez sélectionner une société">
+                                        <span class="fa fa-chess-board"></span>
+                                    </span>
+                                </div>
                                 <select name="search[client]" class="form-control">
                                     <option value="">Veuillez sélectionner une société</option>
                                     {% for client in clients %}
@@ -44,8 +59,14 @@
                                     {% endfor %}
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <label>Commercial en charge</label>
+
+                            {% if  search.get_right_admin() %}
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Commercial en charge">
+                                        <span class="fa fa-copyright"></span>
+                                    </span>
+                                </div>
                                 <select name="search[agent]" class="form-control">
                                     <option value="">Veuillez sélectionner un commercial</option>
                                     {% for agent in agents %}
@@ -53,14 +74,27 @@
                                     {% endfor %}
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <label>Date de début</label>
-                                <input type="date" name="search[dtDebut]" class="form-control" />
+                            {% endif %}
+
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Date de début">
+                                        <span class="fa fa-calendar-alt"></span>
+                                    </span>
+                                </div>
+                                <input type="date" name="search[dtDebut]" class="form-control" placeholder="Date de début" />
                             </div>
-                            <div class="form-group">
-                                <label>Date de fin</label>
-                                <input type="date" name="search[dtFin]" class="form-control" />
+
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Date de fin">
+                                        <span class="fa fa-calendar-alt"></span>
+                                    </span>
+                                </div>
+                                <input type="date" name="search[dtFin]" class="form-control" placeholder="Date de fin" />
                             </div>
+
+
                             <buton type="submit" value="Recherche" class="float-center" />
                         </form>
                     </div>
@@ -89,8 +123,20 @@
     </div>
 </div>
 
-
 {% endblock %}
+
+{% block access_pool %}
+<div class="access_pool">
+    <input type="hidden" id="is_read" value="{{ search.get_right_read("ACTION_ORDER") }}" />
+    <input type="hidden" id="is_write" value="{{ search.get_right_write("ACTION_ORDER") }}" />
+    <input type="hidden" id="is_update" value="{{ search.get_right_update("ACTION_ORDER") }}" />
+    <input type="hidden" id="is_delete" value="{{ search.get_right_delete("ACTION_ORDER") }}" />
+    <input type="hidden" id="is_mail" value="{{ search.get_right_email("ACTION_ORDER") }}" />
+    <input type="hidden" id="is_admin" value="{{ search.get_right_admin() }}" />
+</div>
+{% endblock %}
+
+
 {% block javascripts %}
 <script src="{{  asset('order.js','qobd_web_js') }}"></script>
 {% endblock %}

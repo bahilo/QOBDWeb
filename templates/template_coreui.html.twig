@@ -30,12 +30,19 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <ul class="nav navbar-nav d-md-down-none">
+
+        {% if search.get_right_read("ACTION_DASHBORD") %}
         <li class="nav-item px-3">
           <a class="nav-link" href="{{ path("home") }}">Tableau de bord</a>
         </li>
+        {% endif %}
+
+        {% if search.get_right_read("ACTION_CATALOGUE") %}
         <li class="nav-item px-3">
           <a class="nav-link" href="{{ path("catalogue_home") }}">Catalogue</a>
         </li>
+        {% endif %}
+
         <li class="nav-item px-3">
           <a class="nav-link" href="{{ path("order") }}">Recherche</a>
         </li>
@@ -100,23 +107,31 @@
       <div class="sidebar">
         <nav class="sidebar-nav">
           <ul class="nav">
+
+            {% if search.get_right_read("ACTION_DASHBORD") %}
             <li class="nav-item">
               <a class="nav-link" href="{{ path("home") }}">
                 <i class="fa fa-tachometer-alt"></i> Tableau de bord
                 <!-- <span class="badge badge-primary">NEW</span> -->
               </a>
             </li>
+            {% endif %}
+
+            {% if search.get_right_read("ACTION_CATALOGUE") %}
             <li class="nav-title">Catalogue</li>
             <li class="nav-item">
               <a class="nav-link" href="{{ path("catalogue_home") }}">
                 <i class="fa fa-clone"></i> Produits</a>
             </li>
+            {% endif %}
             <!-- <li class="nav-title">Devis</li>
             <li class="nav-item">
                 <a class="nav-link" href="{{ path("agent_home") }}">
                     <i class="nav-icon icon-drop"></i> Demande de devis</a>
             </li> -->
             <li class="nav-title">Commandes/Avoirs</li>
+
+            {% if search.get_right_read("ACTION_ORDER") %}
             <li class="nav-item nav-dropdown">
               <a class="nav-link nav-dropdown-toggle" href="#">
                 <i class="fa fa-align-justify"></i> Commandes</a>
@@ -165,128 +180,143 @@
                 </li>
               </ul>
             </li>
+            {% endif %}
+
+            {% if search.get_right_read("ACTION_QUOTE") %}
             <li class="nav-item">
                 <a class="nav-link" href="{{ path("order_quote")}}">
                     <i class="fa fa-align-justify"></i> Devis</a>
             </li>
+            {% endif %}
+
+            {% if search.get_right_read("ACTION_CLIENT") %}
             <li class="nav-title">Suivi Clientèle</li>
             <li class="nav-item">
                 <a class="nav-link" href="{{ path("client_home") }}">
                     <i class="fa fa-user"></i> Clients</a>
             </li>
-            <li class="nav-title">Administration</li>
-            <li class="nav-item nav-dropdown">
-                <a class="nav-link nav-dropdown-toggle" href="#">
-                    <i class="fa fa-user-secret"></i> Securité</a>
-                <ul class="nav-dropdown-items">
-                    <li class="nav-item nav-dropdown">
-                        <!-- <a class="nav-link" href="{{ path("agent_home") }}">
-                            <i class="fa fa-user-lock"></i> Commerciaux</a> -->
-                            <a class="nav-link nav-dropdown-toggle" href="#">
-                              <i class="fa fa-user-lock"></i> Commerciaux</a>
-                            <ul class="nav-dropdown-items">
-                              <li class="nav-item">
-                                <a class="nav-link" href="{{ path("agent_home") }}">
-                                  <i class="fa fa-fingerprint"></i> Gérer</a>
-                              </li>
-                              <li class="nav-item">
-                                <a class="nav-link" href="{{ path("security_agent_role") }}">
-                                  <i class="fa fa-id-card"></i> Accès</a>
-                              </li>
-                            </ul>
-                    </li>
-                    <li class="nav-item nav-dropdown">
-                        <a class="nav-link nav-dropdown-toggle" href="#">
-                            <i class="fa fa-id-card"></i> Privilege</a>
-                            <ul class="nav-dropdown-items">
-                              <li class="nav-item">
-                                <a class="nav-link" href="{{ path("security_action") }}">
-                                  <i class="fa fa-fingerprint"></i> Actions</a>
-                              </li>
-                              <li class="nav-item">
-                                <a class="nav-link" href="{{ path("security_role") }}">
-                                  <i class="fa fa-passport"></i> Roles</a>
-                              </li>
-                              <li class="nav-item">
-                                <a class="nav-link" href="{{ path("security_profile") }}">
-                                  <i class="fa fa-passport"></i> Profiles</a>
-                              </li>
-                            </ul>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-item nav-dropdown">
-                <a class="nav-link nav-dropdown-toggle" href="#">
-                    <i class="fa fa-cog"></i> Configuration</a>
-                <ul class="nav-dropdown-items">
-                    <li class="nav-item nav-dropdown">
-                      <a class="nav-link nav-dropdown-toggle" href="#">
-                        <i class="fa fa-toolbox"></i> Options</a>
-                      <ul class="nav-dropdown-items">
-                        <li class="nav-item">
-                          <a class="nav-link" href="{{ path("setting_home") }}">
-                            <i class="fa fa-sliders-h"></i> Générale</a>
-                        </li>
-                        <li class="nav-item">
-                          <a class="nav-link" href="{{ path("setting_currency") }}">
-                            <i class="fa fa-coins"></i> Monnaie</a>
-                        </li>
-                        <li class="nav-item">
-                          <a class="nav-link" href="{{ path("setting_tax") }}">
-                            <i class="fa fa-money-bill-wave-alt"></i> Taxe</a>
-                        </li>
-                        {# <li class="nav-item">
-                          <a class="nav-link" href="{{ path("setting_delivery_status") }}">
-                            <i class="fa fa-star"></i> Status facturation</a>
-                        </li>
-                        <li class="nav-item">
-                          <a class="nav-link" href="{{ path("setting_order_status") }}">
-                            <i class="fa fa-star-half-alt"></i> Statut Commande</a>
-                        </li> #}
-                        <li class="nav-item nav-dropdown">
+            {% endif %}
+
+            {% if search.get_right_read("ACTION_SECURITY") or search.get_right_read("ACTION_SETTING") %}
+              <li class="nav-title">Administration</li>
+              {% if search.get_right_read("ACTION_SECURITY") %}
+              <li class="nav-item nav-dropdown">
+                  <a class="nav-link nav-dropdown-toggle" href="#">
+                      <i class="fa fa-user-secret"></i> Securité</a>
+                  <ul class="nav-dropdown-items">
+                      <li class="nav-item nav-dropdown">
+                          <!-- <a class="nav-link" href="{{ path("agent_home") }}">
+                              <i class="fa fa-user-lock"></i> Commerciaux</a> -->
+                              <a class="nav-link nav-dropdown-toggle" href="#">
+                                <i class="fa fa-user-lock"></i> Commerciaux</a>
+                              <ul class="nav-dropdown-items">
+                                <li class="nav-item">
+                                  <a class="nav-link" href="{{ path("agent_home") }}">
+                                    <i class="fa fa-fingerprint"></i> Gérer</a>
+                                </li>
+                                <li class="nav-item">
+                                  <a class="nav-link" href="{{ path("security_agent_role") }}">
+                                    <i class="fa fa-id-card"></i> Accès</a>
+                                </li>
+                              </ul>
+                      </li>
+                      <li class="nav-item nav-dropdown">
                           <a class="nav-link nav-dropdown-toggle" href="#">
-                            <i class="fa fa-id-card"></i> Statuts</a>
-                            <ul class="nav-dropdown-items">
-                              <li class="nav-item">
-                                <a class="nav-link" href="{{ path("setting_delivery_status") }}">
-                                  <i class="fa fa-star"></i> Statut Facturation</a>
-                              </li>
-                              <li class="nav-item">
-                                <a class="nav-link" href="{{ path("setting_order_status") }}">
-                                  <i class="fa fa-star-half-alt"></i> Statut Commande</a>
-                              </li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                          <a class="nav-link" href="{{ path("setting_email") }}">
-                            <i class="fa fa-star-half-alt"></i> Emails</a>
-                        </li>
-                      </ul>
-                    </li>
-                    <li class="nav-item nav-dropdown">
-                      <a class="nav-link nav-dropdown-toggle" href="#">
-                        <i class="fa fa-clone"></i> Produits</a>
-                      <ul class="nav-dropdown-items">
-                        <li class="nav-item">
-                          <a class="nav-link" href="{{ path("setting_catalogue_brand") }}">
-                            <i class="fa fa-random"></i> Marques</a>
-                        </li>
-                        <li class="nav-item">
-                          <a class="nav-link" href="{{ path("setting_catalogue_group") }}">
-                            <i class="fa fa-caret-square-down"></i> Familles</a>
-                        </li>
-                        <li class="nav-item">
-                          <a class="nav-link" href="{{ path("setting_catalogue_provider") }}">
-                            <i class="fa fa-hourglass-half"></i> Fournisseurs</a>
-                        </li>
-                        <li class="nav-item">
-                          <a class="nav-link" href="{{ path("setting_catalogue_import") }}">
-                            <i class="fa fa-upload"></i> Imports</a>
-                        </li>
-                      </ul>
-                    </li>
-                </ul>
-            </li>
+                              <i class="fa fa-id-card"></i> Privilege</a>
+                              <ul class="nav-dropdown-items">
+                                <li class="nav-item">
+                                  <a class="nav-link" href="{{ path("security_action") }}">
+                                    <i class="fa fa-fingerprint"></i> Actions</a>
+                                </li>
+                                <li class="nav-item">
+                                  <a class="nav-link" href="{{ path("security_role") }}">
+                                    <i class="fa fa-passport"></i> Roles</a>
+                                </li>
+                                <li class="nav-item">
+                                  <a class="nav-link" href="{{ path("security_profile") }}">
+                                    <i class="fa fa-passport"></i> Profiles</a>
+                                </li>
+                              </ul>
+                      </li>
+                  </ul>
+              </li>
+              {% endif %}
+              {% if search.get_right_read("ACTION_SETTING") %}
+              <li class="nav-item nav-dropdown">
+                  <a class="nav-link nav-dropdown-toggle" href="#">
+                      <i class="fa fa-cog"></i> Configuration</a>
+                  <ul class="nav-dropdown-items">
+                      <li class="nav-item nav-dropdown">
+                        <a class="nav-link nav-dropdown-toggle" href="#">
+                          <i class="fa fa-toolbox"></i> Options</a>
+                        <ul class="nav-dropdown-items">
+                          <li class="nav-item">
+                            <a class="nav-link" href="{{ path("setting_home") }}">
+                              <i class="fa fa-sliders-h"></i> Générale</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="{{ path("setting_currency") }}">
+                              <i class="fa fa-coins"></i> Monnaie</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="{{ path("setting_tax") }}">
+                              <i class="fa fa-money-bill-wave-alt"></i> Taxe</a>
+                          </li>
+                          {# <li class="nav-item">
+                            <a class="nav-link" href="{{ path("setting_delivery_status") }}">
+                              <i class="fa fa-star"></i> Status facturation</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="{{ path("setting_order_status") }}">
+                              <i class="fa fa-star-half-alt"></i> Statut Commande</a>
+                          </li> #}
+                          <li class="nav-item nav-dropdown">
+                            <a class="nav-link nav-dropdown-toggle" href="#">
+                              <i class="fa fa-id-card"></i> Statuts</a>
+                              <ul class="nav-dropdown-items">
+                                <li class="nav-item">
+                                  <a class="nav-link" href="{{ path("setting_delivery_status") }}">
+                                    <i class="fa fa-star"></i> Statut Facturation</a>
+                                </li>
+                                <li class="nav-item">
+                                  <a class="nav-link" href="{{ path("setting_order_status") }}">
+                                    <i class="fa fa-star-half-alt"></i> Statut Commande</a>
+                                </li>
+                              </ul>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="{{ path("setting_email") }}">
+                              <i class="fa fa-star-half-alt"></i> Emails</a>
+                          </li>
+                        </ul>
+                      </li>
+                      <li class="nav-item nav-dropdown">
+                        <a class="nav-link nav-dropdown-toggle" href="#">
+                          <i class="fa fa-clone"></i> Produits</a>
+                        <ul class="nav-dropdown-items">
+                          <li class="nav-item">
+                            <a class="nav-link" href="{{ path("setting_catalogue_brand") }}">
+                              <i class="fa fa-random"></i> Marques</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="{{ path("setting_catalogue_group") }}">
+                              <i class="fa fa-caret-square-down"></i> Familles</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="{{ path("setting_catalogue_provider") }}">
+                              <i class="fa fa-hourglass-half"></i> Fournisseurs</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="{{ path("setting_catalogue_import") }}">
+                              <i class="fa fa-upload"></i> Imports</a>
+                          </li>
+                        </ul>
+                      </li>
+                  </ul>
+              </li>
+              {% endif %}
+            {% endif %}
+
             {# <li class="nav-item">
                 <a class="nav-link" href="#">
                     <i class="fa fa-bell"></i> Notifications</a>
@@ -710,6 +740,7 @@
     
     {% block javascripts %} {% endblock %}
 
+    {% block access_pool %}{% endblock %}
     {% block message_pool %}{% endblock %}
 
 </body>

@@ -6,6 +6,7 @@ use App\Entity\Agent;
 use App\Entity\Action;
 use App\Repository\AgentDiscussionRepository;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Security;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\HttpUtils;
@@ -15,7 +16,6 @@ use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\Logout\LogoutHandlerInterface;
 use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 
 class SecurityManager implements LogoutHandlerInterface, AuthenticationSuccessHandlerInterface {
@@ -25,10 +25,10 @@ class SecurityManager implements LogoutHandlerInterface, AuthenticationSuccessHa
     protected $container;
     protected $adRepo;
 
-    public function __construct(AgentDiscussionRepository $adRepo,ObjectManager $manager, TokenStorageInterface $tokenStorage, ContainerInterface $container)
+    public function __construct(AgentDiscussionRepository $adRepo,ObjectManager $manager, Security $tokenStorage, ContainerInterface $container)
     {
         $this->adRepo = $adRepo;
-        $this->token = $tokenStorage->getToken();
+        $this->token = $tokenStorage;
         $this->manager = $manager;
         $this->container = $container;
     }
@@ -60,16 +60,18 @@ class SecurityManager implements LogoutHandlerInterface, AuthenticationSuccessHa
         $this->manager->flush();
     }
 
-    public function isAccessGranted(Agent $agent)
+    public function isAccessGranted()
     {
+        $agent = $this->token->getUser();
         if (empty($agent) || !$agent->getIsActivated()) {
             return false;
         }
         return true;
     }
 
-    public function checkHas(Agent $agent, Action $action, $privilege)
+    public function checkHas(Action $action, $privilege)
     {
+        $agent = $this->token->getUser();
         if ($this->isAccessGranted($agent)) {
             foreach ($agent->getObjectRoles() as $role) {
                 foreach ($role->getActionRoles() as $actionRole) {
@@ -92,29 +94,34 @@ class SecurityManager implements LogoutHandlerInterface, AuthenticationSuccessHa
         return false;
     }
 
-    public function checkHasRead(Agent $agent, Action $action)
+    public function checkHasRead(Action $action)
     {
-        return $this->checkHas($agent, $action, 'READ');
+        return $this->checkHas($action, 'READ');
     }
 
-    public function checkHasWrite(Agent $agent, Action $action)
+    public function checkHasWrite(Action $action)
     {
-        return $this->checkHas($agent, $action, 'WRITE');
+        return $this->checkHas($action, 'WRITE');
     }
 
-    public function checkHasUpdate(Agent $agent, Action $action)
+    public function checkHasUpdate(Action $action)
     {
-        return $this->checkHas($agent, $action, 'UPDATE');
+        return $this->checkHas($action, 'UPDATE');
     }
 
-    public function checkHasDelete(Agent $agent, Action $action)
+    public function checkHasDelete(Action $action)
     {
-        return $this->checkHas($agent, $action, 'DELETE');
+        return $this->checkHas($action, 'DELETE');
     }
 
-    public function checkHasEmail(Agent $agent, Action $action)
+    public function checkHasEmail(Action $action)
     {
-        return $this->checkHas($agent, $action, 'MAIL');
+        return $this->checkHas($action, 'MAIL');
+    }
+
+    public function checkIsAdmin()
+    {
+        return $this->token->getUser()->getIsAdmin();
     }
 
     public function hydrateAgent(array $agents)

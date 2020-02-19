@@ -8,17 +8,7 @@ $(function () {
 
     $("#client_table_js").myTable({
         dataSource: $("#client_data_source").val(),
-        columns: [
-            { data: 'id', title: "", render: Renders.renderSelect },
-            { data: 'CompanyName', title: "Société" },
-            { data: 'LastName', title: "Nom" },
-            { data: 'FirstName', title: "Prénom" },
-            { data: 'Phone', title: "Téléphone" },
-            { data: 'Email', title: "Email" },
-            { data: 'id', title: "", render: Renders.renderShow },
-            { data: 'id', title: "", render: Renders.renderEdit },
-            { data: 'id', title: "", render: Renders.renderDelete },
-        ]
+        columns: getCLientColumn()
     });
 
     var contactRenders = new RenderMethod({
@@ -29,16 +19,7 @@ $(function () {
 
     $("#contact_table_js").myTable({
         dataSource: $("#contact_data_source").val(),
-        columns: [
-            { data: 'id', title: "", visible: false },
-            { data: 'FirstName', title: "Prénom" },
-            { data: 'LastName', title: "Nom" },
-            { data: 'Phone', title: "Téléphone" },
-            { data: 'Email', title: "Email" },
-            { data: 'id', title: "", render: contactRenders.renderShow },
-            { data: 'id', title: "", render: contactRenders.renderEdit },
-            { data: 'id', title: "", render: contactRenders.renderDelete },
-        ]
+        columns: getContactColumn()
     });
 
     $(function(){
@@ -58,6 +39,56 @@ $(function () {
                 window.location = $(elt).attr('href');
             }
         }, ['Valider', 'Annuler']);
+    }
+
+    function getContactColumn(){
+        var col = [];
+
+        col.push({ data: 'id', title: "", visible: false });
+        col.push({ data: 'FirstName', title: "Prénom" });
+        col.push({ data: 'LastName', title: "Nom" });
+        col.push({ data: 'IsActivated', title: "", visible: false });
+        col.push({ data: 'Phone', title: "Téléphone" });
+        col.push({ data: 'Email', title: "Email" });
+
+        if($('#is_update','.access_pool').length > 0 && $('#is_update','.access_pool').val()){
+            col.push({ data: 'id', title: "", render: contactRenders.renderShow });
+            col.push({ data: 'id', title: "", render: contactRenders.renderEdit });
+        }
+
+        if($('#is_delete','.access_pool').length > 0 && $('#is_delete','.access_pool').val()){
+            col.push({ data: 'id', title: "", render: contactRenders.renderDelete });
+        }
+
+        return col;
+    }
+
+    function getCLientColumn(){
+        var col = [];
+
+        if($('#is_quote_write','.access_pool').length > 0 && $('#is_quote_write','.access_pool').val()){
+            col.push({ data: 'id', title: "", render: Renders.renderSelect });
+        }
+        else{
+            col.push({ data: 'id', visible: false });
+        }
+        
+        col.push({ data: 'CompanyName', title: "Société" });
+        col.push({ data: 'LastName', title: "Nom" });
+        col.push({ data: 'FirstName', title: "Prénom" });
+        col.push({ data: 'Phone', title: "Téléphone" });
+        col.push({ data: 'Email', title: "Email" });
+
+        if($('#is_update','.access_pool').length > 0 && $('#is_update','.access_pool').val()){
+            col.push({ data: 'id', title: "", render: Renders.renderShow });
+            col.push({ data: 'id', title: "", render: Renders.renderEdit });
+        }
+
+        if($('#is_delete','.access_pool').length > 0 && $('#is_delete','.access_pool').val()){
+            col.push({ data: 'id', title: "", render: Renders.renderDelete });
+        }
+
+        return col;
     }
 
 });

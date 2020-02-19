@@ -18,7 +18,9 @@
 {% endblock %}
 
 {% block body_header_right %}
-<a href="{{ path("security_registration") }}" class="btn"><i class="fa fa-plus"></i></a>
+    {% if search.get_right_write("ACTION_SECURITY") %}
+        <a href="{{ path("security_registration") }}" class="btn"><i class="fa fa-plus"></i></a>
+    {% endif %}
 {% endblock %}
 
 {% block body %}
@@ -43,6 +45,18 @@
     <input type="hidden" id="agent_data_source" value="{{ agents_data_source }}">
 
 {% endblock %}
+
+{% block access_pool %}
+<div class="access_pool">
+    <input type="hidden" id="is_read" value="{{ search.get_right_read("ACTION_SECURITY") }}" />
+    <input type="hidden" id="is_write" value="{{ search.get_right_write("ACTION_SECURITY") }}" />
+    <input type="hidden" id="is_update" value="{{ search.get_right_update("ACTION_SECURITY") }}" />
+    <input type="hidden" id="is_delete" value="{{ search.get_right_delete("ACTION_SECURITY") }}" />
+    <input type="hidden" id="is_mail" value="{{ search.get_right_email("ACTION_SECURITY") }}" />
+    <input type="hidden" id="is_admin" value="{{ search.get_right_admin() }}" />
+</div>
+{% endblock %}
+
 {% block javascripts %} 
     <script src="{{  asset('agent.js','qobd_web_js') }}"></script>
 {% endblock %}

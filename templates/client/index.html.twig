@@ -12,7 +12,9 @@
 
 
 {% block body_header_right %}
-<a href="{{ path("client_registration") }}" class="btn"><i class="fa fa-plus"></i></a>
+    {% if search.get_right_write("ACTION_CLIENT") %}
+        <a href="{{ path("client_registration") }}" class="btn"><i class="fa fa-plus"></i></a>
+    {% endif %}
 {% endblock %}
 
 {% block body %}
@@ -38,6 +40,19 @@
 
 <input type="hidden" id="client_data_source" value="{{ client_data_source }}">
 {% endblock %}
+
+{% block access_pool %}
+<div class="access_pool">
+    <input type="hidden" id="is_read" value="{{ search.get_right_read("ACTION_CLIENT") }}" />
+    <input type="hidden" id="is_quote_write" value="{{ search.get_right_write("ACTION_QUOTE") }}" />
+    <input type="hidden" id="is_write" value="{{ search.get_right_write("ACTION_CLIENT") }}" />
+    <input type="hidden" id="is_update" value="{{ search.get_right_update("ACTION_CLIENT") }}" />
+    <input type="hidden" id="is_delete" value="{{ search.get_right_delete("ACTION_CLIENT") }}" />
+    <input type="hidden" id="is_mail" value="{{ search.get_right_email("ACTION_CLIENT") }}" />
+    <input type="hidden" id="is_admin" value="{{ search.get_right_admin() }}" />
+</div>
+{% endblock %}
+
 {% block javascripts %}
 <script src="{{  asset('client.js','qobd_web_js') }}"></script>
 {% endblock %}

@@ -19,7 +19,9 @@
 {% endblock %}
 
 {% block body_header_right %}
-<a href="{{ create_url }}" class="btn"><i class="fa fa-plus"></i></a>
+    {% if search.get_right_write("ACTION_SETTING") %}
+        <a href="{{ create_url }}" class="btn"><i class="fa fa-plus"></i></a>
+    {% endif %}
 {% endblock %}
 
 
@@ -41,6 +43,18 @@
             </div>
         </div>
     </div>
+</div>
+{% endblock %}
+
+{% block access_pool %}
+<div class="access_pool">
+    <input type="hidden" id="is_read" value="{{ search.get_right_read("ACTION_SETTING") }}" />
+    <input type="hidden" id="is_write" value="{{ search.get_right_write("ACTION_SETTING") }}" />
+    <input type="hidden" id="is_update" value="{{ search.get_right_update("ACTION_SETTING") }}" />
+    <input type="hidden" id="is_delete" value="{{ search.get_right_delete("ACTION_SETTING") }}" />
+    <input type="hidden" id="is_mail" value="{{ search.get_right_email("ACTION_SETTING") }}" />
+    <input type="hidden" id="is_read_sensible" value="{{ search.get_right_read("ACTION_SENSIBLE") }}" />
+    <input type="hidden" id="is_admin" value="{{ search.get_right_admin() }}" />
 </div>
 {% endblock %}
 

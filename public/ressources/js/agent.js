@@ -8,23 +8,35 @@ $(function(){
 
     $("#agent_table_js").myTable({
         dataSource: $("#agent_data_source").val(),
-        columns: [
-            { data: 'id', title: "", visible: false },
-            { data: 'IsActivated', title: "", visible: false },
-            //{ data: 'Picture', title: "", render: Renders.renderPicture },
-            { data: 'UserName', title: "Pseudo" },
-            { data: 'LastName', title: "Nom" },
-            { data: 'FirstName', title: "Prénom" },
-            //{ data: 'Phone', title: "Téléphone" },
-            { data: 'Email', title: "Email" },
-            { data: 'null', title: "", render: renderActivateAgent },
-            { data: 'null', title: "", render: Renders.renderShow },
-            { data: 'null', title: "", render: Renders.renderEdit },
-            { data: 'null', title: "", render: Renders.renderDelete },
-        ]
+        columns: getColumn()
     });   
 
 
+    function getColumn(){
+        var col = [];
+
+        col.push({ data: 'id', title: "", visible: false });
+        col.push({ data: 'IsActivated', title: "", visible: false });
+        col.push({ data: 'UserName', title: "Pseudo" });
+        col.push({ data: 'LastName', title: "Nom" });
+        col.push({ data: 'FirstName', title: "Prénom" });
+        col.push({ data: 'Email', title: "Email" });
+
+        if($('#is_admin','.access_pool').length > 0 && $('#is_admin','.access_pool').val()){
+            col.push({ data: 'null', title: "", render: renderActivateAgent });
+        }
+
+        if($('#is_update','.access_pool').length > 0 && $('#is_update','.access_pool').val()){
+            col.push({ data: 'null', title: "", render: Renders.renderShow });
+            col.push({ data: 'null', title: "", render: Renders.renderEdit });
+        }
+
+        if($('#is_delete','.access_pool').length > 0 && $('#is_delete','.access_pool').val()){
+            col.push({ data: 'null', title: "", render: Renders.renderDelete });
+        }
+
+        return col;
+    }
 
     function renderActivateAgent(data, type, row) {
         if (row.IsActivated)

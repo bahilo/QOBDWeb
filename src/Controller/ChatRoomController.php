@@ -139,7 +139,7 @@ class ChatRoomController extends Controller
         }
         $manager->flush();
 
-        $this->chatManager->setAsCurrentDiscussion($this->getUser(), $discussion);
+        $this->chatManager->setAsCurrentDiscussion($discussion);
 
         //return $this->RedirectToRoute('home');
         

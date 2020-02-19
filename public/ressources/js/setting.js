@@ -112,13 +112,22 @@ $(function(){
                 });
                 break;
         }
-        return [
-            { data: 'id', visible: false },
-            { data: 'IsEnabled', visible: false },
-            { data: 'Name', title: "Nom" },
-            { data: 'null', title: "Modif.", render: oRender.renderEdit },
-            { data: 'null', title: "Supp.", render: oRender.renderDelete },
-        ];
+        
+        var col = [];
+
+        col.push({ data: 'id', visible: false });
+        col.push({ data: 'IsEnabled', visible: false });
+        col.push({ data: 'Name', title: "Nom" });
+
+        if($('#is_update','.access_pool').length > 0 && $('#is_update','.access_pool').val()){
+            col.push({ data: 'null', title: "Modif.", render: oRender.renderEdit });
+        }
+
+        if($('#is_delete','.access_pool').length > 0 && $('#is_delete','.access_pool').val()){
+            col.push({ data: 'null', title: "Supp.", render: oRender.renderDelete });
+        }
+
+        return col;
     }
 
     function getStatusColumn(target){
@@ -138,13 +147,22 @@ $(function(){
                 });
                 break;
         }
-        return [
-            { data: 'id', visible: false },
-            { data: 'Name', title: "Nom" },
-            { data: 'DisplayName', title: "Description" },
-            { data: 'null', title: "Modif.", render: oRender.renderEdit },
-            { data: 'null', title: "Supp.", render: oRender.renderDelete },
-        ];
+
+        var col = [];
+
+        col.push({ data: 'id', visible: false });
+        col.push({ data: 'Name', title: "Nom" });
+        col.push({ data: 'DisplayName', title: "Description" });
+
+        if($('#is_update','.access_pool').length > 0 && $('#is_update','.access_pool').val()){
+            col.push({ data: 'null', title: "Modif.", render: oRender.renderEdit });
+        }
+
+        if($('#is_admin','.access_pool').length > 0 && $('#is_admin','.access_pool').val()){
+            col.push({ data: 'null', title: "Supp.", render: oRender.renderDelete });
+        }
+
+        return col;
     }
 
     function getTaxColumn(){
@@ -153,15 +171,24 @@ $(function(){
             routeEdit: { route: "setting_tax_edit", logo: 'fa-edit' },
             routeDelete: { route: "setting_tax_delete", logo: 'fa-trash-alt' }
         });
-        return[
-            { data: 'id', visible: false },
-            { data: 'Type', title: "Type" },
-            { data: 'Value', title: "Valeur" },
-            { data: 'IsCurrent', title: "Valeur Par défaut" },
-            { data: 'CreateAt', title: "Date" },
-            { data: 'null', title: "Modif.", render: oRender.renderEdit },
-            { data: 'null', title: "Supp.", render: oRender.renderDelete },
-        ];
+
+        var col = [];
+
+        col.push({ data: 'id', visible: false });
+        col.push({ data: 'Type', title: "Type" });
+        col.push({ data: 'Value', title: "Valeur" });
+        col.push({ data: 'IsCurrent', title: "Valeur Par défaut" });
+        col.push({ data: 'CreateAt', title: "Date" });
+
+        if($('#is_update','.access_pool').length > 0 && $('#is_update','.access_pool').val()){
+            col.push({ data: 'null', title: "Modif.", render: oRender.renderEdit });
+        }
+
+        if($('#is_admin','.access_pool').length > 0 && $('#is_admin','.access_pool').val()){
+            col.push({ data: 'null', title: "Supp.", render: oRender.renderDelete });
+        }
+
+        return col;
     }
 
     function getCurrencyColumn(){
@@ -170,17 +197,26 @@ $(function(){
             routeEdit: { route: "setting_currency_edit", logo: 'fa-edit' },
             routeDelete: { route: "setting_currency_delete", logo: 'fa-trash-alt' }
         });
-        return [
-            { data: 'id', title: "Devis n°" },
-            { data: 'Name', title: "Nom" },
-            { data: 'Symbol', title: "Symbol" },
-            { data: 'Rate', title: "Taux" },
-            { data: 'CountryCode', title: "Code Pays" },
-            { data: 'IsDefault', title: "Sélection par défaut" },
-            { data: 'CreatedAt', title: "Date" },
-            { data: 'null', title: "Modif.", render: oRender.renderEdit },
-            { data: 'null', title: "Supp.", render: oRender.renderDelete },
-        ];
+
+        var col = [];
+
+        col.push({ data: 'id', title: "Devis n°" });
+        col.push({ data: 'Name', title: "Nom" });
+        col.push({ data: 'Symbol', title: "Symbol" });
+        col.push({ data: 'Rate', title: "Taux" });
+        col.push({ data: 'CountryCode', title: "Code Pays" });
+        col.push({ data: 'IsDefault', title: "Sélection par défaut" });
+        col.push({ data: 'CreatedAt', title: "Date" });
+
+        if($('#is_update','.access_pool').length > 0 && $('#is_update','.access_pool').val()){
+            col.push({ data: 'null', title: "Modif.", render: oRender.renderEdit });
+        }
+
+        if($('#is_admin','.access_pool').length > 0 && $('#is_admin','.access_pool').val()){
+            col.push({ data: 'null', title: "Supp.", render: oRender.renderDelete });
+        }
+
+        return col;
     }
 
     function getGeneralColumn(){
@@ -189,14 +225,23 @@ $(function(){
             routeEdit: { route: "setting_edit", logo: 'fa-edit' },
             routeDelete: { route: "setting_delete", logo: 'fa-trash-alt' }
         });
-        return [
-            { data: 'id', visible: false },
-            { data: 'Code', title: "Catégorie" },
-            { data: 'Name', title: "Nom" },
-            { data: 'Value', title: "Valeur" },
-            { data: 'null', title: "Modif.", render: oRender.renderEdit },
-            { data: 'null', title: "Supp.", render: oRender.renderDelete },
-        ];
+
+        var col = [];
+
+        col.push({ data: 'id', visible: false });
+        col.push({ data: 'Code', title: "Catégorie" });
+        col.push({ data: 'Name', title: "Nom" });
+        col.push({ data: 'Value', title: "Valeur" });
+
+        if($('#is_update','.access_pool').length > 0 && $('#is_update','.access_pool').val()){
+            col.push({ data: 'null', title: "Modif.", render: oRender.renderEdit });
+        }
+
+        if($('#is_admin','.access_pool').length > 0 && $('#is_admin','.access_pool').val()){
+            col.push({ data: 'null', title: "Supp.", render: oRender.renderDelete });
+        }
+
+        return col;
     }
 
     function getRender(){

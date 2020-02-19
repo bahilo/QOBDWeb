@@ -46,7 +46,7 @@ class SecurityController extends Controller
     //                      AgentRepository $agentRepo, 
     //                      RoleRepository $roleRepo) {
 
-    //     if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
+    //     if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
     //         return $this->redirectToRoute('security_deny_access');
     //     }
         
@@ -70,7 +70,7 @@ class SecurityController extends Controller
                          AgentRepository $agentRepo, 
                          RoleRepository $roleRepo) {
 
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
             return $this->redirectToRoute('security_deny_access');
         }
         
@@ -91,7 +91,7 @@ class SecurityController extends Controller
                             ActionRepository $actionRepo) {
 
 
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
             return $this->redirectToRoute('security_deny_access');
         }
         
@@ -114,7 +114,7 @@ class SecurityController extends Controller
                             Utility $utility) {
 
 
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -141,7 +141,7 @@ class SecurityController extends Controller
     public function role( Serializer $serializer, 
                           RoleRepository $roleRepo ) {
 
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
             return $this->redirectToRoute('security_deny_access');
         }
         
@@ -159,8 +159,6 @@ class SecurityController extends Controller
      * @Route("/admin/security/accesrefuse", name="security_deny_access")
      */
     public function denyAccess() {
-        
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         
         return $this->render('security/access_deny.html.twig');
     }
@@ -245,7 +243,7 @@ class SecurityController extends Controller
      */
     public function activateAgent(Agent $agent, ObjectManager $manager)
     {
-        if (!$this->securityUtility->checkHasUpdate($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
+        if (!$this->securityUtility->checkHasUpdate($this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -289,7 +287,7 @@ class SecurityController extends Controller
      */
     public function delete(Agent $agent, ObjectManager $manager) {
 
-        if (!$this->securityUtility->checkHasDelete($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
+        if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -312,7 +310,8 @@ class SecurityController extends Controller
                                ActionRepository $actionRepo, 
                                ObjectManager $manager) {
 
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY'])) &&
+            !$this->securityUtility->checkHasUpdate($this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -415,7 +414,7 @@ class SecurityController extends Controller
                                  RoleRepository $roleRepo, 
                                  ObjectManager $manager) {
 
-        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
             return $this->redirectToRoute('security_deny_access');
         }
     
@@ -458,7 +457,7 @@ class SecurityController extends Controller
                                        Request $request, 
                                        ObjectManager $manager) {
 
-        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -488,7 +487,7 @@ class SecurityController extends Controller
      */
     public function actionDelete(Action $action, ObjectManager $manager) {
 
-        if (!$this->securityUtility->checkHasDelete($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
+        if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -505,7 +504,7 @@ class SecurityController extends Controller
      */
     public function roleRegistration(Role $role = null, Request $request, ObjectManager $manager) {
 
-        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
             return $this->redirectToRoute('security_deny_access');
         }
         
@@ -536,7 +535,7 @@ class SecurityController extends Controller
      */
     public function roleDelete(Role $role, ObjectManager $manager) {
 
-        if (!$this->securityUtility->checkHasDelete($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
+        if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 

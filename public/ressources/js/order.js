@@ -51,29 +51,8 @@ $(function () {
                 orderDetail: {},
             },
             column: {
-                order: [
-                    { data: 'id', title: "Devis n°" },
-                    { data: 'CreatedAtToString', title: "date" },
-                    { data: 'ClientCompanyName', title: "Société" },
-                    { data: 'AgentFirstName', title: "Commercial", render: renderAgent },
-                    { data: 'id', title: "Détail", render: Renders.renderShow },
-                    { data: 'id', title: "Supp.", render: Renders.renderDelete },
-                ],
-                orderDetail: [
-                    { data: 'id', visible: false },
-                    { data: 'ContentComment', visible: false },
-                    { data: 'ItemPurchasePrice', visible: false },
-                    { data: 'null', title: "", class: "details-control", orderable: false, defaultContent: "" },
-                    { data: 'ItemName', title: "Nom" },
-                    { data: 'ItemRef', title: "Référence" },
-                    { data: 'ItemSellPrice', title: "P. vente", render: inputSellPriceForm },
-                    { data: 'Quantity', title: "Quantité", render: inputQuantityForm },
-                    { data: 'null', title: "Qt. en attente", render: renderQtEnAttente },
-                    { data: 'ItemSellPriceTotal', title: "P. vente total", render: renderDigit },
-                    { data: 'ItemSellPriceVATTotal', title: "P. TTC total", render: renderDigit },
-                    { data: 'ItemROIPercent', title: "Marge (%)", render: renderDigit },
-                    { data: 'ItemROICurrency', title: "Marge", render: renderDigit },
-                ],
+                order: getOrderColumn(),
+                orderDetail: getOrderDetailColumn(),
                 orderDetailDelivery: [
                     { data: 'id', visible: false },
                     { data: 'ItemName', title: "Nom" },
@@ -331,6 +310,43 @@ $(function () {
     }
 
 /*================================[ Utlities ]==================================*/
+
+    function getOrderColumn(){
+        var col = [];
+
+        col.push({ data: 'id', title: "Devis n°" });
+        col.push({ data: 'CreatedAtToString', title: "date" });
+        col.push({ data: 'ClientCompanyName', title: "Société" });
+        col.push({ data: 'AgentFirstName', title: "Commercial", render: renderAgent });
+        col.push({ data: 'id', title: "Détail", render: Renders.renderShow });
+
+        if($('#is_delete','.access_pool').length > 0 && $('#is_delete','.access_pool').val()){
+            col.push({ data: 'id', title: "Supp.", render: Renders.renderDelete });
+        }
+
+        return col;
+    }
+
+    function getOrderDetailColumn(){
+        var col = [];
+        
+        col.push({ data: 'id', visible: false });
+        col.push({ data: 'ContentComment', visible: false });
+        col.push({ data: 'null', title: "", class: "details-control", orderable: false, defaultContent: "" });
+        col.push({ data: 'ItemName', title: "Nom" });
+        if($('#is_read_sensible','.access_pool').length > 0 && $('#is_read_sensible','.access_pool').val()){
+            col.push({ data: 'ItemPurchasePrice', title: "P. achat" });
+        }
+        col.push({ data: 'ItemSellPrice', title: "P. vente", render: inputSellPriceForm });
+        col.push({ data: 'Quantity', title: "Quantité", render: inputQuantityForm });
+        col.push({ data: 'null', title: "Qt. en attente", render: renderQtEnAttente });
+        col.push({ data: 'ItemSellPriceTotal', title: "P. vente total", render: renderDigit });
+        col.push({ data: 'ItemSellPriceVATTotal', title: "P. TTC total", render: renderDigit });
+        col.push({ data: 'ItemROIPercent', title: "Marge (%)", render: renderDigit });
+        col.push({ data: 'ItemROICurrency', title: "Marge", render: renderDigit });
+        
+        return col;
+    }
 
     //-----------------------------------------------------------------------------
     //-- page détail: affiche le détail de chaque ligne produit

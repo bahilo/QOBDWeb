@@ -67,7 +67,7 @@ class SettingController extends Controller
                         Serializer $serializer,
                         Utility $utility) {
 
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
         
@@ -92,7 +92,7 @@ class SettingController extends Controller
     public function currency(CurrencyRepository $currencyRepo,
                              Serializer $serializer) {
 
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -119,7 +119,7 @@ class SettingController extends Controller
     public function tax(TaxRepository $taxRepo,
                         Serializer $serializer) {
 
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -146,7 +146,7 @@ class SettingController extends Controller
     public function deliveryStatus(DeliveryStatusRepository $delStatusRepo,
                                    Serializer $serializer) {
 
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -173,7 +173,7 @@ class SettingController extends Controller
     public function orderStatus(OrderStatusRepository $orderStatusRepo,
                                 Serializer $serializer) {
 
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -201,7 +201,7 @@ class SettingController extends Controller
     public function catalogueBrand(ItemBrandRepository $brandRepo,
                                    Serializer $serializer) {
 
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -228,7 +228,7 @@ class SettingController extends Controller
     public function catalogueGroup(ItemGroupeRepository $groupRepo,
                                    Serializer $serializer) {
 
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -255,7 +255,7 @@ class SettingController extends Controller
     public function catalogueProvider(ProviderRepository $providerRepo,
                                    Serializer $serializer) {
 
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -321,7 +321,7 @@ class SettingController extends Controller
                                  ObjectManager $manager,
                                  Utility $utility) {
 
-        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -372,7 +372,7 @@ class SettingController extends Controller
                                          Request $request, 
                                          ObjectManager $manager) {
 
-        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -409,7 +409,7 @@ class SettingController extends Controller
                                             Request $request, 
                                             ObjectManager $manager) {
 
-        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -441,7 +441,7 @@ class SettingController extends Controller
                                     Request $request, 
                                     ObjectManager $manager) {
 
-        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -495,7 +495,7 @@ class SettingController extends Controller
                                       Request $request, 
                                       ObjectManager $manager) {
 
-        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -531,7 +531,7 @@ class SettingController extends Controller
                                       Request $request, 
                                       ObjectManager $manager) {
 
-        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -566,7 +566,7 @@ class SettingController extends Controller
                                          Request $request, 
                                          ObjectManager $manager) {
 
-        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -601,7 +601,7 @@ class SettingController extends Controller
                                             Request $request, 
                                             ObjectManager $manager) {
 
-        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -663,7 +663,7 @@ class SettingController extends Controller
      */
     public function emailRegistration(Request $request) {
 
-        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -703,7 +703,7 @@ class SettingController extends Controller
      */
     public function delete(Setting $setting, ObjectManager $manager)
     {
-        if (!$this->securityUtility->checkHasDelete($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+        if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -718,7 +718,7 @@ class SettingController extends Controller
      */
     public function currencyDelete(Currency $currency, ObjectManager $manager)
     {
-        if (!$this->securityUtility->checkHasDelete($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+        if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -733,7 +733,7 @@ class SettingController extends Controller
      */
     public function taxDelete(Tax $tax, ObjectManager $manager)
     {
-        if (!$this->securityUtility->checkHasDelete($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+        if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -748,7 +748,7 @@ class SettingController extends Controller
      */
     public function deliveryStatusDelete(DeliveryStatus $status, ObjectManager $manager)
     {
-        if (!$this->securityUtility->checkHasDelete($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+        if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -764,7 +764,7 @@ class SettingController extends Controller
     public function providerDelete(Provider $provider, ObjectManager $manager)
     {
 
-        if (!$this->securityUtility->checkHasDelete($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+        if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -780,7 +780,7 @@ class SettingController extends Controller
     public function groupDelete(ItemGroupe $group, ObjectManager $manager)
     {
 
-        if (!$this->securityUtility->checkHasDelete($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+        if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -796,7 +796,7 @@ class SettingController extends Controller
     public function brandDelete(ItemBrand $brand, ObjectManager $manager)
     {
 
-        if (!$this->securityUtility->checkHasDelete($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+        if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -811,7 +811,7 @@ class SettingController extends Controller
      */
     public function orderStatusDelete(OrderStatus $status, QuoteOrderRepository $orderRepo, ObjectManager $manager)
     {
-        if (!$this->securityUtility->checkHasDelete($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+        if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
         

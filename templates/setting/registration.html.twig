@@ -43,7 +43,7 @@
                         </div>
                         <br/>
 
-                        {% if is_granted('ROLE_OPERATOR') %}
+                        {% if search.get_right_admin() %}
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
                                 <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Clé utilisée dans le code pour faire référence à la configuration">
@@ -109,6 +109,10 @@
 </div>
 
 {% endblock %}
+
+
+
+
 {% block javascripts %}
 <script src="{{ asset('setting.js','qobd_web_js') }}"></script>
 {% endblock %}

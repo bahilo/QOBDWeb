@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Bill;
+use App\Entity\Agent;
 use App\Entity\Delivery;
 use App\Entity\QuoteOrder;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -26,10 +27,11 @@ class QuoteOrderRepository extends ServiceEntityRepository
     //  */
     /*
     */
-    public function findCustomBy($form)
+    public function findCustomBy($form, Agent $agent)
     {
         $queryBuilder = $this->createQueryBuilder('q');
         $parameters = [];
+       
         if (!empty($form['order'])) {
             $queryBuilder->andWhere('q.id = :id');
             $parameters['id'] = $form['order'];
@@ -46,7 +48,7 @@ class QuoteOrderRepository extends ServiceEntityRepository
             $queryBuilder->andWhere('q_c.id = :clientid');
             $parameters['clientid'] = $form['client'];
         }
-        if (!empty($form['agent'])) {
+        if (!empty($form['agent']) && $agent->getIsAdmin()) {
             $queryBuilder->innerJoin('q.Agent', 'q_a');
             $queryBuilder->andWhere('q_a.id = :agentid');
             $parameters['agentid'] = $form['agent'];
@@ -58,6 +60,11 @@ class QuoteOrderRepository extends ServiceEntityRepository
         if (!empty($form['dtFin'])) {
             $queryBuilder->andWhere('q.CreatedAt <= :dtFin');
             $parameters['dtFin'] = $form['dtFin'] . ' 23:59:59';
+        }
+
+        if(!$agent->getIsAdmin()){
+            $queryBuilder->andWhere('q.Agent = :agent');
+            $parameters['agent'] = $agent;
         }
 
         return $queryBuilder

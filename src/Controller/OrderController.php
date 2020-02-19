@@ -98,7 +98,7 @@ class OrderController extends Controller
      */
     public function home($message = null) {
 
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -115,7 +115,7 @@ class OrderController extends Controller
      */
     public function quote() {
 
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_QUOTE']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_QUOTE']))) {
             return $this->redirectToRoute('security_deny_access');
         }
         
@@ -131,7 +131,7 @@ class OrderController extends Controller
      */
     public function preorder() {
 
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_PREORDER']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_PREORDER']))) {
             return $this->redirectToRoute('security_deny_access');
         }
         
@@ -147,7 +147,7 @@ class OrderController extends Controller
      */
     public function prerefund() {
 
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_PREREFUND']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_PREREFUND']))) {
             return $this->redirectToRoute('security_deny_access');
         }
         
@@ -163,7 +163,7 @@ class OrderController extends Controller
      */
     public function refund() {
 
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_REFUND']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_REFUND']))) {
             return $this->redirectToRoute('security_deny_access');
         }
         
@@ -179,7 +179,7 @@ class OrderController extends Controller
      */
     public function bill() {
 
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_BILL']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_BILL']))) {
             return $this->redirectToRoute('security_deny_access');
         }
         
@@ -195,7 +195,7 @@ class OrderController extends Controller
      */
     public function billRefund() {
 
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_BILL']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_BILL']))) {
             return $this->redirectToRoute('security_deny_access');
         }
         
@@ -211,7 +211,7 @@ class OrderController extends Controller
      */
     public function customerValid() {
 
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_VALID']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_VALID']))) {
             return $this->redirectToRoute('security_deny_access');
         }
         
@@ -227,7 +227,7 @@ class OrderController extends Controller
      */
     public function closed() {
 
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER_CLOSED']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER_CLOSED']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -243,7 +243,7 @@ class OrderController extends Controller
      */
     public function refundClosed() {
 
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_REFUND_CLOSED']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_REFUND_CLOSED']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -264,7 +264,7 @@ class OrderController extends Controller
         string $message = null,
         $statut = null) {
 
-        if (!$this->securityUtility->checkHasUpdate($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+        if (!$this->securityUtility->checkHasUpdate($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -308,7 +308,7 @@ class OrderController extends Controller
                               TaxRepository $tvaRepo,
                               $statut = null) {
 
-        if (!$this->securityUtility->checkHasUpdate($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_QUOTE']))) {
+        if (!$this->securityUtility->checkHasUpdate($this->actionRepo->findOneBy(['Name' => 'ACTION_QUOTE']))) {
             return $this->redirectToRoute('security_deny_access');
         }
         $order = $this->orderRepo->find($id);
@@ -339,7 +339,7 @@ class OrderController extends Controller
                                 TaxRepository $tvaRepo, 
                                 $statut = null) {
 
-        if (!$this->securityUtility->checkHasUpdate($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_PREORDER']))) {
+        if (!$this->securityUtility->checkHasUpdate($this->actionRepo->findOneBy(['Name' => 'ACTION_PREORDER']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -370,7 +370,7 @@ class OrderController extends Controller
                                   TaxRepository $tvaRepo,
                                   $statut = null) {
 
-        if (!$this->securityUtility->checkHasUpdate($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_REFUND']))) {
+        if (!$this->securityUtility->checkHasUpdate($this->actionRepo->findOneBy(['Name' => 'ACTION_REFUND']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -402,7 +402,7 @@ class OrderController extends Controller
         Mailer $mailer,
         ObjectManager $manager) {
 
-        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -447,7 +447,7 @@ class OrderController extends Controller
         Security $security,
         TaxRepository $taxRepo) {
 
-        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -515,7 +515,7 @@ class OrderController extends Controller
                           SettingManager $settingManager, 
                           PdfWebService $webservice) {
 
-        if (!$this->securityUtility->checkHasEmail($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+        if (!$this->securityUtility->checkHasEmail($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -551,7 +551,7 @@ class OrderController extends Controller
         PdfWebService $webservice
     ) {
 
-        if (!$this->securityUtility->checkHasEmail($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+        if (!$this->securityUtility->checkHasEmail($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -586,13 +586,13 @@ class OrderController extends Controller
                            AgentRepository $agentRepo)
     {
 
-        /*if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+        /*if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
             return $this->redirectToRoute('security_deny_access');
         }*/
         
         $data = $this->serializer->serialize([
             'object_array' => [
-                'data' => $this->orderManager->getHydrater()->hydrateQuoteOrder($this->orderRepo->findCustomBy($request->request->get('search')))],
+                'data' => $this->orderManager->getHydrater()->hydrateQuoteOrder($this->orderRepo->findCustomBy($request->request->get('search'), $this->getUser()))],
             'format' => 'json',
             'group' => 'class_property'
         ]);        
@@ -612,7 +612,7 @@ class OrderController extends Controller
                          Request $request,
                          ObjectManager $manager) {
 
-        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
             return $this->redirectToRoute('security_deny_access');
         }
                 
@@ -641,7 +641,7 @@ class OrderController extends Controller
                          Request $request,
                          ObjectManager $manager) {
 
-        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -703,7 +703,7 @@ class OrderController extends Controller
         DeliveryStatusRepository $delStatusRepo,
         ObjectManager $manager) {
 
-        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_BILL']))) {
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_BILL']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -756,7 +756,7 @@ class OrderController extends Controller
         ItemRepository $itemRepo,
         ObjectManager $manager) {
 
-        if (!$this->securityUtility->checkHasDelete($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_BILL']))) {
+        if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_BILL']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -801,7 +801,7 @@ class OrderController extends Controller
         DeliveryRepository $deliveryRepo,
         ObjectManager $manager) {
 
-        if (!$this->securityUtility->checkHasDelete($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+        if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -842,7 +842,7 @@ class OrderController extends Controller
         QuoteOrderDetail $orderDetail,
         ObjectManager $manager) {
 
-        if (!$this->securityUtility->checkHasUpdate($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+        if (!$this->securityUtility->checkHasUpdate($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -861,7 +861,7 @@ class OrderController extends Controller
     public function pdfBill(Bill $bill, 
                             PdfWebService $webservice) {
 
-        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_PDF']))) {
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_PDF']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -878,7 +878,7 @@ class OrderController extends Controller
     public function pdfQuote(QuoteOrder $order,
                             PdfWebService $webservice) {
 
-        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_PDF']))) {
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_PDF']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -896,7 +896,7 @@ class OrderController extends Controller
     public function pdfDelivery(Delivery $delivery, 
                             PdfWebService $webservice) {
 
-        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_PDF']))) {
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_PDF']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -917,7 +917,7 @@ class OrderController extends Controller
     public function delete(QuoteOrder $order,
                            ObjectManager $manager) {
 
-        if (!$this->securityUtility->checkHasDelete($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+        if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 

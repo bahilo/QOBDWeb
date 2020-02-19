@@ -31,25 +31,170 @@
 
                         {{ form_start(formClient, { 'attr': {'id': 'global_form' }}) }}
 
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Prénom">
+                                    <i class="fa fa-id-card"></i>
+                                </span>
+                            </div>
+                            {{ form_widget(formClient.FirstName,{'label': 'Prénom','attr': {'placeholder': 'Prénom'}}) }}
+                        </div>
 
-                        {{ form_row(formClient.FirstName,{'label': 'Prénom','attr': {'placeholder': 'Prénom'}}) }}
-                        {{ form_row(formClient.LastName,{'label': 'Nom','attr': {'placeholder': 'Nom'}}) }}
-                        {{ form_row(formClient.Email,{'label': 'Email','attr': {'placeholder': 'Email...'}}) }}
-                        {{ form_row(formClient.CompanyName,{'label': 'Société','attr': {'placeholder': 'Société'}}) }}
-                        {{ form_row(formClient.Denomination,{'label': 'Dénomination','attr': {'placeholder': 'Dénomination'}}) }}
-                        {{ form_row(formClient.Phone,{'label': 'Numéro de téléphone','attr': {'placeholder': 'Numéro de téléphone'}}) }}
-                        {{ form_row(formClient.Fax,{'label': 'Fax','attr': {'placeholder': 'Fax'}}) }}
-                        {{ form_row(formClient.Rib,{'label': 'RIB','attr': {'placeholder': 'Rib'}}) }}
-                        {{ form_row(formClient.CRN,{'label': 'Kbis','attr': {'placeholder': 'kbis'}}) }}
-                        {{ form_row(formClient.PayDelay,{'label': 'Délais de paiement', 'attr': {'placeholder': 'Délais de paiement'}}) }}
-                        {{ form_row(formClient.MaxCredit,{'label': 'Encours Max', 'attr': {'placeholder': 'Encours Max'}}) }}
-                        {{ form_row(formClient.AddressName,{'label': 'Intitulé de l\'address', 'attr': {'placeholder': 'Intitulé de l\'address'}}) }}
-                        {{ form_row(formClient.Street,{'label': 'Adresse', 'attr': {'placeholder': 'Adresse'}}) }}
-                        {{ form_row(formClient.ZipCode,{'label': 'Code Postal', 'attr': {'placeholder': 'Code Postal'}}) }}
-                        {{ form_row(formClient.City,{'label': 'Ville', 'attr': {'placeholder': 'Ville'}}) }}
-                        {{ form_row(formClient.Country,{'label': 'Pays', 'attr': {'placeholder': 'Pays'}}) }}
-                        {{ form_row(formClient.ClientComment,{'label': 'Commentaire général sur le client', 'attr': {'placeholder': 'Commentaire général sur le client'}}) }}
-                        {{ form_row(formClient.AddressComment,{'label': 'Commentaire sur l\'adresse', 'attr': {'placeholder': 'Commentaire sur l\'adresse'}}) }}
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Nom">
+                                    <i class="fa fa-id-card"></i>
+                                </span>
+                            </div>
+                            {{ form_widget(formClient.LastName,{'label': 'Nom','attr': {'placeholder': 'Nom'}}) }}
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Email">
+                                    <i class="fa fa-envelope"></i>
+                                </span>
+                            </div>
+                            {{ form_widget(formClient.Email,{'label': 'Email','attr': {'placeholder': 'Email...'}}) }}
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Société">
+                                    <i class="fa fa-building"></i>
+                                </span>
+                            </div>
+                            {{ form_widget(formClient.CompanyName,{'label': 'Société','attr': {'placeholder': 'Société'}}) }}
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Dénomination">
+                                    <i class="fa fa-chess-board"></i>
+                                </span>
+                            </div>
+                            {{ form_widget(formClient.Denomination,{'label': 'Dénomination','attr': {'placeholder': 'Dénomination'}}) }}
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Numéro de téléphone">
+                                    <i class="fa fa-phone"></i>
+                                </span>
+                            </div>
+                            {{ form_widget(formClient.Phone,{'label': 'Numéro de téléphone','attr': {'placeholder': 'Numéro de téléphone'}}) }}
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Fax">
+                                    <i class="fa fa-blender-phone"></i>
+                                </span>
+                            </div>
+                            {{ form_widget(formClient.Fax,{'label': 'Fax','attr': {'placeholder': 'Fax'}}) }}
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="RIB">
+                                    <i class="fa fa-university"></i>
+                                </span>
+                            </div>
+                            {{ form_widget(formClient.Rib,{'label': 'RIB','attr': {'placeholder': 'Rib'}}) }}
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Kbis">
+                                    <i class="fa fa-university"></i>
+                                </span>
+                            </div>
+                            {{ form_widget(formClient.CRN,{'label': 'Kbis','attr': {'placeholder': 'kbis'}}) }}
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Délais de paiement">
+                                    <i class="fa fa-hourglass"></i>
+                                </span>
+                            </div>
+                            {{ form_widget(formClient.PayDelay,{'label': 'Délais de paiement', 'attr': {'placeholder': 'Délais de paiement'}}) }}
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Encours Max">
+                                    <i class="fa fa-history"></i>
+                                </span>
+                            </div>
+                            {{ form_widget(formClient.MaxCredit,{'label': 'Encours Max', 'attr': {'placeholder': 'Encours Max'}}) }}
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Intitulé de l\'address">
+                                    <i class="fa fa-map-marked-alt"></i>
+                                </span>
+                            </div>
+                            {{ form_widget(formClient.AddressName,{'label': 'Intitulé de l\'address', 'attr': {'placeholder': 'Intitulé de l\'address'}}) }}
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Adresse">
+                                    <i class="fa fa-map-marked-alt"></i>
+                                </span>
+                            </div>
+                            {{ form_widget(formClient.Street,{'label': 'Adresse', 'attr': {'placeholder': 'Adresse'}}) }}
+                        </div>
+                        
+
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Code Postal">
+                                    <i class="fa fa-map-marked-alt"></i>
+                                </span>
+                            </div>
+                            {{ form_widget(formClient.ZipCode,{'label': 'Code Postal', 'attr': {'placeholder': 'Code Postal'}}) }}
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Ville">
+                                    <i class="fa fa-map-marked-alt"></i>
+                                </span>
+                            </div>
+                            {{ form_widget(formClient.City,{'label': 'Ville', 'attr': {'placeholder': 'Ville'}}) }}
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Pays">
+                                    <i class="fa fa-map-marked-alt"></i>
+                                </span>
+                            </div>
+                            {{ form_widget(formClient.Country,{'label': 'Pays', 'attr': {'placeholder': 'Pays'}}) }}
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Commentaire général sur le client">
+                                    <i class="fa fa-comments"></i>
+                                </span>
+                            </div>
+                            {{ form_widget(formClient.ClientComment,{'label': 'Commentaire général sur le client', 'attr': {'placeholder': 'Commentaire général sur le client'}}) }}
+                        </div>
+                        
+
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Commentaire sur l\'adresse">
+                                    <i class="fa fa-comments"></i>
+                                </span>
+                            </div>
+                            {{ form_widget(formClient.AddressComment,{'label': 'Commentaire sur l\'adresse', 'attr': {'placeholder': 'Commentaire sur l\'adresse'}}) }}
+                        </div>
+                        
                         {{ form_row(formClient.IsProspect) }}
 
                         {{ form_end(formClient) }}

@@ -50,7 +50,7 @@ class StatisticController extends Controller
     public function orderByWeek()
     {
 
-        /*if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_STATISTIC']))) {
+        /*if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_STATISTIC']))) {
             return $this->redirectToRoute('security_deny_access');
         }*/
 
@@ -65,7 +65,7 @@ class StatisticController extends Controller
     public function orderByMonth()
     {
 
-        /*if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_STATISTIC']))) {
+        /*if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_STATISTIC']))) {
             return $this->redirectToRoute('security_deny_access');
         }*/
 
@@ -80,7 +80,7 @@ class StatisticController extends Controller
     public function orderByYear()
     {
 
-        /*if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_STATISTIC']))) {
+        /*if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_STATISTIC']))) {
             return $this->redirectToRoute('security_deny_access');
         }*/
 

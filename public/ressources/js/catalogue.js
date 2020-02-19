@@ -8,20 +8,7 @@ $(function () {
 
     $("#item_table_js").myTable({
         dataSource: $("#item_data_source").val(),
-        columns: [
-            { data: 'id', title: "", visible: false },
-            { data: 'IsErasable', title: "", visible: false },
-            { data: 'FullPathPicture', title: "", render: Renders.renderPicture },
-            { data: 'Ref', title: "Réf." },
-            { data: 'Name', title: "Désignation" },
-            { data: 'ItemBrandName', title: "Marque" }, 
-            { data: 'ItemGroupeName', title: "Sous famille" },
-            { data: 'PurchasePrice', title: "P. Achat" },
-            { data: 'SellPrice', title: "P. Vente" },
-            { data: 'id', title: "Modif.", render: Renders.renderEdit },
-            { data: 'id', title: "Supp.", render: Renders.renderDelete },
-            { data: 'id', title: "Ajouter", render: Renders.renderAddCart },
-        ]
+        columns: getColumn()
     });
 
     $(function(){
@@ -44,5 +31,36 @@ $(function () {
         });
 
     });
+
+    function getColumn(){
+        var col = [];
+
+        col.push({ data: 'id', title: "", visible: false });
+        col.push({ data: 'IsErasable', title: "", visible: false });
+        col.push({ data: 'FullPathPicture', title: "", render: Renders.renderPictur });
+        col.push({ data: 'Ref', title: "Réf." });
+        col.push({ data: 'Name', title: "Désignation" });
+        col.push({ data: 'ItemBrandName', title: "Marque" });
+        col.push({ data: 'ItemGroupeName', title: "Sous famille" });
+        col.push({ data: 'PurchasePrice', title: "P. Achat" });
+
+        if($('#is_admin','.access_pool').length > 0 && $('#is_admin','.access_pool').val()){
+            col.push({ data: 'SellPrice', title: "P. Vente" });
+        }
+
+        if($('#is_update','.access_pool').length > 0 && $('#is_update','.access_pool').val()){
+            col.push({ data: 'id', title: "Modif.", render: Renders.renderEdit });
+        }
+
+        if($('#is_delete','.access_pool').length > 0 && $('#is_delete','.access_pool').val()){
+            col.push({ data: 'id', title: "Supp.", render: Renders.renderDelete });
+        }
+
+        if($('#is_quote_write','.access_pool').length > 0 && $('#is_quote_write','.access_pool').val()){
+            col.push({ data: 'id', title: "Ajouter", render: Renders.renderAddCart });
+        }
+
+        return col;
+    }
 
 });

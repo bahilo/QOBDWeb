@@ -43,7 +43,7 @@ class HomeController extends Controller
      */
     public function dashbord(Mailer $mailer) {
         
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_DASHBORD']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_DASHBORD']))) {
             return $this->redirectToRoute('order');//('security_deny_access');
         }
 

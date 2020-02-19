@@ -1,0 +1,243 @@
+body {
+  font-family: Work Sans;
+  font-weight: 400;
+  font-size: 16px;
+}
+
+.site-title {
+  font-size: 36px;
+}
+
+.site-description {
+  font-size: 16px;
+}
+
+.main-navigation ul ul li {
+  font-size: 13px;
+}
+
+.single-post .entry-title {
+  font-size: 36px;
+  color: #191919;
+}
+
+.widget-area .widget-title {
+  font-size: 24px;
+}
+
+.widget-area .widget {
+  font-size: 16px;
+}
+
+.sidebar-column .widget-title {
+  font-size: 20px;
+}
+
+.sidebar-column .widget {
+  font-size: 16px;
+}
+
+.site-info {
+  font-size: 13px;
+}
+
+.woocommerce div.product .woocommerce-tabs ul.tabs li.active a, .product div.entry-summary p.price, .product div.entry-summary span.price, .athemes-blog:not(.airi_athemes_blog_skin) .posted-on a, .athemes-blog:not(.airi_athemes_blog_skin) .byline a:hover, .testimonials-section.style1:before, .single-post .read-more-link .gt, .blog-loop .read-more-link .gt, .single-post .posted-on a, .blog-loop .posted-on a, .entry-title a:hover, .airi_recent_entries .post-date, .menuStyle3 .top-bar .contact-item .fa, .menuStyle4 .contact-area .contact-block .contact-icon, .widget_categories li:hover::before, .widget_categories li:hover a {
+  color: #f0437e;
+}
+
+.product .single_add_to_cart_button.button.alt, .menuStyle4 .contact-area .contact-block .contact-icon, button, .button, input[type="button"], input[type="reset"], input[type="submit"] {
+  border-color: #f0437e;
+}
+
+.woocommerce-checkout button.button.alt, .woocommerce-checkout button.button.alt:hover, .woocommerce-cart .cart-collaterals .cart_totals .button:hover, .woocommerce-cart .cart-collaterals .cart_totals .button, .product .single_add_to_cart_button.button.alt:hover, .product .single_add_to_cart_button.button.alt, .woocommerce ul.products li.product .button, .menuStyle2 .main-navigation a:hover:after, .menuStyle2 .main-navigation .current-menu-item:after, .comments-area .comment-reply-link:hover, .menuStyle4 .main-navigation .header-cta:before, .menuStyle4 .main-navigation .header-cta, button, .button, input[type="button"], input[type="reset"], input[type="submit"], .menuStyle3 .main-navigation a:hover:after, .menuStyle3 .main-navigation .current-menu-item:after {
+  background-color: #f0437e;
+}
+
+.menuStyle1 .site-title a {
+  color: #ffffff;
+}
+
+.menuStyle1 .sticky-wrapper.is-sticky .site-title a {
+  color: #191919;
+}
+
+.menuStyle1 .site-description {
+  color: #ffffff;
+}
+
+.menuStyle1 .sticky-wrapper.is-sticky .site-description {
+  color: #191919;
+}
+
+.menuStyle1 .main-navigation a, .menuStyle1 .fa-search {
+  color: #ffffff;
+}
+
+.menuStyle1 .sticky-wrapper.is-sticky .main-navigation a, .menuStyle1 .sticky-wrapper.is-sticky .fa-search {
+  color: #ffffff;
+}
+
+.menuStyle1 .is-sticky .site-header {
+  background-color: #13151d;
+}
+
+#site-navigation ul ul li a {
+  color: #1c1c1c;
+}
+
+#site-navigation ul ul li {
+  background-color: #f7f7f7;
+}
+
+.entry-title a {
+  color: #191919;
+}
+
+.single-post .post-cat, .blog-loop .post-cat {
+  background-color: #eff1f4;
+}
+
+.single-post .entry-meta, .blog-loop .entry-meta {
+  color: #bfbfbf;
+}
+
+.single-post .entry-meta .byline a, .blog-loop .entry-meta .byline a {
+  color: #595959;
+}
+
+.single-post .entry-content, .blog-loop .entry-content {
+  color: #595959;
+}
+
+.widget .widget-title {
+  color: #191919;
+}
+
+.widget {
+  color: #707070;
+}
+
+.widget a {
+  color: #595959;
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Work Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local("Work Sans"), local("WorkSans-Regular"), url(https://mk0athemesdemon3j7s5.kinstacdn.com/wp-content/uploads/sites/86/2019/07/QGYsz_wNahGAdqQ43Rh_cqDv-2.woff) format("woff");
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Work Sans';
+  font-style: normal;
+  font-weight: 500;
+  src: local("Work Sans Medium"), local("WorkSans-Medium"), url(https://mk0athemesdemon3j7s5.kinstacdn.com/wp-content/uploads/sites/86/2019/07/QGYpz_wNahGAdqQ43Rh3j4P8lthL-2.woff) format("woff");
+}
+
+img.wp-smiley,
+img.emoji {
+  display: inline !important;
+  border: none !important;
+  -webkit-box-shadow: none !important;
+          box-shadow: none !important;
+  height: 1em !important;
+  width: 1em !important;
+  margin: 0 .07em !important;
+  vertical-align: -0.1em !important;
+  background: none !important;
+  padding: 0 !important;
+}
+
+.atu-agency-video img {
+  display: none !important;
+}
+
+.atu-agency-video .eicon-play {
+  font-size: 62px;
+}
+
+.atu-agency-video .elementor-custom-embed-image-overlay {
+  height: 60px;
+}
+
+.atu-agency-progress .elementor-progress-wrapper {
+  height: 8px;
+  line-height: 8px;
+}
+
+.atu-agency-progress .elementor-progress-percentage {
+  position: relative;
+  top: -16px;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.athemes-blog:not(.atu_athemes_blog_skin) .posted-on a {
+  color: #df2176;
+}
+
+.atu-agency-testimonials .elementor-testimonial-meta::after {
+  content: "\f10e";
+  font-family: Fontawesome;
+  float: right;
+  color: #ebebeb;
+  font-size: 32px;
+  position: relative;
+  top: 5px;
+}
+
+/* Contact page map */
+.contact-page-map #atu-map {
+  height: 400px;
+}
+
+.contact-page-form label,
+.contact-page-form input:not(.wpcf7-submit),
+.contact-page-form select {
+  width: 100%;
+  max-width: 100%;
+}
+
+.contact-page-form select {
+  padding: 17px 20px;
+}
+
+.contact-page-form .wpcf7-submit {
+  width: auto;
+  margin: 0 auto;
+  display: table;
+  border-radius: 30px;
+  -webkit-box-shadow: 0 5px 35px 0 rgba(51, 51, 51, 0.26);
+          box-shadow: 0 5px 35px 0 rgba(51, 51, 51, 0.26);
+}
+
+.contact-page-form .row {
+  margin-bottom: 10px;
+}
+
+.site-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+button, .button, input[type="button"], input[type="reset"], input[type="submit"] {
+  border-radius: 30px;
+}
+
+.page-id-198 #masthead {
+  background-color: #13151d;
+}
+
+@media (max-width: 600px) {
+  .elementor-4 .elementor-element.elementor-element-14cde3a {
+    background-image: none !important;
+  }
+}
+
+h1, h2, h3, h4, h5, h6, .site-title {
+  font-family: Work Sans;
+  font-weight: 500;
+}
+/*# sourceMappingURL=blog.css.map */

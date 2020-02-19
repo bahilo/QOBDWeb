@@ -29,7 +29,7 @@ class AgentController extends Controller
      */
     public function home(AgentRepository $agentRepo, Serializer $serializer, Utility $utility)
     {
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_AGENT']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_AGENT']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -45,7 +45,7 @@ class AgentController extends Controller
         Utility $utility
     ) {
 
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_AGENT']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_AGENT']))) {
             return $this->redirectToRoute('security_deny_access');
         }
         

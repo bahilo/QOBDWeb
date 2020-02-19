@@ -24,9 +24,9 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block body_header_right %}
-    {% if route_plus is defined %}
+    {% if route_plus is defined and search.get_right_write("ACTION_SECURITY") %}
         <a href="{{ route_plus }}" class="btn btn-primary"><i class="fa fa-plus"></i></a>
-    {% else %}
+    {% elseif search.get_right_update("ACTION_SECURITY") %}
         <button form="global_form" type="submit" class="btn btn-"><i class="fa fa-save"></i></button>
     {% endif %}
 {% endblock %}
@@ -57,6 +57,19 @@
 {% endif %}
 
 {% endblock %}
+
+
+{% block access_pool %}
+<div class="access_pool">
+    <input type="hidden" id="is_read" value="{{ search.get_right_read("ACTION_SECURITY") }}" />
+    <input type="hidden" id="is_write" value="{{ search.get_right_write("ACTION_SECURITY") }}" />
+    <input type="hidden" id="is_update" value="{{ search.get_right_update("ACTION_SECURITY") }}" />
+    <input type="hidden" id="is_delete" value="{{ search.get_right_delete("ACTION_SECURITY") }}" />
+    <input type="hidden" id="is_mail" value="{{ search.get_right_email("ACTION_SECURITY") }}" />
+    <input type="hidden" id="is_admin" value="{{ search.get_right_admin() }}" />
+</div>
+{% endblock %}
+
 {% block javascripts %} 
     <script src="{{  asset('security.js','qobd_web_js') }}"></script>
 {% endblock %}

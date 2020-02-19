@@ -69,7 +69,9 @@
 {% endblock %}
 
 {% block body_header_right %}
-<button form="global_form" type="submit" class="btn btn-"><i class="fa fa-save"></i></button>
+    {% if search.get_right_update("ACTION_ORDER") %}
+    <button form="global_form" type="submit" class="btn btn-"><i class="fa fa-save"></i></button>
+    {% endif %}
 {% endblock %}
 
 {% block body %}
@@ -562,4 +564,16 @@
 {% block message_pool %}
 <input type="hidden" name="report-feedback" class="report-feedback" value="{{ code_message }}">
 <input type="hidden" name="report-status" class="report-status" value="{{ code_status }}">
+{% endblock %}
+
+{% block access_pool %}
+<div class="access_pool">
+    <input type="hidden" id="is_read" value="{{ search.get_right_read("ACTION_ORDER") }}" />
+    <input type="hidden" id="is_write" value="{{ search.get_right_write("ACTION_ORDER") }}" />
+    <input type="hidden" id="is_update" value="{{ search.get_right_update("ACTION_ORDER") }}" />
+    <input type="hidden" id="is_delete" value="{{ search.get_right_delete("ACTION_ORDER") }}" />
+    <input type="hidden" id="is_mail" value="{{ search.get_right_email("ACTION_ORDER") }}" />
+    <input type="hidden" id="is_read_sensible" value="{{ search.get_right_read("ACTION_SENSIBLE") }}" />
+    <input type="hidden" id="is_admin" value="{{ search.get_right_admin() }}" />
+</div>
 {% endblock %}

@@ -37,7 +37,7 @@ class CatalogueController extends Controller
                           SessionInterface $session,
                           CatalogueHydrate $catHydrate)
     {
-        if (!$this->securityUtility->checkHasRead($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_CATALOGUE']))) {
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_CATALOGUE']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
@@ -58,7 +58,7 @@ class CatalogueController extends Controller
                                     CatalogueHydrate $catHydrate,
                                     Utility $utility) {
 
-        if (!$this->securityUtility->checkHasWrite($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_CATALOGUE']))) {
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_CATALOGUE']))) {
             return $this->redirectToRoute('security_deny_access');
         }
     
@@ -104,7 +104,7 @@ class CatalogueController extends Controller
                            ObjectManager $manager,
                            QuoteOrderDetailRepository $orderDetailRepo) {
 
-        if (!$this->securityUtility->checkHasDelete($this->getUser(), $this->actionRepo->findOneBy(['Name' => 'ACTION_CATALOGUE']))) {
+        if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_CATALOGUE']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 

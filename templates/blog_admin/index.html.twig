@@ -1,20 +1,62 @@
-{% extends 'base.html.twig' %}
+{% extends 'template_coreui.html.twig' %}
 
-{% block title %}Hello BlogAdminController!{% endblock %}
+
+{% block title %}{{ parent() }} - {{ page_title }}{% endblock %}
+
+{% block home_path %}
+<li class="breadcrumb-item">
+    {% if not page_title %}
+    Configuration
+    {% else %}
+    <a href="#">Configuration</a>
+    {% endif %}
+</li>
+{% if page_title %}
+<li class="breadcrumb-item">
+    {{ page_title }}
+</li>
+{% endif %}
+{% endblock %}
+
+{% block body_header_right %}
+{% if search.get_right_write("ACTION_BLOG") %}
+<a href="{{ create_url }}" class="btn"><i class="fa fa-plus"></i></a>
+{% endif %}
+{% endblock %}
+
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
 
 <div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa fa-align-justify"></i> {{ page_title | default('Configuration') }}</div>
+                    <div class="card-body">
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'D:/wamp2/www/QOBDWeb/src/Controller/BlogAdminController.php'|file_link(0) }}">src/Controller/BlogAdminController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'D:/wamp2/www/QOBDWeb/templates/blog_admin/index.html.twig'|file_link(0) }}">templates/blog_admin/index.html.twig</a></code></li>
-    </ul>
+                        {% include page %}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+{% endblock %}
+
+{% block access_pool %}
+<div class="access_pool">
+    <input type="hidden" id="is_read" value="{{ search.get_right_read("ACTION_BLOG") }}" />
+    <input type="hidden" id="is_write" value="{{ search.get_right_write("ACTION_BLOG") }}" />
+    <input type="hidden" id="is_update" value="{{ search.get_right_update("ACTION_BLOG") }}" />
+    <input type="hidden" id="is_delete" value="{{ search.get_right_delete("ACTION_BLOG") }}" />
+    <input type="hidden" id="is_mail" value="{{ search.get_right_email("ACTION_BLOG") }}" />
+    <input type="hidden" id="is_admin" value="{{ search.get_right_admin() }}" />
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="{{ asset('setting.js','qobd_web_js') }}"></script>
 {% endblock %}

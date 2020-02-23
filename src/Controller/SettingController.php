@@ -64,23 +64,18 @@ class SettingController extends Controller
      * @Route("/admin/configuration", name="setting_home")
      */
     public function home(SettingRepository $settingRepo,
-                        Serializer $serializer,
                         Utility $utility) {
 
         if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
         
-        $source = $utility->getSettingDataSource($settingRepo->findAll());
-        //dump($source); die();
-        $codes = $utility->getDistinctByCode($settingRepo->findAll());
         return $this->render('setting/index.html.twig', [
             'data_table' => 'general_table_js',
             'data_table_source' => 'general_data_source',
             'page_title' => '',
-            'source' => $source,
-            //'table_target' => json_encode($settings),
-            'codes' => $codes,
+            'source' => $utility->getSettingDataSource($settingRepo->findAll()),
+            'codes' => $utility->getDistinctByCode($settingRepo->findAll()),
             'create_url' => $this->generateUrl('setting_registration'),
             'page' => 'setting/_partials/general.html',
         ]);
@@ -90,23 +85,17 @@ class SettingController extends Controller
      * @Route("/admin/configuration/monnaie", options={"expose"=true}, name="setting_currency")
      */
     public function currency(CurrencyRepository $currencyRepo,
-                             Serializer $serializer) {
+                             Utility $utility) {
 
         if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
-        $source = $serializer->serialize([
-            'object_array' => $currencyRepo->findAll(),
-            'format' => 'json',
-            'group' => 'class_property'
-        ]);
-
         return $this->render('setting/index.html.twig', [
             'data_table' => 'currency_table_js',
             'data_table_source' => 'currency_data_source',
             'page_title' => 'Monnaie',
-            'source' => $source,
+            'source' => $utility->getSettingDataSource($currencyRepo->findAll()),
             'codes' => ["CURRENCY"],
             'create_url' => $this->generateUrl('setting_currency_registration'),
             'page' => 'setting/_partials/index.html',
@@ -117,24 +106,18 @@ class SettingController extends Controller
      * @Route("/admin/configuration/taxe", options={"expose"=true}, name="setting_tax")
      */
     public function tax(TaxRepository $taxRepo,
-                        Serializer $serializer) {
+                        Utility $utility) {
 
         if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
-
-        $source = $serializer->serialize([
-            'object_array' => $taxRepo->findAll(),
-            'format' => 'json',
-            'group' => 'class_property'
-        ]);
 
         return $this->render('setting/index.html.twig', [
             'data_table' => 'tax_table_js',
             'data_table_source' => 'tax_data_source',
             'page_title' => 'Tax',
             'codes' => ["TAX"],
-            'source' => $source,
+            'source' => $utility->getSettingDataSource($taxRepo->findAll()),
             'create_url' => $this->generateUrl('setting_tax_registration'),
             'page' => 'setting/_partials/index.html',
         ]);
@@ -144,23 +127,17 @@ class SettingController extends Controller
      * @Route("/admin/configuration/facturation/statut", options={"expose"=true}, name="setting_delivery_status")
      */
     public function deliveryStatus(DeliveryStatusRepository $delStatusRepo,
-                                   Serializer $serializer) {
+                                   Utility $utility) {
 
         if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
-        $source = $serializer->serialize([
-            'object_array' => $delStatusRepo->findAll(),
-            'format' => 'json',
-            'group' => 'class_property'
-        ]);
-
         return $this->render('setting/index.html.twig', [
             'data_table' => 'delivery_status_table_js',
             'data_table_source' => 'delivery_status_data_source',
             'page_title' => 'Statut Facturation',
-            'source' => $source,
+            'source' => $utility->getSettingDataSource($delStatusRepo->findAll()),
             'codes' => ["STATUS"],
             'create_url' => $this->generateUrl('setting_delivery_status_registration'),
             'page' => 'setting/_partials/index.html',
@@ -171,24 +148,18 @@ class SettingController extends Controller
      * @Route("/admin/configuration/commande/statut", options={"expose"=true}, name="setting_order_status")
      */
     public function orderStatus(OrderStatusRepository $orderStatusRepo,
-                                Serializer $serializer) {
+                                Utility $utility) {
 
         if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
-
-        $source =  $serializer->serialize([
-            'object_array' => $orderStatusRepo->findAll(),
-            'format' => 'json',
-            'group' => 'class_property'
-        ]);
 
         //dump($orderStatusRepo->findAll());die();
         return $this->render('setting/index.html.twig', [
             'data_table' => 'status_table_js',
             'data_table_source' => 'order_status_data_source',
             'page_title' => 'Statut Commande',
-            'source' => $source,
+            'source' => $utility->getSettingDataSource($orderStatusRepo->findAll()),
             'codes' => ["STATUS"],
             'create_url' => $this->generateUrl('setting_order_status_registration'),
             'page' => 'setting/_partials/index.html',
@@ -199,23 +170,17 @@ class SettingController extends Controller
      * @Route("/admin/configuration/produit/marque", options={"expose"=true}, name="setting_catalogue_brand")
      */
     public function catalogueBrand(ItemBrandRepository $brandRepo,
-                                   Serializer $serializer) {
+                                   Utility $utility) {
 
         if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
-        $source =  $serializer->serialize([
-            'object_array' => $brandRepo->findAll(),
-            'format' => 'json',
-            'group' => 'class_property'
-        ]);
-
         return $this->render('setting/index.html.twig', [
             'data_table' => 'brand_table_js',
             'data_table_source' => 'brand_data_source',
             'page_title' => 'Marque Produit',
-            'source' => $source,
+            'source' => $utility->getSettingDataSource($brandRepo->findAll()),
             'codes' => ["BRAND"],
             'create_url' => $this->generateUrl('setting_brand_registration'),
             'page' => 'setting/_partials/index.html',
@@ -226,23 +191,17 @@ class SettingController extends Controller
      * @Route("/admin/configuration/produit/famille", options={"expose"=true}, name="setting_catalogue_group")
      */
     public function catalogueGroup(ItemGroupeRepository $groupRepo,
-                                   Serializer $serializer) {
+                                   Utility $utility) {
 
         if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
-        $source =  $serializer->serialize([
-            'object_array' => $groupRepo->findAll(),
-            'format' => 'json',
-            'group' => 'class_property'
-        ]);
-
         return $this->render('setting/index.html.twig', [
             'data_table' => 'group_table_js',
             'data_table_source' => 'group_data_source',
             'page_title' => 'Famille Produit',
-            'source' => $source,
+            'source' => $utility->getSettingDataSource($groupRepo->findAll()),
             'codes' => ["GROUP"],
             'create_url' => $this->generateUrl('setting_group_registration'),
             'page' => 'setting/_partials/index.html',
@@ -253,25 +212,17 @@ class SettingController extends Controller
      * @Route("/admin/configuration/produit/fournisseur", options={"expose"=true}, name="setting_catalogue_provider")
      */
     public function catalogueProvider(ProviderRepository $providerRepo,
-                                   Serializer $serializer) {
+                                   Utility $utility) {
 
         if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
-        $source =  $serializer->serialize([
-            'object_array' => $providerRepo->findAll(),
-            'format' => 'json',
-            'group' => 'class_property'
-        ]);
-
-        //dump($source); die();
-
         return $this->render('setting/index.html.twig', [
             'data_table' => 'provider_table_js',
             'data_table_source' => 'provider_data_source',
             'page_title' => 'Fournisseur Produit',
-            'source' => $source,
+            'source' => $utility->getSettingDataSource($providerRepo->findAll()),
             'codes' => ["PROVIDER"],
             'create_url' => $this->generateUrl('setting_provider_registration'),
             'page' => 'setting/_partials/index.html',
@@ -629,7 +580,6 @@ class SettingController extends Controller
      * @Route("/admin/configuration/produit/import/sauvegarde", options={"expose"=true}, name="setting_catalogue_import_registration")
      */
     public function importRegistration(
-        Utility $utility,
         Request $request,
         ObjectManager $manager
     ) {

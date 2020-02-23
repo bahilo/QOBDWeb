@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <system.webServer>
+        <rewrite>
+            <rules>
+                <rule name="Canonical Host Name" stopProcessing="true">
+                    <match url="(.*)" />
+                    <conditions>
+                        <add input="{HTTP_HOST}" pattern="^$" />
+                    </conditions>
+                    <action type="Redirect" url="public/{R:0}" redirectType="Permanent" />
+                </rule>
+             </rules>
+        </rewrite>
+    </system.webServer>
+</configuration>

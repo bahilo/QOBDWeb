@@ -66,7 +66,7 @@ class SecurityManager implements LogoutHandlerInterface, AuthenticationSuccessHa
         return true;
     }
 
-    public function checkHas(Action $action, $privilege)
+    public function checkHas(?Action $action, $privilege)
     {
         $agent = $this->token->getUser();
         if ($this->isAccessGranted($agent)) {
@@ -91,27 +91,27 @@ class SecurityManager implements LogoutHandlerInterface, AuthenticationSuccessHa
         return false;
     }
 
-    public function checkHasRead(Action $action)
+    public function checkHasRead(?Action $action)
     {
         return $this->checkHas($action, 'READ');
     }
 
-    public function checkHasWrite(Action $action)
+    public function checkHasWrite(?Action $action)
     {
         return $this->checkHas($action, 'WRITE');
     }
 
-    public function checkHasUpdate(Action $action)
+    public function checkHasUpdate(?Action $action)
     {
         return $this->checkHas($action, 'UPDATE');
     }
 
-    public function checkHasDelete(Action $action)
+    public function checkHasDelete(?Action $action)
     {
         return $this->checkHas($action, 'DELETE');
     }
 
-    public function checkHasEmail(Action $action)
+    public function checkHasEmail(?Action $action)
     {
         return $this->checkHas($action, 'MAIL');
     }

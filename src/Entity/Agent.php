@@ -191,6 +191,11 @@ class Agent implements UserInterface
      */
     private $TotalUnRead;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Article", mappedBy="Author")
+     */
+    private $Article;
+
     public function __construct()
     {
         $this->Roles = new ArrayCollection();
@@ -199,6 +204,7 @@ class Agent implements UserInterface
         $this->orders = new ArrayCollection();
         $this->messages = new ArrayCollection();
         $this->agentDiscussions = new ArrayCollection();
+        $this->Article = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -624,6 +630,37 @@ class Agent implements UserInterface
     public function setTotalUnRead(int $TotalUnRead): self
     {
         $this->TotalUnRead = $TotalUnRead;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Article[]
+     */
+    public function getArticle(): Collection
+    {
+        return $this->Article;
+    }
+
+    public function addArticle(Article $Article): self
+    {
+        if (!$this->Article->contains($Article)) {
+            $this->Article[] = $Article;
+            $Article->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeArticle(Article $Article): self
+    {
+        if ($this->Article->contains($Article)) {
+            $this->Article->removeElement($Article);
+            // set the owning side to null (unless already changed)
+            if ($Article->getAuthor() === $this) {
+                $Article->setAuthor(null);
+            }
+        }
 
         return $this;
     }

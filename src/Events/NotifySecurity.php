@@ -48,7 +48,7 @@ class NotifySecurity implements EventSubscriberInterface
         return [
             MyEvents::USER_LOGGEDIN => 'onAgentLoggedIn',
             MyEvents::USER_LOGGEDOUT => 'onAgentLoggedOut',
-            KernelEvents::REQUEST =>  'onKernelRequest'
+            KernelEvents::REQUEST =>  'onKernelRequest',
         ];
     }
 

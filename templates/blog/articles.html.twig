@@ -1,0 +1,47 @@
+{% extends 'blog.html.twig' %}
+
+{% block title %}Blog!{% endblock %}
+
+
+
+{% block body %}
+
+    {% for article in articles %}
+
+        <article id="post-60"
+            class="post-60 post type-post status-publish format-standard has-post-thumbnail hentry category-blog category-food">
+            <div class="entry-thumbnail"> <img width="800" height="400"
+                    src="https://demo.themegrill.com/flash/wp-content/uploads/sites/106/2017/01/blog-1-800x400.jpg"
+                    class="attachment-flash-big size-flash-big wp-post-image lazyloaded" alt=""
+                    data-lazy-src="https://demo.themegrill.com/flash/wp-content/uploads/sites/106/2017/01/blog-1-800x400.jpg"
+                    data-was-processed="true"><noscript><img width="800" height="400"
+                        src="https://demo.themegrill.com/flash/wp-content/uploads/sites/106/2017/01/blog-1-800x400.jpg"
+                        class="attachment-flash-big size-flash-big wp-post-image" alt="" /></noscript></div>
+            <div class="entry-content-block">
+                <header class="entry-header">
+                    <h2 class="entry-title"><a href="https://demo.themegrill.com/flash/2017/01/02/receipe-for-food-lover/"
+                            rel="bookmark">RECEIPE FOR FOOD LOVER</a></h2>
+                </header>
+                <div class="entry-meta"> <span class="entry-date"><i class="fa fa-clock-o"></i><a
+                            href="https://demo.themegrill.com/flash/2017/01/02/receipe-for-food-lover/" rel="bookmark"><time
+                                class="date published" datetime="2017-01-02T10:01:21+00:00">January 2, 2017</time><time
+                                class="updated" datetime="2017-08-04T06:44:41+00:00">August 4, 2017</time></a></span><span
+                        class="entry-author vcard author"> <i class="fa fa-user"></i><a class="url fn n"
+                            href="https://demo.themegrill.com/flash/author/themeeditor/">TG-Demo Team</a></span></div>
+                <div class="entry-content">
+                    <p>Apple pie dessert jelly-o cotton candy soufflé toffee croissant candy canes. Cupcake chupa chups
+                        danish sugar plum candy canes marshmallow. Bear claw soufflé cheesecake toffee cake oat cake pastry.
+                        Cotton candy fruitcake jelly-o. Sesame snaps cake macaroon jelly candy sesame snaps. Bonbon powder
+                        sesame snaps toffee marshmallow halvah icing. Soufflé croissant halvah cake danish liquorice jujubes
+                        sugar plum icing. Pie lemon drops gummi bears ice cream tart chocolate cake candy canes.</p>
+                </div>
+                <footer class="entry-footer"> <span class="cat-links"><i class="fa fa-folder-open"></i> <a
+                            href="https://demo.themegrill.com/flash/category/blog/" rel="category tag">Blog</a>, <a
+                            href="https://demo.themegrill.com/flash/category/food/" rel="category tag">Food</a> </span>
+                </footer>
+            </div>
+        </article>
+
+    {% endfor %}
+
+{% endblock %}

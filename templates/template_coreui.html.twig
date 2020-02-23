@@ -314,6 +314,53 @@
                   </ul>
               </li>
               {% endif %}
+              {% if search.get_right_read("ACTION_BLOG") %}
+              <li class="nav-title">Blog</li>
+              <li class="nav-item nav-dropdown">
+                <a class="nav-link nav-dropdown-toggle" href="#">
+                  <i class="fa fa-cog"></i> Blog Config.</a>
+                  <ul class="nav-dropdown-items">
+                    <li class="nav-item">
+                      <a class="nav-link" href="{{ path("blog_admin_setting_home") }}">
+                        <i class="fa fa-sliders-h"></i> Générale</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{{ path("blog_admin_setting_poster") }}">
+                        <i class="fa fa-coins"></i> Posters</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{{ path("blog_admin_setting_interest") }}">
+                        <i class="fa fa-money-bill-wave-alt"></i> Centres d'interets</a>
+                    </li>
+                    <li class="nav-item nav-dropdown">
+                      <a class="nav-link nav-dropdown-toggle" href="#">
+                        <i class="fa fa-id-card"></i> Articles</a>
+                      <ul class="nav-dropdown-items">
+                        <li class="nav-item">
+                          <a class="nav-link" href="{{ path("blog_admin_article_general") }}">
+                            <i class="fa fa-star"></i> Générale</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="{{ path("blog_admin_article_product") }}">
+                            <i class="fa fa-star"></i> Produits</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="{{ path("blog_admin_article_team") }}">
+                            <i class="fa fa-star-half-alt"></i> Présentation équipe</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="{{ path("blog_admin_article_testimony") }}">
+                            <i class="fa fa-star-half-alt"></i> Témoignage</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="{{ path("blog_admin_article_partenaire") }}">
+                            <i class="fa fa-star-half-alt"></i> Partenaire</a>
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+              </li>
+              {% endif %}
             {% endif %}
 
             {# <li class="nav-item">

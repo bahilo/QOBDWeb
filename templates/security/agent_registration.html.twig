@@ -14,7 +14,7 @@
 </li>
 {% endblock %}
 
-{% block title %}{{ page_title }} {% endblock %}
+{% block title %}{{ parent() }} - {{ page_title }} {% endblock %}
 
 {% block stylesheets %} 
     <link rel="stylesheet" href="{{ asset('agent.css', 'qobd_web_css') }}">

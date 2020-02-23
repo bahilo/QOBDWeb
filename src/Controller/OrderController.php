@@ -4,9 +4,10 @@ namespace App\Controller;
 
 use App\Entity\Bill;
 use App\Entity\Delivery;
-use App\Entity\OrderStatus;
+use App\Events\MyEvents;
 use App\Services\Mailer;
 use App\Entity\QuoteOrder;
+use App\Entity\OrderStatus;
 use App\Services\Serializer;
 use App\Services\OrderManager;
 use App\Services\PdfWebService;
@@ -32,6 +33,7 @@ use App\Repository\QuoteOrderDetailRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
@@ -560,13 +562,20 @@ class OrderController extends Controller
         $form = $request->request->get('order_detail_form')['setting']['email'];
         $bill = $billRepo->find($form['bill']);
         $file = $webservice->downloadBill($bill, $this->getParameter('file.pdf.bill.download_dir'), $this->getParameter('file.type.download_order'), $this->getParameter('file.type.download_refund'));
-
-        $mailer->sendAttachedFile($contact->getEmail(), $form['subject'], $this->renderView('email/_partials/bill.html', [
+        $view = $this->renderView('email/_partials/bill.html', [
             'contact_name' => $contact->getLastName(),
             'company' => $settingManager->get('SOCIETE', 'societe')->getValue(),
-            'bill_id' => $setManager->get("FACTURE","prefix")->getValue() . $bill->getId(),
-        ]), $file);
+            'bill_id' => $setManager->get("FACTURE", "prefix")->getValue() . $bill->getId(),
+        ]);
 
+        $event = new GenericEvent([
+            'form' => $form,
+            'bill' => $bill,
+            'file' => $file,
+            'view' => $view,
+        ]);
+        $this->eventDispatcher->dispatch(MyEvents::ORDER_EMAIL_BILL, $event);
+        
         return $this->redirectToRoute('order_show_report', [
             'message' => "La facture " . basename($file) . " a été envoyé au client avec succès!",
             'statut' => 200,

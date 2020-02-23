@@ -11,7 +11,7 @@
 </li>
 {% endblock %}
 
-{% block title %}{{ page_title }} {% endblock %}
+{% block title %}{{ parent() }} - {{ page_title }} {% endblock %}
 
 {% block body_header_left %}
     {% if items | length > 0 %}

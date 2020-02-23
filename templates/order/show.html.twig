@@ -14,7 +14,7 @@
 {% set target = { link: "order_validation", param: [{id: order.id, idStatus: status_refund.id}]} %}
 {% endif %}
 
-{% block title %} {{ page_title }} {% endblock %}
+{% block title %}{{ parent() }} - {{ page_title }} {% endblock %}
 
 {% block home_path %}
 <li class="breadcrumb-item">

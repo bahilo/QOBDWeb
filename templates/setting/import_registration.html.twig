@@ -14,7 +14,7 @@
 </li>
 {% endblock %}
 
-{% block title %}{{ page_title }} {% endblock %}
+{% block title %}{{ parent() }} - {{ page_title }} {% endblock %}
 
 {% block body_header_right %}
 <button form="global_form" type="submit" class="btn btn-"><i class="fa fa-save"></i></button>

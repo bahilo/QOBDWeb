@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>{% block title %}Welcome!{% endblock %}</title>
+    <title>{% block title %}{{ search.get_setting("SOCIETE","SOCIETE_NOM").value }}{% endblock %}</title>
     <link rel="stylesheet" href="{{ asset('bootstrap.min.css', 'bootstrap_css') }}">
     <link rel="stylesheet" href="{{ asset('all.min.css', 'font_awsome_css') }}">   
     <link rel="stylesheet" href="{{ asset('style/scss/coreui.css', 'theme_coreui') }}">       
@@ -69,21 +69,20 @@
         </li> #}
         <li class="nav-item dropdown">
           <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-            {% if app.user.picture is not null %}
+            {% if app.user.picture %}
             <img class="img-avatar" src="{{ asset('agent/avatars/' ~ app.user.picture, 'download_dir') }}" alt="Image profile">
             {% else %}
-            <img class="img-avatar" src="{{ asset('agent/avatars/default.png', 'download_dir') }}" alt="Image profile">
+            <img class="img-avatar img-circle" src="{{ asset('agent/avatars/default.png', 'download_dir') }}" alt="Image profile">
             {% endif %}
           </a>
           <div class="dropdown-menu dropdown-menu-right">
              <div class="dropdown-header text-center">
               <strong>Compte</strong>
             </div>
-            <!--<a class="dropdown-item" href="#">
-              <i class="fa fa-envelope"></i> Messages
-              <span class="badge badge-success">42</span>
+            <a class="dropdown-item" href="{{ path("agent_show", { id: app.user.id }) }}">
+              <i class="fa fa-user-circle"></i> Mes Informations
             </a>
-            <div class="dropdown-header text-center">
+            <!--<div class="dropdown-header text-center">
               <strong>Settings</strong>
             </div>
             <a class="dropdown-item" href="{{ path("agent_show", {id: app.user.id}) }}">
@@ -350,6 +349,7 @@
         </ol>
         <div class="container-fluid">
           
+          {% block body_header %}
           <ol class="breadcrumb body-header">
             <li class="breadcrumb-item active">
               {% block body_header_left %}{% endblock %}
@@ -359,7 +359,7 @@
             </li>
           </ol>
             {% block body %}{% endblock %}
-            
+          {% endblock %}
         </div>
       </main>
       <div class="chat-wrapper">

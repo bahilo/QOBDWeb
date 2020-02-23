@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>{% block title %}Welcome!{% endblock %}</title>
+    <title>{% block title %}{{ search.get_setting("SOCIETE","SOCIETE_NOM").value }}{% endblock %}</title>
     <link rel="stylesheet" href="https://unpkg.com/@coreui/coreui/dist/css/coreui.min.css">
     <link rel="stylesheet" href="{{ asset('bootstrap.min.css', 'bootstrap_css') }}">
     <!-- <link rel="stylesheet" href="{{ asset('datatables.min.css', 'datatable_dir') }}"> -->
@@ -21,8 +21,8 @@
                     <div class="card-group">
                         <div class="card p-4">
                             <div class="card-body">
-                                <h1>Login</h1>
-                                <p class="text-muted">Sign In to your account</p>
+                                <h1>Connexion</h1>
+                                <p class="text-muted">Entrez vos identifiants de connexion</p>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">
@@ -41,9 +41,13 @@
                                     <input type="password" name="_password" id="" class="form-control"
                                         placeholder="Mot de passe">
                                 </div>
+                                <div class="rememberMe">
+                                    <input type="checkbox" id="remember_me" name="_remember_me" checked />
+                                    <label for="remember_me">Rester connecté</label>
+                                </div>
                                 <div class="row">
                                     <div class="col-6">
-                                        <button type="submit" class="btn btn-primary px-4">Login</button>
+                                        <button type="submit" class="btn btn-primary px-4">Connexion</button>
                                     </div>
                                     <div class="col-6 text-right">
                                         <a href="{{ path("security_anonymous_registration") }}" class="btn btn-secondary">s'inscrire</a>

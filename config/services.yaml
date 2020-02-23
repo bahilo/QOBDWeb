@@ -17,6 +17,8 @@ parameters:
     file.type.download_quote: 0
     file.type.download_order: 1
     file.type.download_refund: 2
+    session_max_idle_time: 1800
+    secret: '%env(APP_SECRET)%'
 
 services:
     # default configuration for services in *this* file
@@ -30,6 +32,7 @@ services:
             $logo_dir: '%resource.download_dir%/setting/image'
             $avatar_dir: '%resource.download_dir%/agent/avatars'
             $catalogue_dir: '%resource.download_dir%/setting/catalogue'
+            $maxIdleTime: '%session_max_idle_time%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name

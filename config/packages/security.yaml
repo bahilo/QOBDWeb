@@ -24,13 +24,18 @@ security:
                 login_path: security_login
                 check_path: security_login
                 default_target_path: home
+                remember_me: true            
                 success_handler: App\Services\SecurityManager
 
             logout:
                 path: security_logout
                 target: security_login
                 handlers: [App\Services\SecurityManager]
-            
+
+            remember_me:
+                secret: '%secret%'
+                lifetime: 604800
+                path: home
             # remember_me:
             #     lifetime: 604800 # 1 week in seconds
             #     always_remember_me: false

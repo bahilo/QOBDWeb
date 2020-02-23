@@ -191,7 +191,9 @@ class SecurityController extends Controller
         $form = $this->createForm(AgentRegistrationType::class, $agent);
 
         $form->handleRequest($request);
-
+// dump($form->isSubmitted());
+//         dump($form->isValid());
+// die();
         if($form->isSubmitted() && $form->isValid() ){
             
             $role = $roleRepo->findOneBy(['Name' => 'ROLE_ANONYMOUS']);
@@ -220,21 +222,23 @@ class SecurityController extends Controller
 
             $manager->persist($agent);
             $manager->flush();
+            
 
-            $mailer->send(
-                $agent->getEmail(),
-                'Inscription',
-                $this->renderView('email/registration.html.twig',['agent' => $agent])
-            );
-
-            if(!$isEdit)
+            if(!$isEdit){
+                $mailer->send(
+                    $agent->getEmail(),
+                    'Inscription',
+                    $this->renderView('email/registration.html.twig', ['agent' => $agent])
+                );
                 return $this->redirectToRoute('security_login');
+            }
             else
-                return $this->redirectToRoute('agent_home');
+                return $this->redirectToRoute('home');
         }        
 
-        return $this->render('security/agent_registration.html.twig', [
-            'formAgent' => $form->createView()
+        return $this->render('agent/show.html.twig', [
+            'formAgent' => $form->createView(),
+            'agent' => $agent
         ]);
     }
 

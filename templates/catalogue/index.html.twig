@@ -3,7 +3,7 @@
 {% set page_title = "Produits" %}
 
 
-{% block title %} {{ page_title }} {% endblock %}
+{% block title %}{{ parent() }} - {{ page_title }} {% endblock %}
 
 {% block home_path %}
 <li class="breadcrumb-item">

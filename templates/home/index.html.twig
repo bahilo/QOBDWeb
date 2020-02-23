@@ -1,6 +1,6 @@
 {% extends 'template_coreui.html.twig' %}
 
-{% block title %}Hello HomeController!{% endblock %}
+{% block title %}{{ search.get_setting("SOCIETE","SOCIETE_NOM").value }}{% endblock %}
 
 {% block body_header_left %}
     <div class="row">

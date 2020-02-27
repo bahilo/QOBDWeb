@@ -14,17 +14,18 @@
 </head>
 
   <body class="app header-fixed sidebar-fixed aside-menu-fixed sidebar-lg-show">
+    
     <header class="app-header navbar">
       <button class="navbar-toggler sidebar-toggler d-lg-none mr-auto" type="button" data-toggle="sidebar-show">
         <span class="navbar-toggler-icon"></span>
       </button>
       <a class="navbar-brand" href="#">
+      
         {% if search.logo %}
         <img class="navbar-brand-full" src="{{ search.logo }}" width="89" height="25" alt="CoreUI Logo">
         {% else %}
         {{ search.get_setting("SOCIETE","SOCIETE_NOM").value }}
         {% endif %}
-        <img class="navbar-brand-minimized" src="{{ asset('image/brand/sygnet.svg', 'theme_coreui') }}" width="30" height="30" alt="CoreUI Logo">
       </a>
       <button class="navbar-toggler sidebar-toggler d-md-down-none" type="button" data-toggle="sidebar-lg-show">
         <span class="navbar-toggler-icon"></span>
@@ -765,7 +766,7 @@
 
       {#=============================== javascripts ================================#}
 
-    <script src="{{ asset('jquery-3.4.1.js','qobd_web_js') }}"></script>
+    <script src="{{ asset('js/jquery-3.4.1.js','theme_default') }}"></script>
     <script src="{{ asset('javascript/popper.min.js','theme_coreui') }}"></script>
     <script src="{{ asset('bootstrap.js','bootstrap_js') }}"></script>
     <script src="{{ asset('javascript/charts.2.8.0.js','theme_coreui') }}"></script>
@@ -775,21 +776,21 @@
     <script src="{{ asset('datatables.js','datatable_dir') }}"></script>    
     <script src="{{ asset('dataTables.responsive.min.js','datatable_dir') }}"></script>
     <script src="{{ asset('all.min.js','font_awsome_js') }}"></script>
-    <script src="{{ asset('lodash.min.js','qobd_web_js') }}"></script>
+    <script src="{{ asset('js/lodash.min.js','theme_default') }}"></script>
     <script src="{{ asset('bundles/fosjsrouting/js/router.min.js') }}"></script>
-    <script src="{{ asset('fos_js_routes.js','qobd_web_js') }}"></script>
-    <script src="{{ asset('global.js','qobd_web_js') }}"></script>
-    <script src="{{ asset('render_methods.js','qobd_web_js') }}"></script>
-    <script src="{{ asset('data_table.js','qobd_web_js') }}"></script>
-    <script src="{{ asset('chat.js','qobd_web_js') }}"></script>
-    <script src="{{ asset('base.js','qobd_web_js') }}"></script>
-    <!-- <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>-->
+    <script src="{{ asset('js/fos_js_routes.js','theme_default') }}"></script>
+    {# <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script> #}
+    <script src="{{ asset('js/global.js','theme_default') }}"></script>
+    <script src="{{ asset('js/render_methods.js','theme_default') }}"></script>
+    <script src="{{ asset('js/data_table.js','theme_default') }}"></script>
+    <script src="{{ asset('js/chat.js','theme_default') }}"></script>
+    <script src="{{ asset('js/base.js','theme_default') }}"></script>
     
     {% block javascripts %} {% endblock %}
 
     {% block access_pool %}{% endblock %}
     {% block message_pool %}{% endblock %}
-
+  <input type="hidden" id="base_dir" value="{{ search.root_dir }}"/>
 </body>
 
 </html>

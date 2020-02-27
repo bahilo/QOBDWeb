@@ -4,6 +4,10 @@
 body {
   table-layout: fixed;
  
+  ul.error-wrapper{
+    color: red;
+  }
+  
   textarea{
     width: 100%;
   }
@@ -55,9 +59,11 @@ body {
         }
     }
 
-    ul.pagination{
-        .page-item{
-            cursor:pointer;
+    ul{
+        &.pagination{
+            .page-item{
+                cursor:pointer;
+            }
         }
     }
 

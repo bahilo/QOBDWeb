@@ -48,6 +48,7 @@ class NotifySecurity implements EventSubscriberInterface
         return [
             MyEvents::USER_LOGGEDIN => 'onAgentLoggedIn',
             MyEvents::USER_LOGGEDOUT => 'onAgentLoggedOut',
+            MyEvents::USER_REGISTRATION_SEND_EMAIL => 'onAgentRegistration',
             KernelEvents::REQUEST =>  'onKernelRequest',
         ];
     }
@@ -99,5 +100,14 @@ class NotifySecurity implements EventSubscriberInterface
                 return new RedirectResponse($this->router->generate('security_login'));
             }
         }
+    }
+
+    public function onAgentRegistration(GenericEvent $event){
+        $params = $event->getSubject();
+        $this->mailer->send(
+            $params['to'],
+            $params['subject'],
+            $params['view']
+        );
     }
 }

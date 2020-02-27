@@ -2,6 +2,10 @@ body {
   table-layout: fixed;
 }
 
+body ul.error-wrapper {
+  color: red;
+}
+
 body textarea {
   width: 100%;
 }

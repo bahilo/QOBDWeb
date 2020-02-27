@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Role;
 use App\Entity\Agent;
 use App\Entity\Action;
+use App\Events\MyEvents;
 use App\Services\Mailer;
 use App\Entity\Privilege;
 use App\Services\Utility;
@@ -21,7 +22,10 @@ use App\Repository\ActionRoleRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
@@ -30,12 +34,14 @@ class SecurityController extends Controller
 
     protected $securityUtility;
     protected $actionRepo;
+    protected $eventDispatcher;
 
 
-    public function __construct(SecurityManager $securityUtility, ActionRepository $actionRepo)
+    public function __construct(SecurityManager $securityUtility, ActionRepository $actionRepo, EventDispatcherInterface $eventDispatcher)
     {
         $this->securityUtility = $securityUtility;
         $this->actionRepo = $actionRepo;
+        $this->eventDispatcher = $eventDispatcher;
     }
     
     // /**
@@ -178,7 +184,8 @@ class SecurityController extends Controller
                                       UserPasswordEncoderInterface $encoder,
                                       RoleRepository $roleRepo,
                                       Utility $utility,
-                                      Mailer $mailer)
+                                      Mailer $mailer,
+                                      ValidatorInterface $validator)
     {
         
         $isEdit = true;
@@ -191,10 +198,9 @@ class SecurityController extends Controller
         $form = $this->createForm(AgentRegistrationType::class, $agent);
 
         $form->handleRequest($request);
-// dump($form->isSubmitted());
-//         dump($form->isValid());
-// die();
-        if($form->isSubmitted() && $form->isValid() ){
+        $errors = $validator->validate($agent);
+
+        if($form->isSubmitted() && $form->isValid() && count($errors) == 0){
             
             $role = $roleRepo->findOneBy(['Name' => 'ROLE_ANONYMOUS']);
             
@@ -225,21 +231,37 @@ class SecurityController extends Controller
             
 
             if(!$isEdit){
-                $mailer->send(
-                    $agent->getEmail(),
-                    'Inscription',
-                    $this->renderView('email/registration.html.twig', ['agent' => $agent])
-                );
+                $event = new GenericEvent([
+                    'to' => $agent->getEmail(),
+                    'subject' => 'Inscription',
+                    'view' =>$this->renderView('email/registration.html.twig', ['agent' => $agent]),
+                ]);
+                $this->eventDispatcher->dispatch(MyEvents::USER_REGISTRATION_SEND_EMAIL, $event);
+                // $mailer->send(
+                //     $agent->getEmail(),
+                //     'Inscription',
+                //     $this->renderView('email/registration.html.twig', ['agent' => $agent])
+                // );
                 return $this->redirectToRoute('security_login');
             }
             else
                 return $this->redirectToRoute('home');
         }        
 
-        return $this->render('agent/show.html.twig', [
-            'formAgent' => $form->createView(),
-            'agent' => $agent
-        ]);
+        //dump($errors);die();
+        if($isEdit){
+            return $this->render('agent/show.html.twig', [
+                'formAgent' => $form->createView(),
+                'agent' => $agent,
+                'errors' => $errors
+            ]);  
+        }
+        else{
+            return $this->render('security/anonymous_registration.html.twig', [
+                'formAgent' => $form->createView(),
+                'errors' => $errors
+            ]);            
+        }
     }
 
     /**
@@ -269,7 +291,8 @@ class SecurityController extends Controller
     {
         $form = $this->createForm(AgentRegistrationType::class, new Agent());
         return $this->render('security/anonymous_registration.html.twig', [
-            'formAgent' => $form->createView()
+            'formAgent' => $form->createView(),
+            'errors' => []
         ]);
     }
 

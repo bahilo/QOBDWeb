@@ -36,6 +36,13 @@
                         <h1>Compte</h1>
                         <p class="text-muted">Création de compte</p>
                         
+                        {% if errors | length > 0 %}
+                            <ul class="error-wrapper">
+                                {% for error in errors %}
+                                    <li>{{ error.message }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
 
                         {{ form_start(formAgent, {'action': path("security_registration"), 'enctype':'multipart/form-data', 'attr': {'id': 'global_form' }}) }}
                         
@@ -117,7 +124,7 @@
         </div>
     </div>
     <!-- CoreUI and necessary plugins-->
-    <script src="{{ asset('jquery-3.4.1.js','qobd_web_js') }}"></script>
+    <script src="{{ asset('js/jquery-3.4.1.js','theme_default') }}"></script>
     <script src="{{ asset('javascript/popper.min.js','theme_coreui') }}"></script>
     <script src="{{ asset('bootstrap.js','bootstrap_js') }}"></script>
     <script src="{{ asset('javascript/coreui.min.js','theme_coreui') }}"></script>
@@ -126,11 +133,11 @@
     <script src="{{ asset('datatables.js','datatable_dir') }}"></script>
     <script src="{{ asset('dataTables.responsive.min.js','datatable_dir') }}"></script>
     <script src="{{ asset('all.min.js','font_awsome_js') }}"></script>
-    <script src="{{ asset('lodash.min.js','qobd_web_js') }}"></script>
+    <script src="{{ asset('js/lodash.min.js','theme_default') }}"></script>
     <script src="{{ asset('bundles/fosjsrouting/js/router.min.js') }}"></script>
-    <script src="{{ asset('fos_js_routes.js','qobd_web_js') }}"></script>
-    <script src="{{ asset('render_methods.js','qobd_web_js') }}"></script>
-    <script src="{{ asset('data_table.js','qobd_web_js') }}"></script>
+    <script src="{{ asset('js/fos_js_routes.js','theme_default') }}"></script>
+    <script src="{{ asset('js/render_methods.js','theme_default') }}"></script>
+    <script src="{{ asset('js/data_table.js','theme_default') }}"></script>
 </body>
 
 </html>

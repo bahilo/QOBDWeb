@@ -14,7 +14,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\AgentRepository")
- * @UniqueEntity(fields={"Email"},message="L'email existe déjà dans la base de données")
+ * UniqueEntity(fields={"Email"},message="L'email existe déjà dans la base de données")
  * @UniqueEntity(fields={"UserName"},message="Le pseudonyme existe déjà dans la base donnéés")
  * 
  */
@@ -68,7 +68,6 @@ class Agent implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\Length(min="6", minMessage="Votre pseudonyme doit faire minimun {{ limit }} caractères")
      * @Groups({"class_property"})
      * @SerializedName("UserName")
      */
@@ -88,7 +87,7 @@ class Agent implements UserInterface
     private $Confirme_password;
 
     /**
-     * 
+     * @Assert\Length(min="6", minMessage="Votre mot de passe doit faire un minimun de {{ limit }} caractères")
      */
     private $PlainTextPassword;
 

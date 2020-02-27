@@ -34,6 +34,14 @@
                         <div class="card-header">
                             <i class="fa fa-align-justify"></i> {{ page_title }}</div>
                         <div class="card-body">
+                        
+                            {% if errors | length > 0 %}
+                                <ul class="error-wrapper">
+                                    {% for error in errors %}
+                                        <li>{{ error.message }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
 
                             {{ form_start(formAgent, {'enctype':'multipart/form-data', 'attr': {'id': 'global_form' }}) }}
 
@@ -132,5 +140,5 @@
 
 {% endblock %}
 {% block javascripts %} 
-    <script src="{{  asset('agent.js','qobd_web_js') }}"></script>
+    <script src="{{  asset('js/agent.js','theme_default') }}"></script>
 {% endblock %}

@@ -3,10 +3,12 @@
         <title>Flash – MultiPurpose WordPress Theme</title>
         <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="profile" href="https://gmpg.org/xfn/11">
-        <link rel="stylesheet" href="https://demo.themegrill.com/flash/wp-content/cache/min/106/dc7c6e8470152dc9e9489a73751bdff1.css" data-minify="1"> 
+        {# <link rel="stylesheet" href="https://demo.themegrill.com/flash/wp-content/cache/min/106/dc7c6e8470152dc9e9489a73751bdff1.css" data-minify="1">  #}
+         <link rel="stylesheet" href="{{ asset('style/scss/blog/dc7c6e8470152dc9e9489a73751bdff1.css', 'theme_default') }}">
+        {#<link rel="stylesheet" href="{{ asset('all.min.css', 'font_awsome_css') }}">   
         <script async="" src="//www.google-analytics.com/analytics.js"></script>
         <script type="text/javascript">function ctSetCookie(c_name, value, def_value){document.cookie = c_name + '=' + escape(value) + '; path=/';}ctSetCookie('ct_checkjs', 'b39747f7071c513fa3151530fe5bffdc90bdf130c546ca2e70a2d98278d1692e', '0');</script>
-        <link rel="alternate" type="application/rss+xml" title="Flash » Feed" href="https://demo.themegrill.com/flash/feed/">  
+        <link rel="alternate" type="application/rss+xml" title="Flash » Feed" href="https://demo.themegrill.com/flash/feed/">   #}
         <script type="text/javascript" data-cfasync="false">var mi_version         = '7.10.4';
             var mi_track_user      = true;
             var mi_no_track_reason = '';
@@ -84,7 +86,7 @@
                             })();
                 }
         </script> 
-        <link rel="stylesheet" id="woocommerce-smallscreen-css" href="https://demo.themegrill.com/flash/wp-content/cache/busting/106/flash/wp-content/plugins/woocommerce/assets/css/woocommerce-smallscreen-3.6.3.css" type="text/css" media="only screen and (max-width: 768px)">
+        {# <link rel="stylesheet" id="woocommerce-smallscreen-css" href="https://demo.themegrill.com/flash/wp-content/cache/busting/106/flash/wp-content/plugins/woocommerce/assets/css/woocommerce-smallscreen-3.6.3.css" type="text/css" media="only screen and (max-width: 768px)"> #}
         
         <script type="text/javascript">
             /* <![CDATA[ */ 
@@ -98,12 +100,12 @@
             /* <![CDATA[ */ 
             var ctNocache = {"ajaxurl":"https:\/\/demo.themegrill.com\/flash\/wp-admin\/admin-ajax.php","info_flag":"","set_cookies_flag":"","blog_home":"https:\/\/demo.themegrill.com\/flash\/"}; /* ]]> */
         </script>  
-        <link rel="https://api.w.org/" href="https://demo.themegrill.com/flash/wp-json/">
+        {# <link rel="https://api.w.org/" href="https://demo.themegrill.com/flash/wp-json/">
         <link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://demo.themegrill.com/flash/xmlrpc.php?rsd">
         <link rel="wlwmanifest" type="application/wlwmanifest+xml" href="https://demo.themegrill.com/flash/wp-includes/wlwmanifest.xml">
         <link rel="canonical" href="https://demo.themegrill.com/flash/">
         <link rel="shortlink" href="https://demo.themegrill.com/flash/"> <noscript>
-        
+         #}
         <link rel="icon" href="https://demo.themegrill.com/flash/wp-content/uploads/sites/106/2017/01/cropped-cropped-flash-logo-32x32.png" sizes="32x32">
         <link rel="icon" href="https://demo.themegrill.com/flash/wp-content/uploads/sites/106/2017/01/cropped-cropped-flash-logo-192x192.png" sizes="192x192">
         <link rel="apple-touch-icon-precomposed" href="https://demo.themegrill.com/flash/wp-content/uploads/sites/106/2017/01/cropped-cropped-flash-logo-180x180.png">
@@ -111,7 +113,8 @@
         
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400&amp;subset=cyrillic,cyrillic-ext,devanagari,greek,greek-ext,khmer,latin,latin-ext,vietnamese,hebrew,arabic,bengali,gujarati,tamil,telugu,thai" media="all"><noscript>
         </noscript>
-        <style type="text/css">
+        <link rel="stylesheet" href="{{ asset('style/scss/blog/blog.css', 'theme_default') }}">
+        {# <style type="text/css">
             img.wp-smiley,img.emoji{
                 display:inline!important;
                 border:none!important;
@@ -122,12 +125,12 @@
                 background:none!important;
                 padding:0!important
             }
-        </style>
-        <style id="woocommerce-inline-inline-css" type="text/css">
+        </style> #}
+        {# <style id="woocommerce-inline-inline-css" type="text/css">
             .woocommerce form .form-row .required{
                 visibility:visible
             }
-        </style>
+        </style> #}
         <style id="flash-style-inline-css" type="text/css">
             #site-navigation ul li:hover>a,#site-navigation ul li.current-menu-item>a,
             #site-navigation ul li.current_page_item>a,
@@ -275,7 +278,7 @@
                 font-weight:400
             }
         </style> 
-        {# <link rel="stylesheet" href="{{ asset('style/scss/blog/blog.css', 'theme_default') }}"> #}
+        
 
     </head>
 
@@ -300,40 +303,40 @@
                                 <div class="left-content">
                                     <ul class="contact-info">
                                         <li>
-                                            <i class="fa fa-map-marker"></i>New York, NY 928865, USA
+                                            <i class="fa fa-map-marker"></i> adresse
                                         </li>
                                         <li>
-                                            <i class="fa fa-phone"></i>+987-265945868
+                                            <i class="fa fa-phone"></i> numero de telephone
                                         </li>
                                         <li>
-                                            <i class="fa fa-envelope"></i>info@themegrill.com
+                                            <i class="fa fa-envelope"></i> societe@gmail.com
                                         </li>
                                     </ul>
                                 </div>
                                 <div class="right-content">
                                     <div class="menu-social-container">
-                                        <ul id="menu-social" class="social-menu">
+                                        {# <ul id="menu-social" class="social-menu">
                                             <li id="menu-item-107" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-107">
-                                                <a href="http://facebook.com">
+                                                <a href="#">
                                                     <span class="screen-reader-text">facebook</span>
                                                 </a>
                                             </li>
                                             <li id="menu-item-108" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-108">
-                                                <a href="http://twitter.com">
+                                                <a href="#">
                                                     <span class="screen-reader-text">twitter</span>
                                                 </a>
                                             </li>
                                             <li id="menu-item-109" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-109">
-                                                <a href="https://plus.google.com/">
+                                                <a href="#">
                                                     <span class="screen-reader-text">google plus</span>
                                                 </a>
                                             </li>
                                             <li id="menu-item-110" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-110">
-                                                <a href="http://linkedin.com">
+                                                <a href="#">
                                                     <span class="screen-reader-text">linkedin</span>
                                                 </a>
                                             </li>
-                                        </ul>
+                                        </ul> #}
                                     </div>
                                 </div>
                             </div>
@@ -342,17 +345,20 @@
                     <div class="header-bottom">
                         <div class="tg-container">
                             <div class="logo">
-                                <figure class="logo-image"> 
-                                    <a href="https://demo.themegrill.com/flash/" class="custom-logo-link" rel="home" itemprop="url">
+                                {% if search.logo %}
+                                <img class="navbar-brand-full" src="{{ search.logo }}" width="89" height="25" alt="CoreUI Logo">
+                                {% endif %}
+                                {# <figure class="logo-image"> 
+                                    <a href="#" class="custom-logo-link" rel="home" itemprop="url">
                                         <img width="107" height="30" src="https://demo.themegrill.com/flash/wp-content/uploads/sites/106/2017/01/flash-logo.png" class="custom-logo lazyloaded" alt="flash-logo" itemprop="logo" data-lazy-src="https://demo.themegrill.com/flash/wp-content/uploads/sites/106/2017/01/flash-logo.png" data-was-processed="true"><noscript>
                                         <img width="107" height="30" src="https://demo.themegrill.com/flash/wp-content/uploads/sites/106/2017/01/flash-logo.png" class="custom-logo" alt="flash-logo" itemprop="logo" /></noscript>
                                     </a>
-                                </figure>
+                                </figure> #}
                                 <div class="logo-text site-branding">
                                     <h1 class="site-title">
-                                        <a href="https://demo.themegrill.com/flash/" rel="home">Flash</a>
+                                        <a href="#" rel="home">{{ search.get_setting("SOCIETE","SOCIETE_NOM").value }}</a>
                                     </h1>
-                                    <p class="site-description">MultiPurpose WordPress Theme</p>
+                                    <p class="site-description"></p>
                                 </div>
                             </div>
                             <div class="site-navigation-wrapper">
@@ -363,90 +369,90 @@
                                     <div class="menu-menu-container">
                                         <ul id="primary-menu" class="menu nav-menu" aria-expanded="false">
                                             <li id="menu-item-35" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home current-menu-item page_item page-item-5 current_page_item menu-item-35">
-                                                <a href="https://demo.themegrill.com/flash/">Home</a>
+                                                <a href="#">Accueil</a>
                                             </li>
                                             <li id="menu-item-102" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-102">
-                                                <a href="https://downloads.wordpress.org/theme/flash.zip">Download Flash</a>
+                                                <a href="#">Lien1</a>
                                             </li>
                                             <li id="menu-item-279" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-279">
-                                                <a href="https://demo.themegrill.com/flash-pro/demos/">View Pro</a>
+                                                <a href="#">Lien2</a>
                                                 <ul class="sub-menu">
                                                     <li id="menu-item-281" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-281">
-                                                        <a target="_blank" href="https://demo.themegrill.com/flash-pro/demos/">View Pro Demos</a>
+                                                        <a target="_blank" href="#">Lien21</a>
                                                     </li>
                                                     <li id="menu-item-280" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-280">
-                                                        <a target="_blank" href="https://themegrill.com/themes/flash/#free-vs-pro">Free vs Pro</a>
+                                                        <a target="_blank" href="#">Lien23</a>
                                                     </li>
                                                 </ul>
-                                                <span class="sub-toggle"> 
+                                                {# <span class="sub-toggle"> 
                                                     <i class="fa fa-angle-down"></i> 
-                                                </span>
+                                                </span> #}
                                             </li>
                                             <li id="menu-item-34" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-34">
-                                                <a href="https://demo.themegrill.com/flash/layouts/">Layouts</a>
+                                                <a href="#">Lien3</a>
                                                 <ul class="sub-menu">
                                                     <li id="menu-item-27" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-27">
-                                                        <a href="https://demo.themegrill.com/flash/right-sidebar/">Right Sidebar</a>
+                                                        <a href="#">Lien31</a>
                                                     </li>
                                                     <li id="menu-item-28" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-28">
-                                                        <a href="https://demo.themegrill.com/flash/left-sidebar/">Left Sidebar</a>
+                                                        <a href="#">Lien32</a>
                                                     </li>
                                                     <li id="menu-item-41" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-41">
-                                                        <a href="https://demo.themegrill.com/flash/no-sidebar-full-width/">No sidebar full width</a>
+                                                        <a href="#">Lien33</a>
                                                     </li>
                                                     <li id="menu-item-42" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-42">
-                                                        <a href="https://demo.themegrill.com/flash/no-sidebar-content-centered/">No sidebar content centered</a>
+                                                        <a href="#">Lien34</a>
                                                     </li>
                                                 </ul>
-                                                <span class="sub-toggle"> 
+                                                {# <span class="sub-toggle"> 
                                                     <i class="fa fa-angle-down"></i> 
-                                                </span>
+                                                </span> #}
                                             </li>
                                             <li id="menu-item-312" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-312">
-                                                <a href="https://demo.themegrill.com/flash/blog/">Blog</a>
+                                                <a href="#">Lien4</a>
                                             </li>
                                             <li id="menu-item-213" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-213">
-                                                <a href="https://demo.themegrill.com/flash/shop/">Shop</a>
+                                                <a href="#">Lien5</a>
                                             </li>
                                             <li id="menu-item-278" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-278">
-                                                <a href="#">Pages</a>
+                                                <a href="#">Lien6</a>
                                                 <ul class="sub-menu">
                                                     <li id="menu-item-43" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-43">
-                                                        <a href="https://demo.themegrill.com/flash/typography/">Typography</a>
+                                                        <a href="#">Lien61</a>
                                                     </li>
                                                     <li id="menu-item-328" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-328">
-                                                        <a target="_blank" href="https://docs.themegrill.com/flash">Documentation</a>
+                                                        <a target="_blank" href="#">Lien62</a>
                                                     </li>
                                                     <li id="menu-item-32" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-32">
-                                                        <a href="https://demo.themegrill.com/flash/contact/">Contact</a>
+                                                        <a href="#">Lien63</a>
                                                     </li>
                                                 </ul>
-                                                <span class="sub-toggle"> 
+                                                {# <span class="sub-toggle"> 
                                                     <i class="fa fa-angle-down"></i> 
-                                                </span>
+                                                </span> #}
                                             </li>
                                             <li id="menu-item-221" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-221">
-                                                <a href="https://themegrill.com/themes/flash/#import-demo">One Click Demo</a>
+                                                <a href="#">Lien7</a>
                                             </li>
                                             <li id="menu-item-473" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-473">
-                                                <a href="https://demo.themegrill.com/flash/contact/">Contact</a>
+                                                <a href="#">Lien8</a>
                                             </li>
                                         </ul>
                                     </div>
                                 </nav>
                             </div>
                             <div class="header-action-container">
-                                <div class="cart-wrap">	
+                                {# <div class="cart-wrap">	
                                     <div class="flash-cart-views">
-                                        <a href="https://demo.themegrill.com/flash/cart/" class="wcmenucart-contents">
-                                            <i class="fa fa-opencart"></i>
+                                        <a href="#" class="wcmenucart-contents">
+                                            <i class="fa fa-cart-plus"></i>
                                             <span class="cart-value">0</span>
                                         </a>
                                     </div>
                                     <div class="widget woocommerce widget_shopping_cart">
                                         <h2 class="widgettitle">Cart</h2>
                                         <div class="widget_shopping_cart_content">
-                                            <p class="woocommerce-mini-cart__empty-message">No products in the cart.</p>
+                                            <p class="woocommerce-mini-cart__empty-message">Panier vide</p>
                                         </div>
                                     </div>
                                 </div>
@@ -455,18 +461,18 @@
                                         <i class="fa fa-search"></i>
                                     </div>
                                     <div class="search-box">
-                                        <form role="search" method="get" class="searchform" action="https://demo.themegrill.com/flash/"> 
+                                        <form role="search" method="get" class="searchform" action="#"> 
                                             <label> 
-                                                <span class="screen-reader-text">Search for:</span> 
+                                                <span class="screen-reader-text">Recherche de:</span> 
                                                 <input type="search" class="search-field" placeholder="Search …" value="" name="s"> 
                                             </label> 
                                             <button type="submit" class="search-submit btn search-btn">
-                                                <span class="screen-reader-text">Search</span>
+                                                <span class="screen-reader-text">Chercher</span>
                                                 <i class="fa fa-search"></i>
                                             </button>
                                         </form>
                                     </div>
-                                </div>
+                                </div> #}
                             </div>
                         </div>
                     </div>
@@ -491,50 +497,50 @@
                                 <section id="categories-3" class="widget widget_categories">
                                     <h3 class="widget-title">Categories</h3>
                                     <ul>
-                                        <li class="cat-item cat-item-3"><a href="https://demo.themegrill.com/flash/category/blog/">Blog</a></li>
-                                        <li class="cat-item cat-item-30"><a href="https://demo.themegrill.com/flash/category/food/">Food</a></li>
+                                        <li class="cat-item cat-item-3"><a href="#">Categorie 1</a></li>
+                                        <li class="cat-item cat-item-30"><a href="#">Categorie 2</a></li>
                                     </ul>
                                 </section>
                             </div>
                             <div class="tg-column-4 footer-block">
                                 <section id="meta-3" class="widget widget_meta">
-                                    <h3 class="widget-title">Meta</h3>
+                                    <h3 class="widget-title">Liens utiles</h3>
                                     <ul>
-                                        <li><a href="https://demo.themegrill.com/flash/wp-login.php">Log in</a></li>
-                                        <li><a href="https://demo.themegrill.com/flash/feed/">Entries <abbr title="Really Simple Syndication">RSS</abbr></a></li>
-                                        <li><a href="https://demo.themegrill.com/flash/comments/feed/">Comments <abbr title="Really Simple Syndication">RSS</abbr></a></li>
-                                        <li><a href="https://wordpress.org/" title="Powered by WordPress, state-of-the-art semantic personal publishing platform.">WordPress.org</a></li>
+                                        <li><a href="#">Lien 1</a></li>
+                                        {# <li><a href="#">Entries <abbr title="Really Simple Syndication">RSS</abbr></a></li> #}
+                                        <li><a href="#">Lien 2 <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+                                        <li><a href="#" title=""></a></li>
                                     </ul>
                                 </section>
                             </div>
                             <div class="tg-column-4 footer-block">
                                 <section id="nav_menu-2" class="widget widget_nav_menu">
-                                    <h3 class="widget-title">Important Links</h3>
+                                    <h3 class="widget-title">Liens important</h3>
                                         <div class="menu-important-links-container">
                                             <ul id="menu-important-links" class="menu">
                                                 <li id="menu-item-111" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-111">
-                                                    <a href="https://demo.themegrill.com/flash/about/">About</a>
+                                                    <a href="#">Lien 1</a>
                                                 </li>
                                                 <li id="menu-item-112" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home current-menu-item page_item page-item-5 current_page_item menu-item-112">
-                                                    <a href="https://demo.themegrill.com/flash/">Home</a>
+                                                    <a href="#">Lien 2</a>
                                                 </li>
-                                                <li id="menu-item-113" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-113">
-                                                    <a href="https://demo.themegrill.com/flash/blog/">Blog</a>
+                                                {# <li id="menu-item-113" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-113">
+                                                    <a href="">Blog</a>
                                                 </li>
                                                 <li id="menu-item-114" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-114">
                                                     <a href="http://##">Work with Us</a>
-                                                </li>
+                                                </li> #}
                                             </ul>
                                         </div>
                                 </section>
                             </div>
                             <div class="tg-column-4 footer-block">
                                 <section id="recent-posts-3" class="widget widget_recent_entries">
-                                    <h3 class="widget-title">Recent Post</h3>
+                                    <h3 class="widget-title">Articles rescent</h3>
                                     <ul>
-                                        <li> <a href="https://demo.themegrill.com/flash/2017/01/02/receipe-for-food-lover/">RECEIPE FOR FOOD LOVER</a></li>
-                                        <li> <a href="https://demo.themegrill.com/flash/2017/01/02/artistic-drawing-of-girl-has-gone-away/">Artistic Drawing Of Girl Has Gone Away</a></li>
-                                        <li> <a href="https://demo.themegrill.com/flash/2017/01/02/photography-tips-for-photographer/">Photography Tips For Photographer</a></li>
+                                        <li> <a href="#">contenu 1</a></li>
+                                        <li> <a href="#">contenu 2</a></li>
+                                        <li> <a href="#">contenu 3</a></li>
                                     </ul>
                                 </section>
                             </div>
@@ -545,9 +551,7 @@
                     <div class="tg-container">
                         <div class="copyright"> 
                             <span class="copyright-text"> 
-                                Copyright © 2020 <a href="https://demo.themegrill.com/flash/">Flash</a> 
-                                Theme: Flash by <a href="http://themegrill.com/themes/flash" rel="author">ThemeGrill</a>. 
-                                Proudly powered by <a href="https://wordpress.org/">WordPress</a> 
+                                Copyright © 2020 <a href="#">{{ search.get_setting("SOCIETE","SOCIETE_NOM").value }}</a>                                 
                             </span>
                         </div>
                     </div>

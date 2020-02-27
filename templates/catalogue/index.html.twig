@@ -57,10 +57,11 @@
     <input type="hidden" id="is_delete" value="{{ search.get_right_delete("ACTION_CATALOGUE") }}" />
     <input type="hidden" id="is_mail" value="{{ search.get_right_email("ACTION_CATALOGUE") }}" />
     <input type="hidden" id="is_quote_write" value="{{ search.get_right_write("ACTION_QUOTE") }}" />
+    <input type="hidden" id="is_read_sensible" value="{{ search.get_right_read("ACTION_SENSIBLE") }}" />
     <input type="hidden" id="is_admin" value="{{ search.get_right_admin() }}" />
 </div>
 {% endblock %}
 
 {% block javascripts %}
-<script src="{{  asset('catalogue.js','qobd_web_js') }}"></script>
+<script src="{{  asset('js/catalogue.js','theme_default') }}"></script>
 {% endblock %}

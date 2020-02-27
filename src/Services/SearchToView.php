@@ -14,6 +14,7 @@ class SearchToView{
     protected $setting;
     protected $settingFileDir;
     protected $avatarFileDir;
+    protected $rootDir;
     protected $chatManager;
     protected $securityManager;
     protected $actionRepo;
@@ -22,6 +23,7 @@ class SearchToView{
     public function __construct(SettingManager $setting, 
                                 $logo_dir,
                                 $avatar_dir,
+                                $root_dir,
                                 ChatManager $chatManager,
                                 SecurityManager $securityManager,
                                 ActionRepository $actionRepo,
@@ -30,6 +32,7 @@ class SearchToView{
         $this->setting = $setting;
         $this->settingFileDir = $logo_dir;
         $this->avatarFileDir = $avatar_dir;
+        $this->rootDir = $root_dir;
         $this->chatManager = $chatManager;
         $this->securityManager = $securityManager;
         $this->actionRepo = $actionRepo;
@@ -37,12 +40,15 @@ class SearchToView{
     }
 
     public function logo(){
-
         $setting = $this->get_setting('SOCIETE', 'SOCIETE_LOGO');
         if(!empty($setting) && $setting->getIsFile() && !empty($setting->getValue())){
             return $this->settingFileDir . '/' . $setting->getValue();
         }
         return null;
+    }
+
+    public function root_dir(){
+        return $this->rootDir;
     }
 
     public function avatar_dir(?Agent $agent){

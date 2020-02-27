@@ -47,6 +47,15 @@
                             
                                 <input type="hidden" name="token" value="{{ csrf_token('upload') }}" />
                             
+                                <div>
+                                    {% if errors | length > 0 %}
+                                        <ul class="error-wrapper">
+                                            {% for error in errors %}
+                                                <li>{{ error.message }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </div>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Nom">
@@ -144,5 +153,5 @@
 
 {% endblock %}
 {% block javascripts %} 
-    <script src="{{  asset('agent.js','qobd_web_js') }}"></script>
+    <script src="{{  asset('js/agent.js','theme_default') }}"></script>
 {% endblock %}

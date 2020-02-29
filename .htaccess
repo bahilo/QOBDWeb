@@ -4,11 +4,16 @@ RewriteEngine On
 # RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 # RewriteRule ^QOBDWeb(.*)$ QOBDWeb/Public/$1 [R=302,L]
 
-# RewriteRule ^(.+)$ /public/$1 [L]
-# RewriteRule ^$ /public [L]
+RewriteRule ^$ /public [L]
+RewriteRule ^(.+)$ /public/$1 [L]
 
-RewriteRule ^(.+)$ /QOBDWeb/public/$1 [L]
-RewriteRule ^$ /QOBDWeb/public [L]
+# RewriteRule ^$ /public [L]
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteRule ^(.+)$ /public/$1 [L]
+
+# RewriteRule ^(.+)$ /QOBDWeb/public/$1 [L]
+# RewriteRule ^$ /QOBDWeb/public [L]
 
 # RewriteRule ^/admin/(.+)$ /public/admin/$1 [L]
 # RewriteRule ^/admin /public/admin [L]

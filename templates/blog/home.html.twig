@@ -2,271 +2,69 @@
     <head>
         <title>Flash – MultiPurpose WordPress Theme</title>
         <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="profile" href="https://gmpg.org/xfn/11">
         <link rel="stylesheet" href="https://demo.themegrill.com/flash/wp-content/cache/min/106/dc7c6e8470152dc9e9489a73751bdff1.css" data-minify="1"> 
-        <script async="" src="//www.google-analytics.com/analytics.js"></script>
-        <script type="text/javascript">function ctSetCookie(c_name, value, def_value){document.cookie = c_name + '=' + escape(value) + '; path=/';}ctSetCookie('ct_checkjs', 'b39747f7071c513fa3151530fe5bffdc90bdf130c546ca2e70a2d98278d1692e', '0');</script>
-        <link rel="alternate" type="application/rss+xml" title="Flash » Feed" href="https://demo.themegrill.com/flash/feed/">  
-        <script type="text/javascript" data-cfasync="false">var mi_version         = '7.10.4';
-            var mi_track_user      = true;
-            var mi_no_track_reason = '';
-            
-            var disableStr = 'ga-disable-UA-148726606-1';
-
-            /* Function to detect opted out users */
-            function __gaTrackerIsOptedOut() {
-                return document.cookie.indexOf(disableStr + '=true') > -1;
-            }
-
-            /* Disable tracking if the opt-out cookie exists. */
-            if ( __gaTrackerIsOptedOut() ) {
-                window[disableStr] = true;
-            }
-
-            /* Opt-out function */
-            function __gaTrackerOptout() {
-            document.cookie = disableStr + '=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/';
-            window[disableStr] = true;
-            }
-            
-            if ( mi_track_user ) {
-                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-                    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-                    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-                })(window,document,'script','//www.google-analytics.com/analytics.js','__gaTracker');
-
-                __gaTracker('create', 'UA-148726606-1', 'auto');
-                __gaTracker('set', 'forceSSL', true);
-                __gaTracker('require', 'displayfeatures');
-                __gaTracker('send','pageview');
-            } else {
-                console.log( "" );
-                (function() {
-                    /* https://developers.google.com/analytics/devguides/collection/analyticsjs/ */
-                    var noopfn = function() {
-                        return null;
-                    };
-                    var noopnullfn = function() {
-                        return null;
-                    };
-                    var Tracker = function() {
-                        return null;
-                    };
-                    var p = Tracker.prototype;
-                    p.get = noopfn;
-                    p.set = noopfn;
-                    p.send = noopfn;
-                    var __gaTracker = function() {
-                        var len = arguments.length;
-                        if ( len === 0 ) {
-                            return;
-                        }
-                        var f = arguments[len-1];
-                        if ( typeof f !== 'object' || f === null || typeof f.hitCallback !== 'function' ) {
-                            console.log( 'Not running function __gaTracker(' + arguments[0] + " ....) because you are not being tracked. " + mi_no_track_reason );
-                            return;
-                        }
-                        try {
-                            f.hitCallback();
-                        } catch (ex) {
-
-                        }
-                    };
-                    __gaTracker.create = function() {
-                        return new Tracker();
-                    };
-                    __gaTracker.getByName = noopnullfn;
-                    __gaTracker.getAll = function() {
-                        return [];
-                    };
-                    __gaTracker.remove = noopfn;
-                    window['__gaTracker'] = __gaTracker;
-                            })();
-                }
-        </script> 
+        <!-- <link rel="stylesheet" href="dc7c6e8470152dc9e9489a73751bdff1.css"/>  -->
+        
         <style type="text/css">
-            img.wp-smiley,img.emoji{
-                display:inline!important;
-                border:none!important;
-                box-shadow:none!important;
-                height:1em!important;
-                width:1em!important;margin:0 .07em!important;
-                vertical-align:-0.1em!important;
-                background:none!important;
-                padding:0!important
-            }
+            img.wp-smiley,img.emoji{display:inline!important;border:none!important;box-shadow:none!important;height:1em!important;width:1em!important;margin:0 .07em!important;vertical-align:-0.1em!important;background:none!important;padding:0!important}
         </style>
         <link rel="stylesheet" id="woocommerce-smallscreen-css" href="https://demo.themegrill.com/flash/wp-content/cache/busting/106/flash/wp-content/plugins/woocommerce/assets/css/woocommerce-smallscreen-3.6.3.css" type="text/css" media="only screen and (max-width: 768px)">
         <style id="woocommerce-inline-inline-css" type="text/css">
-            .woocommerce form .form-row .required{
-                visibility:visible
-            }
+            .woocommerce form .form-row .required{visibility:visible}
         </style>
         <style id="flash-style-inline-css" type="text/css">
-            #site-navigation ul li:hover>a,#site-navigation ul li.current-menu-item>a,
-            #site-navigation ul li.current_page_item>a,
-            #site-navigation ul li.current_page_ancestor>a,
-            #site-navigation ul li.current-menu-ancestor>a,
-            #site-navigation ul.sub-menu li:hover>a,
-            #site-navigation ul li ul.sub-menu li.menu-item-has-children ul li:hover>a,
-            #site-navigation ul li ul.sub-menu li.menu-item-has-children:hover>.menu-item,
-            body.transparent #masthead .header-bottom #site-navigation ul li:hover>.menu-item,
-            body.transparent #masthead .header-bottom #site-navigation ul li:hover>a,
-            body.transparent #masthead .header-bottom #site-navigation ul.sub-menu li:hover>a,
-            body.transparent #masthead .header-bottom #site-navigation ul.sub-menu li.menu-item-has-children ul li:hover>a,
-            body.transparent.header-sticky #masthead-sticky-wrapper #masthead .header-bottom #site-navigation ul.sub-menu li>a:hover,
-            .tg-service-widget .service-title-wrap a:hover,.tg-service-widget .service-more,
-            .feature-product-section .button-group button:hover,.fun-facts-section .fun-facts-icon-wrap,
-            .fun-facts-section .tg-fun-facts-widget.tg-fun-facts-layout-2 .counter-wrapper,
-            .blog-section .tg-blog-widget-layout-2 .blog-content .read-more-container .read-more a,
-            footer.footer-layout #top-footer .widget-title::first-letter,
-            footer.footer-layout #top-footer .widget ul li a:hover,
-            footer.footer-layout #bottom-footer .copyright .copyright-text a:hover,
-            footer.footer-layout #bottom-footer .footer-menu ul li a:hover,
-            .archive #primary .entry-content-block h2.entry-title a:hover,
-            .blog #primary .entry-content-block h2.entry-title a:hover,#secondary .widget ul li a:hover,
-            .woocommerce-Price-amount.amount,.team-wrapper .team-content-wrapper .team-social a:hover,
-            .testimonial-container .testimonial-wrapper .testimonial-slide .testominial-content-wrapper .testimonial-icon,
-            .footer-menu li a:hover,.tg-feature-product-filter-layout .button.is-checked:hover,
-            .testimonial-container .testimonial-icon,#site-navigation ul li.menu-item-has-children:hover>.sub-toggle,
-            .woocommerce-error::before,.woocommerce-info::before,.woocommerce-message::before,
-            #primary .post .entry-content-block .entry-meta a:hover,
-            #primary .post .entry-content-block .entry-meta span:hover,.entry-meta span:hover a,
-            .post .entry-content-block .entry-footer span a:hover,#secondary .widget ul li a,
-            #comments .comment-list article.comment-body .reply a,.tg-slider-widget .btn-wrapper a,
-            .entry-content a,.related-posts-wrapper .entry-title a:hover,
-            .related-posts-wrapper .entry-meta>span a:hover{
-                color:#30afb8
-            }
-            .blog-section .tg-blog-widget-layout-1 .tg-blog-widget:hover,
-            #scroll-up,.header-bottom .search-wrap .search-box .searchform .btn:hover,
-            .header-bottom .cart-wrap .flash-cart-views a span,
-            body.transparent #masthead .header-bottom #site-navigation ul li a::before,
-            .tg-slider-widget.slider-dark .btn-wrapper a:hover,.section-title:after,
-            .about-section .about-content-wrapper .btn-wrapper a,.tg-service-widget .service-icon-wrap,
-            .team-wrapper .team-content-wrapper .team-designation:after,.call-to-action-section .btn-wrapper a:hover,
-            .blog-section .tg-blog-widget-layout-1:hover,.blog-section .tg-blog-widget-layout-2 .post-image .entry-date,
-            .blog-section .tg-blog-widget-layout-2 .blog-content .post-readmore,
-            .pricing-table-section .tg-pricing-table-widget:hover,
-            .pricing-table-section .tg-pricing-table-widget.tg-pricing-table-layout-2 .pricing,
-            .pricing-table-section .tg-pricing-table-widget.tg-pricing-table-layout-2 .btn-wrapper a,
-            footer.footer-layout #top-footer .widget_tag_cloud .tagcloud a:hover,#secondary .widget-title:after,
-            #secondary .searchform .btn:hover,#primary .searchform .btn:hover,
-            #respond #commentform .form-submit input,.woocommerce span.onsale,
-            .woocommerce ul.products li.product .onsale,.woocommerce ul.products li.product .button,
-            .woocommerce #respond input#submit.alt,.woocommerce a.button.alt,.woocommerce button.button.alt,
-            .woocommerce input.button.alt,.added_to_cart.wc-forward,
-            .testimonial-container .swiper-pagination.testimonial-pager .swiper-pagination-bullet:hover,
-            .testimonial-container .swiper-pagination.testimonial-pager .swiper-pagination-bullet.swiper-pagination-bullet-active,
-            .header-bottom .searchform .btn,.navigation .nav-links a:hover,.bttn:hover,button,
-            input[type="button"]:hover,input[type="reset"]:hover,input[type="submit"]:hover,
-            .tg-slider-widget .btn-wrapper a:hover{
-                background-color:#30afb8
-            }
-            .feature-product-section .tg-feature-product-layout-2 .tg-container .tg-column-wrapper .tg-feature-product-widget .featured-image-desc,
-            .tg-team-widget.tg-team-layout-3 .team-wrapper .team-img .team-social{
-                background-color:rgba(48,175,184,.8)
-            }
-            #respond #commentform .form-submit input:hover{
-                background-color:#1c9ba4
-            }.tg-slider-widget.slider-dark .btn-wrapper a:hover,.call-to-action-section .btn-wrapper a:hover,
-            footer.footer-layout #top-footer .widget_tag_cloud .tagcloud a:hover,.woocommerce-error,
-            .woocommerce-info,.woocommerce-message,#comments .comment-list article.comment-body .reply a::before,
-            .tg-slider-widget .btn-wrapper a,.tg-slider-widget .btn-wrapper a:hover{
-                border-color:#30afb8
-            }
-            body.transparent.header-sticky #masthead-sticky-wrapper.is-sticky #site-navigation ul li.current-flash-item a,
-            #site-navigation ul li.current-flash-item a,
-            body.transparent.header-sticky #masthead-sticky-wrapper #site-navigation ul li:hover>a,
-            body.transparent #site-navigation ul li:hover .sub-toggle{
-                color:#30afb8
-            }
-            .tg-service-widget .service-icon-wrap:after{
-                border-top-color:#30afb8
-            }
-            body.transparent.header-sticky #masthead-sticky-wrapper .search-wrap .search-icon:hover,
-            body.transparent .search-wrap .search-icon:hover,.header-bottom .search-wrap .search-icon:hover{
-                border-color:#30afb8
-            }
-            body.transparent.header-sticky #masthead-sticky-wrapper .search-wrap .search-icon:hover,
-            body.transparent #masthead .header-bottom .search-wrap .search-icon:hover,
-            .header-bottom .search-wrap .search-icon:hover,
-            .breadcrumb-trail.breadcrumbs .trail-items li:first-child span:hover,
-            .breadcrumb-trail.breadcrumbs .trail-items li span:hover a{
-                color:#30afb8
-            }
-            .woocommerce ul.products li.product .button:hover,
-            .woocommerce #respond input#submit.alt:hover,
-            .woocommerce a.button.alt:hover,.woocommerce button.button.alt:hover,
-            .woocommerce input.button.alt:hover,.added_to_cart.wc-forward:hover{
-                background-color:#1c9ba4
-            }
-            .feature-product-section .tg-feature-product-widget .featured-image-desc::before,
-            .blog-section .row:nth-child(odd) .tg-blog-widget:hover .post-image::before{
-                border-right-color:#30afb8
-            }
-            .feature-product-section .tg-feature-product-widget .featured-image-desc::before,
-            .blog-section .row:nth-child(odd) .tg-blog-widget:hover .post-image::before,
-            footer.footer-layout #top-footer .widget-title,.blog-section .row:nth-child(2n) .tg-blog-widget:hover .post-image::before{
-                border-left-color:#30afb8
-            }
-            .blog-section .tg-blog-widget-layout-2 .entry-title a:hover,
-            .blog-section .tg-blog-widget-layout-2 .tg-blog-widget:hover .blog-content .entry-title a:hover,
-            .tg-blog-widget-layout-2 .read-more-container .entry-author:hover a,
-            .tg-blog-widget-layout-2 .read-more-container .entry-author:hover,
-            .blog-section .tg-blog-widget-layout-2 .read-more-container .read-more:hover a{
-                color:#1c9ba4
-            }
-            .tg-service-widget .service-more:hover{
-                color:#1c9ba4
-            }
+            #site-navigation ul li:hover>a,#site-navigation ul li.current-menu-item>a,#site-navigation ul li.current_page_item>a,#site-navigation ul li.current_page_ancestor>a,#site-navigation ul li.current-menu-ancestor>a,#site-navigation ul.sub-menu li:hover>a,#site-navigation ul li ul.sub-menu li.menu-item-has-children ul li:hover>a,#site-navigation ul li ul.sub-menu li.menu-item-has-children:hover>.menu-item,body.transparent #masthead .header-bottom #site-navigation ul li:hover>.menu-item,body.transparent #masthead .header-bottom #site-navigation ul li:hover>a,body.transparent #masthead .header-bottom #site-navigation ul.sub-menu li:hover>a,body.transparent #masthead .header-bottom #site-navigation ul.sub-menu li.menu-item-has-children ul li:hover>a,body.transparent.header-sticky #masthead-sticky-wrapper #masthead .header-bottom #site-navigation ul.sub-menu li>a:hover,.tg-service-widget .service-title-wrap a:hover,.tg-service-widget .service-more,.feature-product-section .button-group button:hover,.fun-facts-section .fun-facts-icon-wrap,.fun-facts-section .tg-fun-facts-widget.tg-fun-facts-layout-2 .counter-wrapper,.blog-section .tg-blog-widget-layout-2 .blog-content .read-more-container .read-more a,footer.footer-layout #top-footer .widget-title::first-letter,footer.footer-layout #top-footer .widget ul li a:hover,footer.footer-layout #bottom-footer .copyright .copyright-text a:hover,footer.footer-layout #bottom-footer .footer-menu ul li a:hover,.archive #primary .entry-content-block h2.entry-title a:hover,.blog #primary .entry-content-block h2.entry-title a:hover,#secondary .widget ul li a:hover,.woocommerce-Price-amount.amount,.team-wrapper .team-content-wrapper .team-social a:hover,.testimonial-container .testimonial-wrapper .testimonial-slide .testominial-content-wrapper .testimonial-icon,.footer-menu li a:hover,.tg-feature-product-filter-layout .button.is-checked:hover,.testimonial-container .testimonial-icon,#site-navigation ul li.menu-item-has-children:hover>.sub-toggle,.woocommerce-error::before,.woocommerce-info::before,.woocommerce-message::before,#primary .post .entry-content-block .entry-meta a:hover,#primary .post .entry-content-block .entry-meta span:hover,.entry-meta span:hover a,.post .entry-content-block .entry-footer span a:hover,#secondary .widget ul li a,#comments .comment-list article.comment-body .reply a,.tg-slider-widget .btn-wrapper a,.entry-content a,.related-posts-wrapper .entry-title a:hover,.related-posts-wrapper .entry-meta>span a:hover
+            {color:#30afb8}
+            .blog-section .tg-blog-widget-layout-1 .tg-blog-widget:hover,#scroll-up,.header-bottom .search-wrap .search-box .searchform .btn:hover,.header-bottom .cart-wrap .flash-cart-views a span,body.transparent #masthead .header-bottom #site-navigation ul li a::before,.tg-slider-widget.slider-dark .btn-wrapper a:hover,.section-title:after,.about-section .about-content-wrapper .btn-wrapper a,.tg-service-widget .service-icon-wrap,.team-wrapper .team-content-wrapper .team-designation:after,.call-to-action-section .btn-wrapper a:hover,.blog-section .tg-blog-widget-layout-1:hover,.blog-section .tg-blog-widget-layout-2 .post-image .entry-date,.blog-section .tg-blog-widget-layout-2 .blog-content .post-readmore,.pricing-table-section .tg-pricing-table-widget:hover,.pricing-table-section .tg-pricing-table-widget.tg-pricing-table-layout-2 .pricing,.pricing-table-section .tg-pricing-table-widget.tg-pricing-table-layout-2 .btn-wrapper a,footer.footer-layout #top-footer .widget_tag_cloud .tagcloud a:hover,#secondary .widget-title:after,#secondary .searchform .btn:hover,#primary .searchform .btn:hover,#respond #commentform .form-submit input,.woocommerce span.onsale,.woocommerce ul.products li.product .onsale,.woocommerce ul.products li.product .button,.woocommerce #respond input#submit.alt,.woocommerce a.button.alt,.woocommerce button.button.alt,.woocommerce input.button.alt,.added_to_cart.wc-forward,.testimonial-container .swiper-pagination.testimonial-pager .swiper-pagination-bullet:hover,.testimonial-container .swiper-pagination.testimonial-pager .swiper-pagination-bullet.swiper-pagination-bullet-active,.header-bottom .searchform .btn,.navigation .nav-links a:hover,.bttn:hover,button,input[type="button"]:hover,input[type="reset"]:hover,input[type="submit"]:hover,.tg-slider-widget .btn-wrapper a:hover
+            {background-color:#30afb8}
+            .feature-product-section .tg-feature-product-layout-2 .tg-container .tg-column-wrapper .tg-feature-product-widget .featured-image-desc,.tg-team-widget.tg-team-layout-3 .team-wrapper .team-img .team-social
+            {background-color:rgba(48,175,184,.8)}
+            #respond #commentform .form-submit input:hover
+            {background-color:#1c9ba4}
+            .tg-slider-widget.slider-dark .btn-wrapper a:hover,.call-to-action-section .btn-wrapper a:hover,footer.footer-layout #top-footer .widget_tag_cloud .tagcloud a:hover,.woocommerce-error,.woocommerce-info,.woocommerce-message,#comments .comment-list article.comment-body .reply a::before,.tg-slider-widget .btn-wrapper a,.tg-slider-widget .btn-wrapper a:hover
+            {border-color:#30afb8}
+            body.transparent.header-sticky #masthead-sticky-wrapper.is-sticky #site-navigation ul li.current-flash-item a,#site-navigation ul li.current-flash-item a,body.transparent.header-sticky #masthead-sticky-wrapper #site-navigation ul li:hover>a,body.transparent #site-navigation ul li:hover .sub-toggle
+            {color:#30afb8}
+            .tg-service-widget .service-icon-wrap:after
+            {border-top-color:#30afb8}
+            body.transparent.header-sticky #masthead-sticky-wrapper .search-wrap .search-icon:hover,body.transparent .search-wrap .search-icon:hover,.header-bottom .search-wrap .search-icon:hover
+            {border-color:#30afb8}
+            body.transparent.header-sticky #masthead-sticky-wrapper .search-wrap .search-icon:hover,body.transparent #masthead .header-bottom .search-wrap .search-icon:hover,.header-bottom .search-wrap .search-icon:hover,.breadcrumb-trail.breadcrumbs .trail-items li:first-child span:hover,.breadcrumb-trail.breadcrumbs .trail-items li span:hover a
+            {color:#30afb8}
+            .woocommerce ul.products li.product .button:hover,.woocommerce #respond input#submit.alt:hover,.woocommerce a.button.alt:hover,.woocommerce button.button.alt:hover,.woocommerce input.button.alt:hover,.added_to_cart.wc-forward:hover
+            {background-color:#1c9ba4}
+            .feature-product-section .tg-feature-product-widget .featured-image-desc::before,.blog-section .row:nth-child(odd) .tg-blog-widget:hover .post-image::before
+            {border-right-color:#30afb8}
+            .feature-product-section .tg-feature-product-widget .featured-image-desc::before,.blog-section .row:nth-child(odd) .tg-blog-widget:hover .post-image::before,footer.footer-layout #top-footer .widget-title,.blog-section .row:nth-child(2n) .tg-blog-widget:hover .post-image::before
+            {border-left-color:#30afb8}
+            .blog-section .tg-blog-widget-layout-2 .entry-title a:hover,.blog-section .tg-blog-widget-layout-2 .tg-blog-widget:hover .blog-content .entry-title a:hover,.tg-blog-widget-layout-2 .read-more-container .entry-author:hover a,.tg-blog-widget-layout-2 .read-more-container .entry-author:hover,.blog-section .tg-blog-widget-layout-2 .read-more-container .read-more:hover a
+            {color:#1c9ba4}
+            .tg-service-widget .service-more:hover
+            {color:#1c9ba4}
             @media(max-width:980px){
-                #site-navigation ul li.menu-item-has-children .sub-toggle{
-                    background-color:#30afb8
-                }
+                #site-navigation ul li.menu-item-has-children .sub-toggle
+                {background-color:#30afb8}
             }
             @media screen and (min-width:56.875em){
-                .main-navigation li:hover>a,.main-navigation li.focus>a{
-                    color:#30afb8
-                }
+                .main-navigation li:hover>a,.main-navigation li.focus>a
+                {color:#30afb8}
             }
-            .site-branding{
-                margin:0 auto 0 0
-            }
-            .site-branding .site-title,.site-description{
-                clip:rect(1px,1px,1px,1px);
-                position:absolute!important;
-                height:1px;width:1px;
-                overflow:hidden
-            }
-            .logo .logo-text{
-                padding:0
-            }
+            .site-branding
+            {margin:0 auto 0 0}
+            .site-branding .site-title,.site-description
+            {clip:rect(1px,1px,1px,1px);position:absolute!important;height:1px;width:1px;overflow:hidden}
+            .logo .logo-text
+            {padding:0}
         </style>
         <style id="kirki-styles-flash_config-inline-css" type="text/css">
-            body{
-                font-family:Montserrat,Helvetica,Arial,sans-serif;
-                font-weight:400
-            }
+            body{font-family:Montserrat,Helvetica,Arial,sans-serif;font-weight:400}
         </style> 
         <script type="text/javascript">
             /* <![CDATA[ */ 
-            var monsterinsights_frontend = {"js_events_tracking":"true","download_extensions":"doc,pdf,ppt,zip,xls,docx,pptx,xlsx","inbound_paths":"[]","home_url":"https:\/\/demo.themegrill.com\/flash","hash_tracking":"false"}; /* ]]> */
-        </script>    
-        <script type="text/javascript">
-            /* <![CDATA[ */ 
-            var ctPublic = {"_ajax_nonce":"5b583fad0a","_ajax_url":"https:\/\/demo.themegrill.com\/flash\/wp-admin\/admin-ajax.php"}; /* ]]> */
+            var monsterinsights_frontend = {"js_events_tracking":"true","download_extensions":"doc,pdf,ppt,zip,xls,docx,pptx,xlsx","inbound_paths":"[]","home_url":"https:\/\/demo.themegrill.com\/flash","hash_tracking":"false"}; /* ]]> */</script>    <script type="text/javascript">/* <![CDATA[ */ var ctPublic = {"_ajax_nonce":"5b583fad0a","_ajax_url":"https:\/\/demo.themegrill.com\/flash\/wp-admin\/admin-ajax.php"}; /* ]]> */
         </script>  
         <script type="text/javascript">
-            /* <![CDATA[ */ 
-            var ctNocache = {"ajaxurl":"https:\/\/demo.themegrill.com\/flash\/wp-admin\/admin-ajax.php","info_flag":"","set_cookies_flag":"","blog_home":"https:\/\/demo.themegrill.com\/flash\/"}; /* ]]> */
-        </script>  
-        <link rel="https://api.w.org/" href="https://demo.themegrill.com/flash/wp-json/">
-        <link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://demo.themegrill.com/flash/xmlrpc.php?rsd">
-        <link rel="wlwmanifest" type="application/wlwmanifest+xml" href="https://demo.themegrill.com/flash/wp-includes/wlwmanifest.xml">
-        <link rel="canonical" href="https://demo.themegrill.com/flash/">
-        <link rel="shortlink" href="https://demo.themegrill.com/flash/"> <noscript>
-        <style>.woocommerce-product-gallery{opacity:1!important}</style></noscript>
+        /* <![CDATA[ */ var ctNocache = {"ajaxurl":"https:\/\/demo.themegrill.com\/flash\/wp-admin\/admin-ajax.php","info_flag":"","set_cookies_flag":"","blog_home":"https:\/\/demo.themegrill.com\/flash\/"}; /* ]]> */</script>  <link rel="https://api.w.org/" href="https://demo.themegrill.com/flash/wp-json/"><link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://demo.themegrill.com/flash/xmlrpc.php?rsd">
         <style type="text/css" media="all" id="siteorigin-panels-layouts-head">
             #pgc-5-0-0,#pgc-5-2-0,
             #pgc-5-3-0,#pgc-5-4-0,
@@ -372,11 +170,8 @@
             }
         </style>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400&amp;subset=cyrillic,cyrillic-ext,devanagari,greek,greek-ext,khmer,latin,latin-ext,vietnamese,hebrew,arabic,bengali,gujarati,tamil,telugu,thai" media="all"><noscript>
-        <style id="rocket-lazyload-nojs-css">
-            .rll-youtube-player,[data-lazy-src]{
-                display:none!important
-            }
-        </style></noscript>
+        <!-- <link rel="stylesheet" href="font-google.css"/>  -->
+        <style id="rocket-lazyload-nojs-css">.rll-youtube-player,[data-lazy-src]{display:none!important}</style></noscript>
             
     </head>
 
@@ -1450,7 +1245,9 @@
             images=mutation.addedNodes[i].getElementsByTagName('img');is_image=mutation.addedNodes[i].tagName=="IMG";iframes=mutation.addedNodes[i].getElementsByTagName('iframe');is_iframe=mutation.addedNodes[i].tagName=="IFRAME";rocket_lazy=mutation.addedNodes[i].getElementsByClassName('rocket-lazyload');image_count+=images.length;iframe_count+=iframes.length;rocketlazy_count+=rocket_lazy.length;if(is_image){image_count+=1}
             if(is_iframe){iframe_count+=1}}});if(image_count>0||iframe_count>0||rocketlazy_count>0){lazyLoadInstance.update()}});var b=document.getElementsByTagName("body")[0];var config={childList:!0,subtree:!0};observer.observe(b,config)}},!1)
         </script>
+        <!-- <script src="lazyload.js"></script>   -->
         <script data-no-minify="1" async="" src="https://demo.themegrill.com/flash/wp-content/plugins/wp-rocket/assets/js/lazyload/12.0/lazyload.min.js"></script> 
+        <!-- <script src="1c07ab9ecb38692ed6f3a5d0fb190703.js"></script> -->
         <script src="https://demo.themegrill.com/flash/wp-content/cache/min/106/1c07ab9ecb38692ed6f3a5d0fb190703.js" data-minify="1"></script>
         <!-- This website is like a Rocket, isn't it? Performance optimized by WP Rocket. Learn more: https://wp-rocket.me - Debug: cached@1582362890 -->
     </body>

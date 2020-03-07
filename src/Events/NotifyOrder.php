@@ -20,22 +20,22 @@ class NotifyOrder implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            MyEvents::ORDER_VALIDATION => 'onOrderValidated',
-            MyEvents::ORDER_EMAIL_BILL => 'onOrderValidated',
+            MyEvents::ORDER_EMAIL_VALIDATION => 'onOrderValidated',
+            MyEvents::ORDER_EMAIL_BILL => 'onOrderEmailBill',
         ];
     }
 
     public function onOrderEmailBill(GenericEvent $event): void
     {
-        /** @var User $user */
         $result = $event->getSubject();
-
-        $contact = $result['contact'];
         $form = $result['form'];
-        $bill = $result['bil'];
-        $file = $result['file'];
-        $view = $result['view'];
 
-        $this->mailer->sendAttachedFile($contact->getEmail(), $form['subject'], $view, $file);
+        $this->mailer->sendAttachedFile($result['to'], $form['subject'], $result['view'], $result['file']);
+    }
+
+    public function onOrderValidated(GenericEvent $event): void
+    {
+        $result = $event->getSubject();
+        $this->mailer->send($result['to'], $result['subject'], $result['view']);
     }
 }

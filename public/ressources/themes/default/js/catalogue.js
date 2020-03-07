@@ -38,10 +38,10 @@ $(function () {
         col.push({ data: 'id', title: "", visible: false });
         col.push({ data: 'IsErasable', title: "", visible: false });
         col.push({ data: 'FullPathPicture', title: "", render: Renders.renderPictur });
-        col.push({ data: 'Ref', title: "Réf." });
+        col.push({ data: 'Ref', title: "N° Serie" });
         col.push({ data: 'Name', title: "Désignation" });
-        col.push({ data: 'ItemBrandName', title: "Marque" });
-        col.push({ data: 'ItemGroupeName', title: "Sous famille" });
+        col.push({ data: 'Ean', title: "EAN" });
+        col.push({ data: 'Imei', title: "IMEI" });
 
         if($('#is_read_sensible','.access_pool').length > 0 && $('#is_read_sensible','.access_pool').val()){
             col.push({ data: 'PurchasePrice', title: "P. Achat" });

@@ -29,6 +29,14 @@
                         <i class="fa fa-align-justify"></i> {{ page_title }}</div>
 
                         <div class="card-body">
+
+                            {% if errors | length > 0 %}
+                            <ul class="error-wrapper">
+                                {% for error in errors %}
+                                <li>{{ error.message }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
                         
                             {{ form_start(formItem, {'enctype':'multipart/form-data', 'attr': {'id': 'global_form' }}) }}
                         
@@ -45,11 +53,11 @@
                         
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Référence">
+                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Numéro de série">
                                         <i class="fa fa-chess-board"></i>
                                     </span>
                                 </div>
-                                {{ form_widget(formItem.Ref,{'label': 'Rérérence', 'attr': {'placeholder': 'Référence'}}) }}
+                                {{ form_widget(formItem.Ref,{'label': 'Numéro de série', 'attr': {'placeholder': 'Numéro de série'}}) }}
                             </div>
                         
                             <div class="input-group mb-3">
@@ -105,6 +113,26 @@
                                     </span>
                                 </div>
                                 {{ form_widget(formItem.Stock,{'label': 'Stock', 'attr': {'placeholder': 'Stock'}}) }}
+                            </div>
+                        
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top"
+                                        title="EAN est un système global destiné à l'identification univoque d'objets. L'EAN est composé de 8, 13 ou 128 chiffres">
+                                        <i class="fa fa-barcode"></i>
+                                    </span>
+                                </div>
+                                {{ form_widget(formItem.Ean,{'label': 'Code EAN', 'attr': {'placeholder': 'Code EAN'}})}}
+                            </div>
+                        
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top"
+                                        title="Code IMEI">
+                                        <i class="fa fa-qrcode"></i>
+                                    </span>
+                                </div>
+                                {{ form_widget(formItem.Imei,{'label': 'Code IMEI', 'attr': {'placeholder': 'Code IMEI'}})}}
                             </div>
                         
                             <div class="input-group mb-3">

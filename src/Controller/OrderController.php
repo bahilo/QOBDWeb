@@ -36,6 +36,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OrderController extends Controller
 {
@@ -50,6 +51,7 @@ class OrderController extends Controller
     protected $billRepo;
     protected $tvaRepo;
     protected $quantityDelRepo;
+    protected $eventDispatcher;
 
 
     public function __construct(Serializer $serializer, 
@@ -62,6 +64,7 @@ class OrderController extends Controller
                                 QuoteOrderDetailRepository $orderDetailRepo,
                                 DeliveryRepository $deliveryRepo,
                                 BillRepository $billRepo,
+                                EventDispatcherInterface $eventDispatcher,
                                 TaxRepository $tvaRepo)
     {
         $this->orderDetailRepo = $orderDetailRepo;
@@ -72,6 +75,7 @@ class OrderController extends Controller
         $this->securityUtility = $securityUtility;
         $this->actionRepo = $actionRepo;
         $this->deliveryRepo = $deliveryRepo;
+        $this->eventDispatcher = $eventDispatcher;
         $this->billRepo = $billRepo;
         $this->tvaRepo = $tvaRepo;
         $this->quantityDelRepo = $quantityDelRepo;
@@ -271,14 +275,14 @@ class OrderController extends Controller
         }
 
         $bills = $this->orderManager->getHydrater()->hydrateBill($this->billRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']), $order);
-        $orderDetrail = $this->orderManager->getHydrater()->hydrateOrderDetail($this->orderDetailRepo->findBy(['QuoteOrder' => $order]), $order);
+        $orderDetail = $this->orderManager->getHydrater()->hydrateOrderDetail($this->orderDetailRepo->findBy(['QuoteOrder' => $order]), $order);
         $orderDetrailQtReceived = $this->orderManager->getHydrater()->hydrateOrderDetail($this->orderDetailRepo->findByQuantityRecieved($order), $order);
         $roderDeliveries = $this->orderManager->getHydrater()->hydrateQuantityDelivery($this->quantityDelRepo->findByBillStatus($order), $order);
         $CreateDeliveries = $this->deliveryRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']);
-        $infos = $this->orderManager->getCommandeInfo($orderDetrail, $order);
+        $infos = $this->orderManager->getCommandeInfo($orderDetail, $order);
         
         return $this->render('order/show.html.twig', [
-            'order_detail_data_source' => $this->serializer->serialize(['object_array' => $orderDetrail, 'format' => 'json', 'group' => 'class_property']),
+            'order_detail_data_source' => $this->serializer->serialize(['object_array' => $orderDetail, 'format' => 'json', 'group' => 'class_property']),
             'order_detail_delivery_data_source' => $this->serializer->serialize(['object_array' => $orderDetrailQtReceived, 'format' => 'json', 'group' => 'class_property']),
             'order_detail_bill_data_source' => $this->serializer->serialize(['object_array' => $roderDeliveries, 'format' => 'json', 'group' => 'class_property']),
             'bill_data_source' => $this->serializer->serialize(['object_array' => $bills, 'format' => 'json', 'group' => 'class_property']),
@@ -420,12 +424,19 @@ class OrderController extends Controller
 
         // envoi d'un mail de prise en compte de la commande
         if(!empty($order->getStatus()) && $order->getStatus()->getName() == 'STATUS_ORDER'){
-            $societe = $settingManager->get('SOCIETE', 'societe');            
-            $mailer->send($order->getContact()->getEmail(), $societe->getValue() . ": Validation de votre commande", $this->renderView('email/_partials/validation.html', [
-                'contact_name' => $order->getContact()->getLastName(),
-                'company' => $societe->getValue(),
-                'order' => $order
-            ]));
+            $societe = $settingManager->get('SOCIETE', 'SOCIETE_NOM');            
+            
+            $event = new GenericEvent([
+                'subject' => "Validation de votre commande",
+                'to' => $order->getContact()->getEmail(),
+                'view' => $this->renderView('email/_partials/validation.html', [
+                    'contact_name' => $order->getContact()->getLastName(),
+                    'company' => $societe->getValue(),
+                    'order' => $order
+                ]),
+            ]);
+            $this->eventDispatcher->dispatch(MyEvents::ORDER_EMAIL_VALIDATION, $event);
+
         }
         else{
             $this->orderManager->loggCommandeCritical($order, "la commande n'a pas de statut!");
@@ -529,7 +540,6 @@ class OrderController extends Controller
          
         $mailer->sendAttachedFile($contact->getEmail(), $form['subject'], $this->renderView('email/_partials/quote.html',[
             'contact_name' => $contact->getLastName(),
-            'company' => $settingManager->get('SOCIETE', 'societe')->getValue()
          ]), $file);
 
         return $this->redirectToRoute('order_show_quote_report', [
@@ -564,13 +574,12 @@ class OrderController extends Controller
         $file = $webservice->downloadBill($bill, $this->getParameter('file.pdf.bill.download_dir'), $this->getParameter('file.type.download_order'), $this->getParameter('file.type.download_refund'));
         $view = $this->renderView('email/_partials/bill.html', [
             'contact_name' => $contact->getLastName(),
-            'company' => $settingManager->get('SOCIETE', 'societe')->getValue(),
-            'bill_id' => $setManager->get("FACTURE", "prefix")->getValue() . $bill->getId(),
+            'bill_id' => $setManager->get("PDF", "FACTURE_PREFIX")->getValue() . $bill->getId(),
         ]);
 
         $event = new GenericEvent([
+            'to' => $contact->getEmail(),
             'form' => $form,
-            'bill' => $bill,
             'file' => $file,
             'view' => $view,
         ]);
@@ -986,16 +995,16 @@ class OrderController extends Controller
                 case 'STATUS_VALID':
                 case 'STATUS_ORDER':
                     $myRoute = 'order_show_report';
-                    $message = "Veuillez renseigner un contact!";
+                    $message = "Veuillez renseigner une adresse de livraison!";
                 case 'STATUS_PREREFUND':
                     $myRoute = 'order_show_prerefund_report';
-                    $message = "Veuillez renseigner un contact pour le pré-avoir";
+                    $message = "Veuillez renseigner une adresse de livraison pour le pré-avoir";
                 case 'STATUS_PREORDER':
                     $myRoute = 'order_show_preorder_report';
-                    $message = "Veuillez renseigner un contact pour la pré-commande";
+                    $message = "Veuillez renseigner une adresse de livraison pour la pré-commande";
                 case 'STATUS_QUOTE':
                     $myRoute = 'order_show_quote_report';
-                    $message = "Veuillez renseigner un contact pour le devis";
+                    $message = "Veuillez renseigner une adresse de livraison pour le devis";
             }
             //dump($myRoute);die();
             if(!empty($myRoute)){

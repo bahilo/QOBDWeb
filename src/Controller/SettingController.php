@@ -74,7 +74,7 @@ class SettingController extends Controller
             'data_table' => 'general_table_js',
             'data_table_source' => 'general_data_source',
             'page_title' => '',
-            'source' => $utility->getSettingDataSource($settingRepo->findAll()),
+            'source' => $this->settingManager->getGeneralSettingDataSource($settingRepo->findAll()),
             'codes' => $utility->getDistinctByCode($settingRepo->findAll()),
             'create_url' => $this->generateUrl('setting_registration'),
             'page' => 'setting/_partials/general.html',
@@ -84,8 +84,7 @@ class SettingController extends Controller
     /**
      * @Route("/admin/configuration/monnaie", options={"expose"=true}, name="setting_currency")
      */
-    public function currency(CurrencyRepository $currencyRepo,
-                             Utility $utility) {
+    public function currency(CurrencyRepository $currencyRepo) {
 
         if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
@@ -95,7 +94,7 @@ class SettingController extends Controller
             'data_table' => 'currency_table_js',
             'data_table_source' => 'currency_data_source',
             'page_title' => 'Monnaie',
-            'source' => $utility->getSettingDataSource($currencyRepo->findAll()),
+            'source' => $this->settingManager->getSettingDataSource($currencyRepo->findAll()),
             'codes' => ["CURRENCY"],
             'create_url' => $this->generateUrl('setting_currency_registration'),
             'page' => 'setting/_partials/index.html',
@@ -105,19 +104,18 @@ class SettingController extends Controller
     /**
      * @Route("/admin/configuration/taxe", options={"expose"=true}, name="setting_tax")
      */
-    public function tax(TaxRepository $taxRepo,
-                        Utility $utility) {
+    public function tax(TaxRepository $taxRepo) {
 
         if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
-
+        //dump($this->settingManager->getSettingDataSource($taxRepo->findAll()));die();
         return $this->render('setting/index.html.twig', [
             'data_table' => 'tax_table_js',
             'data_table_source' => 'tax_data_source',
             'page_title' => 'Tax',
             'codes' => ["TAX"],
-            'source' => $utility->getSettingDataSource($taxRepo->findAll()),
+            'source' => $this->settingManager->getSettingDataSource($taxRepo->findAll()),
             'create_url' => $this->generateUrl('setting_tax_registration'),
             'page' => 'setting/_partials/index.html',
         ]);
@@ -126,8 +124,7 @@ class SettingController extends Controller
     /**
      * @Route("/admin/configuration/facturation/statut", options={"expose"=true}, name="setting_delivery_status")
      */
-    public function deliveryStatus(DeliveryStatusRepository $delStatusRepo,
-                                   Utility $utility) {
+    public function deliveryStatus(DeliveryStatusRepository $delStatusRepo) {
 
         if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
@@ -137,7 +134,7 @@ class SettingController extends Controller
             'data_table' => 'delivery_status_table_js',
             'data_table_source' => 'delivery_status_data_source',
             'page_title' => 'Statut Facturation',
-            'source' => $utility->getSettingDataSource($delStatusRepo->findAll()),
+            'source' => $this->settingManager->getSettingDataSource($delStatusRepo->findAll()),
             'codes' => ["STATUS"],
             'create_url' => $this->generateUrl('setting_delivery_status_registration'),
             'page' => 'setting/_partials/index.html',
@@ -147,8 +144,7 @@ class SettingController extends Controller
     /**
      * @Route("/admin/configuration/commande/statut", options={"expose"=true}, name="setting_order_status")
      */
-    public function orderStatus(OrderStatusRepository $orderStatusRepo,
-                                Utility $utility) {
+    public function orderStatus(OrderStatusRepository $orderStatusRepo) {
 
         if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
@@ -159,7 +155,7 @@ class SettingController extends Controller
             'data_table' => 'status_table_js',
             'data_table_source' => 'order_status_data_source',
             'page_title' => 'Statut Commande',
-            'source' => $utility->getSettingDataSource($orderStatusRepo->findAll()),
+            'source' => $this->settingManager->getSettingDataSource($orderStatusRepo->findAll()),
             'codes' => ["STATUS"],
             'create_url' => $this->generateUrl('setting_order_status_registration'),
             'page' => 'setting/_partials/index.html',
@@ -169,8 +165,7 @@ class SettingController extends Controller
     /**
      * @Route("/admin/configuration/produit/marque", options={"expose"=true}, name="setting_catalogue_brand")
      */
-    public function catalogueBrand(ItemBrandRepository $brandRepo,
-                                   Utility $utility) {
+    public function catalogueBrand(ItemBrandRepository $brandRepo) {
 
         if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
@@ -180,7 +175,7 @@ class SettingController extends Controller
             'data_table' => 'brand_table_js',
             'data_table_source' => 'brand_data_source',
             'page_title' => 'Marque Produit',
-            'source' => $utility->getSettingDataSource($brandRepo->findAll()),
+            'source' => $this->settingManager->getSettingDataSource($brandRepo->findAll()),
             'codes' => ["BRAND"],
             'create_url' => $this->generateUrl('setting_brand_registration'),
             'page' => 'setting/_partials/index.html',
@@ -190,8 +185,7 @@ class SettingController extends Controller
     /**
      * @Route("/admin/configuration/produit/famille", options={"expose"=true}, name="setting_catalogue_group")
      */
-    public function catalogueGroup(ItemGroupeRepository $groupRepo,
-                                   Utility $utility) {
+    public function catalogueGroup(ItemGroupeRepository $groupRepo) {
 
         if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
@@ -201,7 +195,7 @@ class SettingController extends Controller
             'data_table' => 'group_table_js',
             'data_table_source' => 'group_data_source',
             'page_title' => 'Famille Produit',
-            'source' => $utility->getSettingDataSource($groupRepo->findAll()),
+            'source' => $this->settingManager->getSettingDataSource($groupRepo->findAll()),
             'codes' => ["GROUP"],
             'create_url' => $this->generateUrl('setting_group_registration'),
             'page' => 'setting/_partials/index.html',
@@ -211,8 +205,7 @@ class SettingController extends Controller
     /**
      * @Route("/admin/configuration/produit/fournisseur", options={"expose"=true}, name="setting_catalogue_provider")
      */
-    public function catalogueProvider(ProviderRepository $providerRepo,
-                                   Utility $utility) {
+    public function catalogueProvider(ProviderRepository $providerRepo) {
 
         if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
@@ -222,7 +215,7 @@ class SettingController extends Controller
             'data_table' => 'provider_table_js',
             'data_table_source' => 'provider_data_source',
             'page_title' => 'Fournisseur Produit',
-            'source' => $utility->getSettingDataSource($providerRepo->findAll()),
+            'source' => $this->settingManager->getSettingDataSource($providerRepo->findAll()),
             'codes' => ["PROVIDER"],
             'create_url' => $this->generateUrl('setting_provider_registration'),
             'page' => 'setting/_partials/index.html',
@@ -399,6 +392,7 @@ class SettingController extends Controller
         if(!$tax)
             $tax = new Tax();
         
+        
         $comment = $tax->getComment();
         if($comment)
             $tax->getCommentContent($comment->getContent());
@@ -409,7 +403,7 @@ class SettingController extends Controller
 
         if($form->isSubmitted() && $form->isValid() ){
             if(!empty($request->request->get('tax_registration[CommentContent]'))){
-
+                
                 if(!$comment)
                     $comment = new Comment();
                 $comment->setContent($request->request->get('tax_registration[CommentContent]'));
@@ -418,13 +412,7 @@ class SettingController extends Controller
                 $tax->setComment($comment);
                 $manager->persist($comment);
             }
-
-            if(empty($request->request->get('tax_registration[IsCurrent]')))
-                $tax->setIsCurrent(false);
-
-            if(empty($request->request->get('tax_registration[IsTVAMarge]')))
-                $tax->setIsTVAMarge(false);
-
+            
             $tax->setCreateAt(new \DateTime());
             $manager->persist($tax);
             $manager->flush();

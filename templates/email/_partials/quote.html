@@ -4,7 +4,7 @@
 
 <div class="row">
     <div class="col-md-12">
-        <pre>{% include 'email/files/devis.txt' with {'nom_client': contact_name, 'nom_societe': company } %}</pre>
+        <pre>{% include 'email/files/devis.txt' with {'nom_client': contact_name, 'nom_societe': search.get_setting("SOCIETE","SOCIETE_NOM").value } %}</pre>
     </div>
 </div>
 

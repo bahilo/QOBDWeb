@@ -10,8 +10,26 @@ $(document).ready(function(){
         $('#mdlDefault').modal('hide');
     }
 
-    $.fn.displayMessage = function (messageTitle, messageBody, footer = "") {
+    $.fn.displayMessage = function (messageTitle, messageBody, footer = "", errorCode = 0) {
         var modal = $('#mdlDefault');
+
+        // set panel color regarding the given error code 
+        var modalContentWrapper = modal.find('.modal-dialog');
+        modalContentWrapper.removeClass('modal-danger modal-info modal-success');
+        if(errorCode == 500){
+            modalContentWrapper.addClass('modal-danger');
+        }
+        else if(errorCode == 300){
+            modalContentWrapper.addClass('modal-warning');
+        }
+        else if(errorCode == 200){
+            modalContentWrapper.addClass('modal-success');
+        }
+        else{
+            modalContentWrapper.addClass('modal-info');
+        }
+
+        // fill the panel content
         modal.find('.modal-title').html(messageTitle);
         modal.find('.modal-body').html(messageBody);
         modal.find('.modal-footer').html(footer);

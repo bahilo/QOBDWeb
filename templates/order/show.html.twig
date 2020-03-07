@@ -124,7 +124,9 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- /.col-->
+
+                                {% if search.get_right_read("ACTION_SENSIBLE") %}
+                                <!-- Marges -->
                                 <div class="col-sm-2">
                                     <div class="callout callout-primary">
                                         <small class="text-muted">Marge (%)</small>
@@ -135,7 +137,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- /.col-->
+                                
                                 <div class="col-sm-2">
                                     <div class="callout callout-secondary">
                                         <small class="text-muted">Marge ({{ order.currency.symbol }})</small>
@@ -146,6 +148,8 @@
                                         </div>
                                     </div>
                                 </div>
+                                {% endif %}
+
                                 <!-- /.col-->
                                 <div class="col-sm-2">
                                     <div class="callout callout-danger">

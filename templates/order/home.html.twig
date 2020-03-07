@@ -48,6 +48,18 @@
 
 
 {% endblock %}
+
+{% block access_pool %}
+<div class="access_pool">
+    <input type="hidden" id="is_read" value="{{ search.get_right_read("ACTION_ORDER") }}" />
+    <input type="hidden" id="is_write" value="{{ search.get_right_write("ACTION_ORDER") }}" />
+    <input type="hidden" id="is_update" value="{{ search.get_right_update("ACTION_ORDER") }}" />
+    <input type="hidden" id="is_delete" value="{{ search.get_right_delete("ACTION_ORDER") }}" />
+    <input type="hidden" id="is_mail" value="{{ search.get_right_email("ACTION_ORDER") }}" />
+    <input type="hidden" id="is_admin" value="{{ search.get_right_admin() }}" />
+</div>
+{% endblock %}
+
 {% block javascripts %}
 <script src="{{  asset('js/order.js','theme_default') }}"></script>
 {% endblock %}

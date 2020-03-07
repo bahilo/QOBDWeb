@@ -1,18 +1,14 @@
 <html lang="en-US" class="wf-montserrat-n4-active wf-active">
     <head>
-        <title>{{ search.get_setting("SOCIETE","SOCIETE_NOM").value }}</title>
+       <title>{{ search.get_setting("SOCIETE","SOCIETE_NOM").value }}</title>
         <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="{{ asset('style/scss/blog/dc7c6e8470152dc9e9489a73751bdff1.css', 'theme_default') }}">
         <link rel="stylesheet" href="{{ asset('all.min.css', 'font_awsome_css') }}"> 
-        <link rel="stylesheet" href="{{ asset('style/scss/font-awesome.css', 'theme_default') }}">
-        {# <link rel="stylesheet" href="https://demo.themegrill.com/flash/wp-content/cache/min/106/dc7c6e8470152dc9e9489a73751bdff1.css" data-minify="1">  #}
-        <!-- <link rel="stylesheet" href="dc7c6e8470152dc9e9489a73751bdff1.css"/>  -->
         <link rel="stylesheet" href="{{ asset('style/scss/blog/blog.css', 'theme_default') }}">
         <style type="text/css">
             img.wp-smiley,img.emoji{display:inline!important;border:none!important;box-shadow:none!important;height:1em!important;width:1em!important;margin:0 .07em!important;vertical-align:-0.1em!important;background:none!important;padding:0!important}
         </style>
         <link rel="stylesheet" href="{{ asset('style/scss/blog/woocommerce-smallscreen-3.6.3.css', 'theme_default') }}">
-        {# <link rel="stylesheet" id="woocommerce-smallscreen-css" href="https://demo.themegrill.com/flash/wp-content/cache/busting/106/flash/wp-content/plugins/woocommerce/assets/css/woocommerce-smallscreen-3.6.3.css" type="text/css" media="only screen and (max-width: 768px)"> #}
         <style id="woocommerce-inline-inline-css" type="text/css">
             .woocommerce form .form-row .required{visibility:visible}
         </style>
@@ -242,19 +238,18 @@
                     <div class="header-bottom">
                         <div class="tg-container">
                             <div class="logo">
-                                {% if search.logo %}
-                                <img class="navbar-brand-full" src="{{ search.logo }}" width="89" height="25" alt="CoreUI Logo">
-                                {% endif %}
-                                {# <figure class="logo-image"> 
+                                
+                                <figure class="logo-image"> 
                                     <a href="#" class="custom-logo-link" rel="home" itemprop="url">
-                                        <img width="107" height="30" src="https://demo.themegrill.com/flash/wp-content/uploads/sites/106/2017/01/flash-logo.png" class="custom-logo lazyloaded" alt="flash-logo" itemprop="logo" data-lazy-src="https://demo.themegrill.com/flash/wp-content/uploads/sites/106/2017/01/flash-logo.png" data-was-processed="true"><noscript>
-                                        <img width="107" height="30" src="https://demo.themegrill.com/flash/wp-content/uploads/sites/106/2017/01/flash-logo.png" class="custom-logo" alt="flash-logo" itemprop="logo" /></noscript>
+                                        {% if search.logo %}
+                                        <img class="navbar-brand-full" src="{{ search.logo }}" width="89" height="25" alt="CoreUI Logo">
+                                        {% endif %}
                                     </a>
-                                </figure> #}
+                                </figure>
                                 <div class="logo-text site-branding">
-                                    <h1 class="site-title">
+                                    <h3 class="site-title">
                                         <a href="#" rel="home">{{ search.get_setting("SOCIETE","SOCIETE_NOM").value }}</a>
-                                    </h1>
+                                    </h3>
                                     <p class="site-description"></p>
                                 </div>
                             </div>

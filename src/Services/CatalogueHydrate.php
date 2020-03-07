@@ -2,7 +2,10 @@
 
 namespace App\Services;
 
+use App\Entity\Item;
 use App\Entity\Comment;
+use App\Entity\EanCode;
+use App\Entity\ImeiCode;
 
 class CatalogueHydrate{
 
@@ -21,23 +24,31 @@ protected $catalogue_dir;
             $group = $item->getItemGroupe();
             $brand = $item->getItemBrand();
             $comment = $item->getComment();
+            $imei = $item->getImeiCode();
 
             if($brand)
                 $item->setItemBrandName((string)$brand);
-            else
-                $item->setItemBrandName("");
+            // else
+            //     $item->setItemBrandName("");
 
 
             if($group)
                 $item->setItemGroupeName((string)$group);
-            else
-                $item->setItemGroupeName("");
+            // else
+            //     $item->setItemGroupeName("");
             
             if($comment)
                 $item->setContentComment($comment->getContent());
-            else
-                $item->setContentComment("");
-            
+            // else
+            //     $item->setContentComment("");
+
+            if ($imei){
+                $item->setImei($imei->getCode());
+                $ean = $imei->getEanCode();
+                if($ean)
+                    $item->setEan($ean->getCode());
+            }
+
             if(!empty($item->getPicture()))
                 $item->setFullPathPicture($this->catalogue_dir .'/'. $item->getPicture());
 
@@ -46,18 +57,42 @@ protected $catalogue_dir;
         return $output;
     }
 
-    public function hydrateItemRelationFromForm($item, $form){
-
-        $group = $item->getItemGroupe();
-        $brand = $item->getItemBrand();
+    public function hydrateItemRelationFromForm(Item $item){
+        
         $comment = $item->getComment();
-       
-        if(!$comment)
-            $comment = new Comment();
-        $comment->setContent($form['ContentComment']);
-        $comment->setCreateAt(new \DateTime());
+        $imei = $item->getImeiCode();
+               
+       if(!empty($item->getContentComment())){
+            if (!empty($comment))
+                $comment = new Comment();
 
-        $item->setComment($comment);
+            $comment->setContent($item->getContentComment());
+            $comment->setCreateAt(new \DateTime());
+            $item->setComment($comment);
+       }
+
+        if(!empty($item->getImei())){
+            if (empty($imei))
+                $imei = new ImeiCode;
+            $imei->setCode($item->getImei());               
+        }
+
+        if (!empty($item->getEan())) {
+            if (empty($imei)){
+                $imei = new ImeiCode;
+                $imei->setCode("");
+            }
+            $ean = $imei->getEanCode();
+            if (empty($ean))
+                $ean = new EanCode;
+
+            $ean->setCode($item->getEan());             
+            $imei->setEanCode($ean);
+        }
+
+        $item->setImeiCode($imei);   
+
+        
         $item->setCreatedAt(new \DateTime());
         $item->setIsErasable(true);
 

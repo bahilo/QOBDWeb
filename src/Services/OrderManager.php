@@ -63,29 +63,38 @@ class OrderManager{
 
         foreach ($orderDetails as $orderDetail) {
 
-            // $orderDetail->setItemSellPrice($orderDetail->getItemSellPrice());
-            // $orderDetail->setItemPurchasePrice($orderDetail->getItemPurchasePrice());
-            
-            $output['total_HT'] += $orderDetail->getItemSellPrice() * $orderDetail->getQuantity();
-            $output['marge_perc'] += (($orderDetail->getItemSellPrice() - $orderDetail->getItemPurchasePrice()) / $orderDetail->getItemSellPrice()) * 100;
-            $output['marge_amount'] += ($orderDetail->getItemSellPrice() - $orderDetail->getItemPurchasePrice());
+            $qt = $orderDetail->getQuantity();
+            $pa = $orderDetail->getItemPurchasePrice();
+            $pv = $orderDetail->getItemSellPrice(); 
+
+            $total_HT = $pv * $qt;
+            $marge_perc = ($pv - $pa) / $pv * 100;
+            $marge_amount = $pv - $pa;
+                        
+            $output['total_HT'] += $total_HT;
+            $output['marge_perc'] += $marge_perc;
+            $output['marge_amount'] += $marge_amount; 
             
             $tax = empty($orderDetail->getTax()) ? $order->getTax() : $orderDetail->getTax();
 
             if(!empty($tax)){
-                $output['VAT'] = $tax->getValue();
-                $output['VAT_amount'] += $orderDetail->getItemSellPrice() * $orderDetail->getQuantity() *  $tax->getValue() / 100;
-                $output['total_TTC'] += $orderDetail->getItemSellPrice() * $orderDetail->getQuantity() * (1 + $tax->getValue() / 100);
+                $bTvaMarge = $tax->getIsTVAMarge();
+                $tva = $tax->getValue();                
+                $VAT_amount = $orderDetail->getItemSellPrice() * $orderDetail->getQuantity();
+
+                $output['VAT'] = $tva;
+                $output['VAT_amount'] += ($bTvaMarge ? $marge_amount : $pv) * $qt * $tva/100 ;
+                $output['total_TTC'] += $bTvaMarge ? ($pv + $marge_amount * $tva/100) * $qt : $pv * (1 + $tva/100) * $qt;
             }
             else{
                 $output['total_TTC'] += $orderDetail->getItemSellPrice() * $orderDetail->getQuantity();
             }            
         }
-        $output['total_HT'] = round($output['total_HT'] , 2) * $currencyValue;
-        $output['total_TTC'] = round($output['total_TTC'] , 2) * $currencyValue;
-        $output['marge_perc'] = round($output['marge_perc'] , 2) * $currencyValue;
-        $output['marge_amount'] = round($output['marge_amount'] , 2) * $currencyValue;
-        $output['VAT_amount'] = round($output['VAT_amount'] , 2) * $currencyValue;
+        $output['marge_perc'] = round($output['marge_perc'], 2);
+        $output['total_HT'] = round($output['total_HT'] * $currencyValue , 2);
+        $output['total_TTC'] = round($output['total_TTC'] * $currencyValue , 2);
+        $output['marge_amount'] = round($output['marge_amount'] * $currencyValue , 2);
+        $output['VAT_amount'] = round($output['VAT_amount'] * $currencyValue , 2);
         return $output;
     }
 

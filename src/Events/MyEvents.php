@@ -14,6 +14,6 @@ final class MyEvents
     const USER_LOGGEDIN = 'agent.loggedin';
     const USER_LOGGEDOUT = 'agent.loggedout';
     const USER_REGISTRATION_SEND_EMAIL = 'agent.email.register';
-    const ORDER_VALIDATION = 'order.validation';
+    const ORDER_EMAIL_VALIDATION = 'order.email.validation';
     const ORDER_EMAIL_BILL = 'order.email.bill';
 }

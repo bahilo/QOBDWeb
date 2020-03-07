@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Services\Serializer;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -11,12 +10,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 class Utility{
 
     protected $logger;
-    protected $serializer;
 
-    public function __construct(LoggerInterface $logger, Serializer $serializer)
+    public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
-        $this->serializer = $serializer;
     }
    
     public function getMonthOfYear($date){
@@ -184,33 +181,6 @@ class Utility{
         return $outputArray;
     }
 
-    /**
-     * Extract data du setting général
-     */
-    public function extractData($sourceArray){
-        $outputArray = [];
-        foreach($sourceArray as $key => $obj){
-            if (!\array_key_exists($obj->getCode(), $outputArray)) {
-                $outputArray[$obj->getCode()] = [];                
-            }             
-            \array_push($outputArray[$obj->getCode()], $obj);
-        }
-        return $outputArray;
-    }
-
-    public function getSettingDataSource($sourceArray){
-        $outputArray = [];
-        $res = $this->extractData($sourceArray);        
-        foreach($res as $key => $obj){
-            $outputArray[$key] = $this->serializer->serialize([
-                'object_array' => $obj,
-                'format' => 'json',
-                'group' => 'class_property'
-            ]);
-        }
-        return $outputArray;
-    }
-
     public function replaceSpecialChars(array $array_in)
     {
         $outputArray = array();
@@ -232,11 +202,11 @@ class Utility{
     {
         $object = array();
         foreach ($array_in as $key => $value) {
-            if (!is_object($value) && !is_array($value)) {
+            if (!is_object($value) && !is_array($value) && !is_numeric($value)) {
                 $object[$key] = base64_encode($value);
             } 
             elseif(is_object($value)){
-                dump($value); die();
+                //dump($value); die();
             }
             elseif (is_array($value)) {
                 $object[$key] = $this->encodeBase64($value);

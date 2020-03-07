@@ -42,7 +42,7 @@ class SearchToView{
     public function logo(){
         $setting = $this->get_setting('SOCIETE', 'SOCIETE_LOGO');
         if(!empty($setting) && $setting->getIsFile() && !empty($setting->getValue())){
-            return $this->settingFileDir . '/' . $setting->getValue();
+            return $this->rootDir . '/'. $this->settingFileDir . '/' . $setting->getValue();
         }
         return null;
     }

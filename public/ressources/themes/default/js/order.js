@@ -342,8 +342,10 @@ $(function () {
         col.push({ data: 'null', title: "Qt. en attente", render: renderQtEnAttente });
         col.push({ data: 'ItemSellPriceTotal', title: "P. vente total", render: renderDigit });
         col.push({ data: 'ItemSellPriceVATTotal', title: "P. TTC total", render: renderDigit });
-        col.push({ data: 'ItemROIPercent', title: "Marge (%)", render: renderDigit });
-        col.push({ data: 'ItemROICurrency', title: "Marge", render: renderDigit });
+        if ($('#is_read_sensible', '.access_pool').length > 0 && $('#is_read_sensible', '.access_pool').val()) {
+            col.push({ data: 'ItemROIPercent', title: "Marge (%)", render: renderDigit });
+            col.push({ data: 'ItemROICurrency', title: "Marge", render: renderDigit });
+        }
         
         return col;
     }

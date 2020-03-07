@@ -15,6 +15,7 @@ use App\Repository\QuoteOrderDetailRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class CatalogueController extends Controller
@@ -56,7 +57,8 @@ class CatalogueController extends Controller
                                     Request $request, 
                                     ObjectManager $manager,
                                     CatalogueHydrate $catHydrate,
-                                    Utility $utility) {
+                                    Utility $utility,
+                                    ValidatorInterface $validator) {
 
         if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_CATALOGUE']))) {
             return $this->redirectToRoute('security_deny_access');
@@ -66,12 +68,14 @@ class CatalogueController extends Controller
             $item = new Item();
         
         $item = $catHydrate->hydrateItem([$item])[0];
-     
+        
         $form = $this->createForm(ItemRegistrationType::class, $item);
         $form->handleRequest($request);
+        $errors = $validator->validate($item);
+
         if($form->isSubmitted() && $form->isValid() ){
 
-            $item = $catHydrate->hydrateItemRelationFromForm($item, $request->request->get('item_registration'));
+            $item = $catHydrate->hydrateItemRelationFromForm($item);
 
             $file = $request->files->get('item_registration')['PictureFile'];
 
@@ -85,7 +89,15 @@ class CatalogueController extends Controller
 
             $item->setIsErasable(true);
 
-            $manager->persist($item->getComment());
+            if($item->getComment())
+                $manager->persist($item->getComment());
+
+            if($item->getImeiCode()){
+                $manager->persist($item->getImeiCode());
+                if($item->getImeiCode()->getEanCode())
+                    $manager->persist($item->getImeiCode()->getEanCode());
+            }
+
             $manager->persist($item);
             $manager->flush();
 
@@ -93,7 +105,8 @@ class CatalogueController extends Controller
         }        
 
         return $this->render('catalogue/item_registration.html.twig', [
-            'formItem' => $form->createView()
+            'formItem' => $form->createView(),
+            'errors' => $errors
         ]);
     }   
 

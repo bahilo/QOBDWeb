@@ -4,17 +4,17 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
-    app.name: '/'
-    app.name.base_dir: '%app.name%public'
+    app.name: '/QOBDWeb'
+    app.name.base_dir: '%app.name%/public'
     resource.download_dir: '%app.name.base_dir%/ressources/download'
-    file.download_dir: '%resource.download_dir%'
-    file.agent.download_dir: '%resource.download_dir%/agent/avatars'
-    file.setting.catalogue.download_dir: '%resource.download_dir%/setting/catalogue'
-    file.setting.file.download_dir: '%resource.download_dir%/setting/files'
-    file.setting.image.download_dir: '%resource.download_dir%/setting/image'
-    file.pdf.bill.download_dir: '%resource.download_dir%/pdf/bill'
-    file.pdf.quote.download_dir: '%resource.download_dir%/pdf/quote'
-    file.pdf.delivery.download_dir: '%resource.download_dir%/pdf/delivery'
+    file.download_dir: '/ressources/download'
+    file.agent.download_dir: '%file.download_dir%/agent/avatars'
+    file.setting.catalogue.download_dir: '%file.download_dir%/setting/catalogue'
+    file.setting.file.download_dir: '%file.download_dir%/setting/files'
+    file.setting.image.download_dir: '%file.download_dir%/setting/image'
+    file.pdf.bill.download_dir: '%file.download_dir%/pdf/order'
+    file.pdf.quote.download_dir: '%file.download_dir%/pdf/quote'
+    file.pdf.delivery.download_dir: '%file.download_dir%/pdf/delivery'
     file.setting.email: '../templates/email/files'
     file.type.download_quote: 0
     file.type.download_order: 1

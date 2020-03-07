@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Entity\Item;
 use App\Entity\Provider;
+use App\Services\Serializer;
 use App\Repository\SettingRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 
@@ -13,12 +14,17 @@ class SettingManager{
     protected $settingRepo;
     protected $utility;
     protected $manager;
+    protected $serializer;
 
-    public function __construct(SettingRepository $settingRepo, ObjectManager $manager, Utility $utility)
+    public function __construct(SettingRepository $settingRepo, 
+                                ObjectManager $manager, 
+                                Utility $utility,
+                                Serializer $serializer)
     {
         $this->settingRepo = $settingRepo;
         $this->utility = $utility;
         $this->manager = $manager;
+        $this->serializer = $serializer;
     }
 
     public function get($code, $name){
@@ -192,4 +198,44 @@ class SettingManager{
 
         return $error;
     }
+
+    public function extractData($sourceArray, $SearchKey)
+    {
+        $outputArray = [];
+        foreach ($sourceArray as $key => $obj) {
+            if (!\array_key_exists($obj->{'get' . $SearchKey}(), $outputArray)) {
+                $outputArray[$obj->{'get' . $SearchKey}()] = [];
+            }
+            \array_push($outputArray[$obj->{'get' . $SearchKey}()], $obj);
+        }
+        return $outputArray;
+    }
+
+    public function getSerializedObject($obj){
+        return  $this->serializer->serialize([
+            'object_array' => $obj,
+            'format' => 'json',
+            'group' => 'class_property'
+        ]);
+    }
+
+    public function getDataSource($sourceArray, $code)
+    {
+        $outputArray = [];
+        $res = $this->extractData($sourceArray, $code);
+        foreach ($res as $key => $obj) {
+            $outputArray[$key] = $this->getSerializedObject($obj);
+        }
+        return $outputArray;
+    }
+
+    public function getGeneralSettingDataSource($sourceArray)
+    {
+        return $this->getDataSource($sourceArray, 'Code');
+    }
+
+    public function getSettingDataSource($sourceArray){
+        return $this->getSerializedObject($sourceArray);
+    }
+
 }

@@ -37,8 +37,6 @@ class ApiManager{
         $token = $this->settingManager->get('WEBSERVICE', 'CURRENCY_TOKEN');
 
         $currency = $this->currencyRepo->findOneBy(['IsDefault' => true]);
-        // dump($currency);
-        // die();
         $this->currencyClient = new Client();
         $response = $this->currencyClient->request('GET', $currencyURL->getValue() . $token->getValue() . '&base='. $currency->getSymbol() .'&symbols='.$currencySymbol);
         $data = \json_decode($response->getBody());

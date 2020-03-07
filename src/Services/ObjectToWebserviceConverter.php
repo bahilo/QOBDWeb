@@ -300,6 +300,7 @@ class ObjectToWebserviceConverter{
             $obj['Source']  = 0;
             $obj['Picture']  = '';
         }
+        
         return $obj;
     }
 
@@ -311,7 +312,7 @@ class ObjectToWebserviceConverter{
             $obj['ID'] = $agent->getId();
             $obj['FirstName'] = $agent->getFirstName();
             $obj['LastName'] = $agent->getLastName();
-            $obj['Phone'] = $agent->getPhone();
+            $obj['Phone'] = "0x " . $agent->getPhone();
             $obj['Fax'] = $agent->getFax();
             $obj['Email']  = $agent->getEmail();
             $obj['UserName']  = $agent->getUserName();
@@ -388,7 +389,7 @@ class ObjectToWebserviceConverter{
             $obj['LastName'] = $contact->getLastName();
             $obj['Company'] = $contact->getPosition();
             $obj['Email']  = $contact->getEmail();
-            $obj['Phone']  = $contact->getPhone();
+            $obj['Phone']  = "0x " . $contact->getPhone();
             $obj['Fax']  = $contact->getFax();
             $obj['Rib']  = '';
             $obj['CRN']  = '';

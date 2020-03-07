@@ -46,41 +46,49 @@ class OrderHydrate{
         foreach( $orderDetails as $orderDetail){
             
             $item = $orderDetail->getItem();
-            $tax = empty($orderDetail->getTax()) || empty($orderDetail->getTax()->getValue()) ? $order->getTax() : $orderDetail->getTax();
+            $tax = empty($orderDetail->getTax()) ? $order->getTax() : $orderDetail->getTax();
             
             if($item){
                 $item = $this->catHydrate->hydrateItem([$item])[0];
-                
+
+                $bTvaMarge = (!empty($tax)) ? $tax->getIsTVAMarge() : false;
+                $qt = $orderDetail->getQuantity();
+                $pa = $orderDetail->getItemPurchasePrice();
+                $pv = $orderDetail->getItemSellPrice();
+                $marge_amount = $pv - $pa;
+                $tva = (!empty($tax)) ? $tax->getValue() : 0;
+
                 $orderDetail->setContentComment($item->getContentComment());
                 $orderDetail->setItemRef($item->getRef());
                 $orderDetail->setItemName($item->getName());
 
-                $sellPrice = $orderDetail->getItemSellPrice();
-                $purchasePrice = $orderDetail->getItemPurchasePrice();
-
-                if(empty($sellPrice) || $sellPrice == 0){
-                    $orderDetail->setItemSellPrice($item->getSellPrice());
-                    $this->manager->persist($orderDetail);                    
+                if(empty($pv) || $pv == 0){
+                    $pv = $item->getSellPrice();
+                    $orderDetail->setItemSellPrice($pv);                   
                 }
 
-                if(empty($purchasePrice) || $purchasePrice == 0){
-                    $orderDetail->setItemPurchasePrice($item->getPurchasePrice());
-                    $this->manager->persist($orderDetail);                    
+                if(empty($pa) || $pa == 0){
+                    $pa = $item->getPurchasePrice();
+                    $orderDetail->setItemPurchasePrice($pa);                                       
                 }
+
+                $marge_amount = $pv - $pa;
+                $total_HT = $pv * $qt;
+                $total_TTC = ($bTvaMarge) ? ($pv + $marge_amount * $tva / 100) * $qt : $pv * (1 + $tva / 100) * $qt;
+                $marge_perc = ($pv - $pa) / $pv * 100;
+
+                $orderDetail->setItemSellPriceTotal($total_HT);
+                $orderDetail->setItemSellPriceVATTotal($total_TTC);
+
+                $orderDetail->setItemROIPercent($marge_perc);
+                $orderDetail->setItemROICurrency($marge_amount);
                 
-                $orderDetail->setItemSellPriceTotal($orderDetail->getItemSellPrice() * $orderDetail->getQuantity());
-                if($tax)
-                    $orderDetail->setItemSellPriceVATTotal(($orderDetail->getItemSellPrice() * $orderDetail->getQuantity())*(1 + $tax->getValue() / 100));
-                else
-                    $orderDetail->setItemSellPriceVATTotal($orderDetail->getItemSellPrice() * $orderDetail->getQuantity());
-                $orderDetail->setItemROIPercent((($orderDetail->getItemSellPrice() - $orderDetail->getItemPurchasePrice()) / $orderDetail->getItemSellPrice()) * 100);
-                $orderDetail->setItemROICurrency(($orderDetail->getItemSellPrice() - $orderDetail->getItemPurchasePrice()) * $orderDetail->getQuantity() );
-                
+                $this->manager->persist($orderDetail); 
             }
             $this->manager->flush();
             array_push($output, $orderDetail);
         }
-
+        
         return $output;
     }
 

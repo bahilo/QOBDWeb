@@ -7,6 +7,8 @@ use JMS\Serializer\Annotation\Groups;
 use Doctrine\Common\Collections\Collection;
 use JMS\Serializer\Annotation\SerializedName;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ItemRepository")
@@ -24,6 +26,7 @@ class Item
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotNull(message = "Le numéro de serie ne peut pas être null.")
      * @Groups({"class_property"})
      * @SerializedName("Ref")
      */
@@ -38,6 +41,7 @@ class Item
 
     /**
      * @ORM\Column(type="float")
+     * @Assert\NotNull(message = "Le prix de vente ne peut pas être null.")
      * @Groups({"class_property"})
      * @SerializedName("SellPrice")
      */
@@ -45,6 +49,7 @@ class Item
 
     /**
      * @ORM\Column(type="float")
+     * @Assert\NotNull(message = "Le prix d'achat ne peut pas être null.")
      * @Groups({"class_property"})
      * @SerializedName("PurchasePrice")
      */
@@ -52,6 +57,7 @@ class Item
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\NotNull(message = "Le stock ne peut pas être null.")
      * @Groups({"class_property"})
      * @SerializedName("Stock")
      */
@@ -80,6 +86,7 @@ class Item
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Provider", inversedBy="items")
+     * @Assert\NotNull(message = "Veuillez choisir au moins un fournisseur.")
      * @Groups({"class_relation"})
      */
     private $Provider;
@@ -137,7 +144,24 @@ class Item
      */
     private $FullPathPicture;
 
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("Imei")
+     */
+    private $Imei;
+
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("Ean")
+     */
+    private $Ean;
+
     private $PictureFile;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\ImeiCode", inversedBy="item", cascade={"persist", "remove"})
+     */
+    private $ImeiCode;
 
 
     public function __construct()
@@ -408,6 +432,42 @@ class Item
     public function setFullPathPicture(?string $FullPathPicture): self
     {
         $this->FullPathPicture = $FullPathPicture;
+
+        return $this;
+    }
+
+    public function getImeiCode(): ?ImeiCode
+    {
+        return $this->ImeiCode;
+    }
+
+    public function setImeiCode(?ImeiCode $ImeiCode): self
+    {
+        $this->ImeiCode = $ImeiCode;
+
+        return $this;
+    }
+
+    public function getImei(): ?string
+    {
+        return $this->Imei;
+    }
+
+    public function setImei(?string $Imei): self
+    {
+        $this->Imei = $Imei;
+
+        return $this;
+    }
+
+    public function getEan(): ?string
+    {
+        return $this->Ean;
+    }
+
+    public function setEan(?string $Ean): self
+    {
+        $this->Ean = $Ean;
 
         return $this;
     }

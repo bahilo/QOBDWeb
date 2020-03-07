@@ -234,14 +234,9 @@ class SecurityController extends Controller
                 $event = new GenericEvent([
                     'to' => $agent->getEmail(),
                     'subject' => 'Inscription',
-                    'view' =>$this->renderView('email/registration.html.twig', ['agent' => $agent]),
+                    'view' =>$this->renderView('email/_partials/registration.html', ['agent' => $agent]),
                 ]);
                 $this->eventDispatcher->dispatch(MyEvents::USER_REGISTRATION_SEND_EMAIL, $event);
-                // $mailer->send(
-                //     $agent->getEmail(),
-                //     'Inscription',
-                //     $this->renderView('email/registration.html.twig', ['agent' => $agent])
-                // );
                 return $this->redirectToRoute('security_login');
             }
             else

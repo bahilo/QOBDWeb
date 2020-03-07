@@ -91,6 +91,9 @@ class PdfWebService{
         if (!empty($setting)) {
             $fileName = $setting->getValue() . $param['order']->getId() . '.pdf';
         }
+        // dump($res[0]['Name']);
+        // dump($param['download_dir']);
+        // die();
         file_put_contents($param['download_dir'] . '/' . $fileName, $res[0]['Value']);
 
         return $param['download_dir'] . '/' . $fileName;
@@ -103,11 +106,11 @@ class PdfWebService{
         $bill = $this->billRepo->findOneByDelivery($delivery);
         $param = [
             'ws_method' => 'download_delivery',
-            'ws_params' => ['company_name' => 'BNOME', 'source' => $this->getSource($order, $bill, 0)],
+            'ws_params' => ['company_name' => strtoupper($this->settingManager->get("SOCIETE", "SOCIETE_NOM")->getValue()), 'source' => $this->getSource($order, $bill, 0)],
             'download_dir' => $downloadDir,
             'delivery' => $delivery
         ];
-
+        
         $response = $this->apiManager->execPdfRequest($param['ws_method'], $param['ws_params']);
         $res = $this->utility->restoreSpecialChars($response);
 
@@ -145,6 +148,9 @@ class PdfWebService{
             "Order_items"       => $this->utility->replaceSpecialChars($objArray['order_item']),
             "Tax"               => $this->utility->replaceSpecialChars($objArray['tax_order'])
         );
+        //dump($objArray['item']);
+        //dump($source);
+        //die();
         return $source;
     }
 

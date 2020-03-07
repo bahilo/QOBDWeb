@@ -34,6 +34,7 @@ class Item
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotNull(message = "Le nom du produit ne peut pas être null.")
      * @Groups({"class_property"})
      * @SerializedName("Name")
      */
@@ -58,6 +59,7 @@ class Item
     /**
      * @ORM\Column(type="integer")
      * @Assert\NotNull(message = "Le stock ne peut pas être null.")
+     * @Assert\GreaterThan(0, message = "Le stock ne peut pas être inférieur ou égual à {{ compared_value }}.")
      * @Groups({"class_property"})
      * @SerializedName("Stock")
      */

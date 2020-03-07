@@ -14,6 +14,8 @@ use App\Entity\ItemGroupe;
 use App\Entity\OrderStatus;
 use App\Services\Serializer;
 use App\Entity\DeliveryStatus;
+use Hoa\Event\Test\Unit\Source;
+use App\Services\SettingManager;
 use App\Form\TaxRegistrationType;
 use App\Repository\TaxRepository;
 use App\Services\SecurityManager;
@@ -33,12 +35,11 @@ use App\Form\OrderStatusRegistrationType;
 use App\Repository\OrderStatusRepository;
 use App\Form\DeliveryStatusRegistrationType;
 use App\Repository\DeliveryStatusRepository;
-use App\Services\SettingManager;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Persistence\ObjectManager;
-use Hoa\Event\Test\Unit\Source;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class SettingController extends Controller
 {
@@ -46,15 +47,18 @@ class SettingController extends Controller
     protected $securityUtility;
     protected $actionRepo;
     protected $settingManager;
+    protected $validator;
 
 
     public function __construct(SecurityManager $securityUtility, 
                                 ActionRepository $actionRepo,
-                                SettingManager $settingManager)
+                                SettingManager $settingManager,
+                                ValidatorInterface $validator)
     {
         $this->securityUtility = $securityUtility;
         $this->actionRepo = $actionRepo;
         $this->settingManager = $settingManager;
+        $this->validator = $validator;
     }
     
     /*______________________________________________________________________________________________________________________ 
@@ -275,6 +279,7 @@ class SettingController extends Controller
         $form = $this->createForm(SettingRegistrationType::class, $setting);
 
         $form->handleRequest($request);
+        $errors = $this->validator->validate($setting);
 
         //dump($request);die();
         if($form->isSubmitted() && $form->isValid() ){
@@ -303,7 +308,8 @@ class SettingController extends Controller
         }        
 
         return $this->render('setting/registration.html.twig', [
-            'formSetting' => $form->createView()
+            'formSetting' => $form->createView(),
+            'errors' => $errors
         ]);
     }
 
@@ -326,6 +332,7 @@ class SettingController extends Controller
         $form = $this->createForm(CurrencyRegistrationType::class, $currency);
 
         $form->handleRequest($request);
+        $errors = $this->validator->validate($currency);
 
         if($form->isSubmitted() && $form->isValid() ){
             $isDefault = $request->request->get('currency_registration[IsDefault]');
@@ -340,7 +347,8 @@ class SettingController extends Controller
         }        
 
         return $this->render('setting/currency_registration.html.twig', [
-            'formCurrency' => $form->createView()
+            'formCurrency' => $form->createView(),
+            'errors' => $errors
         ]);
     }
 
@@ -363,6 +371,7 @@ class SettingController extends Controller
         $form = $this->createForm(DeliveryStatusRegistrationType::class, $status);
 
         $form->handleRequest($request);
+        $errors = $this->validator->validate($status);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $manager->persist($status);
@@ -372,7 +381,8 @@ class SettingController extends Controller
         }
 
         return $this->render('setting/delivery_status_registration.html.twig', [
-            'formStatus' => $form->createView()
+            'formStatus' => $form->createView(),
+            'errors' => $errors
         ]);
     }
 
@@ -400,6 +410,7 @@ class SettingController extends Controller
         $form = $this->createForm(TaxRegistrationType::class, $tax);
 
         $form->handleRequest($request);
+        $errors = $this->validator->validate($tax);
 
         if($form->isSubmitted() && $form->isValid() ){
             if(!empty($request->request->get('tax_registration[CommentContent]'))){
@@ -421,7 +432,8 @@ class SettingController extends Controller
         }        
 
         return $this->render('setting/tax_registration.html.twig', [
-            'formTax' => $form->createView()
+            'formTax' => $form->createView(),
+            'errors' => $errors
         ]);
     }
 
@@ -444,6 +456,7 @@ class SettingController extends Controller
         $form = $this->createForm(ItemBrandRegistrationType::class, $itemBrand);
 
         $form->handleRequest($request);
+        $errors = $this->validator->validate($itemBrand);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
@@ -457,7 +470,8 @@ class SettingController extends Controller
         }
 
         return $this->render('setting/brand_registration.html.twig', [
-            'formBrand' => $form->createView()
+            'formBrand' => $form->createView(),
+            'errors' => $errors
         ]);
     }
 
@@ -480,6 +494,7 @@ class SettingController extends Controller
         $form = $this->createForm(ItemGroupeRegistrationType::class, $itemGroupe);
 
         $form->handleRequest($request);
+        $errors = $this->validator->validate($itemGroupe);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
@@ -492,7 +507,8 @@ class SettingController extends Controller
         }
 
         return $this->render('setting/group_registration.html.twig', [
-            'formGroup' => $form->createView()
+            'formGroup' => $form->createView(),
+            'errors' => $errors
         ]);
     }
 
@@ -515,6 +531,7 @@ class SettingController extends Controller
         $form = $this->createForm(ProviderRegistrationType::class, $provider);
 
         $form->handleRequest($request);
+        $errors = $this->validator->validate($provider);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
@@ -527,7 +544,8 @@ class SettingController extends Controller
         }
 
         return $this->render('setting/provider_registration.html.twig', [
-            'formProvider' => $form->createView()
+            'formProvider' => $form->createView(),
+            'errors' => $errors
         ]);
     }
 
@@ -550,6 +568,7 @@ class SettingController extends Controller
         $form = $this->createForm(OrderStatusRegistrationType::class, $status);
 
         $form->handleRequest($request);
+        $errors = $this->validator->validate($status);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
@@ -560,7 +579,8 @@ class SettingController extends Controller
         }
 
         return $this->render('setting/status_registration.html.twig', [
-            'formStatus' => $form->createView()
+            'formStatus' => $form->createView(),
+            'errors' => $errors
         ]);
     }
 

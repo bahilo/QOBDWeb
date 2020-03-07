@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class ClientController extends Controller
@@ -93,7 +94,8 @@ class ClientController extends Controller
     public function registration(Client $client = null, 
                                 Request $request, 
                                 ObjectManager $manager,
-                                ClientHydrate $clientHydrate) {
+                                ClientHydrate $clientHydrate,
+                                ValidatorInterface $validator) {
 
         if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
             return $this->redirectToRoute('security_deny_access');
@@ -106,6 +108,8 @@ class ClientController extends Controller
      
         $form = $this->createForm(ClientRegistrationType::class, $client);
         $form->handleRequest($request);
+        $errors = $validator->validate($client);
+
         if($form->isSubmitted() && $form->isValid() ){
 
             $client = $clientHydrate->hydrateClientRelationFromForm($client, $request->request->get('client_registration'));
@@ -121,7 +125,8 @@ class ClientController extends Controller
         }       
 
         return $this->render('Client/registration.html.twig', [
-            'formClient' => $form->createView()
+            'formClient' => $form->createView(),
+            'errors' => $errors
         ]);
     }
 

@@ -74,6 +74,28 @@ class StatisticManager{
         ];
     }
 
+    public function getCountBy(string $status, string $target){
+        $moments = []; 
+        $output = [];//'STATUS_ORDER'
+        foreach ($this->orderRepo->findBy(['Status' => $this->statusRepo->findOneBy(['Name' => $status ])]) as $order) {
+           $moment = $this->getMomentOfYearArray($target, $order);
+
+            if ($this->utility->str_in_array($moments, $moment) == -1) {
+                $moments[] = $moment;
+                $output[$moment] = 0;
+            }
+            else{
+                $output[$moment] += 1;
+            }
+        }
+
+        return [
+            'title' => 'Commande',
+            'axisX' => $moments,
+            'data' => $output
+        ];
+    }
+
    public function getBillBy(string $target, bool $bPayReceived = false){
         $moments = []; 
         $output = [];
@@ -108,6 +130,7 @@ class StatisticManager{
         ];
     }
 
+    
     public function getOrderDataBy($target){
         $output = [];
        
@@ -126,6 +149,67 @@ class StatisticManager{
                 $output[] = $this->getOrderByYear();
                 $output[] = $this->getBillByYear();
                 $output[] = $this->getBillPayedByYear();
+                break;
+        }
+        
+        return $output;
+    }
+
+    public function getCountDataBy($status, $target){
+        $output = [];
+       
+        switch($status) {
+            case 'STATUS_ORDER':
+                switch ($target) {
+                    case 'WEEK':
+                        $output[] = $this->getCountOrderByWeek();
+                        break;
+                    case 'MONTH':
+                        $output[] = $this->getCountOrderByMonth();
+                        break;
+                    case 'YEAR':
+                        $output[] = $this->getCountOrderByYear();
+                        break;
+                }
+                break;
+            case 'STATUS_QUOTE':
+                switch ($target) {
+                    case 'WEEK':
+                        $output[] = $this->getCountQuoteByWeek();
+                        break;
+                    case 'MONTH':
+                        $output[] = $this->getCountQuoteByMonth();
+                        break;
+                    case 'YEAR':
+                        $output[] = $this->getCountQuoteByYear();
+                        break;
+                }
+                break;
+            case 'STATUS_REFUND':
+                switch ($target) {
+                    case 'WEEK':
+                        $output[] = $this->getCountRefundByWeek();
+                        break;
+                    case 'MONTH':
+                        $output[] = $this->getCountRefundByMonth();
+                        break;
+                    case 'YEAR':
+                        $output[] = $this->getCountRefundByYear();
+                        break;
+                }
+                break;
+            case 'STATUS_VALID':
+                switch ($target) {
+                    case 'WEEK':
+                        $output[] = $this->getCountValidByWeek();
+                        break;
+                    case 'MONTH':
+                        $output[] = $this->getCountValidByMonth();
+                        break;
+                    case 'YEAR':
+                        $output[] = $this->getCountValidByYear();
+                        break;
+                }
                 break;
         }
         
@@ -153,41 +237,56 @@ class StatisticManager{
         return $moment;
     }
 
-    public function getOrderDataByWeek()
-    {
-        return $this->getOrderDataBy('WEEK');
-    }
-
+    //________________________________________________[ Orders ]____________________________//
+    
+    //-------------------------[ Month ]
     public function getOrderDataByMonth()
     {
         return $this->getOrderDataBy('MONTH');
     }
 
-    public function getOrderDataByYear()
+    public function getCountOrderByMonth()
     {
-        return $this->getOrderDataBy('YEAR');
-    } 
-
-    public function getOrderByWeek(){
-        return $this->getOrderBy('WEEK');
+        return $this->getCountDataBy('STATUS_ORDER','MONTH');
     }
 
     public function getOrderByMonth(){
         return $this->getOrderBy('MONTH');
     }
 
+     //-------------------------[ Year ]
+    public function getOrderDataByYear()
+    {
+        return $this->getOrderDataBy('YEAR');
+    }
+
+    public function getCountOrderByYear()
+    {
+        return $this->getCountDataBy('STATUS_ORDER', 'YEAR');
+    } 
+
     public function getOrderByYear(){
         return $this->getOrderBy('YEAR');
     }
 
-   public function getBillByWeek(){
-        return $this->getBillBy('WEEK');
+    //-------------------------[ Week ]
+    public function getOrderDataByWeek()
+    {
+        return $this->getOrderDataBy('WEEK');
     }
 
-   public function getBillPayedByWeek(){
-        return $this->getBillBy('WEEK', true);
+    public function getCountOrderByWeek()
+    {
+        return $this->getCountDataBy('STATUS_ORDER', 'WEEK');
+    } 
+
+    public function getOrderByWeek(){
+        return $this->getOrderBy('WEEK');
     }
 
+    //________________________________________________[ Bills ]____________________________//
+    
+    //-------------------------[ Month ] 
    public function getBillByMonth(){
         return $this->getBillBy('MONTH');
     }
@@ -196,6 +295,15 @@ class StatisticManager{
         return $this->getBillBy('MONTH', true);
     }
 
+   //-------------------------[ Week ] 
+    public function getBillPayedByWeek(){
+        return $this->getBillBy('WEEK', true);
+    }  
+    public function getBillByWeek(){
+        return $this->getBillBy('WEEK');
+    }
+
+    //-------------------------[ Year ] 
    public function getBillByYear(){
         return $this->getBillBy('YEAR');
     }
@@ -204,6 +312,63 @@ class StatisticManager{
         return $this->getBillBy('YEAR', true);
     }
 
-    
+    //________________________________________________[ Quotes ]____________________________//
+   
+    //-------------------------[ Month ] 
+    public function getCountQuoteByMonth()
+    {
+        return $this->getCountBy('STATUS_QUOTE', 'MONTH');
+    }
 
+    //-------------------------[ Week ] 
+    public function getCountQuoteByWeek()
+    {
+        return $this->getCountBy('STATUS_QUOTE', 'WEEK');
+    }
+
+    //-------------------------[ Year ] 
+    public function getCountQuoteByYear()
+    {
+        return $this->getCountBy('STATUS_QUOTE', 'YEAR');
+    }
+
+    //________________________________________________[ Refunds ]____________________________//
+
+    //-------------------------[ Month ] 
+    public function getCountValidByMonth()
+    {
+        return $this->getCountBy('STATUS_VALID', 'MONTH');
+    }
+
+    //-------------------------[ Week ] 
+    public function getCountValidByWeek()
+    {
+        return $this->getCountBy('STATUS_VALID', 'WEEK');
+    }
+
+    //-------------------------[ Year ] 
+    public function getCountValidByYear()
+    {
+        return $this->getCountBy('STATUS_VALID', 'YEAR');
+    }
+
+    //________________________________________________[ Customer validation ]____________________________//
+
+    //-------------------------[ Month ] 
+    public function getCountRefundByMonth()
+    {
+        return $this->getCountBy('STATUS_REFUND', 'MONTH');
+    }
+
+    //-------------------------[ Week ] 
+    public function getCountRefundByWeek()
+    {
+        return $this->getCountBy('STATUS_REFUND', 'WEEK');
+    }
+
+    //-------------------------[ Year ] 
+    public function getCountRefundByYear()
+    {
+        return $this->getCountBy('STATUS_REFUND', 'YEAR');
+    } 
 }

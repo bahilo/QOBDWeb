@@ -1,777 +1,838 @@
-<!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>{% block title %}{{ search.get_setting("SOCIETE","SOCIETE_NOM").value }}{% endblock %}</title>
-    <link rel="stylesheet" href="{{ asset('bootstrap.min.css', 'bootstrap_css') }}">
-    <link rel="stylesheet" href="{{ asset('all.min.css', 'font_awsome_css') }}">   
-    <link rel="stylesheet" href="{{ asset('style/scss/coreui.css', 'theme_coreui') }}">       
-    <link rel="stylesheet" href="{{ asset('style/scss/base.css', 'theme_default') }}">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <meta name="description" content="CoreUI - Open Source Bootstrap Admin Template">
+  <meta name="author" content="Łukasz Holeczek">
+  <meta name="keyword" content="Bootstrap,Admin,Template,Open,Source,jQuery,CSS,HTML,RWD,Dashboard">
+  <title>{% block title %}{{ search.get_setting("SOCIETE","SOCIETE_NOM").value }}{% endblock %}</title>
 
-    {% block stylesheets %} {% endblock %}
+  <link rel="stylesheet" href="{{ asset('bootstrap.min.css', 'bootstrap_css') }}">
+  <link rel="stylesheet" href="{{ asset('all.min.css', 'font_awsome_css') }}">
+  <link rel="stylesheet" href="{{ asset('style/css/src/style.css', 'theme_coreui') }}">     
+    <link rel="stylesheet" href="{{ asset('style/scss/base.css', 'theme_default') }}">
+   <!-- <script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js"></script>
+  <script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-118965717-1"></script>
+  -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'UA-118965717-1');
+  </script>
+  <style type="text/css">
+    /* Chart.js */
+    /*
+ * DOM element rendering detection
+ * https://davidwalsh.name/detect-node-insertion
+ */
+    @keyframes chartjs-render-animation {
+      from {
+        opacity: 0.99;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    .chartjs-render-monitor {
+      animation: chartjs-render-animation 0.001s;
+    }
+
+    /*
+ * DOM element resizing detection
+ * https://github.com/marcj/css-element-queries
+ */
+    .chartjs-size-monitor,
+    .chartjs-size-monitor-expand,
+    .chartjs-size-monitor-shrink {
+      position: absolute;
+      direction: ltr;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      overflow: hidden;
+      pointer-events: none;
+      visibility: hidden;
+      z-index: -1;
+    }
+
+    .chartjs-size-monitor-expand>div {
+      position: absolute;
+      width: 1000000px;
+      height: 1000000px;
+      left: 0;
+      top: 0;
+    }
+
+    .chartjs-size-monitor-shrink>div {
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      left: 0;
+      top: 0;
+    }
+  </style>
 </head>
 
-  <body class="app header-fixed sidebar-fixed aside-menu-fixed sidebar-lg-show">
-    
-    <header class="app-header navbar">
-      <button class="navbar-toggler sidebar-toggler d-lg-none mr-auto" type="button" data-toggle="sidebar-show">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <a class="navbar-brand" href="#">
+<body class="c-app">
+  <div class="c-sidebar c-sidebar-dark c-sidebar-fixed c-sidebar-lg-show" id="sidebar">
+    <div class="c-sidebar-brand d-md-down-none">
+      {% if search.logo %}
+      <img class="navbar-brand-full" src="{{ search.logo }}" width="89" height="25" alt="CoreUI Logo">      
+      {% endif %}
+      {{ search.get_setting("SOCIETE","SOCIETE_NOM").value }}      
+    </div>
+    <ul class="c-sidebar-nav ps ps--active-y">
+
+      {% if search.get_right_read("ACTION_DASHBORD") %}
+      <li class="c-sidebar-nav-item">
+        <a class="c-sidebar-nav-link c-active" href="{{ path("home") }}">
+          <i class="fa fa-tachometer-alt"></i> Tableau de bord
+        </a>
+      </li>
+      {% endif %}
+
+      {% if search.get_right_read("ACTION_CATALOGUE") %}
+      <li class="c-sidebar-nav-title">Catyalogue</li>      
+      <li class="c-sidebar-nav-item">
+        <a class="c-sidebar-nav-link" href="{{ path("catalogue_home") }}">
+          <i class="fa fa-clone"></i> Produits
+        </a>
+      </li>
+      {% endif %}
+
+      <li class="c-sidebar-nav-title">Commandes/Avoirs</li>
+
+      {% if search.get_right_read("ACTION_ORDER") %}
+      <li class="c-sidebar-nav-dropdown">
+        <a class="c-sidebar-nav-dropdown-toggle" href="#">
+          <i class="fa fa-align-justify"></i> Commandes</a>
+        </a>
+        <ul class="c-sidebar-nav-dropdown-items">
+          <li class="c-sidebar-nav-item">
+            <a class="c-sidebar-nav-link" href="{{ path("order_preorder") }}">
+              <i class="fa fa-calendar"></i> A valider
+            </a>
+          </li>
+          <li class="c-sidebar-nav-item">
+            <a class="c-sidebar-nav-link" href="{{ path("order_home") }}">
+              <i class="fa fa-clipboard-check"></i> validées
+            </a>
+          </li>
+          <li class="c-sidebar-nav-item">
+            <a class="c-sidebar-nav-link" href="{{ path("order_customer_valid") }}">
+              <i class="fa fa-calendar-check"></i> Revalidation client
+            </a>
+          </li>
+          <li class="c-sidebar-nav-item">
+            <a class="c-sidebar-nav-link" href="{{ path("order_bill") }}">
+              <i class="fa fa-cubes"></i> Expédiées</a>
+          </li>
+          <li class="c-sidebar-nav-item">
+            <a class="c-sidebar-nav-link" href="{{ path("order_closed") }}">
+              <i class="fa fa-closed-captioning"></i> Cloturées</a>
+          </li>
+        </ul>
+      </li>
+
+      <li class="c-sidebar-nav-dropdown">
+        <a class="c-sidebar-nav-dropdown-toggle" href="#">
+          <i class="fa fa-align-justify"></i> Avoirs</a>
+        </a>
+        <ul class="c-sidebar-nav-dropdown-items">
+          <li class="c-sidebar-nav-item">
+            <a class="c-sidebar-nav-link" href="{{ path("order_prerefund") }}">
+              <i class="fa fa-calendar"></i> A valider
+            </a>
+          </li>
+          <li class="c-sidebar-nav-item">
+            <a class="c-sidebar-nav-link" href="{{ path("order_refund") }}">
+              <i class="fa fa-clipboard-check"></i> validées
+            </a>
+          </li>
+          <li class="c-sidebar-nav-item">
+            <a class="c-sidebar-nav-link" href="{{ path("order_bill_refund") }}">
+              <i class="fa fa-cubes"></i> Expédiées</a>
+          </li>
+          <li class="c-sidebar-nav-item">
+            <a class="c-sidebar-nav-link" href="{{ path("order_refund_closed") }}">
+              <i class="fa fa-closed-captioning"></i> Cloturées</a>
+          </li>
+        </ul>
+      </li>
+      {% endif %}
+
+      {% if search.get_right_read("ACTION_QUOTE") %}
+      <li class="c-sidebar-nav-item">
+        <a class="c-sidebar-nav-link" href="{{ path("order_quote")}}">
+          <i class="fa fa-align-justify"></i> Devis
+        </a>
+      </li>
+      {% endif %}
+
+      {% if search.get_right_read("ACTION_CLIENT") %}
+      <li class="c-sidebar-nav-title">Suivi Clientèle</li>
+      <li class="c-sidebar-nav-item">
+        <a class="c-sidebar-nav-link" href="{{ path("client_home") }}">
+          <i class="fa fa-user"></i> Clients
+        </a>
+      </li>
+      {% endif %}
       
-        {% if search.logo %}
-        <img class="navbar-brand-full" src="{{ search.logo }}" width="89" height="25" alt="CoreUI Logo">
-        {% else %}
-        {{ search.get_setting("SOCIETE","SOCIETE_NOM").value }}
-        {% endif %}
-      </a>
-      <button class="navbar-toggler sidebar-toggler d-md-down-none" type="button" data-toggle="sidebar-lg-show">
-        <span class="navbar-toggler-icon"></span>
+      <li class="c-sidebar-nav-title">Administration / Securité</li>
+      {% if search.get_right_read("ACTION_SECURITY") %}
+      <li class="c-sidebar-nav-dropdown">
+        <a class="c-sidebar-nav-dropdown-toggle" href="#">
+          <i class="fa fa-user-secret"></i> Securité</a>
+        </a>
+        <ul class="c-sidebar-nav-dropdown-items">
+          <li class="c-sidebar-nav-item">
+            <a class="c-sidebar-nav-link" href="{{ path("agent_home") }}">
+              <i class="fa fa-fingerprint"></i> commerciaux
+            </a>
+          </li>
+          <li class="c-sidebar-nav-item">
+            <a class="c-sidebar-nav-link" href="{{ path("security_agent_role") }}">
+              <i class="fa fa-id-card"></i> Accès
+            </a>
+          </li>
+        </ul>
+      </li>
+      {% endif %}
+
+      {% if search.get_right_read("ACTION_SETTING") %}
+      <li class="c-sidebar-nav-dropdown">
+        <a class="c-sidebar-nav-dropdown-toggle" href="#">
+          <i class="fa fa-user-secret"></i> Configuration
+        </a>        
+        <ul class="c-sidebar-nav-dropdown-items">
+          <li class="c-sidebar-nav-item">
+            <a class="c-sidebar-nav-link" href="{{ path("setting_home") }}">
+              <i class="fa fa-sliders-h"></i> Générale
+            </a>
+          </li>
+          <li class="c-sidebar-nav-item">
+            <a class="c-sidebar-nav-link" href="{{ path("setting_currency") }}">
+              <i class="fa fa-coins"></i> Monnaie
+            </a>
+          </li>
+          <li class="c-sidebar-nav-item">
+            <a class="c-sidebar-nav-link" href="{{ path("setting_tax") }}">
+              <i class="fa fa-money-bill-wave-alt"></i> Taxe
+            </a>
+          </li>
+          <li class="c-sidebar-nav-item">
+            <a class="c-sidebar-nav-link" href="{{ path("setting_delivery_status") }}">
+              <i class="fa fa-star"></i> Statut Facturation
+            </a>
+          </li>
+          <li class="c-sidebar-nav-item">
+            <a class="c-sidebar-nav-link" href="{{ path("setting_order_status") }}">
+              <i class="fa fa-star-half-alt"></i> Statut Commande
+            </a>
+          </li>
+          <li class="c-sidebar-nav-item">
+            <a class="c-sidebar-nav-link" href="{{ path("setting_email") }}">
+              <i class="fa fa-star-half-alt"></i> Emails
+            </a>
+          </li>
+          <li class="c-sidebar-nav-item">
+            <a class="c-sidebar-nav-link" href="{{ path("setting_catalogue_brand") }}">
+              <i class="fa fa-random"></i> Marques produits
+            </a>
+          </li>
+          <li class="c-sidebar-nav-item">
+            <a class="c-sidebar-nav-link" href="{{ path("setting_catalogue_group") }}">
+              <i class="fa fa-caret-square-down"></i> Familles produits
+            </a>
+          </li>
+          <li class="c-sidebar-nav-item">
+            <a class="c-sidebar-nav-link" href="{{ path("setting_catalogue_provider") }}">
+              <i class="fa fa-hourglass-half"></i> Fournisseurs produits
+            </a>
+          </li>          
+          <li class="c-sidebar-nav-item">
+            <a class="c-sidebar-nav-link" href="{{ path("setting_catalogue_import") }}">
+              <i class="fa fa-upload"></i> Imports
+            </a>
+          </li>
+          <li class="c-sidebar-nav-dropdown">
+            <a class="c-sidebar-nav-dropdown-toggle" href="#">
+              <i class="fa fa-user-secret"></i> Securité
+            </a>
+            <ul class="c-sidebar-nav-dropdown-items">
+              <li class="c-sidebar-nav-item">
+                <a class="c-sidebar-nav-link" href="{{ path("security_action") }}">
+                  <i class="fa fa-fingerprint"></i> Actions
+                </a>
+              </li>
+              <li class="c-sidebar-nav-item">
+                <a class="c-sidebar-nav-link" href="{{ path("security_role") }}">
+                  <i class="fa fa-passport"></i> Roles
+                </a>
+              </li>
+              <li class="c-sidebar-nav-item">
+                <a class="c-sidebar-nav-link" href="{{ path("security_profile") }}">
+                  <i class="fa fa-passport"></i> profiles
+                </a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      {% endif %}
+
+      <div class="ps__rail-x" style="left: 0px; bottom: 0px;">
+        <div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div>
+      </div>
+      <div class="ps__rail-y" style="top: 0px; height: 720px; right: 0px;">
+        <div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 399px;"></div>
+      </div>
+    </ul>
+    <button class="c-sidebar-minimizer c-class-toggler" type="button" data-target="_parent"
+      data-class="c-sidebar-unfoldable"></button>
+  </div>
+  <div class="chat-wrapper">
+    <div class="c-sidebar c-sidebar-lg c-sidebar-light c-sidebar-right c-sidebar-overlaid" id="aside">
+      <button class="c-sidebar-close c-class-toggler" type="button" data-target="_parent" data-class="c-sidebar-show"
+        responsive="true">
+        <span class="fa fa-sliders-h"></span>
       </button>
-      <ul class="nav navbar-nav d-md-down-none">
-
+      <ul class="nav nav-tabs nav-underline nav-underline-primary" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" data-toggle="tab" href="#timeline" role="tab">
+            <i class="fa fa-comments"></i>
+          </a>
+        </li>
+        <!-- <li class="nav-item">
+          <a class="nav-link" data-toggle="tab" href="#messages" role="tab" style="display: none;" >
+            <i class="fa fa-comments"></i>
+          </a>
+        </li> -->
+      </ul>
+    
+      <div class="tab-content">
+        <div class="tab-pane active" id="timeline" role="tabpanel">
+          <div class="list-group list-group-accent">
+            <a class="btn btn-info discussion-create" href="{{ path("chat_discussion_register", {name: "test"}) }}"><i
+                class="fa fa-plus-square"></i></a>
+            <div
+              class="list-group-item list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">
+              Discussions</div>
+        
+            <div class="discussion-home-wrapper">
+              
+              {% for discussion in search.discussions %}
+              {% set agentOwner = chat.discussion_owner(discussion) %}
+              <div data-id="{{ discussion.id }}" data-current="{{ discussion.iscurrent }}" data-owner="{{ discussion.isowner }}"
+                class="list-group-item list-group-item-accent-{% if discussion.iscurrent %}danger{% else %}warning{% endif %} list-group-item-divider dvDiscussion">
+                <div class="c-avatar float-right">
+                  <img class="img-avatar c-avatar-img" src="{{ search.avatar_dir(agentOwner) }}" alt="admin@bootstrapmaster.com"
+                    data-toggle="tooltip" data-placement="top" title="{{ agentOwner.UserName }}">
+                </div>
+                <a href="{{ path("chat_agent_discusion", {id: discussion.id }) }}" class="link-discussion">
+                  <strong class="DiscName">{{ discussion.name }}</strong> {% if discussion.TotalUnRead > 0 %}<span
+                    class="badge badge-pill badge-danger">{{ discussion.TotalUnRead }}</span>{% endif %}
+                  {% if agentOwner.id == app.user.id %}
+                  <a href="#" class="btnDiscSetting">
+                    <i class="fa fa-cog"></i>
+                  </a>
+                  {% endif %}
+                </a>
+                <small class="text-muted mr-3">
+                  {% if agentOwner %}
+                  <div>Créer par
+                    <strong>{{ agentOwner.username }}</strong>
+                  </div>
+                  {% endif %}
+                  <i class="fa fa-calendar"></i> {{ discussion.CreatedAtShort }}</small>
+                <small class="text-muted mr-3">
+                  <a href="{{ path("chat_delete_discussion", {id: discussion.id}) }}" class="btnDelete">
+                    <i class="fa fa-trash"></i>
+                  </a>
+                </small>
+                <div class="c-avatars-stack mt-2">
+                  {% for agent in chat.discussion_users(discussion) %}
+                  <div class="c-avatar c-avatar-xs">
+                    <img class="img-avatar c-avatar-img" data-id-agent="{{ agent.id }}" src="{{ search.avatar_dir(agent) }}"
+                      alt="{{ agent.UserName }}" data-toggle="tooltip" data-placement="top" title="{{ agent.UserName }}">
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane" id="messages" role="tabpanel">
+          <div data-id-discussion="" class="messages-home-wrapper">
+            <div
+              class="lstDiscussion list-group-item list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">
+            </div>
+            <a href="#" class="loadMessages">
+              <div
+                class="list-group-item list-group-item-accent-warning bg-light text-center font-weight-bold text-muted text-uppercase small">
+                Messages plus anciens...
+              </div>
+            </a>
+            <div class="p-3">
+              <div class="message-area-wrapper"></div>
+              <div class="char-room">
+                <div class="card border-info">
+                  <div class="card-body">
+                    <form method="post">
+                      <input type="hidden" name="chat_room[discussion]">
+                      <textarea class="form-control" name="chat_room[message]" id=""
+                        style="width: 100%; height: 100px;"></textarea>
+                      <div class="control-wrapper">
+                        {# {% set currentDiscussion = user.lastdiscussion %} #}
+                        <br />
+                        <button type="submit" class="float-right btn btn-success"><i class="fa fa-paper-plane"></i></button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="c-wrapper">
+    <header class="c-header c-header-light c-header-fixed">
+      <button class="c-header-toggler c-class-toggler d-lg-none mfe-auto" type="button" data-target="#sidebar"
+        data-class="c-sidebar-show">
+        <svg class="c-icon c-icon-lg">
+          <use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-menu"></use>
+        </svg>
+      </button><a class="c-header-brand d-lg-none c-header-brand-sm-up-center" href="#">
+        <svg width="118" height="46" alt="CoreUI Logo">
+          <use xlink:href="assets/brand/coreui-pro.svg#full"></use>
+        </svg></a>
+        <!-- <button class="navbar-toggler sidebar-toggler d-md-down-none" type="button" data-toggle="sidebar-lg-show">
+          <span class="navbar-toggler-icon"></span>
+        </button> -->
+      <button class="c-header-toggler c-class-toggler mfs-3 d-md-down-none" type="button" data-target="#sidebar"
+        data-class="c-sidebar-lg-show" responsive="true">
+        <span class="fa fa-sliders-h"></span>
+      </button>
+      <ul class="c-header-nav d-md-down-none">
         {% if search.get_right_read("ACTION_DASHBORD") %}
-        <li class="nav-item px-3">
-          <a class="nav-link" href="{{ path("home") }}">Tableau de bord</a>
-        </li>
+        <li class="c-header-nav-item px-3"><a class="c-header-nav-link" href="{{ path("home") }}">Tableau de bord</a></li>
         {% endif %}
-
         {% if search.get_right_read("ACTION_CATALOGUE") %}
-        <li class="nav-item px-3">
-          <a class="nav-link" href="{{ path("catalogue_home") }}">Catalogue</a>
-        </li>
+        <li class="c-header-nav-item px-3"><a class="c-header-nav-link" href="{{ path("catalogue_home") }}">Catalogue</a></li>
         {% endif %}
-
-        <li class="nav-item px-3">
-          <a class="nav-link" href="{{ path("order") }}">Recherche</a>
+        <li class="c-header-nav-item px-3"><a class="c-header-nav-link" href="{{ path("order") }}">Recherche commande</a></li>
+        
+      </ul>
+      <ul class="c-header-nav mfs-auto">
+        <li class="c-header-nav-item px-3 c-d-legacy-none">
+          <button class="c-class-toggler c-header-nav-btn" type="button" id="header-tooltip" data-target="body"
+            data-class="c-dark-theme" data-toggle="c-tooltip" data-placement="bottom" title=""
+            data-original-title="Toggle Light/Dark Mode">
+            <svg class="c-icon c-d-dark-none">
+              <use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-moon"></use>
+            </svg>
+            <svg class="c-icon c-d-default-none">
+              <use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-sun"></use>
+            </svg>
+          </button>
         </li>
       </ul>
-      <ul class="nav navbar-nav ml-auto">
-        <li class="nav-item d-md-down-none">
-          {% set unread_messages = chat.unread_messages %}
-          {% if unread_messages and unread_messages > 0 %}
-          <a class="nav-link btnMessageNotif" href="#">
-            <i class="fa fa-bell"></i>
-            <span class="badge badge-pill badge-danger">{{ unread_messages }}</span>
+      <ul class="c-header-nav">
+        {% set unread_messages = chat.unread_messages %}
+        <!-- <li class="c-header-nav-item dropdown d-md-down-none mx-2">
+          <a class="c-header-nav-link" data-toggle="dropdown"
+            href="#" role="button" aria-haspopup="true" aria-expanded="false">
+            <svg class="c-icon">
+              <use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-bell"></use>
+            </svg><span class="badge badge-pill badge-danger">5</span>
           </a>
-          {% endif %}
+          <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg pt-0">
+            <div class="dropdown-header bg-light">
+              <strong>You have 5 notifications</strong>
+            </div>
+            <a class="dropdown-item" href="#">
+              <svg class="c-icon mfe-2 text-success">
+                <use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-user-follow"></use>
+              </svg> New user registered</a><a class="dropdown-item" href="#">
+              <svg class="c-icon mfe-2 text-danger">
+                <use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-user-unfollow"></use>
+              </svg> User deleted</a><a class="dropdown-item" href="#">
+              <svg class="c-icon mfe-2 text-info">
+                <use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-chart"></use>
+              </svg> Sales report is ready</a><a class="dropdown-item" href="#">
+              <svg class="c-icon mfe-2 text-success">
+                <use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-basket"></use>
+              </svg> New client</a><a class="dropdown-item" href="#">
+              <svg class="c-icon mfe-2 text-warning">
+                <use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-speedometer"></use>
+              </svg> Server overloaded</a>
+            <div class="dropdown-header bg-light"><strong>Server</strong></div><a class="dropdown-item d-block"
+              href="#">
+              <div class="text-uppercase mb-1"><small><b>CPU Usage</b></small></div><span class="progress progress-xs">
+                <div class="progress-bar bg-info" role="progressbar" style="width: 25%" aria-valuenow="25"
+                  aria-valuemin="0" aria-valuemax="100"></div>
+              </span><small class="text-muted">348 Processes. 1/4 Cores.</small>
+            </a><a class="dropdown-item d-block" href="#">
+              <div class="text-uppercase mb-1"><small><b>Memory Usage</b></small></div><span
+                class="progress progress-xs">
+                <div class="progress-bar bg-warning" role="progressbar" style="width: 70%" aria-valuenow="70"
+                  aria-valuemin="0" aria-valuemax="100"></div>
+              </span><small class="text-muted">11444GB/16384MB</small>
+            </a><a class="dropdown-item d-block" href="#">
+              <div class="text-uppercase mb-1"><small><b>SSD 1 Usage</b></small></div><span
+                class="progress progress-xs">
+                <div class="progress-bar bg-danger" role="progressbar" style="width: 95%" aria-valuenow="95"
+                  aria-valuemin="0" aria-valuemax="100"></div>
+              </span><small class="text-muted">243GB/256GB</small>
+            </a>
+          </div>
+        </li> -->
+        <!-- <li class="c-header-nav-item dropdown d-md-down-none mx-2">
+          <a class="c-header-nav-link" data-toggle="dropdown"
+            href="#" role="button" aria-haspopup="true" aria-expanded="false">
+            <svg class="c-icon">
+              <use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-list-rich"></use>
+            </svg><span class="badge badge-pill badge-warning">15</span></a>
+          <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg pt-0">
+            <div class="dropdown-header bg-light"><strong>You have 5 pending tasks</strong></div><a
+              class="dropdown-item d-block" href="#">
+              <div class="small mb-1">Upgrade NPM &amp; Bower<span class="float-right"><strong>0%</strong></span></div>
+              <span class="progress progress-xs">
+                <div class="progress-bar bg-info" role="progressbar" style="width: 0%" aria-valuenow="0"
+                  aria-valuemin="0" aria-valuemax="100"></div>
+              </span>
+            </a><a class="dropdown-item d-block" href="#">
+              <div class="small mb-1">ReactJS Version<span class="float-right"><strong>25%</strong></span></div><span
+                class="progress progress-xs">
+                <div class="progress-bar bg-danger" role="progressbar" style="width: 25%" aria-valuenow="25"
+                  aria-valuemin="0" aria-valuemax="100"></div>
+              </span>
+            </a><a class="dropdown-item d-block" href="#">
+              <div class="small mb-1">VueJS Version<span class="float-right"><strong>50%</strong></span></div><span
+                class="progress progress-xs">
+                <div class="progress-bar bg-warning" role="progressbar" style="width: 50%" aria-valuenow="50"
+                  aria-valuemin="0" aria-valuemax="100"></div>
+              </span>
+            </a><a class="dropdown-item d-block" href="#">
+              <div class="small mb-1">Add new layouts<span class="float-right"><strong>75%</strong></span></div><span
+                class="progress progress-xs">
+                <div class="progress-bar bg-info" role="progressbar" style="width: 75%" aria-valuenow="75"
+                  aria-valuemin="0" aria-valuemax="100"></div>
+              </span>
+            </a><a class="dropdown-item d-block" href="#">
+              <div class="small mb-1">Angular 8 Version<span class="float-right"><strong>100%</strong></span></div><span
+                class="progress progress-xs">
+                <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100"
+                  aria-valuemin="0" aria-valuemax="100"></div>
+              </span>
+            </a><a class="dropdown-item text-center border-top" href="#"><strong>View all tasks</strong></a>
+          </div>
+        </li> -->
+        {% if unread_messages and unread_messages > 0 %}
+        <li class="c-header-nav-item dropdown d-md-down-none mx-2">
+          <a class="c-header-nav-link" data-toggle="dropdown"
+            href="#" role="button" aria-haspopup="true" aria-expanded="false">
+            <svg class="c-icon">
+              <use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-envelope-open"></use>
+            </svg><span class="badge badge-pill badge-info">7</span></a>
+          <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg pt-0">
+            <div class="dropdown-header bg-light"><strong>You have 4 messages</strong></div><a class="dropdown-item"
+              href="#">
+              <div class="message">
+                <div class="py-3 mfe-3 float-left">
+                  <div class="c-avatar"><img class="c-avatar-img" src="assets/img/avatars/7.jpg"
+                      alt="user@email.com"><span class="c-avatar-status bg-success"></span></div>
+                </div>
+                <div><small class="text-muted">John Doe</small><small class="text-muted float-right mt-1">Just
+                    now</small></div>
+                <div class="text-truncate font-weight-bold"><span class="text-danger">!</span> Important message</div>
+                <div class="small text-muted text-truncate">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+                  sed do eiusmod tempor incididunt...</div>
+              </div>
+            </a><a class="dropdown-item" href="#">
+              <div class="message">
+                <div class="py-3 mfe-3 float-left">
+                  <div class="c-avatar"><img class="c-avatar-img" src="assets/img/avatars/6.jpg"
+                      alt="user@email.com"><span class="c-avatar-status bg-warning"></span></div>
+                </div>
+                <div><small class="text-muted">John Doe</small><small class="text-muted float-right mt-1">5 minutes
+                    ago</small></div>
+                <div class="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
+                <div class="small text-muted text-truncate">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+                  sed do eiusmod tempor incididunt...</div>
+              </div>
+            </a><a class="dropdown-item" href="#">
+              <div class="message">
+                <div class="py-3 mfe-3 float-left">
+                  <div class="c-avatar"><img class="c-avatar-img" src="assets/img/avatars/5.jpg"
+                      alt="user@email.com"><span class="c-avatar-status bg-danger"></span></div>
+                </div>
+                <div><small class="text-muted">John Doe</small><small class="text-muted float-right mt-1">1:52
+                    PM</small></div>
+                <div class="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
+                <div class="small text-muted text-truncate">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+                  sed do eiusmod tempor incididunt...</div>
+              </div>
+            </a><a class="dropdown-item" href="#">
+              <div class="message">
+                <div class="py-3 mfe-3 float-left">
+                  <div class="c-avatar"><img class="c-avatar-img" src="assets/img/avatars/4.jpg"
+                      alt="user@email.com"><span class="c-avatar-status bg-info"></span></div>
+                </div>
+                <div><small class="text-muted">John Doe</small><small class="text-muted float-right mt-1">4:03
+                    PM</small></div>
+                <div class="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
+                <div class="small text-muted text-truncate">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+                  sed do eiusmod tempor incididunt...</div>
+              </div>
+            </a><a class="dropdown-item text-center border-top" href="#"><strong>View all messages</strong></a>
+          </div>
         </li>
-        {# <li class="nav-item d-md-down-none">
-          <a class="nav-link" href="#">
-            <i class="fa fa-list"></i>
+        {% endif %}
+        <li class="c-header-nav-item dropdown">
+          <a class="c-header-nav-link" data-toggle="dropdown" href="#"
+            role="button" aria-haspopup="true" aria-expanded="false">
+            <div class="c-avatar">
+              {% if app.user.picture %}
+              <img class="img-avatar c-avatar-img" src="{{ asset('agent/avatars/' ~ app.user.picture, 'download_dir') }}" alt="Image profile">
+              {% else %}
+              <img class="img-avatar img-circle c-avatar-img" src="{{ asset('agent/avatars/default.png', 'download_dir') }}" alt="Image profile">
+              {% endif %}
+            </div>
           </a>
-        </li>
-        <li class="nav-item d-md-down-none">
-          <a class="nav-link" href="#">
-            <i class="fa fa-map-marker-alt"></i>
-          </a>
-        </li> #}
-        <li class="nav-item dropdown">
-          <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-            {% if app.user.picture %}
-            <img class="img-avatar" src="{{ asset('agent/avatars/' ~ app.user.picture, 'download_dir') }}" alt="Image profile">
-            {% else %}
-            <img class="img-avatar img-circle" src="{{ asset('agent/avatars/default.png', 'download_dir') }}" alt="Image profile">
-            {% endif %}
-          </a>
-          <div class="dropdown-menu dropdown-menu-right">
-             <div class="dropdown-header text-center">
+          <div class="dropdown-menu dropdown-menu-right pt-0">
+            <div class="dropdown-header bg-light py-2">
               <strong>Compte</strong>
             </div>
             <a class="dropdown-item" href="{{ path("agent_show", { id: app.user.id }) }}">
               <i class="fa fa-user-circle"></i> Mes Informations
             </a>
-            <!--<div class="dropdown-header text-center">
-              <strong>Settings</strong>
-            </div>
-            <a class="dropdown-item" href="{{ path("agent_show", {id: app.user.id}) }}">
-              <i class="fa fa-user"></i> Profile</a> -->
-            <!-- <a class="dropdown-item" href="#">
-              <i class="fa fa-cog"></i> Settings</a> -->
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="{{ path("security_logout") }}">
-              <i class="fa fa-lock"></i> Déconnexion</a>
+              <i class="fa fa-lock"></i> Déconnexion
+            </a>
           </div>
         </li>
+        <button class="c-header-toggler c-class-toggler mfe-md-3" type="button" data-target="#aside"
+          data-class="c-sidebar-show">
+          <span class="fa fa-sliders-h"></span>
+        </button>
       </ul>
-      <button class="navbar-toggler aside-menu-toggler d-md-down-none" type="button" data-toggle="aside-menu-lg-show">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <button class="navbar-toggler aside-menu-toggler d-lg-none" type="button" data-toggle="aside-menu-show">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-    </header>
-    <div class="app-body">
-      <div class="sidebar">
-        <nav class="sidebar-nav">
-          <ul class="nav">
+      <div class="c-subheader justify-content-between px-3">
 
-            {% if search.get_right_read("ACTION_DASHBORD") %}
-            <li class="nav-item">
-              <a class="nav-link" href="{{ path("home") }}">
-                <i class="fa fa-tachometer-alt"></i> Tableau de bord
-                <!-- <span class="badge badge-primary">NEW</span> -->
-              </a>
-            </li>
-            {% endif %}
+        <!-- <ol class="breadcrumb border-0 m-0 px-0 px-md-3">
+          <li class="breadcrumb-item">Home</li>
+          <li class="breadcrumb-item"><a href="#">Admin</a></li>
+          <li class="breadcrumb-item active">Dashboard</li>
 
-            {% if search.get_right_read("ACTION_CATALOGUE") %}
-            <li class="nav-title">Catalogue</li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ path("catalogue_home") }}">
-                <i class="fa fa-clone"></i> Produits</a>
-            </li>
-            {% endif %}
-            <!-- <li class="nav-title">Devis</li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ path("agent_home") }}">
-                    <i class="nav-icon icon-drop"></i> Demande de devis</a>
-            </li> -->
-            <li class="nav-title">Commandes/Avoirs</li>
-
-            {% if search.get_right_read("ACTION_ORDER") %}
-            <li class="nav-item nav-dropdown">
-              <a class="nav-link nav-dropdown-toggle" href="#">
-                <i class="fa fa-align-justify"></i> Commandes</a>
-              <ul class="nav-dropdown-items">
-                <li class="nav-item">
-                  <a class="nav-link" href="{{ path("order_preorder") }}">
-                    <i class="fa fa-calendar"></i> A valider</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="{{ path("order_home") }}">
-                    <i class="fa fa-clipboard-check"></i> validées</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="{{ path("order_customer_valid") }}">
-                    <i class="fa fa-calendar-check"></i> Revalidation client</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="{{ path("order_bill") }}">
-                    <i class="fa fa-cubes"></i> Expédiées</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="{{ path("order_closed") }}">
-                    <i class="fa fa-closed-captioning"></i> Cloturées</a>
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item nav-dropdown">
-              <a class="nav-link nav-dropdown-toggle" href="#">
-                <i class="fa fa-align-justify"></i> Avoirs</a>
-              <ul class="nav-dropdown-items">
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ path("order_prerefund") }}">
-                        <i class="fa fa-calendar"></i> A valider</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ path("order_refund") }}">
-                        <i class="fa fa-clipboard-check"></i> validés</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ path("order_bill_refund") }}">
-                        <i class="fa fa-cubes"></i> Expédiés</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ path("order_refund_closed") }}">
-                        <i class="fa fa-closed-captioning"></i> Cloturés</a>
-                </li>
-              </ul>
-            </li>
-            {% endif %}
-
-            {% if search.get_right_read("ACTION_QUOTE") %}
-            <li class="nav-item">
-                <a class="nav-link" href="{{ path("order_quote")}}">
-                    <i class="fa fa-align-justify"></i> Devis</a>
-            </li>
-            {% endif %}
-
-            {% if search.get_right_read("ACTION_CLIENT") %}
-            <li class="nav-title">Suivi Clientèle</li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ path("client_home") }}">
-                    <i class="fa fa-user"></i> Clients</a>
-            </li>
-            {% endif %}
-
-            {% if search.get_right_read("ACTION_SECURITY") or search.get_right_read("ACTION_SETTING") %}
-              <li class="nav-title">Administration</li>
-              {% if search.get_right_read("ACTION_SECURITY") %}
-              <li class="nav-item nav-dropdown">
-                  <a class="nav-link nav-dropdown-toggle" href="#">
-                      <i class="fa fa-user-secret"></i> Securité</a>
-                  <ul class="nav-dropdown-items">
-                      <li class="nav-item nav-dropdown">
-                          <!-- <a class="nav-link" href="{{ path("agent_home") }}">
-                              <i class="fa fa-user-lock"></i> Commerciaux</a> -->
-                              <a class="nav-link nav-dropdown-toggle" href="#">
-                                <i class="fa fa-user-lock"></i> Commerciaux</a>
-                              <ul class="nav-dropdown-items">
-                                <li class="nav-item">
-                                  <a class="nav-link" href="{{ path("agent_home") }}">
-                                    <i class="fa fa-fingerprint"></i> Gérer</a>
-                                </li>
-                                <li class="nav-item">
-                                  <a class="nav-link" href="{{ path("security_agent_role") }}">
-                                    <i class="fa fa-id-card"></i> Accès</a>
-                                </li>
-                              </ul>
-                      </li>
-                      <li class="nav-item nav-dropdown">
-                          <a class="nav-link nav-dropdown-toggle" href="#">
-                              <i class="fa fa-id-card"></i> Privilege</a>
-                              <ul class="nav-dropdown-items">
-                                <li class="nav-item">
-                                  <a class="nav-link" href="{{ path("security_action") }}">
-                                    <i class="fa fa-fingerprint"></i> Actions</a>
-                                </li>
-                                <li class="nav-item">
-                                  <a class="nav-link" href="{{ path("security_role") }}">
-                                    <i class="fa fa-passport"></i> Roles</a>
-                                </li>
-                                <li class="nav-item">
-                                  <a class="nav-link" href="{{ path("security_profile") }}">
-                                    <i class="fa fa-passport"></i> Profiles</a>
-                                </li>
-                              </ul>
-                      </li>
-                  </ul>
-              </li>
-              {% endif %}
-              {% if search.get_right_read("ACTION_SETTING") %}
-              <li class="nav-item nav-dropdown">
-                  <a class="nav-link nav-dropdown-toggle" href="#">
-                      <i class="fa fa-cog"></i> Configuration</a>
-                  <ul class="nav-dropdown-items">
-                      <li class="nav-item nav-dropdown">
-                        <a class="nav-link nav-dropdown-toggle" href="#">
-                          <i class="fa fa-toolbox"></i> Options</a>
-                        <ul class="nav-dropdown-items">
-                          <li class="nav-item">
-                            <a class="nav-link" href="{{ path("setting_home") }}">
-                              <i class="fa fa-sliders-h"></i> Générale</a>
-                          </li>
-                          <li class="nav-item">
-                            <a class="nav-link" href="{{ path("setting_currency") }}">
-                              <i class="fa fa-coins"></i> Monnaie</a>
-                          </li>
-                          <li class="nav-item">
-                            <a class="nav-link" href="{{ path("setting_tax") }}">
-                              <i class="fa fa-money-bill-wave-alt"></i> Taxe</a>
-                          </li>
-                          {# <li class="nav-item">
-                            <a class="nav-link" href="{{ path("setting_delivery_status") }}">
-                              <i class="fa fa-star"></i> Status facturation</a>
-                          </li>
-                          <li class="nav-item">
-                            <a class="nav-link" href="{{ path("setting_order_status") }}">
-                              <i class="fa fa-star-half-alt"></i> Statut Commande</a>
-                          </li> #}
-                          <li class="nav-item nav-dropdown">
-                            <a class="nav-link nav-dropdown-toggle" href="#">
-                              <i class="fa fa-id-card"></i> Statuts</a>
-                              <ul class="nav-dropdown-items">
-                                <li class="nav-item">
-                                  <a class="nav-link" href="{{ path("setting_delivery_status") }}">
-                                    <i class="fa fa-star"></i> Statut Facturation</a>
-                                </li>
-                                <li class="nav-item">
-                                  <a class="nav-link" href="{{ path("setting_order_status") }}">
-                                    <i class="fa fa-star-half-alt"></i> Statut Commande</a>
-                                </li>
-                              </ul>
-                          </li>
-                          <li class="nav-item">
-                            <a class="nav-link" href="{{ path("setting_email") }}">
-                              <i class="fa fa-star-half-alt"></i> Emails</a>
-                          </li>
-                        </ul>
-                      </li>
-                      <li class="nav-item nav-dropdown">
-                        <a class="nav-link nav-dropdown-toggle" href="#">
-                          <i class="fa fa-clone"></i> Produits</a>
-                        <ul class="nav-dropdown-items">
-                          <li class="nav-item">
-                            <a class="nav-link" href="{{ path("setting_catalogue_brand") }}">
-                              <i class="fa fa-random"></i> Marques</a>
-                          </li>
-                          <li class="nav-item">
-                            <a class="nav-link" href="{{ path("setting_catalogue_group") }}">
-                              <i class="fa fa-caret-square-down"></i> Familles</a>
-                          </li>
-                          <li class="nav-item">
-                            <a class="nav-link" href="{{ path("setting_catalogue_provider") }}">
-                              <i class="fa fa-hourglass-half"></i> Fournisseurs</a>
-                          </li>
-                          <li class="nav-item">
-                            <a class="nav-link" href="{{ path("setting_catalogue_import") }}">
-                              <i class="fa fa-upload"></i> Imports</a>
-                          </li>
-                        </ul>
-                      </li>
-                  </ul>
-              </li>
-              {% endif %}
-              {% if search.get_right_read("ACTION_BLOG") %}
-              <li class="nav-title">Blog</li>
-              <li class="nav-item nav-dropdown">
-                <a class="nav-link nav-dropdown-toggle" href="#">
-                  <i class="fa fa-cog"></i> Blog Config.</a>
-                  <ul class="nav-dropdown-items">
-                    <li class="nav-item">
-                      <a class="nav-link" href="{{ path("blog_admin_setting_home") }}">
-                        <i class="fa fa-sliders-h"></i> Générale</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="{{ path("blog_admin_setting_poster") }}">
-                        <i class="fa fa-coins"></i> Posters</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="{{ path("blog_admin_setting_interest") }}">
-                        <i class="fa fa-money-bill-wave-alt"></i> Centres d'interets</a>
-                    </li>
-                    <li class="nav-item nav-dropdown">
-                      <a class="nav-link nav-dropdown-toggle" href="#">
-                        <i class="fa fa-id-card"></i> Articles</a>
-                      <ul class="nav-dropdown-items">
-                        <li class="nav-item">
-                          <a class="nav-link" href="{{ path("blog_admin_article_general") }}">
-                            <i class="fa fa-star"></i> Générale</a>
-                        </li>
-                        <li class="nav-item">
-                          <a class="nav-link" href="{{ path("blog_admin_article_product") }}">
-                            <i class="fa fa-star"></i> Produits</a>
-                        </li>
-                        <li class="nav-item">
-                          <a class="nav-link" href="{{ path("blog_admin_article_team") }}">
-                            <i class="fa fa-star-half-alt"></i> Présentation équipe</a>
-                        </li>
-                        <li class="nav-item">
-                          <a class="nav-link" href="{{ path("blog_admin_article_testimony") }}">
-                            <i class="fa fa-star-half-alt"></i> Témoignage</a>
-                        </li>
-                        <li class="nav-item">
-                          <a class="nav-link" href="{{ path("blog_admin_article_partenaire") }}">
-                            <i class="fa fa-star-half-alt"></i> Partenaire</a>
-                        </li>
-                      </ul>
-                    </li>
-                  </ul>
-              </li>
-              {% endif %}
-            {% endif %}
-
-            {# <li class="nav-item">
-                <a class="nav-link" href="#">
-                    <i class="fa fa-bell"></i> Notifications</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">
-                    <i class="fa fa-signal"></i> Statistiques</a>
-            </li> #}
-                        
-          </ul>
-        </nav>
-        <button class="sidebar-minimizer brand-minimizer" type="button"></button>
-      </div>
-      <main class="main">
-        <!-- Breadcrumb-->
-        <ol class="breadcrumb">
+        </ol> -->
+        <ol class="breadcrumb border-0 m-0 px-0 px-md-3">
           <li class="breadcrumb-item">
-            <a href="{{ path("home") }}">Home</a>
+            <a href="{{ path("home") }}">Accueil</a>
           </li>
-          <!-- <li class="breadcrumb-item active">Dashboard</li> -->
           {% block home_path %} {% endblock %}
           <!-- Breadcrumb Menu-->
-          <li class="breadcrumb-menu d-md-down-none">
+          <!-- <li class="breadcrumb-menu d-md-down-none">
             <div class="btn-group" role="group" aria-label="Button group">
               <a class="btn" href="#">
                 <i class="icon-speech"></i>
               </a>
-              {% block home_path_right %} {% endblock %}
+              {#% block home_path_right %} {% endblock %#}
             </div>
-          </li>
+          </li> -->
         </ol>
+        <div class="c-subheader-nav d-md-down-none mfe-2"><a class="c-subheader-nav-link" href="#">
+            {% block home_path_right %} {% endblock %}
+      </div>
+    </header>
+    <div class="c-body">
+      <main class="c-main">
         <div class="container-fluid">
-          
           {% block body_header %}
-          <ol class="breadcrumb body-header">
+          <div class="row bodyHeader-wrapper">
+            <div class="col-md-10">
+              {% block body_header_left %}{% endblock %}
+            </div>
+            <div class="col-md-2">
+              {% block body_header_right %}{% endblock %}
+            </div>
+          </div>
+          {#<ol class="breadcrumb body-header">
             <li class="breadcrumb-item active">
               {% block body_header_left %}{% endblock %}
             </li>
             <li class="breadcrumb-menu d-md-down-none">
               {% block body_header_right %}{% endblock %}
             </li>
-          </ol>
-            {% block body %}{% endblock %}
+          </ol>#}
           {% endblock %}
+          {% block body %}{% endblock %}
         </div>
       </main>
-      <div class="chat-wrapper">
-        <aside class="aside-menu">
-          <ul class="nav nav-tabs" role="tablist">
-            <li class="nav-item">
-              <a class="nav-link active" data-toggle="tab" href="#timeline" role="tab">
-                <i class="fa fa-list"></i>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-toggle="tab" href="#messages" role="tab" style="display: none">
-                <i class="fa fa-comments"></i>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-toggle="tab" href="#settings" role="tab" style="display: none">
-                <i class="fa fa-cog"></i>
-              </a>
-            </li>
-          </ul>
-          <!-- Tab panes-->
-          <div class="tab-content">
-            <div class="tab-pane active" id="timeline" role="tabpanel">
-              <div class="list-group list-group-accent">
-                <a class="btn btn-info discussion-create" href="{{ path("chat_discussion_register", {name: "test"}) }}"><i class="fa fa-plus-square"></i></a>
-                <div
-                  class="list-group-item list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">
-                  Discussions</div>
-        
-                <div class="discussion-home-wrapper">
-                  {#{ dump(chat.discussions ) }#}
-                  {% for discussion in search.discussions %}
-                  {% set agentOwner = chat.discussion_owner(discussion) %}                  
-                    <div data-id="{{ discussion.id }}"  data-current="{{ discussion.iscurrent }}" data-owner="{{ discussion.isowner }}" class="list-group-item list-group-item-accent-{% if discussion.iscurrent %}danger{% else %}warning{% endif %} list-group-item-divider dvDiscussion">
-                      <div class="avatar float-right">
-                        <img class="img-avatar" src="{{ search.avatar_dir(agentOwner) }}" alt="admin@bootstrapmaster.com" data-toggle="tooltip" data-placement="top" title="{{ agentOwner.UserName }}">
-                      </div>
-                      <a href="{{ path("chat_agent_discusion", {id: discussion.id }) }}" class="link-discussion">
-                        <strong class="DiscName">{{ discussion.name }}</strong> {% if discussion.TotalUnRead > 0 %}<span class="badge badge-pill badge-danger">{{ discussion.TotalUnRead }}</span>{% endif %}
-                        {% if agentOwner.id == app.user.id %}
-                          <a href="#" class="btnDiscSetting">
-                            <i class="fa fa-cog"></i>
-                          </a>
-                        {% endif %}
-                      </a>
-                      <small class="text-muted mr-3">
-                          {% if agentOwner %}
-                          <div>Créer par
-                            <strong>{{ agentOwner.username }}</strong>
-                          </div>
-                          {% endif %}
-                        <i class="fa fa-calendar"></i> {{ discussion.CreatedAtShort }}</small>
-                      <small class="text-muted mr-3">
-                        <a href="{{ path("chat_delete_discussion", {id: discussion.id}) }}" class="btnDelete">
-                          <i class="fa fa-trash"></i>
-                        </a>
-                      </small>
-                      <div class="avatars-stack mt-2">
-                      {% for agent in chat.discussion_users(discussion) %}
-                        <div class="avatar avatar-xs">
-                          <img class="img-avatar" data-id-agent="{{ agent.id }}" src="{{ search.avatar_dir(agent) }}" alt="{{ agent.UserName }}" data-toggle="tooltip" data-placement="top" title="{{ agent.UserName }}">
-                        </div>
-                        {% endfor %}
-                      </div>
-                    </div>
-                  
-        
-                  {% endfor %}
-                </div>
-        
-                {# <div class="list-group-item list-group-item-accent-danger list-group-item-divider">
-                                        
-                      </div> #}
-              </div>
-            </div>
-            <div class="tab-pane" id="messages" role="tabpanel">
-              <div data-id-discussion="" class="messages-home-wrapper">
-              <div class="lstDiscussion list-group-item list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">                
-              </div>  
-              <a href="#" class="loadMessages">
-                <div
-                  class="list-group-item list-group-item-accent-warning bg-light text-center font-weight-bold text-muted text-uppercase small">
-                  Messages plus anciens...
-                </div>
-              </a>
-              <div class="p-3">
-                  <div class="message-area-wrapper">
-                    {#% for message in chat.current_discussion_messages %}
-                    <div class="message">
-                      <div class="mr-3 float-left">
-                        <div class="avatar">
-                          <img class="img-avatar" src="{{ search.avatar_dir(message.agent) }}" alt="{{ message.agent.username }}">
-                          <span class="avatar-status badge-primary"></span>
-                        </div>
-                      </div>
-                      <div>
-                        <small class="text-muted">{{ message.agent.username }}</small>
-                        <small class="text-muted float-right mt-1">{{ message.createdat | date('d/m/Y') }} <br />
-                          {{ message.createdat | date('H:m:s') }}</small>
-                      </div>
-                      <div class="text-truncate font-weight-bold">{{ message.content }}</div>
-                      <small class="text-muted">{{ message.content }}</small>
-                    </div>
-                    <hr>
-                    {% endfor %#}
-                  </div>
-                
-                  <div class="char-room">
-
-                    <div class="card border-info">
-                      <div class="card-body">
-                        <form method="post">
-                          <input type="hidden" name="chat_room[discussion]">
-                          <textarea class="form-control" name="chat_room[message]" id="" style="width: 100%; height: 100px;"></textarea>
-                          <div class="control-wrapper">
-                            {# {% set currentDiscussion = user.lastdiscussion %} #}
-                            <br/>
-                            <button type="submit" class="float-right btn btn-success"><i class="fa fa-paper-plane"></i></button>
-                          </div>
-                        </form>                        
-                      </div>
-                    </div>
-
-                    
-                  </div>
-
-                </div>
-              </div>
-        
-            </div>
-            <div class="tab-pane p-3" id="settings" role="tabpanel">
-              <h6>Settings</h6>
-              <div class="aside-options">
-                <div class="clearfix mt-4">
-                  <small>
-                    <b>Option 1</b>
-                  </small>
-                  <label class="switch switch-label switch-pill switch-success switch-sm float-right">
-                    <input class="switch-input" type="checkbox" checked="">
-                    <span class="switch-slider" data-checked="On" data-unchecked="Off"></span>
-                  </label>
-                </div>
-                <div>
-                  <small class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-                    incididunt ut labore et dolore magna aliqua.</small>
-                </div>
-              </div>
-              <div class="aside-options">
-                <div class="clearfix mt-3">
-                  <small>
-                    <b>Option 2</b>
-                  </small>
-                  <label class="switch switch-label switch-pill switch-success switch-sm float-right">
-                    <input class="switch-input" type="checkbox">
-                    <span class="switch-slider" data-checked="On" data-unchecked="Off"></span>
-                  </label>
-                </div>
-                <div>
-                  <small class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-                    incididunt ut labore et dolore magna aliqua.</small>
-                </div>
-              </div>
-              <div class="aside-options">
-                <div class="clearfix mt-3">
-                  <small>
-                    <b>Option 3</b>
-                  </small>
-                  <label class="switch switch-label switch-pill switch-success switch-sm float-right">
-                    <input class="switch-input" type="checkbox">
-                    <span class="switch-slider" data-checked="On" data-unchecked="Off"></span>
-                  </label>
-                </div>
-              </div>
-              <div class="aside-options">
-                <div class="clearfix mt-3">
-                  <small>
-                    <b>Option 4</b>
-                  </small>
-                  <label class="switch switch-label switch-pill switch-success switch-sm float-right">
-                    <input class="switch-input" type="checkbox" checked="">
-                    <span class="switch-slider" data-checked="On" data-unchecked="Off"></span>
-                  </label>
-                </div>
-              </div>
-              <hr>
-              <h6>System Utilization</h6>
-              <div class="text-uppercase mb-1 mt-4">
-                <small>
-                  <b>CPU Usage</b>
-                </small>
-              </div>
-              <div class="progress progress-xs">
-                <div class="progress-bar bg-info" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0"
-                  aria-valuemax="100"></div>
-              </div>
-              <small class="text-muted">348 Processes. 1/4 Cores.</small>
-              <div class="text-uppercase mb-1 mt-2">
-                <small>
-                  <b>Memory Usage</b>
-                </small>
-              </div>
-              <div class="progress progress-xs">
-                <div class="progress-bar bg-warning" role="progressbar" style="width: 70%" aria-valuenow="70" aria-valuemin="0"
-                  aria-valuemax="100"></div>
-              </div>
-              <small class="text-muted">11444GB/16384MB</small>
-              <div class="text-uppercase mb-1 mt-2">
-                <small>
-                  <b>SSD 1 Usage</b>
-                </small>
-              </div>
-              <div class="progress progress-xs">
-                <div class="progress-bar bg-danger" role="progressbar" style="width: 95%" aria-valuenow="95" aria-valuemin="0"
-                  aria-valuemax="100"></div>
-              </div>
-              <small class="text-muted">243GB/256GB</small>
-              <div class="text-uppercase mb-1 mt-2">
-                <small>
-                  <b>SSD 2 Usage</b>
-                </small>
-              </div>
-              <div class="progress progress-xs">
-                <div class="progress-bar bg-success" role="progressbar" style="width: 10%" aria-valuenow="10" aria-valuemin="0"
-                  aria-valuemax="100"></div>
-              </div>
-              <small class="text-muted">25GB/256GB</small>
-            </div>
-          </div>
-        </aside>
-      </div>
-    </div>
-    <footer class="app-footer">
-      <div>
-        <a href="#">QOBD</a>
-        <span>&copy; Management. Version 1.0.1</span>
-      </div>
-      <div class="ml-auto">
-        <span>Created by</span>
-        <a href="mailto:joel.dago@yahoo.fr">joel dago</a>
-      </div>
-
-      {#=============================== templates ================================#}
-
-      <template id="template-cart_btn">
-        <div class="input-group">
-          <input type="text" data-id="$(cart_item_id)" name="cart_quantity_js" class="form-control cart-quantity"
-            placeholder="Input group example" aria-label="Input group example" aria-describedby="btnGroupAddon"
-            value="$(cart_default_value)">
-          <div class="input-group-append">
-            <a href="$(cart_route)" data-id="$(cart_item_id)" class="cart_add_js">
-              <div class="input-group-text"><i class="fa fa-cart-plus"></i></div>
-            </a>
-          </div>
+      <footer class="app-footer">
+        <div>
+          <a href="#">QOBD</a>
+          <span>&copy; Management. Version 1.0.1</span>
         </div>
-      </template>
-
-      <template id="template-discussion">        
-        <div data-id="$(discussion_id)" data-current="$(is_current)" data-owner="$(is_owner)" class="list-group-item list-group-item-accent-warning list-group-item-divider">
-          <div class="avatar float-right">
-            <img class="img-avatar" src="$(url_agent_owner_avatar)" alt="admin@bootstrapmaster.com">
+        <div class="ml-auto">
+          <span>Created by</span>
+          <a href="mailto:joel.dago@yahoo.fr">joel dago</a>
+        </div>
+      
+        {#=============================== templates ================================#}
+      
+        <template id="template-cart_btn">
+          <div class="input-group">
+            <input type="text" data-id="$(cart_item_id)" name="cart_quantity_js" class="form-control cart-quantity"
+              placeholder="Input group example" aria-label="Input group example" aria-describedby="btnGroupAddon"
+              value="$(cart_default_value)">
+            <div class="input-group-append">
+              <a href="$(cart_route)" data-id="$(cart_item_id)" class="cart_add_js">
+                <div class="input-group-text"><i class="fa fa-cart-plus"></i></div>
+              </a>
+            </div>
           </div>
-          <a href="$(url_chat_agent_discusion)" class="link-discussion">
-            <strong>$(discussion_name)</strong>
-          </a>
-          <small class="text-muted mr-3">
-            <div class="owner-wrapper"></div>
-            <i class="fa fa-calendar"></i> $(created_at)</small>
-          <small class="text-muted mr-3">
-            <a href="$(url_chat_delete_discussion)" class="btnDelete">
+        </template>
+      
+        <template id="template-discussion">
+          <div data-id="$(discussion_id)" data-current="$(is_current)" data-owner="$(is_owner)"
+            class="list-group-item list-group-item-accent-warning list-group-item-divider">
+            <div class="avatar float-right">
+              <img class="img-avatar c-avatar-img" src="$(url_agent_owner_avatar)" alt="admin@bootstrapmaster.com">
+            </div>
+            <a href="$(url_chat_agent_discusion)" class="link-discussion">
+              <strong>$(discussion_name)</strong>
+            </a>
+            <small class="text-muted mr-3">
+              <div class="owner-wrapper"></div>
+              <i class="fa fa-calendar"></i> $(created_at)
+            </small>
+            <small class="text-muted mr-3">
+              <a href="$(url_chat_delete_discussion)" class="btnDelete">
+                <i class="fa fa-trash"></i>
+              </a>
+            </small>
+            <div class="c-avatars-stack mt-2 discussion-recip-wrapper"></div>
+          </div>
+        </template>
+      
+        <template id="template-discussion-new">
+          <div class="discussion-new-wrapper">
+            <a href="#" class="float-right btnDelete">
               <i class="fa fa-trash"></i>
             </a>
-          </small>
-          <div class="avatars-stack mt-2 discussion-recip-wrapper"></div>
-        </div>        
-      </template>
-
-      <template id="template-discussion-new"> 
-        <div class="discussion-new-wrapper">
-          <a href="#" class="float-right btnDelete">
-            <i class="fa fa-trash"></i>
-          </a>
-          <div class="form-group">
-            <label for="recipient-name" class="col-form-label">Titre de la discussion</label>
-            <input type="text" class="form-control discussion-name">
+            <div class="form-group">
+              <label for="recipient-name" class="col-form-label">Titre de la discussion</label>
+              <input type="text" class="form-control discussion-name">
+            </div>
+            <div class="form-group">
+              <label for="recipient-name" class="col-form-label">Commerciaux</label>
+              <div class="ctrlAgents" style="height: 300px; overflow-y: scroll"></div>
+            </div>
           </div>
-          <div class="form-group">
-            <label for="recipient-name" class="col-form-label">Commerciaux</label>
-            <div class="ctrlAgents" style="height: 300px; overflow-y: scroll"></div>
-          </div>
-        </div>
-      </template>
+        </template>
       
-      <template id="template-discussion-agents">
-        <div class="message" style="margin-top: 10px;">
-          <div class="mr-3 float-left">
-            <div class="input-group">
-              <input type="checkbox" data-id-agent="$(agent_id)" class="input-control mr-3 chxAgent">
-              <div class="avatar">              
-                <img class="img-avatar" src="$(url_agent_avatar)" alt="$(agent_username)" style="max-height: 50px; ">
-                <span class="avatar-status badge-$(status)"></span>
+        <template id="template-discussion-agents">
+          <div class="message" style="margin-top: 10px;">
+            <div class="mr-3 float-left">
+              <div class="input-group">
+                <input type="checkbox" data-id-agent="$(agent_id)" class="input-control mr-3 chxAgent">
+                <div class="c-avatar">
+                  <img class="img-avatar c-avatar-img" src="$(url_agent_avatar)" alt="$(agent_username)" style="max-height: 50px; ">
+                  <span class="c-avatar-status badge-$(status)"></span>
+                </div>
               </div>
             </div>
-          </div>        
-          <div>
-            <small class="text-muted">$(agent_username)</small>
-            <small class="text-muted float-right mt-1">der. connection <br/>$(last_connected)</small>
-          </div>
-        </div>
-        <hr>
-      </template>
-
-      <template id="template-discussion-recipients">
-        <div class="avatar avatar-xs">
-          <img class="img-avatar" src="$(url_agent_avatar)" alt="$(agent_username)" data-toggle="tooltip" data-placement="top" title="$(agent_username)">
-        </div>
-      </template>
-
-      <template id="template-message">
-        <div class="message">
-          <div class="mr-3 float-left">
-            <div class="avatar">
-              <img class="img-avatar" src="$(url_agent_avatar)" alt="$(agent_username)">
-              <span class="avatar-status badge-$(status)"></span>
+            <div>
+              <small class="text-muted">$(agent_username)</small>
+              <small class="text-muted float-right mt-1">der. connection <br />$(last_connected)</small>
             </div>
           </div>
-          <div>
-            <small class="text-muted">$(agent_username)</small>
-            <small class="text-muted float-right mt-1">$(created_at)</small>
+          <hr>
+        </template>
+      
+        <template id="template-discussion-recipients">
+          <div class="c-avatar c-avatar-xs">
+            <img class="img-avatar c-avatar-img" src="$(url_agent_avatar)" alt="$(agent_username)" data-toggle="tooltip"
+              data-placement="top" title="$(agent_username)">
           </div>
-          <div class="text-truncate font-weight-bold">$(message_content)</div>
-          <small class="text-muted">$(message_content)</small>
-        </div>
-        <hr>
-      </template>
-
-      {# Modal #}
-      <div id="mdlDefault" class="modal fade" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-dialog-centered modal-danger" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Modal title</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
+        </template>
+      
+        <template id="template-message">
+          <div class="message">
+            <div class="mr-3 float-left">
+              <div class="c-avatar">
+                <img class="img-avatar c-avatar-img" src="$(url_agent_avatar)" alt="$(agent_username)">
+                <span class="c-avatar-status badge-$(status)"></span>
+              </div>
             </div>
-            <div class="modal-body">
-              <p>Modal body text goes here.</p>
+            <div>
+              <small class="text-muted">$(agent_username)</small>
+              <small class="text-muted float-right mt-1">$(created_at)</small>
             </div>
-            <div class="modal-footer">
-              
+            <div class="text-truncate font-weight-bold">$(message_content)</div>
+            <small class="text-muted">$(message_content)</small>
+          </div>
+          <hr>
+        </template>
+      
+        {# Modal #}
+        <div id="mdlDefault" class="modal fade" tabindex="-1" role="dialog">
+          <div class="modal-dialog modal-dialog-centered modal-danger" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <p>Modal body text goes here.</p>
+              </div>
+              <div class="modal-footer">
+      
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      
+        {#=============================== javascripts ================================#}
+      </footer>
+    </div>
+  </div>
 
-      {#=============================== javascripts ================================#}
+  <!--<script type="text/javascript" src="js/coreui.bundle.min.js"></script>
+  [if IE]><!
+  <script src="js/svgxuse.min.js"></script>-->
+  <!--<![endif]-->
+  <!-- <script> -->
+  <!-- new coreui.AsyncLoad(document.getElementById('ui-view')); -->
+  <!-- var tooltipEl = document.getElementById('header-tooltip'); -->
+  <!-- var tootltip = new coreui.Tooltip(tooltipEl); -->
+  <!-- </script> 
 
-    <script src="{{ asset('js/jquery-3.4.1.js','theme_default') }}"></script>
-    <script src="{{ asset('javascript/popper.min.js','theme_coreui') }}"></script>
-    <script src="{{ asset('js/bootstrap/bootstrap.js','theme_default') }}"></script>
-    <script src="{{ asset('javascript/charts.2.8.0.js','theme_coreui') }}"></script>
-    <script src="{{ asset('javascript/coreui.min.js','theme_coreui') }}"></script>
-    {# <script src="{{ asset('javascript/charts.js','theme_coreui') }}"></script> #}
+    
+    <script type="text/javascript" src="js/coreui-chartjs.bundle.js" class="view-script"></script>
+    <script type="text/javascript" src="js/coreui-utils.js" class="view-script"></script>-->
+
+  <script src="{{ asset('js/jquery-3.4.1.js','theme_default') }}"></script>
+  <script src="{{ asset('javascript/popper.min.js','theme_coreui') }}"></script>
+  <script src="{{ asset('js/bootstrap/bootstrap.js','theme_default') }}"></script>
+
+  <script src="{{ asset('javascript/src/coreui.bundle.min.js','theme_coreui') }}"></script>
+  <script src="{{ asset('javascript/src/svgxuse.min.js','theme_coreui') }}"></script>
+<!--  -->
+  <script src="{{ asset('javascript/src/coreui-chartjs.bundle.js','theme_coreui') }}"></script>
+  <script src="{{ asset('javascript/src/coreui-utils.js','theme_coreui') }}"></script>
         
     <script src="{{ asset('datatables.js','datatable_dir') }}"></script>    
     <script src="{{ asset('dataTables.responsive.min.js','datatable_dir') }}"></script>
@@ -779,18 +840,21 @@
     <script src="{{ asset('js/lodash.min.js','theme_default') }}"></script>
     <script src="{{ asset('bundles/fosjsrouting/js/router.min.js') }}"></script>
     <script src="{{ asset('js/fos_js_routes.js','theme_default') }}"></script>
-    {# <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script> #}
+  <!--  
+    <script type="text/javascript" src="{{ asset('javascript/src/main.js','theme_coreui') }}" class="view-script"></script>
+  -->
+    <script type="text/javascript" src="{{ asset('javascript/home.chart.js','theme_coreui') }}" class="view-script"></script>
     <script src="{{ asset('js/global.js','theme_default') }}"></script>
     <script src="{{ asset('js/render_methods.js','theme_default') }}"></script>
     <script src="{{ asset('js/data_table.js','theme_default') }}"></script>
     <script src="{{ asset('js/chat.js','theme_default') }}"></script>
     <script src="{{ asset('js/base.js','theme_default') }}"></script>
-    
-    {% block javascripts %} {% endblock %}
 
+    {% block javascripts %} {% endblock %}
+    
     {% block access_pool %}{% endblock %}
     {% block message_pool %}{% endblock %}
-  <input type="hidden" id="base_dir" value="{{ search.root_dir }}"/>
+    <input type="hidden" id="base_dir" value="{{ search.root_dir }}" />
 </body>
 
 </html>

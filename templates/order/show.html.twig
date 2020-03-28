@@ -29,12 +29,12 @@
 
 <div class="row">
     <div class="col-md-3">
-        <div class="callout callout-info">
+        <div class="c-callout">
             <strong class="h4">{{ status.displayname }}</strong>
         </div>
     </div>
     <div class="col-md-9">
-        <div class="callout callout" >
+        <div class="c-callout c-callout-info" >
             <div class="">
                 {{ status.displayname }} n°#{{ order.id }} du {{ order.createdat | date("Y/m/d") }} en cours pour la société <a href="#">{{ order.client.companyname }}</a><br/> géré par 
                 {{ order.agent.Firstname }} {{ order.agent.LastName }}
@@ -104,7 +104,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-sm-2">
-                                    <div class="callout callout-warning">
+                                    <div class="c-callout c-callout-warning">
                                         <small class="text-muted">Total HT ({{ order.currency.symbol }})</small>
                                         <br>
                                         <strong class="h4">{{ info.total_HT }}</strong>
@@ -115,7 +115,7 @@
                                 </div>
                                 <!-- /.col-->
                                 <div class="col-sm-2">
-                                    <div class="callout callout-success">
+                                    <div class="c-callout c-callout-success">
                                         <small class="text-muted">Total TTC ({{ order.currency.symbol }})</small>
                                         <br>
                                         <strong class="h4">{{ info.total_TTC }}</strong>
@@ -128,7 +128,7 @@
                                 {% if search.get_right_read("ACTION_SENSIBLE") %}
                                 <!-- Marges -->
                                 <div class="col-sm-2">
-                                    <div class="callout callout-primary">
+                                    <div class="c-callout c-callout-primary">
                                         <small class="text-muted">Marge (%)</small>
                                         <br>
                                         <strong class="h4">{{ info.marge_perc }}%</strong>
@@ -139,7 +139,7 @@
                                 </div>
                                 
                                 <div class="col-sm-2">
-                                    <div class="callout callout-secondary">
+                                    <div class="c-callout c-callout-secondary">
                                         <small class="text-muted">Marge ({{ order.currency.symbol }})</small>
                                         <br>
                                         <strong class="h4">{{ info.marge_amount }}</strong>
@@ -152,7 +152,7 @@
 
                                 <!-- /.col-->
                                 <div class="col-sm-2">
-                                    <div class="callout callout-danger">
+                                    <div class="c-callout c-callout-danger">
                                         <small class="text-muted">Montant TVA ({{ order.currency.symbol }})</small>
                                         <br>
                                         <strong class="h4">{{ info.VAT_amount }}</strong>
@@ -163,7 +163,7 @@
                                 </div>
                                 <!-- /.col-->
                                 <div class="col-sm-2">
-                                    <div class="callout callout-info">
+                                    <div class="c-callout c-callout-info">
                                         <small class="text-muted">TVA</small>
                                         <br>
                                         <strong class="h4">{{ order.tax.value }}%</strong>

@@ -42,7 +42,7 @@ class SearchToView{
     public function logo(){
         $setting = $this->get_setting('SOCIETE', 'SOCIETE_LOGO');
         if(!empty($setting) && $setting->getIsFile() && !empty($setting->getValue())){
-            return $this->rootDir . '/'. $this->settingFileDir . '/' . $setting->getValue();
+            return $this->root_dir() . '/'. $this->settingFileDir . '/' . $setting->getValue();
         }
         return null;
     }
@@ -54,7 +54,7 @@ class SearchToView{
     public function avatar_dir(?Agent $agent){
 
         if(!empty($agent)){
-            return $this->avatarFileDir . '/' . ((!empty($agent->getPicture())) ? $agent->getPicture() : 'default.png') ;
+            return $this->root_dir() . '/' . $this->avatarFileDir . '/' . ((!empty($agent->getPicture())) ? $agent->getPicture() : 'default.png') ;
         }
         return "";
     }

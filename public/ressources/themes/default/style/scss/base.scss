@@ -1,8 +1,9 @@
-
-
-
-body {
+.c-app {
   table-layout: fixed;
+
+  a{
+      text-decoration: none;
+  }
  
   ul.error-wrapper{
     color: red;
@@ -12,11 +13,26 @@ body {
     width: 100%;
   }
 
-  .app-body{
+  //------[ sidebar ]
+  .c-sidebar{
+       svg{
+          margin-right: 10px;
+      }
+  }
+
+  .c-sidebar-nav-dropdown-items .c-sidebar-nav-dropdown-items .c-sidebar-nav-link {
+        padding-left: 86px;
+  }
+
+  .c-body{
 
     .breadcrumb{
         margin-bottom: 0;
+    }
 
+    .bodyHeader-wrapper{
+        //margin-top: 15px;
+        margin-bottom: 15px;
     }
     
     td.details-control {

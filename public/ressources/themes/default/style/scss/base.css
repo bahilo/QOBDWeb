@@ -1,28 +1,44 @@
-body {
+.c-app {
   table-layout: fixed;
 }
 
-body ul.error-wrapper {
+.c-app a {
+  text-decoration: none;
+}
+
+.c-app ul.error-wrapper {
   color: red;
 }
 
-body textarea {
+.c-app textarea {
   width: 100%;
 }
 
-body .app-body {
+.c-app .c-sidebar svg {
+  margin-right: 10px;
+}
+
+.c-app .c-sidebar-nav-dropdown-items .c-sidebar-nav-dropdown-items .c-sidebar-nav-link {
+  padding-left: 86px;
+}
+
+.c-app .c-body {
   /*___________________[ Pagination ]*/
 }
 
-body .app-body .breadcrumb {
+.c-app .c-body .breadcrumb {
   margin-bottom: 0;
 }
 
-body .app-body td.details-control {
+.c-app .c-body .bodyHeader-wrapper {
+  margin-bottom: 15px;
+}
+
+.c-app .c-body td.details-control {
   cursor: pointer;
 }
 
-body .app-body td.details-control:before {
+.c-app .c-body td.details-control:before {
   content: "\f044";
   font-family: 'Font Awesome\ 5 Free';
   position: relative;
@@ -30,7 +46,7 @@ body .app-body td.details-control:before {
   left: 10px;
 }
 
-body .app-body tr.details td.details-control:before {
+.c-app .c-body tr.details td.details-control:before {
   content: "\f057";
   font-family: 'Font Awesome\ 5 Free';
   position: relative;
@@ -38,79 +54,79 @@ body .app-body tr.details td.details-control:before {
   left: 10px;
 }
 
-body .app-body .breadcrumb-menu .btn {
+.c-app .c-body .breadcrumb-menu .btn {
   font-size: inherit;
 }
 
-body .app-body .body-header.breadcrumb {
+.c-app .c-body .body-header.breadcrumb {
   background: none;
 }
 
-body .app-body .body-header.breadcrumb .breadcrumb-menu .btn:hover {
+.c-app .c-body .body-header.breadcrumb .breadcrumb-menu .btn:hover {
   color: white;
   background: #1b8eb7;
 }
 
-body .app-body .body-header.breadcrumb .breadcrumb-menu .btn {
+.c-app .c-body .body-header.breadcrumb .breadcrumb-menu .btn {
   padding: 4px 13px;
   color: white;
   background: #1b8eb7;
 }
 
-body .app-body ul.pagination .page-item {
+.c-app .c-body ul.pagination .page-item {
   cursor: pointer;
 }
 
-body .app-body .security-wrapper .input-control {
+.c-app .c-body .security-wrapper .input-control {
   margin-left: auto;
   margin-right: auto;
 }
 
-body .app-body .setting-wrapper .switch-label {
+.c-app .c-body .setting-wrapper .switch-label {
   width: 96px;
 }
 
-body .app-body .setting-wrapper .switch-wrapper label {
+.c-app .c-body .setting-wrapper .switch-wrapper label {
   display: inline-block;
   margin-bottom: -0.5rem;
 }
 
-body .app-body .img-avatar, body .app-body .avatar > img, body .app-body .img-circle {
+.c-app .c-body .img-avatar, .c-app .c-body .avatar > img, .c-app .c-body .img-circle {
   max-width: 64%;
 }
 
-body .app-body .agent-show-wrapper .profilImg-wrapper {
+.c-app .c-body .agent-show-wrapper .profilImg-wrapper {
   margin-left: auto;
   margin-right: auto;
   max-width: 10%;
 }
 
-body .app-body .agent-show-wrapper .profilImg-wrapper .img-circle {
+.c-app .c-body .agent-show-wrapper .profilImg-wrapper .img-circle {
   max-width: 100%;
   border-bottom: 2px solid #c8ced3;
   margin-top: -96px;
 }
 
-body .app-body .agent-body-header {
+.c-app .c-body .agent-body-header {
   height: 50px;
 }
 
-body .app-body .messages-home-wrapper .loadMessages {
+.c-app .c-body .messages-home-wrapper .loadMessages {
   cursor: pointer;
 }
 
-body .app-body .messages-home-wrapper .isDisabled {
+.c-app .c-body .messages-home-wrapper .isDisabled {
   color: currentColor;
   cursor: not-allowed;
   opacity: 0.5;
   text-decoration: none;
 }
 
-body .app-body table img {
+.c-app .c-body table img {
   max-width: 50px;
 }
 
-body .app-body .bottom.nav-wrapper .ul a, body .app-body .bottom.nav-wrapper .ul .ellipsis {
+.c-app .c-body .bottom.nav-wrapper .ul a, .c-app .c-body .bottom.nav-wrapper .ul .ellipsis {
   position: relative;
   display: inline-block;
   padding: 0.5rem 0.75rem;
@@ -123,7 +139,7 @@ body .app-body .bottom.nav-wrapper .ul a, body .app-body .bottom.nav-wrapper .ul
   text-decoration: none;
 }
 
-body .app-body .bottom.nav-wrapper .ul a.current, body .app-body .bottom.nav-wrapper .ul .ellipsis.current {
+.c-app .c-body .bottom.nav-wrapper .ul a.current, .c-app .c-body .bottom.nav-wrapper .ul .ellipsis.current {
   z-index: 1;
   color: #fff;
   background-color: #20a8d8;

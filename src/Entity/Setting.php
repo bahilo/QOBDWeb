@@ -46,6 +46,13 @@ class Setting
      */
     private $IsFile;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("DisplayName")
+     */
+    private $DisplayName;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -95,6 +102,18 @@ class Setting
     public function setIsFile(?bool $IsFile): self
     {
         $this->IsFile = $IsFile;
+
+        return $this;
+    }
+
+    public function getDisplayName(): ?string
+    {
+        return $this->DisplayName;
+    }
+
+    public function setDisplayName(?string $DisplayName): self
+    {
+        $this->DisplayName = $DisplayName;
 
         return $this;
     }

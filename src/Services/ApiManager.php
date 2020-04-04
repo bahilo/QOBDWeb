@@ -48,6 +48,7 @@ class ApiManager{
         $this->initNuSopClient();
         $settingPDF = $this->settingManager->get('WEBSERVICE', 'QOBD_URL');
         if(!empty($this->nusoapClient)){
+            //dump($params);
             $result = $this->nusoapClient->call($method, $params, $settingPDF->getValue());
             //dump($this->nusoapClient);die();
             return $result;

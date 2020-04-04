@@ -7,5 +7,9 @@ RewriteEngine On
 #RewriteRule ^$ /public [L]
 #RewriteRule ^(.+)$ /public/$1 [L]
 
- RewriteRule ^$ /QOBDWeb/public [L]
- RewriteRule ^(.+)$ /QOBDWeb/public/$1 [L]
+RewriteRule ^$ /QOBDWeb/public [L]
+RewriteCond %{REQUEST_URI} !^/QOBDWeb/public
+RewriteRule ^(.+)$ /QOBDWeb/public/$1 [L]
+
+# RewriteRule ^$ /QOBDWeb/public [L]
+# RewriteRule ^(.+)$ /QOBDWeb/public/$1 [L]

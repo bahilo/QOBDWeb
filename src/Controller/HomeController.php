@@ -43,6 +43,10 @@ class HomeController extends Controller
      */
     public function dashbord(Mailer $mailer) {
         
+        if(empty($this->getUser()) || !$this->getUser()->getIsActivated()){
+            return $this->redirectToRoute('security_login', ['message' => "Votre compte n'est pas actif. Veuillez contacter votre administrateur!"]);
+        }
+
         if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_DASHBORD']))) {
             return $this->redirectToRoute('order');//('security_deny_access');
         }

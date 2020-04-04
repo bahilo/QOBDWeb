@@ -13,9 +13,7 @@
   <link rel="stylesheet" href="{{ asset('all.min.css', 'font_awsome_css') }}">
   <link rel="stylesheet" href="{{ asset('style/css/src/style.css', 'theme_coreui') }}">     
     <link rel="stylesheet" href="{{ asset('style/scss/base.css', 'theme_default') }}">
-   <!-- <script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js"></script>
-  <script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-118965717-1"></script>
-  -->
+   
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
@@ -185,7 +183,7 @@
       {% endif %}
       
       <li class="c-sidebar-nav-title">Administration / Securité</li>
-      {% if search.get_right_read("ACTION_SECURITY") %}
+      {% if search.get_right_read("ACTION_SECURITY") %}      
       <li class="c-sidebar-nav-dropdown">
         <a class="c-sidebar-nav-dropdown-toggle" href="#">
           <i class="fa fa-user-secret"></i> Securité</a>
@@ -199,6 +197,11 @@
           <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ path("security_agent_role") }}">
               <i class="fa fa-id-card"></i> Accès
+            </a>
+          </li>
+          <li class="c-sidebar-nav-item">
+            <a class="c-sidebar-nav-link" href="{{ path("security_profile") }}">
+              <i class="fa fa-passport"></i> profiles
             </a>
           </li>
         </ul>
@@ -261,6 +264,8 @@
               <i class="fa fa-upload"></i> Imports
             </a>
           </li>
+
+          {% if search.get_right_read("ACTION_SECURITY") %}
           <li class="c-sidebar-nav-dropdown">
             <a class="c-sidebar-nav-dropdown-toggle" href="#">
               <i class="fa fa-user-secret"></i> Securité
@@ -276,13 +281,10 @@
                   <i class="fa fa-passport"></i> Roles
                 </a>
               </li>
-              <li class="c-sidebar-nav-item">
-                <a class="c-sidebar-nav-link" href="{{ path("security_profile") }}">
-                  <i class="fa fa-passport"></i> profiles
-                </a>
-              </li>
             </ul>
           </li>
+          {% endif %}
+
         </ul>
       </li>
       {% endif %}
@@ -309,11 +311,6 @@
             <i class="fa fa-comments"></i>
           </a>
         </li>
-        <!-- <li class="nav-item">
-          <a class="nav-link" data-toggle="tab" href="#messages" role="tab" style="display: none;" >
-            <i class="fa fa-comments"></i>
-          </a>
-        </li> -->
       </ul>
     
       <div class="tab-content">
@@ -388,9 +385,9 @@
                     <form method="post">
                       <input type="hidden" name="chat_room[discussion]">
                       <textarea class="form-control" name="chat_room[message]" id=""
-                        style="width: 100%; height: 100px;"></textarea>
+                        style="width: 100%; height: 100px;">
+                      </textarea>
                       <div class="control-wrapper">
-                        {# {% set currentDiscussion = user.lastdiscussion %} #}
                         <br />
                         <button type="submit" class="float-right btn btn-success"><i class="fa fa-paper-plane"></i></button>
                       </div>
@@ -408,16 +405,13 @@
     <header class="c-header c-header-light c-header-fixed">
       <button class="c-header-toggler c-class-toggler d-lg-none mfe-auto" type="button" data-target="#sidebar"
         data-class="c-sidebar-show">
-        <svg class="c-icon c-icon-lg">
-          <use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-menu"></use>
-        </svg>
-      </button><a class="c-header-brand d-lg-none c-header-brand-sm-up-center" href="#">
-        <svg width="118" height="46" alt="CoreUI Logo">
-          <use xlink:href="assets/brand/coreui-pro.svg#full"></use>
-        </svg></a>
-        <!-- <button class="navbar-toggler sidebar-toggler d-md-down-none" type="button" data-toggle="sidebar-lg-show">
-          <span class="navbar-toggler-icon"></span>
-        </button> -->
+        <i class="fa fa-sliders-h"></i>
+      </button>
+      <a class="c-header-brand d-lg-none c-header-brand-sm-up-center" href="#">
+        {% if search.logo %}
+        <img class="navbar-brand-full" src="{{ search.logo }}" width="89" height="25" alt="CoreUI Logo">
+        {% endif %}
+      </a>
       <button class="c-header-toggler c-class-toggler mfs-3 d-md-down-none" type="button" data-target="#sidebar"
         data-class="c-sidebar-lg-show" responsive="true">
         <span class="fa fa-sliders-h"></span>
@@ -434,116 +428,21 @@
       </ul>
       <ul class="c-header-nav mfs-auto">
         <li class="c-header-nav-item px-3 c-d-legacy-none">
-          <button class="c-class-toggler c-header-nav-btn" type="button" id="header-tooltip" data-target="body"
+          <!-- <button class="c-class-toggler c-header-nav-btn" type="button" id="header-tooltip" data-target="body"
             data-class="c-dark-theme" data-toggle="c-tooltip" data-placement="bottom" title=""
             data-original-title="Toggle Light/Dark Mode">
-            <svg class="c-icon c-d-dark-none">
-              <use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-moon"></use>
-            </svg>
-            <svg class="c-icon c-d-default-none">
-              <use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-sun"></use>
-            </svg>
-          </button>
+            <i class="fa fa-toggle-off"></i>
+          </button> -->
         </li>
       </ul>
       <ul class="c-header-nav">
-        {% set unread_messages = chat.unread_messages %}
-        <!-- <li class="c-header-nav-item dropdown d-md-down-none mx-2">
-          <a class="c-header-nav-link" data-toggle="dropdown"
-            href="#" role="button" aria-haspopup="true" aria-expanded="false">
-            <svg class="c-icon">
-              <use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-bell"></use>
-            </svg><span class="badge badge-pill badge-danger">5</span>
-          </a>
-          <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg pt-0">
-            <div class="dropdown-header bg-light">
-              <strong>You have 5 notifications</strong>
-            </div>
-            <a class="dropdown-item" href="#">
-              <svg class="c-icon mfe-2 text-success">
-                <use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-user-follow"></use>
-              </svg> New user registered</a><a class="dropdown-item" href="#">
-              <svg class="c-icon mfe-2 text-danger">
-                <use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-user-unfollow"></use>
-              </svg> User deleted</a><a class="dropdown-item" href="#">
-              <svg class="c-icon mfe-2 text-info">
-                <use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-chart"></use>
-              </svg> Sales report is ready</a><a class="dropdown-item" href="#">
-              <svg class="c-icon mfe-2 text-success">
-                <use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-basket"></use>
-              </svg> New client</a><a class="dropdown-item" href="#">
-              <svg class="c-icon mfe-2 text-warning">
-                <use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-speedometer"></use>
-              </svg> Server overloaded</a>
-            <div class="dropdown-header bg-light"><strong>Server</strong></div><a class="dropdown-item d-block"
-              href="#">
-              <div class="text-uppercase mb-1"><small><b>CPU Usage</b></small></div><span class="progress progress-xs">
-                <div class="progress-bar bg-info" role="progressbar" style="width: 25%" aria-valuenow="25"
-                  aria-valuemin="0" aria-valuemax="100"></div>
-              </span><small class="text-muted">348 Processes. 1/4 Cores.</small>
-            </a><a class="dropdown-item d-block" href="#">
-              <div class="text-uppercase mb-1"><small><b>Memory Usage</b></small></div><span
-                class="progress progress-xs">
-                <div class="progress-bar bg-warning" role="progressbar" style="width: 70%" aria-valuenow="70"
-                  aria-valuemin="0" aria-valuemax="100"></div>
-              </span><small class="text-muted">11444GB/16384MB</small>
-            </a><a class="dropdown-item d-block" href="#">
-              <div class="text-uppercase mb-1"><small><b>SSD 1 Usage</b></small></div><span
-                class="progress progress-xs">
-                <div class="progress-bar bg-danger" role="progressbar" style="width: 95%" aria-valuenow="95"
-                  aria-valuemin="0" aria-valuemax="100"></div>
-              </span><small class="text-muted">243GB/256GB</small>
-            </a>
-          </div>
-        </li> -->
-        <!-- <li class="c-header-nav-item dropdown d-md-down-none mx-2">
-          <a class="c-header-nav-link" data-toggle="dropdown"
-            href="#" role="button" aria-haspopup="true" aria-expanded="false">
-            <svg class="c-icon">
-              <use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-list-rich"></use>
-            </svg><span class="badge badge-pill badge-warning">15</span></a>
-          <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg pt-0">
-            <div class="dropdown-header bg-light"><strong>You have 5 pending tasks</strong></div><a
-              class="dropdown-item d-block" href="#">
-              <div class="small mb-1">Upgrade NPM &amp; Bower<span class="float-right"><strong>0%</strong></span></div>
-              <span class="progress progress-xs">
-                <div class="progress-bar bg-info" role="progressbar" style="width: 0%" aria-valuenow="0"
-                  aria-valuemin="0" aria-valuemax="100"></div>
-              </span>
-            </a><a class="dropdown-item d-block" href="#">
-              <div class="small mb-1">ReactJS Version<span class="float-right"><strong>25%</strong></span></div><span
-                class="progress progress-xs">
-                <div class="progress-bar bg-danger" role="progressbar" style="width: 25%" aria-valuenow="25"
-                  aria-valuemin="0" aria-valuemax="100"></div>
-              </span>
-            </a><a class="dropdown-item d-block" href="#">
-              <div class="small mb-1">VueJS Version<span class="float-right"><strong>50%</strong></span></div><span
-                class="progress progress-xs">
-                <div class="progress-bar bg-warning" role="progressbar" style="width: 50%" aria-valuenow="50"
-                  aria-valuemin="0" aria-valuemax="100"></div>
-              </span>
-            </a><a class="dropdown-item d-block" href="#">
-              <div class="small mb-1">Add new layouts<span class="float-right"><strong>75%</strong></span></div><span
-                class="progress progress-xs">
-                <div class="progress-bar bg-info" role="progressbar" style="width: 75%" aria-valuenow="75"
-                  aria-valuemin="0" aria-valuemax="100"></div>
-              </span>
-            </a><a class="dropdown-item d-block" href="#">
-              <div class="small mb-1">Angular 8 Version<span class="float-right"><strong>100%</strong></span></div><span
-                class="progress progress-xs">
-                <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100"
-                  aria-valuemin="0" aria-valuemax="100"></div>
-              </span>
-            </a><a class="dropdown-item text-center border-top" href="#"><strong>View all tasks</strong></a>
-          </div>
-        </li> -->
+        {% set unread_messages = chat.unread_messages %}        
         {% if unread_messages and unread_messages > 0 %}
         <li class="c-header-nav-item dropdown d-md-down-none mx-2">
           <a class="c-header-nav-link" data-toggle="dropdown"
             href="#" role="button" aria-haspopup="true" aria-expanded="false">
-            <svg class="c-icon">
-              <use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-envelope-open"></use>
-            </svg><span class="badge badge-pill badge-info">7</span></a>
+            <i class="fa fa-toggle-off"></i>
+            <span class="badge badge-pill badge-info">7</span></a>
           <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg pt-0">
             <div class="dropdown-header bg-light"><strong>You have 4 messages</strong></div><a class="dropdown-item"
               href="#">
@@ -628,57 +527,38 @@
         </button>
       </ul>
       <div class="c-subheader justify-content-between px-3">
-
-        <!-- <ol class="breadcrumb border-0 m-0 px-0 px-md-3">
-          <li class="breadcrumb-item">Home</li>
-          <li class="breadcrumb-item"><a href="#">Admin</a></li>
-          <li class="breadcrumb-item active">Dashboard</li>
-
-        </ol> -->
         <ol class="breadcrumb border-0 m-0 px-0 px-md-3">
           <li class="breadcrumb-item">
             <a href="{{ path("home") }}">Accueil</a>
           </li>
           {% block home_path %} {% endblock %}
-          <!-- Breadcrumb Menu-->
-          <!-- <li class="breadcrumb-menu d-md-down-none">
-            <div class="btn-group" role="group" aria-label="Button group">
-              <a class="btn" href="#">
-                <i class="icon-speech"></i>
-              </a>
-              {#% block home_path_right %} {% endblock %#}
-            </div>
-          </li> -->
         </ol>
-        <div class="c-subheader-nav d-md-down-none mfe-2"><a class="c-subheader-nav-link" href="#">
+        <div class="c-subheader-nav d-md-down-none mfe-2">
+          <!-- <a class="c-subheader-nav-link" href="#"> -->
             {% block home_path_right %} {% endblock %}
       </div>
     </header>
     <div class="c-body">
       <main class="c-main">
         <div class="container-fluid">
-          {% block body_header %}
-          <div class="row bodyHeader-wrapper">
-            <div class="col-md-10">
-              {% block body_header_left %}{% endblock %}
+          <div id="ui-view">
+            {% block body_header %}
+            <div class="bodyHeader-wrapper">
+            <div class="row">
+                <div class="col-md-10">                  
+                  {% block body_header_left %}{% endblock %}
+                </div>
+                <div class="col-md-2">
+                  {% block body_header_right %}{% endblock %}
+                </div>
+              </div>
+              {% endblock %}
             </div>
-            <div class="col-md-2">
-              {% block body_header_right %}{% endblock %}
-            </div>
+            {% block body %}{% endblock %}
           </div>
-          {#<ol class="breadcrumb body-header">
-            <li class="breadcrumb-item active">
-              {% block body_header_left %}{% endblock %}
-            </li>
-            <li class="breadcrumb-menu d-md-down-none">
-              {% block body_header_right %}{% endblock %}
-            </li>
-          </ol>#}
-          {% endblock %}
-          {% block body %}{% endblock %}
         </div>
       </main>
-      <footer class="app-footer">
+      <footer class="c-footer">
         <div>
           <a href="#">QOBD</a>
           <span>&copy; Management. Version 1.0.1</span>
@@ -810,27 +690,11 @@
     </div>
   </div>
 
-  <!--<script type="text/javascript" src="js/coreui.bundle.min.js"></script>
-  [if IE]><!
-  <script src="js/svgxuse.min.js"></script>-->
-  <!--<![endif]-->
-  <!-- <script> -->
-  <!-- new coreui.AsyncLoad(document.getElementById('ui-view')); -->
-  <!-- var tooltipEl = document.getElementById('header-tooltip'); -->
-  <!-- var tootltip = new coreui.Tooltip(tooltipEl); -->
-  <!-- </script> 
-
-    
-    <script type="text/javascript" src="js/coreui-chartjs.bundle.js" class="view-script"></script>
-    <script type="text/javascript" src="js/coreui-utils.js" class="view-script"></script>-->
-
   <script src="{{ asset('js/jquery-3.4.1.js','theme_default') }}"></script>
-  <script src="{{ asset('javascript/popper.min.js','theme_coreui') }}"></script>
+ <script src="{{ asset('javascript/popper.min.js','theme_coreui') }}"></script>
   <script src="{{ asset('js/bootstrap/bootstrap.js','theme_default') }}"></script>
 
   <script src="{{ asset('javascript/src/coreui.bundle.min.js','theme_coreui') }}"></script>
-  <script src="{{ asset('javascript/src/svgxuse.min.js','theme_coreui') }}"></script>
-<!--  -->
   <script src="{{ asset('javascript/src/coreui-chartjs.bundle.js','theme_coreui') }}"></script>
   <script src="{{ asset('javascript/src/coreui-utils.js','theme_coreui') }}"></script>
         
@@ -840,9 +704,7 @@
     <script src="{{ asset('js/lodash.min.js','theme_default') }}"></script>
     <script src="{{ asset('bundles/fosjsrouting/js/router.min.js') }}"></script>
     <script src="{{ asset('js/fos_js_routes.js','theme_default') }}"></script>
-  <!--  
-    <script type="text/javascript" src="{{ asset('javascript/src/main.js','theme_coreui') }}" class="view-script"></script>
-  -->
+    
     <script type="text/javascript" src="{{ asset('javascript/home.chart.js','theme_coreui') }}" class="view-script"></script>
     <script src="{{ asset('js/global.js','theme_default') }}"></script>
     <script src="{{ asset('js/render_methods.js','theme_default') }}"></script>

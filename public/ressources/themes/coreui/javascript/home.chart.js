@@ -39,21 +39,53 @@ $(document).ready(function(){
     };
 
     Chart.defaults.global.pointHitDetectionRadius = 1;
-    Chart.defaults.global.tooltips.enabled = false;
+    Chart.defaults.global.tooltips.enabled = true;
     Chart.defaults.global.tooltips.mode = 'index';
     Chart.defaults.global.tooltips.position = 'nearest';
-    Chart.defaults.global.tooltips.custom = coreui.ChartJS.customTooltips;
+    //Chart.defaults.global.tooltips.custom = coreui.ChartJS.customTooltips;
     Chart.defaults.global.defaultFontColor = '#646470';
     Chart.defaults.global.responsiveAnimationDuration = 1; 
 
-/*==========================[ début programme ]================================*/
+    /*==========================[ début programme ]================================*/
 
     $(function () {
+        //$('[data-toggle="tooltip"]').tooltip();
         loadChart();
         loadOrderChart();
         loadQuoteChart();
         loadRefundChart();
-        loadValidChart();
+        loadValidChart();        
+    });
+
+    /*================================[ Events ]==================================*/
+
+    $(function () {
+
+        $('[name="options"]').change(function () {
+
+            if ($(this).attr('id') == 'optionWeek')
+                generateGeneralChart(api.routing.order.week);
+            else if ($(this).attr('id') == 'optionMonth')
+                generateGeneralChart(api.routing.order.month);
+            else if ($(this).attr('id') == 'optionYear')
+                generateGeneralChart(api.routing.order.year);
+        });
+
+        document.body.addEventListener('classtoggle', function (event) {
+            if (event.detail.className === 'c-dark-theme') {
+                if (document.body.classList.contains('c-dark-theme')) {
+                    cardChart1.data.datasets[0].pointBackgroundColor = coreui.Utils.getStyle('--primary-dark-theme');
+                    cardChart2.data.datasets[0].pointBackgroundColor = coreui.Utils.getStyle('--info-dark-theme');
+                    Chart.defaults.global.defaultFontColor = '#fff';
+                } else {
+                    cardChart1.data.datasets[0].pointBackgroundColor = coreui.Utils.getStyle('--primary');
+                    cardChart2.data.datasets[0].pointBackgroundColor = coreui.Utils.getStyle('--info');
+                    Chart.defaults.global.defaultFontColor = '#646470';
+                }
+                cardChart1.update(); cardChart2.update(); mainChart.update();
+            }
+        });
+
     });
     
     /*================================[ Functions ]==================================*/
@@ -124,19 +156,21 @@ $(document).ready(function(){
             url: routePeriode,
             onSuccess: function (result) {
                 var data = JSON.parse(result);
-                if (data.length > 0) {
-                    new Chart(document.getElementById('card-chart1'),
+                if (data) {
+                    new Chart($('#card-chart1'),
                         {
                             type: 'line',
                             data: {
                                 labels: data['axisX'],
                                 datasets: [
                                     {
-                                        label: 'My First dataset',
+                                        label: data['title'],
                                         backgroundColor: 'transparent',
                                         borderColor: 'rgba(255,255,255,.55)',
                                         pointBackgroundColor: coreui.Utils.getStyle('--primary'),
-                                        data: [65, 59, 84, 84, 51, 55, 40]
+                                        data: _.map(data['axisX'], function (elt) {
+                                            return data.data[elt];
+                                        })
                                     }
                                 ]
                             },
@@ -156,7 +190,18 @@ $(document).ready(function(){
                                             }
                                         }
                                     ],
-                                    yAxes: [{ display: false, ticks: { display: false, min: 35, max: 89 } }]
+                                    yAxes: [{
+                                        display: false, ticks: {
+                                            display: false, 
+                                            min: _.min(_.map(data['axisX'], function (elt) {
+                                                return data.data[elt];
+                                            }))
+                                            , 
+                                            max: _.max(_.map(data['axisX'], function (elt) {
+                                                return data.data[elt];
+                                            })) 
+                                        } 
+                                    }]
                                 },
                                 elements: {
                                     line: { borderWidth: 1 },
@@ -182,19 +227,21 @@ $(document).ready(function(){
             url: routePeriode,
             onSuccess: function (result) {
                 var data = JSON.parse(result);
-                if (data.length > 0) {
-                    new Chart(document.getElementById('card-chart2'),
+                if (data) {
+                    new Chart($('#card-chart2'),
                         {
                             type: 'line',
                             data: {
                                 labels: data['axisX'],
                                 datasets: [
                                     {
-                                        label: 'My First dataset',
+                                        label: data['title'],
                                         backgroundColor: 'transparent',
                                         borderColor: 'rgba(255,255,255,.55)',
                                         pointBackgroundColor: coreui.Utils.getStyle('--info'),
-                                        data: [1, 18, 9, 17, 34, 22, 11]
+                                        data: _.map(data['axisX'], function (elt) {
+                                            return data.data[elt];
+                                        })
                                     }
                                 ]
                             },
@@ -211,12 +258,18 @@ $(document).ready(function(){
                                             ticks: { fontSize: 2, fontColor: 'transparent' }
                                         }
                                     ],
-                                    yAxes: [
-                                        {
+                                    yAxes: [{
+                                        display: false, ticks: {
                                             display: false,
-                                            ticks: { display: false, min: -4, max: 39 }
+                                            min: _.min(_.map(data['axisX'], function (elt) {
+                                                return data.data[elt];
+                                            }))
+                                            ,
+                                            max: _.max(_.map(data['axisX'], function (elt) {
+                                                return data.data[elt];
+                                            }))
                                         }
-                                    ]
+                                    }]
                                 },
                                 elements: {
                                     line: {
@@ -245,18 +298,20 @@ $(document).ready(function(){
             url: routePeriode,
             onSuccess: function (result) {
                 var data = JSON.parse(result);
-                if (data.length > 0) {
-                    new Chart(document.getElementById('card-chart3'),
+                if (data) {
+                    new Chart($('#card-chart3'),
                         {
                             type: 'line',
                             data: {
                                 labels: data['axisX'],
                                 datasets: [
                                     {
-                                        label: 'My First dataset',
+                                        label: data['title'],
                                         backgroundColor: 'rgba(255,255,255,.2)',
                                         borderColor: 'rgba(255,255,255,.55)',
-                                        data: [78, 81, 80, 45, 34, 12, 40]
+                                        data: _.map(data['axisX'], function (elt) {
+                                            return data.data[elt];
+                                        })
                                     }
                                 ]
                             },
@@ -265,7 +320,18 @@ $(document).ready(function(){
                                 legend: { display: false },
                                 scales: {
                                     xAxes: [{ display: false }],
-                                    yAxes: [{ display: false }]
+                                    yAxes: [{
+                                        display: false, ticks: {
+                                            display: false,
+                                            min: _.min(_.map(data['axisX'], function (elt) {
+                                                return data.data[elt];
+                                            }))
+                                            ,
+                                            max: _.max(_.map(data['axisX'], function (elt) {
+                                                return data.data[elt];
+                                            }))
+                                        }
+                                    }]
                                 },
                                 elements: {
                                     line: { borderWidth: 2 },
@@ -287,19 +353,21 @@ $(document).ready(function(){
             url: routePeriode,
             onSuccess: function (result) {
                 var data = JSON.parse(result);
-                if (data.length > 0) {
-                    new Chart(document.getElementById('card-chart4'),
+                if (data) {
+                    new Chart($('#card-chart4'),
                         {
                             type: 'bar',
                             data: {
-                                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March', 'April'],
+                                labels: data['axisX'],
                                 datasets: [
                                     {
-                                        label: 'My First dataset',
+                                        label: data['title'],
                                         backgroundColor: 'rgba(255,255,255,.2)',
                                         borderColor: 'rgba(255,255,255,.55)',
-                                        data: [78, 81, 80, 45, 34, 12, 40, 85, 65, 23, 12, 98, 34, 84, 67, 82],
-                                        barPercentage: 0.6
+                                        barPercentage: 0.6,
+                                        data: _.map(data['axisX'], function (elt) {
+                                            return data.data[elt];
+                                        })
                                     }
                                 ]
                             },
@@ -308,7 +376,18 @@ $(document).ready(function(){
                                 legend: { display: false },
                                 scales: {
                                     xAxes: [{ display: false }],
-                                    yAxes: [{ display: false }]
+                                    yAxes: [{
+                                        display: false, ticks: {
+                                            display: false,
+                                            min: _.min(_.map(data['axisX'], function (elt) {
+                                                return data.data[elt];
+                                            }))
+                                            ,
+                                            max: _.max(_.map(data['axisX'], function (elt) {
+                                                return data.data[elt];
+                                            }))
+                                        }
+                                    }]
                                 }
                             }
                         }); 

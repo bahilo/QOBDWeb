@@ -28,16 +28,16 @@ $(function(){
 
     $(function(){
 
-        $('input.switch-input','.switch-wrapper').on('click', function(){
-             if($(this).prop('checked')){
-                 $('.value-file','.value-wrapper').hide();
-                 $('.value-default','.value-wrapper').show();
-             }
-             else{
-                 $('.value-file', '.value-wrapper').show();
-                 $('.value-default', '.value-wrapper').hide();
-             }
-        });
+        // $('input.c-switch-input','.switch-wrapper').on('click', function(){
+        //      if($(this).prop('checked')){
+        //           $('.value-file', '.value-wrapper').show();
+        //          $('.value-default', '.value-wrapper').hide();
+        //      }
+        //      else{
+        //          $('.value-file', '.value-wrapper').hide();
+        //          $('.value-default', '.value-wrapper').show();
+        //      }
+        // });
         
     });
 
@@ -178,7 +178,7 @@ $(function(){
         col.push({ data: 'Type', title: "Type" });
         col.push({ data: 'Value', title: "Valeur" });
         col.push({ data: 'IsCurrent', title: "Valeur Par défaut" });
-        col.push({ data: 'CreateAt', title: "Date" });
+        //col.push({ data: 'CreateAt', title: "Date" });
 
         if($('#is_update','.access_pool').length > 0 && $('#is_update','.access_pool').val()){
             col.push({ data: 'null', title: "Modif.", render: oRender.renderEdit });
@@ -200,13 +200,13 @@ $(function(){
 
         var col = [];
 
-        col.push({ data: 'id', title: "Devis n°" });
+        col.push({ data: 'id', visible: false });
         col.push({ data: 'Name', title: "Nom" });
         col.push({ data: 'Symbol', title: "Symbol" });
-        col.push({ data: 'Rate', title: "Taux" });
+        col.push({ data: 'Rate', visible: false });
         col.push({ data: 'CountryCode', title: "Code Pays" });
         col.push({ data: 'IsDefault', title: "Sélection par défaut" });
-        col.push({ data: 'CreatedAt', title: "Date" });
+        //col.push({ data: 'CreatedAt', visible: false });
 
         if($('#is_update','.access_pool').length > 0 && $('#is_update','.access_pool').val()){
             col.push({ data: 'null', title: "Modif.", render: oRender.renderEdit });
@@ -229,8 +229,9 @@ $(function(){
         var col = [];
 
         col.push({ data: 'id', visible: false });
-        col.push({ data: 'Code', title: "Catégorie" });
-        col.push({ data: 'Name', title: "Nom" });
+        col.push({ data: 'Code', visible: false });
+        col.push({ data: 'Name', visible: false });
+        col.push({ data: 'DisplayName', title: "Nom" });
         col.push({ data: 'Value', title: "Valeur" });
 
         if($('#is_update','.access_pool').length > 0 && $('#is_update','.access_pool').val()){

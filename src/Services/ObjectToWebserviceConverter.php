@@ -95,6 +95,10 @@ class ObjectToWebserviceConverter{
             array_push($output['info'], $this->convertSettingToObject($setting));
         }
         
+        foreach ($this->settingRepo->findBy(['Code' => 'BANQUE']) as $setting) {
+            array_push($output['info'], $this->convertSettingToObject($setting));
+        }
+        
         foreach ($order->getQuoteOrderDetails() as $orderDetail) {
             array_push($output['order_item'], $this->convertOrderDetailToObject($orderDetail, $order));
         }

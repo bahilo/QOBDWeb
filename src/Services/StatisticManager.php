@@ -77,18 +77,18 @@ class StatisticManager{
     public function getCountBy(string $status, string $target){
         $moments = []; 
         $output = [];//'STATUS_ORDER'
+        
         foreach ($this->orderRepo->findBy(['Status' => $this->statusRepo->findOneBy(['Name' => $status ])]) as $order) {
            $moment = $this->getMomentOfYearArray($target, $order);
 
             if ($this->utility->str_in_array($moments, $moment) == -1) {
                 $moments[] = $moment;
-                $output[$moment] = 0;
+                $output[$moment] = 1;
             }
             else{
                 $output[$moment] += 1;
             }
         }
-
         return [
             'title' => 'Commande',
             'axisX' => $moments,
@@ -247,7 +247,7 @@ class StatisticManager{
 
     public function getCountOrderByMonth()
     {
-        return $this->getCountDataBy('STATUS_ORDER','MONTH');
+        return $this->getCountBy('STATUS_ORDER','MONTH');
     }
 
     public function getOrderByMonth(){
@@ -262,7 +262,7 @@ class StatisticManager{
 
     public function getCountOrderByYear()
     {
-        return $this->getCountDataBy('STATUS_ORDER', 'YEAR');
+        return $this->getCountBy('STATUS_ORDER', 'YEAR');
     } 
 
     public function getOrderByYear(){
@@ -277,7 +277,7 @@ class StatisticManager{
 
     public function getCountOrderByWeek()
     {
-        return $this->getCountDataBy('STATUS_ORDER', 'WEEK');
+        return $this->getCountBy('STATUS_ORDER', 'WEEK');
     } 
 
     public function getOrderByWeek(){

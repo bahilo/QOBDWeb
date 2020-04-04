@@ -293,10 +293,11 @@ class SecurityController extends Controller
 
     /**
      * @Route("/security/agent/connexion", options={"expose"=true}, name="security_login")
+     * @Route("/security/agent/connexion/{message}", options={"expose"=true}, name="security_login")
      */
-    public function login()
+    public function login($message = "")
     {
-        return $this->render('security/login.html.twig');
+        return $this->render('security/login.html.twig',['message' => $message]);
     }
 
     /**

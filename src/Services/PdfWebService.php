@@ -58,6 +58,7 @@ class PdfWebService{
             'bill' => $bill
         ];
 
+        //dump($param); die();
         $response = $this->apiManager->execPdfRequest($param['ws_method'], $param['ws_params']);
         $res = $this->utility->restoreSpecialChars($response);
 
@@ -67,9 +68,10 @@ class PdfWebService{
         if (!empty($setting) && !empty($setting->getValue())) {
             $fileName = $setting->getValue() . $param['bill']->getId() . '.pdf';
         }
-        file_put_contents($param['download_dir'] .'/'. $fileName, $res[0]['Value']);
 
-        return $param['download_dir'] . '/' . $fileName;
+        file_put_contents(dirname(__DIR__). '\..\public' . $param['download_dir'] .'/'. $fileName, $res[0]['Value']);
+
+        return dirname(__DIR__) . '\..\public' . $param['download_dir'] . '/' . $fileName;
     }
 
     public function downloadQuote(QuoteOrder $order, $downloadDir, int $target)
@@ -94,9 +96,9 @@ class PdfWebService{
         // dump($res[0]['Name']);
         // dump($param['download_dir']);
         // die();
-        file_put_contents($param['download_dir'] . '/' . $fileName, $res[0]['Value']);
+        file_put_contents(dirname(__DIR__) . '\..\public' . $param['download_dir'] . '/' . $fileName, $res[0]['Value']);
 
-        return $param['download_dir'] . '/' . $fileName;
+        return dirname(__DIR__) . '\..\public' . $param['download_dir'] . '/' . $fileName;
     }
 
     public function downloadDelivery(Delivery $delivery, $downloadDir)
@@ -120,14 +122,14 @@ class PdfWebService{
         if (!empty($setting)) {
             $fileName = $setting->getValue() . $param['delivery']->getId() . '.pdf';
         }
-        file_put_contents($param['download_dir'] . '/' . $fileName, $res[0]['Value']);
+        file_put_contents(dirname(__DIR__) . '\..\public' . $param['download_dir'] . '/' . $fileName, $res[0]['Value']);
 
-        return $param['download_dir'] . '/' . $fileName;
+        return dirname(__DIR__) . '\..\public' . $param['download_dir'] . '/' . $fileName;
     }
 
     private function getSource(QuoteOrder $order, ?Bill $bill, $target){
         $objArray = $this->wsConverter->getObjectFromOrder($order, $bill);
-        //dump($order->getIsRefVisible());die();
+        //dump($objArray);die();
         $source = array(
             "Lang"              => "fr",
             "TaxType"           => $this->getTaxType($order),

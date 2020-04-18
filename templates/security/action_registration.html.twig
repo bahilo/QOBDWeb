@@ -32,6 +32,8 @@
                         <i class="fa fa-align-justify"></i>{{ page_title }}</div>
                     <div class="card-body">
 
+                        {% include "notify.html.twig" %}
+                        
                         {{ form_start(formAction, { 'attr': {'id': 'global_form' }}) }}
                         
                        

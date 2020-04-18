@@ -635,16 +635,10 @@ class OrderController extends Controller
         }
                 
         $form = $request->request->get('order_detail_form');
+        //dump($form);die();
         $this->orderManager->loggCommandeSaveInfo($order, $form);
         $order = $this->orderManager->getHydrater()->hydrateQuoteOrderRelationFromForm($order, $form);
-        $manager->persist($order);
-        
-        foreach($form['tab']['items'] as $key => $val){
-            $orderDetail = $this->orderManager->getHydrater()->hydrateQuoteOrderDetailRelationFromForm($this->orderDetailRepo->find($key), $val);
-
-            $manager->persist($orderDetail->getItem());
-            $manager->persist($orderDetail);
-        }
+        $manager->persist($order);        
         $manager->flush();
         
         return $this->getRouteFromStatus($order->getStatus(), $order);
@@ -744,8 +738,6 @@ class OrderController extends Controller
                 
                 if($orderDetail){
                     $amount += $qtDelivery->getQuantity() * $orderDetail->getItemSellPrice();
-                    //$orderDetail->setQuantityRecieved(0);
-                    //$manager->persist($orderDetail);
                 }
                 
                 $qtDelivery->setBill($bill);

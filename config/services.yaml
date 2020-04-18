@@ -19,7 +19,7 @@ parameters:
     file.type.download_quote: 0
     file.type.download_order: 1
     file.type.download_refund: 2
-    session_max_idle_time: 1800
+    session_max_idle_time: 3800
     secret: '%env(APP_SECRET)%'
 
 services:

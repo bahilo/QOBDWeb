@@ -406,7 +406,7 @@ $(function () {
     
 
     function billDetailformat(row) {
-        var payedDate = new Date(row.PayedAt);
+        var payedDate = moment(row.PayedAt).format('YYYY-MM-DD');
 
         return '<div class="bill-produit">' +
             
@@ -419,7 +419,7 @@ $(function () {
                         '</div>' +
                         '<div class="col-md-6">' +
                             '<label for="pay_date' + row.id + '">Date de paiement</label>' +
-                            '<input type="date" name="order_detail_form[tab][bill][' + row.id + '][pay_date]" id="pay_date' + row.id + '" class="form-control" value="' + payedDate.getDate() + '/' + (payedDate.getMonth() +1) + '/' + payedDate.getFullYear() +'">' +
+            '<input type="date" name="order_detail_form[tab][bill][' + row.id + '][pay_date]" id="pay_date' + row.id + '" class="form-control" value="' + payedDate + '">' +
                         '</div>' +                        
                     '</div>' +
                     '<div class="row">' +
@@ -434,7 +434,7 @@ $(function () {
                         '<input type="checkbox" name="order_detail_form[tab][bill][' + row.id + '][ref_visible]" id="ref_visible' + row.id + '" class="form-check-input">' +
                         '<label for="ref_visible' + row.id + '" class="form-check-label">Référence Visisble </label>' +
                     '</div>'+
-                    '<a href="'+  Routing.generate('order_pdf_bill', { id: row.id }) +'" class="btn btn-dark">Générer PDF</a><br/>' +
+                    '<a href="'+  Routing.generate('order_pdf_bill', { id: row.id }) +'" class="btn btn-primary">Générer PDF</a><br/>' +
                     '<a href="mailto:toto@yahoo.fr" class="">Ouvrir un mail</a><br/>' +
             '<a href="' + Routing.generate('order_bill_cancel', { id: row.id }) +'" class="btn btn-danger btnDelete">Annuler cette facture</a>' +
                 '</div>' +
@@ -491,11 +491,11 @@ $(function () {
     }
 
     function renderPDF(data, type, row) {
-        return '<a class="btn btn-dark" href="#">Générer le BL</a>';
+        return '<a class="btn btn-primary" href="#">Générer le BL</a>';
     }
 
     function renderDeliveryPDF(data, type, row) {
-        return '<a class="btn btn-dark" href="' + Routing.generate('order_pdf_delivery', { id: row.id }) +'">Générer le BL</a>';
+        return '<a class="btn btn-primary" href="' + Routing.generate('order_pdf_delivery', { id: row.id }) +'">Générer le BL</a>';
     }
 
     function renderPreRefundShow(data, type, row) {

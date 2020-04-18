@@ -3,9 +3,10 @@
     {% for role in roles_distinct %}
     <li class="nav-item">
         {% if loop.first %}
-            <a class="nav-link active" href="#{{ role.name }}" data-toggle="tab"><span data-toggle="tooltip" data-placement="top" title="{{ role.displayname }}"><i class="fa fa-question-circle"></i></span>{{ role.name }}</a>
+            <!-- <a class="nav-link active" href="#{#{ role.name }}" data-toggle="tab"><span data-toggle="tooltip" data-placement="top" title="{{ role.displayname }}"><i class="fa fa-question-circle"></i></span>{{ role.displayname }#}</a> -->
+            <a class="nav-link active" href="#{{ role.name }}" data-toggle="tab">{{ role.displayname }}</a>
         {% else %}
-            <a class="nav-link" href="#{{ role.name }}" data-toggle="tab"><span data-toggle="tooltip" data-placement="top" title="{{ role.displayname }}"><i class="fa fa-question-circle"></i></span>{{ role.name }}</a>
+            <a class="nav-link" href="#{{ role.name }}" data-toggle="tab">{{ role.displayname }}</a>
         {% endif %}    
     </li>
     {% endfor %}

@@ -1,0 +1,4 @@
+Mise en prod
+- update le .htaccess
+- update service.yam retirer le /QOBDWeb/public
+- supprimer le repertoire cache du serveur

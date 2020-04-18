@@ -257,6 +257,7 @@
                         </div>
                     </div>
                 </div>
+                {% if search.get_right_read("ACTION_SENSIBLE") %}
                 <div class="col-sm-6 col-md-4">
                     <div class="card  border-info">
                         <div class="card-header">
@@ -267,6 +268,7 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
             </div>
 
             {# Adresse de livraison #}
@@ -352,7 +354,7 @@
                                         <input type="number" name="order_detail_form[setting][devis][duree]" id="inptDuree" class="form-control" value="{{ order.ValidityPeriode | default(2) }}">
                                     </div>
                                     <div class="btndevis-wrapper">
-                                        <a href="{{ path("order_pdf_quote", {id: order.id}) }}" class="btn btn-success">Générer le devis</a>
+                                        <a href="{{ path("order_pdf_quote", {id: order.id}) }}" class="btn btn-primary">Générer le devis</a>
                                     </div>
                                 </div>
                             </div>
@@ -482,7 +484,7 @@
                                         <textarea name="order_detail_form[setting][email][body]" id="" cols="30" rows="10"
                                             class="form-control">{{ email_content }}</textarea>
                                     </div>
-                                    <input type="submit" value="Envoyer" class="btn btn-dark">
+                                    <input type="submit" value="Envoyer" class="btn btn-primary">
                                 </div>
                             </div>
                         </div>                        
@@ -524,7 +526,7 @@
                                             {% endfor %}
                                         </select>
                                     </div>
-                                    <input type="submit" value="Envoyer" class="btn btn-dark">
+                                    <input type="submit" value="Envoyer" class="btn btn-primary">
                                 </div>
                             </div>
                         </div>
@@ -567,11 +569,6 @@
 {% endblock %}
 {% block javascripts %}
 <script src="{{  asset('js/order.js','theme_default') }}"></script>
-{% endblock %}
-
-{% block message_pool %}
-<input type="hidden" name="report-feedback" class="report-feedback" value="{{ code_message }}">
-<input type="hidden" name="report-status" class="report-status" value="{{ code_status }}">
 {% endblock %}
 
 {% block access_pool %}

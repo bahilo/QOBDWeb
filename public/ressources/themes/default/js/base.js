@@ -1,6 +1,7 @@
 $(document).ready(function ($) {
 
 /*================================[ Init ]==================================*/
+
     Routing.setBaseUrl($('#base_dir').val());
     var api = {};
 
@@ -24,72 +25,22 @@ $(document).ready(function ($) {
     
 /*================================[ Functions ]==================================*/
 
-    // function loadChart(){
-    //     if ($('.home-wrapper').length > 0){
-    //        generateGeneralChart(api.order.month);
-    //    }
-    // }    
-
-    // function generateGeneralChart(routePeriode){
-    //     $.fn.loading('show');
-    //     $.fn.ajaxLoader({
-    //         type: "post",
-    //         data: {},
-    //         url: routePeriode,
-    //         onSuccess: function (result) {
-    //             var data = JSON.parse(result);
-    //             if(data.length > 0){
-    //                 var lineChart = new Chart($('#myChart0'), {
-    //                     type: 'line',
-    //                     data: {
-    //                         labels: data[0]['axisX'],
-    //                         datasets: extractDataSets(data)
-    //                     },
-    //                     options: {
-    //                         responsive: true,
-    //                         tooltips: {
-    //                             mode: 'index'
-    //                         }
-    //                     }
-    //                 });
-    //             }
-    //             $.fn.loading('hide');
-    //         },
-    //     });
-    // }
-
-    // function extractDataSets(result){
-    //     var dataSet = [];
-    //     $.each(result, function (index, elt) {
-    //         dataSet.push({
-    //             label: elt['title'],
-    //             backgroundColor: 'rgba(220, 220, 220, 0.2)',
-    //             borderColor: api.backgroundColor[index],
-    //             pointBackgroundColor: api.backgroundColor[index],
-    //             pointBorderColor: '#fff',
-    //             data: $.map(elt['data'], function (elt2, index) {
-    //                 return elt2;
-    //             })
-    //         });
-    //     });
-
-    //     return dataSet;
-    // }
-
     function displayPoolMessage() {
         var $feedback = $('input[name="report-feedback"]');
         if ($feedback.length > 0 && $feedback.val()) {
+
+            var title = '';
             var $status = $('input[name="report-status"]');
-            if ($status.length > 0 && $status.val() == 200) {
-                $.fn.displayMessage('Votre requête a été executé avec succès', $feedback.val());
-                $status.val('');
-                $feedback.val('');
-            }
-            else if ($status.length > 0 && $status.val() == 500) {
-                $.fn.displayMessage('/!\\ Erreur lors du traitement de votre requête', $feedback.val());
-                $status.val('');
-                $feedback.val('');
-            }
+
+            if ($status.length > 0 && $status.val() == 200)
+                title = 'Votre requête a été executé avec succès';            
+            else if ($status.length > 0 && $status.val() == 500)
+                title = '/!\\ Erreur lors du traitement de votre requête';                
+            
+            $.fn.displayMessage({ messageTitle: title, messageBody: $feedback.val(), errorCode: $status.val() });
+            $status.val('');
+            $feedback.val('');
+
         }
     }
 

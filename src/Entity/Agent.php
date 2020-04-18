@@ -195,6 +195,11 @@ class Agent implements UserInterface
      */
     private $Article;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $Token;
+
     public function __construct()
     {
         $this->Roles = new ArrayCollection();
@@ -660,6 +665,18 @@ class Agent implements UserInterface
                 $Article->setAuthor(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getToken(): ?string
+    {
+        return $this->Token;
+    }
+
+    public function setToken(?string $Token): self
+    {
+        $this->Token = $Token;
 
         return $this;
     }

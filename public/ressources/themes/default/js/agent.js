@@ -1,16 +1,60 @@
 $(function(){
 
+/*================================[ Init ]==================================*/
+
     var Renders = new RenderMethod({
         routeShow: { route: 'agent_show', logo: 'fa-eye' },
         routeEdit: { route: 'security_edit', logo: 'fa-edit' },
         routeDelete: { route: 'security_delete', logo: 'fa-trash-alt' }
     });
 
-    $("#agent_table_js").myTable({
-        dataSource: $("#agent_data_source").val(),
-        columns: getColumn()
-    });   
+/*==========================[ début programme ]================================*/
 
+    $(function(){
+
+        // traite le tableau des commerciaux
+        var agentTable = $("#agent_table_js");
+        if (agentTable.length > 0){
+            $("#agent_table_js").myTable({
+                dataSource: $("#agent_data_source").val(),
+                columns: getColumn()
+            }); 
+        }
+
+    });
+
+/*================================[ Events ]==================================*/
+
+    $(function () {
+
+        $(".passwordForgotten").on("click", function(e){
+            e.preventDefault();
+            var username = $("input[name='_username']");
+            if(username.val()){                
+                window.location = $(this).attr("href") + "?_username=" + username.val();
+            }
+            else
+                alert("Veuillez renseigner le pseudonyme!");
+        });
+
+        $("._validatePassword").on("click", function(e){
+            e.preventDefault();
+            var mdp = $("input[name='password']");
+            var mdpConfirm = $("input[name='password_confirm']");
+            if (mdp.val() && mdp.val() == mdpConfirm.val() ){
+                $("form.resetPassword").submit();
+            }
+            else if (!mdp.val()){
+                alert("Veuillez renseigner le mot de passe!");
+            }
+            else{
+                alert("la confirmation de mot passe est différente du mot de passe!");
+            }
+        });
+
+    });
+
+/*================================[ Functions ]==================================*/
 
     function getColumn(){
         var col = [];
@@ -37,6 +81,8 @@ $(function(){
 
         return col;
     }
+
+/*================================[ Renders ]==================================*/
 
     function renderActivateAgent(data, type, row) {
         if (row.IsActivated)

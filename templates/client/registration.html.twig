@@ -29,13 +29,7 @@
                         <i class="fa fa-align-justify"></i> {{ page_title }}</div>
                     <div class="card-body">
 
-                        {% if errors | length > 0 %}
-                        <ul class="error-wrapper">
-                            {% for error in errors %}
-                            <li>{{ error.message }}</li>
-                            {% endfor %}
-                        </ul>
-                        {% endif %}
+                        {% include "notify.html.twig" %}
                         
                         {{ form_start(formClient, { 'attr': {'id': 'global_form' }}) }}
 

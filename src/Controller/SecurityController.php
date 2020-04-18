@@ -25,22 +25,34 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 
 class SecurityController extends Controller
 {
 
+    protected $manager;
     protected $securityUtility;
     protected $actionRepo;
+    protected $agentRepo;
     protected $eventDispatcher;
 
 
-    public function __construct(SecurityManager $securityUtility, ActionRepository $actionRepo, EventDispatcherInterface $eventDispatcher)
+    public function __construct(SecurityManager $securityUtility, 
+                                ActionRepository $actionRepo, 
+                                AgentRepository $agentRepo, 
+                                EventDispatcherInterface $eventDispatcher, 
+                                ObjectManager $manager)
     {
         $this->securityUtility = $securityUtility;
         $this->actionRepo = $actionRepo;
+        $this->agentRepo = $agentRepo;
+        $this->manager = $manager;
         $this->eventDispatcher = $eventDispatcher;
     }
     
@@ -179,8 +191,7 @@ class SecurityController extends Controller
      * 
      */
     public function agentRegistration(Agent $agent = null, 
-                                      Request $request, 
-                                      ObjectManager $manager, 
+                                      Request $request,                                        
                                       UserPasswordEncoderInterface $encoder,
                                       RoleRepository $roleRepo,
                                       Utility $utility,
@@ -226,8 +237,8 @@ class SecurityController extends Controller
                 $agent->addRole($role);
             }
 
-            $manager->persist($agent);
-            $manager->flush();
+            $this->manager->persist($agent);
+            $this->manager->flush();
             
 
             if(!$isEdit){
@@ -262,7 +273,7 @@ class SecurityController extends Controller
     /**
      * @Route("/admin/security/agent/{id}/activation", options={"expose"=true}, name="security_activate_agent")
      */
-    public function activateAgent(Agent $agent, ObjectManager $manager)
+    public function activateAgent(Agent $agent)
     {
         if (!$this->securityUtility->checkHasUpdate($this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
             return $this->redirectToRoute('security_deny_access');
@@ -273,8 +284,8 @@ class SecurityController extends Controller
         else
             $agent->setIsActivated(true);
 
-        $manager->persist($agent);
-        $manager->flush();
+        $this->manager->persist($agent);
+        $this->manager->flush();
         
         return $this->RedirectToRoute('agent_home');
     }
@@ -293,31 +304,96 @@ class SecurityController extends Controller
 
     /**
      * @Route("/security/agent/connexion", options={"expose"=true}, name="security_login")
-     * @Route("/security/agent/connexion/{message}", options={"expose"=true}, name="security_login")
      */
-    public function login($message = "")
+    public function login()
     {
-        return $this->render('security/login.html.twig',['message' => $message]);
+        return $this->render('security/login.html.twig');
     }
 
     /**
      * @Route("/admin/security/agent/deconnexion", options={"expose"=true}, name="security_logout")
      */
-    public function logout(ObjectManager $manager) {}
+    public function logout() {}
 
     /**
      * @Route("/admin/security/agent/{id}/delete", options={"expose"=true}, name="security_delete")
      */
-    public function delete(Agent $agent, ObjectManager $manager) {
+    public function delete(Agent $agent) {
 
         if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
-        $manager->remove($agent);
-        $manager->flush();
+        $this->manager->remove($agent);
+        $this->manager->flush();
 
         return $this->RedirectToRoute('agent_home');
+    }
+
+    /**
+     * @Route("/security/agent/formulaire/oubli-mot-de-passe/{token}", options={"expose"=true}, name="security_form_password_forgotten")
+     */
+    public function forgottenPasswordForm(string $token) {
+
+        return $this->render('security/password_forgotten_form.html.twig', ["token" => $token]);
+    }
+
+    /**
+     * @Route("/security/agent/oubli-mot-de-passe", options={"expose"=true}, name="security_password_forgotten")
+     */
+    public function forgottenPassword(TokenGeneratorInterface $tokenGen, Request $request, Mailer $mailer) {
+      
+        $username = $request->query->get("_username");
+
+        /** @var Agent $agent */
+        $agent = $this->agentRepo->findOneBy(["UserName" => $username]);
+        
+        if (!empty($agent)) {
+            
+            $token = $tokenGen->generateToken();
+            $agent->setToken($token);
+            $this->manager->persist($agent);
+            $this->manager->flush();
+            $mailer->send(
+                $agent->getEmail(),
+                "Mot de passe oublié",
+                $this->renderView("email/_partials/password_forgotten.html", ["url" => $this->generateUrl("security_form_password_forgotten", ["token" => $token], UrlGeneratorInterface::ABSOLUTE_URL)])
+            );
+            $this->addFlash("success", "Un mail vous a été envoyé avec un lien, clicker sur le lien pour confirmer le reset de mot de passe!");
+            return $this->redirectToRoute("security_login");
+        }
+
+        $this->addFlash("danger", "Votre nom d'utilisateur n'existe pas dans notre base de données!");
+        return $this->redirectToRoute("security_login");
+    }
+
+    /**
+     * @Route("/security/agent/reinitialiser/oubli-mot-de-passe", options={"expose"=true}, name="security_reset_password")
+     */
+    public function resetPassword(Request $request, EncoderFactoryInterface  $encoderGene) {
+                
+        /** @var Agent $agent */
+        $token = $request->request->get("token");
+        $agent = $this->agentRepo->findOneBy(["Token" => $token]);
+        
+        if(!empty($agent)){
+            $encoder = $encoderGene->getEncoder($agent);
+            $newPassword = $encoder->encodePassword($request->request->get("password"), $agent->getSalt());
+            if($encoder->isPasswordValid($newPassword, $request->request->get("password"), $agent->getSalt())){
+                $agent->setPassword($newPassword);
+                $agent->setToken(null);
+                $this->manager->persist($agent);
+                $this->manager->flush();
+                $this->addFlash("success", "Votre mot de passe a été regénéré avec succés!");
+                return $this->redirectToRoute("security_login");
+            }
+            else{
+                $this->addFlash("danger", "Votre mot de passe doit faire minimun 6 caractères!");
+                return $this->redirectToRoute("security_form_password_forgotten", ["token" => $token]);
+            }
+        }
+        $this->addFlash("danger", "Mot de passe non reconnu!");
+        return $this->redirectToRoute("security_login");
     }
 
     /*--------------------------------------------------------------------------------------------------
@@ -330,8 +406,7 @@ class SecurityController extends Controller
     public function actionRole(Request $request, 
                                ActionRoleRepository $actionRoleRepo, 
                                RoleRepository $roleRepo, 
-                               ActionRepository $actionRepo, 
-                               ObjectManager $manager) {
+                               ActionRepository $actionRepo) {
 
         if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY'])) &&
             !$this->securityUtility->checkHasUpdate($this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
@@ -416,11 +491,11 @@ class SecurityController extends Controller
                 // dump($role);
 
                 if($bInitialized){                    
-                    $manager->persist($privilege);
-                    $manager->persist($action);                
-                    $manager->persist($role);
-                    $manager->persist($actionRole);
-                    $manager->flush();
+                    $this->manager->persist($privilege);
+                    $this->manager->persist($action);                
+                    $this->manager->persist($role);
+                    $this->manager->persist($actionRole);
+                    $this->manager->flush();
                 }
             }           
         }
@@ -434,8 +509,7 @@ class SecurityController extends Controller
      */
     public function agentProfile(Request $request, 
                                  AgentRepository $agentRepo, 
-                                 RoleRepository $roleRepo, 
-                                 ObjectManager $manager) {
+                                 RoleRepository $roleRepo) {
 
         if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
             return $this->redirectToRoute('security_deny_access');
@@ -461,8 +535,8 @@ class SecurityController extends Controller
                     $agent->addRole($role);
                 }
 
-                $manager->persist($agent);
-                $manager->flush();
+                $this->manager->persist($agent);
+                $this->manager->flush();
 
             }
         }
@@ -477,8 +551,7 @@ class SecurityController extends Controller
      * 
      */
     public function actionRegistration(Action $action = null, 
-                                       Request $request, 
-                                       ObjectManager $manager) {
+                                       Request $request) {
 
         if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
             return $this->redirectToRoute('security_deny_access');
@@ -494,8 +567,8 @@ class SecurityController extends Controller
 
         if($form->isSubmitted() && $form->isValid() ){
             
-            $manager->persist($action);
-            $manager->flush();
+            $this->manager->persist($action);
+            $this->manager->flush();
 
             return $this->redirectToRoute('security_action');
         }
@@ -508,14 +581,14 @@ class SecurityController extends Controller
     /**
      * @Route("/admin/security/action/{id}/delete", options={"expose"=true}, name="security_action_delete")
      */
-    public function actionDelete(Action $action, ObjectManager $manager) {
+    public function actionDelete(Action $action) {
 
         if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
-        $manager->remove($action);
-        $manager->flush();
+        $this->manager->remove($action);
+        $this->manager->flush();
 
         return $this->RedirectToRoute('security_action');
     }
@@ -525,7 +598,7 @@ class SecurityController extends Controller
      * @Route("/admin/security/role/{id}/edit", options={"expose"=true}, name="security_role_edit")
      * 
      */
-    public function roleRegistration(Role $role = null, Request $request, ObjectManager $manager) {
+    public function roleRegistration(Role $role = null, Request $request) {
 
         if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
             return $this->redirectToRoute('security_deny_access');
@@ -542,8 +615,8 @@ class SecurityController extends Controller
 
         if($form->isSubmitted() && $form->isValid() ){
             
-            $manager->persist($role);
-            $manager->flush();
+            $this->manager->persist($role);
+            $this->manager->flush();
 
             return $this->redirectToRoute('security_role');
         }
@@ -556,14 +629,14 @@ class SecurityController extends Controller
     /**
      * @Route("/admin/security/role/{id}/delete", options={"expose"=true}, name="security_role_delete")
      */
-    public function roleDelete(Role $role, ObjectManager $manager) {
+    public function roleDelete(Role $role) {
 
         if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
-        $manager->remove($role);
-        $manager->flush();
+        $this->manager->remove($role);
+        $this->manager->flush();
 
         return $this->RedirectToRoute('security_role');
     }

@@ -10,29 +10,45 @@ $(document).ready(function(){
         $('#mdlDefault').modal('hide');
     }
 
-    $.fn.displayMessage = function (messageTitle, messageBody, footer = "", errorCode = 0) {
+    $.fn.displayMessage = function (param) {
+        var options = {
+            messageTitle: null,
+            messageBody: null,
+            footer: null,
+            errorCode: 200
+        };
+
+        options = $.extend(options, param);
+
         var modal = $('#mdlDefault');
 
         // set panel color regarding the given error code 
         var modalContentWrapper = modal.find('.modal-dialog');
         modalContentWrapper.removeClass('modal-danger modal-info modal-success');
-        if(errorCode == 500){
-            modalContentWrapper.addClass('modal-danger');
-        }
-        else if(errorCode == 300){
-            modalContentWrapper.addClass('modal-warning');
-        }
-        else if(errorCode == 200){
-            modalContentWrapper.addClass('modal-success');
-        }
-        else{
-            modalContentWrapper.addClass('modal-info');
-        }
+
+        if (options.errorCode){
+           if (options.errorCode == 500) {
+               modalContentWrapper.addClass('modal-danger');
+           }
+           else if (options.errorCode == 300) {
+               modalContentWrapper.addClass('modal-warning');
+           }
+           else if (options.errorCode == 200) {
+               modalContentWrapper.addClass('modal-success');
+           }
+           else {
+               modalContentWrapper.addClass('modal-info');
+           }
+       }
 
         // fill the panel content
-        modal.find('.modal-title').html(messageTitle);
-        modal.find('.modal-body').html(messageBody);
-        modal.find('.modal-footer').html(footer);
+        if (options.messageTitle)
+            modal.find('.modal-title').html(options.messageTitle);
+        if (options.messageBody)
+            modal.find('.modal-body').html(options.messageBody);
+        if (options.footer)
+            modal.find('.modal-footer').html(options.footer);
+
         $.fn.openModal();
     }
 
@@ -43,7 +59,7 @@ $(document).ready(function(){
             body += '<div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">';
             body += '    <span class="sr-only">Chargement...</span>';
             body += '</div>';
-            $.fn.displayMessage(title, body);
+            $.fn.displayMessage({ messageTitle: title, messageBody: body});
         }
         else if (action == 'hide') {
             $.fn.closeModal();
@@ -60,7 +76,7 @@ $(document).ready(function(){
             type: options.type,
             success: options.onSuccess,
             error: function (jqXHR, textStatus) {
-                $.fn.displayMessage('Erreur détectée', "Une erreur s'est produite lors de la communication avec le server. Veuillez contacter un administrateur");
+                $.fn.displayMessage({ messageTitle: 'Erreur détectée', messageBody: "Une erreur s'est produite lors de la communication avec le server. Veuillez contacter un administrateur"});
                 console.log('Error found: ' + textStatus);
                 $.fn.loading('hide');
             }
@@ -112,7 +128,7 @@ $(document).ready(function(){
         footer += '<button type="button" class="btn btn-primary _mvalide">' + array[0] + '</button>';
         footer += '<button type="button" class="btn btn-secondary _mcancel">' + array[1] + '</button>';
 
-        $.fn.displayMessage(titre, message, footer);
+        $.fn.displayMessage({ messageTitle: titre, messageBody: message, footer: footer});
 
         $root.find('._mvalide').on('click', function () {
             if ($.isFunction(action)) {

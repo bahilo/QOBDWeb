@@ -1,24 +1,105 @@
 <html>
     <head>
         <title> 
-            {% block title %}{% endblock title %}
+            {% block title %}{{ search.get_setting("SOCIETE","SOCIETE_NOM").value }}{% endblock title %}
         </title>
-        {% block head %}{% endblock head %}
-        <style>
-            .email-wrapper{
-                font-family: Arial, Helvetica, sans-serif;
+       
+        <style type="text/css">
+            body {
+        
+                margin: 0px;
+                text-align: left;
+                font-size: 12px;
+                font-family: Arial, Verdana, ;
+                color: #7D7D7D;
+                line-height: 17px;
+        
+            }
+
+            .bg-gradient-info {
+                background: #2982cc!important;
+                background: linear-gradient(45deg,#39f 0%,#2982cc 100%)!important;
+                border-color: #2982cc!important;
+            }
+        
+            a:link {
+                color: #2982cc;
+            }
+        
+            a:visited {
+                color: #2982cc;
+            }
+        
+            a:hover {
+                color: #f60;
+                text-decoration: none;
+            }
+        
+            a:active {
+                color:#2982cc ;
             }
         </style>
+        {% block head %}{% endblock head %}
     </head>
     <body>
         <div class="email-wrapper">
-            {% block body %}{% endblock body %}
+            <table height="100%" width="700">
+                <tbody>
+                    <tr>
+                        <td width="50"> </td>
+                        <td>
+                            {#% if search.logo %}
+                            <img class="navbar-brand-full" src="{{ app.request.getSchemeAndHttpHost() ~  search.logo }}" width="89" height="25" alt="Logo">
+                            {% endif %}
+                            {{ search.get_setting("SOCIETE","SOCIETE_NOM").value }#}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> </td>
+                        <td bgcolor="#2982cc" align="center">
+                            <font color="white" size="6">
+                                {% block body_title %}{% endblock body_title %}
+                            </font><br>
+                            <font color="white" size="5">
+                                {% block body_sub_title %}{% endblock body_sub_title %}
+                            </font>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> </td>
+            
+                        <td valign="top">
+                            <div style="padding:10px 0 5px 0;line-height:180%;border-bottom:1px #bbb solid;">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td style="font-size:14px;color:#000;" valign="top"><b>Attention: </b></td>
+                                            <td style="font-size:14px;color:#000;">Afin de vous assurer que vous recevrez tous nos futures emails,
+                                                nous vous invitons à nous ajouter dans votre liste de contacts.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% block body %}{% endblock body %}            
+                        </td>
+            
+                        <td width="100"> </td>
+                    </tr>
+                </tbody>
+            </table>
+            
         </div>
     </body>
     <footer>
         <div class="email-wrapper">
             {% block footer %}
             condition générale d'utilisation!
+
+            <div style="padding:0px 0 5px 0;line-height:180%;font-size:14px;color:#000;border-bottom:1px #bbb solid;border-top:1px #bbb solid;">
+                <b>
+                    <center>NE PAS REPONDRE A CET EMAIL</center>
+                </b>
+            </div>
             {% endblock footer %}
         </div>        
     </footer>

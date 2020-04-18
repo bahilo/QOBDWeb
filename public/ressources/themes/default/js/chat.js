@@ -267,7 +267,7 @@ $(function(){
             updateCurrentDiscussion(data.id)
         }
         else{
-            $.fn.displayMessage('Modification', 'Veuillez rafraichir la page pour visualiser vos modifications...');
+            $.fn.displayMessage({ messageTitle: 'Modification', messageBody: 'Veuillez rafraichir la page pour visualiser vos modifications...'});
         }        
     }
 

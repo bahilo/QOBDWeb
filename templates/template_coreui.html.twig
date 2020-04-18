@@ -540,11 +540,11 @@
     </header>
     <div class="c-body">
       <main class="c-main">
-        <div class="container-fluid">
+        <div class="container-fluid">          
           <div id="ui-view">
             {% block body_header %}
             <div class="bodyHeader-wrapper">
-            <div class="row">
+              <div class="row">
                 <div class="col-md-10">                  
                   {% block body_header_left %}{% endblock %}
                 </div>
@@ -554,6 +554,7 @@
               </div>
               {% endblock %}
             </div>
+            
             {% block body %}{% endblock %}
           </div>
         </div>
@@ -693,6 +694,7 @@
   <script src="{{ asset('js/jquery-3.4.1.js','theme_default') }}"></script>
  <script src="{{ asset('javascript/popper.min.js','theme_coreui') }}"></script>
   <script src="{{ asset('js/bootstrap/bootstrap.js','theme_default') }}"></script>
+  <script src="{{ asset('js/moment.js','theme_default') }}"></script>
 
   <script src="{{ asset('javascript/src/coreui.bundle.min.js','theme_coreui') }}"></script>
   <script src="{{ asset('javascript/src/coreui-chartjs.bundle.js','theme_coreui') }}"></script>

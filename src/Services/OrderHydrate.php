@@ -4,10 +4,12 @@ namespace App\Services;
 
 use App\Entity\Comment;
 use App\Entity\QuoteOrder;
+use App\Repository\BillRepository;
 use App\Repository\TaxRepository;
 use App\Services\CatalogueHydrate;
 use App\Repository\ContactRepository;
 use App\Repository\CurrencyRepository;
+use App\Repository\QuoteOrderDetailRepository;
 use JMS\Serializer\SerializerInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
@@ -16,8 +18,10 @@ class OrderHydrate{
 
     protected $serializer; 
     protected $contactRepo;
+    protected $billRepo;
     protected $currencyRepo;
     protected $taxRepo;
+    protected $orderDetailRepo;
     protected $catHydrate;
     protected $manager;
     protected $webApi;
@@ -27,6 +31,8 @@ class OrderHydrate{
                                 CurrencyRepository $currencyRepo,  
                                 ApiManager $webApi,
                                 TaxRepository $taxRepo,
+                                QuoteOrderDetailRepository $orderDetailRepo,
+                                BillRepository $billRepo,
                                 CatalogueHydrate $catHydrate,
                                 ObjectManager $manager){
 
@@ -35,6 +41,8 @@ class OrderHydrate{
         $this->contactRepo = $contactRepo;
         $this->currencyRepo = $currencyRepo;
         $this->taxRepo = $taxRepo;
+        $this->billRepo = $billRepo;
+        $this->orderDetailRepo = $orderDetailRepo;
         $this->catHydrate = $catHydrate;
         $this->manager = $manager;
     }
@@ -218,6 +226,54 @@ class OrderHydrate{
 
         if(!empty($form['tax'])){
             $order->setTax($this->taxRepo->find($form['tax']));
+        }
+
+        foreach ($form['tab']['items'] as $key => $val) {
+            $orderDetail = $this->hydrateQuoteOrderDetailRelationFromForm($this->orderDetailRepo->find($key), $val);
+
+            $this->manager->persist($orderDetail->getItem());
+            $this->manager->persist($orderDetail);
+        }
+
+        foreach ($form['tab']['bill'] as $key => $val) {
+            $bill = $this->billRepo->find($key);
+            if(!empty($bill)){
+
+                if(!empty($val['pay_mode']))
+                    $bill->setPayMode($val['pay_mode']);
+                if (!empty($val['payed_amount']))
+                    $bill->setPayReceived($val['payed_amount']);
+                if (!empty($val['pay_date']))
+                    $bill->setPayedAt(new \Datetime($val['pay_date']));
+                
+                if (!empty($val['comment_private'])){
+
+                    $privCom = $bill->getPrivateComment();
+                    if(empty($privCom))
+                        $privCom = new Comment();
+
+                    $privCom->setCreateAt(new \DateTime());
+                    $privCom->setContent($val['comment_private']);
+                    $bill->setPrivateComment($privCom);
+
+                    $this->manager->persist($privCom);
+                }
+
+                if (!empty($val['comment_public'])) {
+
+                    $publicCom = $bill->getPublicComment();
+                    if (empty($publicCom))
+                        $publicCom = new Comment();
+
+                    $publicCom->setCreateAt(new \DateTime());
+                    $publicCom->setContent($val['comment_public']);
+                    $bill->setPublicComment($publicCom);
+
+                    $this->manager->persist($publicCom);
+                }
+
+                $this->manager->persist($bill);
+            }
         }
 
         $order->setPrivateComment($privateComment);

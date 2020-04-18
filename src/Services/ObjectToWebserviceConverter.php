@@ -531,14 +531,25 @@ class ObjectToWebserviceConverter{
         $obj = [];
         if (!empty($bill)) {
 
+            $comPriv = $bill->getPrivateComment();
+            $comPub = $bill->getPublicComment();
+
             $obj['ID'] = $bill->getId();
             $obj['ClientId'] = $client->getId();
             $obj['OrderId'] = $order->getId();
             $obj['PayMod'] = $bill->getPayMode();
             $obj['Pay'] = $bill->getPay();
             $obj['PayReceived'] = $bill->getPayReceived();
-            $obj['Comment1'] = $bill->getPrivateComment();
-            $obj['Comment2'] = $bill->getPublicComment(); 
+
+            if($comPriv)
+                $obj['Comment1'] = $comPriv->getContent();
+            else
+                $obj['Comment1'] =  '';
+
+            if ($comPub)
+                $obj['Comment2'] = $comPub->getContent();
+            else
+                $obj['Comment2'] =  '';
 
             $obj['Date'] = $bill->getCreatedAt();
              if(!empty($obj['Date']))

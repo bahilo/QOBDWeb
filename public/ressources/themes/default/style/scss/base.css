@@ -82,6 +82,19 @@
   margin-right: auto;
 }
 
+.c-app .c-body .security-wrapper tbody {
+  display: block;
+  height: 400px;
+  overflow: auto;
+}
+
+.c-app .c-body .security-wrapper thead, .c-app .c-body .security-wrapper tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  /* even columns width , fix width of table too*/
+}
+
 .c-app .c-body .setting-wrapper .switch-label {
   width: 96px;
 }

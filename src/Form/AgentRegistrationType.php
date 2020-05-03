@@ -62,6 +62,7 @@ class AgentRegistrationType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Agent::class,
+            "allow_extra_fields" => true,
         ]);
     }
 }

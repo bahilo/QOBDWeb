@@ -1,16 +1,16 @@
-Bonjour  Madame, Monsieur {{ nom_client }},
+Bonjour  Madame, Monsieur {{ nom_client }}, <br><br>
 
 
-Veuillez trouver ci-joint le détail de votre facture {{ num_facture }} pour laquelle  la date d échéance est dépassée. 
+Veuillez trouver ci-joint le détail de votre facture {{ num_facture }} pour laquelle  la date d échéance est dépassée. <br>
 
-Nous pensons qu il s agit d un oubli de votre part et vous remercions de bien vouloir solder ce dossier dans les meilleurs délais.
+Nous pensons qu il s agit d un oubli de votre part et vous remercions de bien vouloir solder ce dossier dans les meilleurs délais. <br>
 
-Dans cette attente, nous vous prions d agréer, Madame, Monsieur, nos salutations distinguées.
+Dans cette attente, nous vous prions d agréer, Madame, Monsieur, nos salutations distinguées. <br>
 
 
-Cordialement,
+Cordialement, <br><br>
 
-Le service recouvrement.
+Le service recouvrement. <br>
 
 L'equipe {{ nom_societe }}.
                     

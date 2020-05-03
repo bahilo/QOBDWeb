@@ -29,6 +29,7 @@ class AddressRegistrationType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Address::class,
+            "allow_extra_fields" => true,
         ]);
     }
 }

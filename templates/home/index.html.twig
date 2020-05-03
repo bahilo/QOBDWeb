@@ -150,3 +150,11 @@
     </div>
 </div>
 {% endblock %}
+
+{% block javascripts %} 
+    
+    <script src="{{ asset('javascript/src/coreui-chartjs.bundle.js','theme_coreui') }}"></script>
+    <script src="{{ asset('javascript/src/coreui-utils.js','theme_coreui') }}"></script>
+    <script type="text/javascript" src="{{ asset('javascript/home.chart.js','theme_coreui') }}"
+        class="view-script"></script>
+{% endblock %}

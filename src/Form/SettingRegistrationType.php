@@ -23,6 +23,7 @@ class SettingRegistrationType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Setting::class,
+            "allow_extra_fields" => true,
         ]);
     }
 }

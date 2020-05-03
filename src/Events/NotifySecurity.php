@@ -4,6 +4,7 @@ namespace App\Events;
 
 use App\Entity\Agent;
 use App\Services\Mailer;
+use App\Services\SettingManager;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
@@ -25,6 +26,7 @@ class NotifySecurity implements EventSubscriberInterface
     protected $session;
     protected $router;
     protected $eventDispatcher;
+    protected $settingManager;
 
     public function __construct(Mailer $mailer, 
                                  $maxIdleTime = 0,
@@ -32,13 +34,15 @@ class NotifySecurity implements EventSubscriberInterface
                                 TokenStorageInterface $securityToken, 
                                 SessionInterface $session,
                                 RouterInterface $router,
-                                EventDispatcherInterface $eventDispatcher)
+                                EventDispatcherInterface $eventDispatcher,
+                                SettingManager $settingManager)
     {
         $this->mailer = $mailer;
         $this->router = $router;
         $this->manager = $manager;
         $this->session = $session;
         $this->maxIdleTime = $maxIdleTime;
+        $this->settingManager = $settingManager;
         $this->eventDispatcher = $eventDispatcher;
         $this->securityToken = $securityToken;
     }
@@ -95,7 +99,7 @@ class NotifySecurity implements EventSubscriberInterface
                 $this->eventDispatcher->dispatch(MyEvents::USER_LOGGEDOUT, $event);
 
                 $this->securityToken->setToken(null);
-                $this->session->getFlashBag()->add('info', 'You have been logged out due to inactivity.');
+                $this->session->getFlashBag()->add('info', "Vous avez été deconnecté par manque d'activité sur la page.");
                 
                 return new RedirectResponse($this->router->generate('security_login'));
             }
@@ -104,8 +108,13 @@ class NotifySecurity implements EventSubscriberInterface
 
     public function onAgentRegistration(GenericEvent $event){
         $params = $event->getSubject();
+        $setting = $this->settingManager->get("SOCIETE", "SOCIETE_EMAIL");
+        
         $this->mailer->send(
-            $params['to'],
+            [
+                'to' => $params['to'], 
+                'cc' => [$setting->getValue()]
+            ],
             $params['subject'],
             $params['view']
         );

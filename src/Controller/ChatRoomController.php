@@ -19,7 +19,6 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
 
 class ChatRoomController extends Controller
 {
@@ -139,7 +138,7 @@ class ChatRoomController extends Controller
         }
         $manager->flush();
 
-        $this->chatManager->setAsCurrentDiscussion($discussion);
+        $this->chatManager->setAsCurrentDiscussion($this->getUser(),$discussion);
 
         //return $this->RedirectToRoute('home');
         

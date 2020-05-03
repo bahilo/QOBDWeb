@@ -15,7 +15,10 @@ $(document).ready(function(){
             messageTitle: null,
             messageBody: null,
             footer: null,
-            errorCode: 200
+            errorCode: 200,
+            size: "md",
+            textAlign: "left",
+            isCentered: true,
         };
 
         options = $.extend(options, param);
@@ -25,19 +28,24 @@ $(document).ready(function(){
         // set panel color regarding the given error code 
         var modalContentWrapper = modal.find('.modal-dialog');
         modalContentWrapper.removeClass('modal-danger modal-info modal-success');
+        modalContentWrapper.find('.modal-body').addClass("text-" + options.textAlign);
+
+        if (!options.isCentered){
+            modalContentWrapper.removeClass('modal-dialog-centered');
+        }
 
         if (options.errorCode){
            if (options.errorCode == 500) {
-               modalContentWrapper.addClass('modal-danger');
+               modalContentWrapper.addClass('modal-danger modal-' + options.size);
            }
-           else if (options.errorCode == 300) {
-               modalContentWrapper.addClass('modal-warning');
+           else if (options.errorCode == 600) {
+               modalContentWrapper.addClass('modal-warning modal-' + options.size);
            }
            else if (options.errorCode == 200) {
-               modalContentWrapper.addClass('modal-success');
+               modalContentWrapper.addClass('modal-success modal-' + options.size);
            }
            else {
-               modalContentWrapper.addClass('modal-info');
+               modalContentWrapper.addClass('modal-primary modal-' + options.size);
            }
        }
 
@@ -56,10 +64,10 @@ $(document).ready(function(){
         if (action == 'show') {
             var title = 'Chargement...';
             var body = '';
-            body += '<div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">';
+            body += '<div class="spinner-border" style="width: 3rem; height: 3rem; text-align: center" role="status">';
             body += '    <span class="sr-only">Chargement...</span>';
             body += '</div>';
-            $.fn.displayMessage({ messageTitle: title, messageBody: body});
+            $.fn.displayMessage({ messageTitle: title, messageBody: body, size: "sm", textAlign: "center", errorCode: 601 });
         }
         else if (action == 'hide') {
             $.fn.closeModal();
@@ -74,9 +82,11 @@ $(document).ready(function(){
             url: options.url,
             data: options.data,
             type: options.type,
-            success: options.onSuccess,
+            success: function(result){
+                options.onSuccess(result);
+            },
             error: function (jqXHR, textStatus) {
-                $.fn.displayMessage({ messageTitle: 'Erreur détectée', messageBody: "Une erreur s'est produite lors de la communication avec le server. Veuillez contacter un administrateur"});
+                $.fn.displayMessage({ messageTitle: 'Erreur détectée', errorCode: 500, messageBody: "Une erreur s'est produite lors de la communication avec le server. Veuillez contacter un administrateur"});
                 console.log('Error found: ' + textStatus);
                 $.fn.loading('hide');
             }
@@ -98,6 +108,7 @@ $(document).ready(function(){
     //-----------------------------------------------------------------------------
     $.fn.initEventBtnValidation = function(){
         $('.btnValidation').on('click', function (e) {
+            var elt = $(this);
             e.preventDefault();
             $.fn.displayConfirm('Validation', 'Comfirmez-vous votre requête?', function (response) {
                 if (response) {
@@ -128,7 +139,7 @@ $(document).ready(function(){
         footer += '<button type="button" class="btn btn-primary _mvalide">' + array[0] + '</button>';
         footer += '<button type="button" class="btn btn-secondary _mcancel">' + array[1] + '</button>';
 
-        $.fn.displayMessage({ messageTitle: titre, messageBody: message, footer: footer});
+        $.fn.displayMessage({ messageTitle: titre, messageBody: message, footer: footer, errorCode: 601});
 
         $root.find('._mvalide').on('click', function () {
             if ($.isFunction(action)) {

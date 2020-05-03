@@ -7,7 +7,11 @@ $(function () {
     });
 
     $("#item_table_js").myTable({
-        dataSource: $("#item_data_source").val(),
+        //dataSource: $("#item_data_source").val(),
+        com: "async",
+        ajax: {
+            url: Routing.generate("catalogue_home_data"),
+        },
         columns: getColumn()
     });
 
@@ -38,7 +42,7 @@ $(function () {
         col.push({ data: 'id', title: "", visible: false });
         col.push({ data: 'IsErasable', title: "", visible: false });
         col.push({ data: 'FullPathPicture', title: "", render: Renders.renderPictur });
-        col.push({ data: 'Ref', title: "N° Serie" });
+        col.push({ data: 'Ref', title: "Ref." });
         col.push({ data: 'Name', title: "Désignation" });
         col.push({ data: 'Ean', title: "EAN" });
         col.push({ data: 'Imei', title: "IMEI" });

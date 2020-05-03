@@ -18,7 +18,8 @@ class Serializer{
     public function serialize($params){
         $context = new SerializationContext();
         $context->setSerializeNull(true);
-        $context->setGroups(array($params['group']));
+        if(!empty($params['group']))
+            $context->setGroups(array($params['group']));
         return $this->serializer->serialize($params['object_array'], $params['format'], $context);
     }
 }

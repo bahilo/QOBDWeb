@@ -1,16 +1,16 @@
-Bonjour {{ pseudo }}
+Bonjour {{ pseudo }} <br><br>
 
 
 
-Nous vous confirmons votre inscription dans notre application, et nous vous en remercions.
+Nous vous confirmons votre inscription dans notre application, et nous vous en remercions. <br>
 
-Un email a été envoyé à votre administrateur afin de valider votre inscription.
+Un email a été envoyé à votre administrateur afin de valider votre inscription. <br>
 
-N’hésitez pas a contacter directement votre administrateur pour tout complément d'information.
+N’hésitez pas a contacter directement votre administrateur pour tout complément d'information. <br>
 
 
 
-Cordialement,
+Cordialement, <br><br>
 
 
 

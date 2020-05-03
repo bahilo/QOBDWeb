@@ -21,6 +21,7 @@ class DeliveryStatusRegistrationType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => DeliveryStatus::class,
+            "allow_extra_fields" => true,
         ]);
     }
 }

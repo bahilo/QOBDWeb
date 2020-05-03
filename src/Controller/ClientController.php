@@ -2,38 +2,56 @@
 
 namespace App\Controller;
 
+use Exception;
 use App\Entity\Client;
 use App\Entity\Address;
-use App\Entity\Comment;
 use App\Entity\Contact;
-use App\Services\Utility;
+use App\Services\Serializer;
+use App\Services\ErrorHandler;
+use App\Services\OrderManager;
 use App\Services\ClientHydrate;
 use App\Services\SecurityManager;
+use App\Repository\BillRepository;
 use App\Form\ClientRegistrationType;
 use App\Repository\ActionRepository;
 use App\Repository\ClientRepository;
 use App\Form\AddressRegistrationType;
 use App\Form\ContactRegistrationType;
 use App\Repository\ContactRepository;
+use Doctrine\DBAL\Driver\PDOException;
 use JMS\Serializer\SerializerInterface;
+use App\Repository\QuoteOrderRepository;
 use JMS\Serializer\SerializationContext;
+use App\Repository\OrderStatusRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Persistence\ObjectManager;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 
 class ClientController extends Controller
 {
+    protected $serializer;
     protected $securityUtility;
     protected $actionRepo;
+    protected $ErrorHandler;
+    protected $orderManager;
 
 
-    public function __construct(SecurityManager $securityUtility, ActionRepository $actionRepo)
+    public function __construct(SecurityManager $securityUtility, 
+                                ActionRepository $actionRepo,
+                                Serializer $serializer,
+                                OrderManager $orderManager,
+                                ErrorHandler $ErrorHandler)
     {
+        $this->serializer = $serializer;
         $this->securityUtility = $securityUtility;
         $this->actionRepo = $actionRepo;
+        $this->ErrorHandler = $ErrorHandler;
+        $this->orderManager = $orderManager;
     }
     
     /**
@@ -47,9 +65,7 @@ class ClientController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        return $this->render('client/index.html.twig', [
-            'client_data_source' => $serializer->serialize($clientHydrate->hydrate($clientRepo->findAll()), 'json', SerializationContext::create()->setGroups(array('class_property'))),
-        ]);
+        return $this->render('client/index.html.twig');
     }
 
     /**
@@ -57,15 +73,29 @@ class ClientController extends Controller
      */
     public function show(Client $client,
                          SerializerInterface $serializer,
+                         QuoteOrderRepository $orderRepo,
+                         OrderStatusRepository $statusRepo,
+                         BillRepository $billRepo,
                          ContactRepository $contactRepo) {
 
         if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
+        $encours = 0;
+        $billAmount = $billRepo->findScalarBillByClient($client);
+        $payedBillAmount = $billRepo->findScalarBillPayedByClient($client);
+
+        if(!empty($billAmount) && !empty($payedBillAmount))
+            $encours = $billAmount - $payedBillAmount;
+        else if(!empty($billAmount) && empty($payedBillAmount))
+            $encours = $billAmount;
+       
         return $this->render('client/show.html.twig', [
             'client' => $client,
-            'contact_data_source' => $serializer->serialize($contactRepo->findBy(['Client' => $client]), 'json', SerializationContext::create()->setGroups(array('class_property'))),
+            'nb_order' => $orderRepo->countByStatus($statusRepo->findOneBy(['Name' => 'STATUS_ORDER'])),
+            'nb_quote' => $orderRepo->countByStatus($statusRepo->findOneBy(['Name' => 'STATUS_QUOTE'])),
+            'encours' => $encours,
         ]);
     }
 
@@ -83,7 +113,7 @@ class ClientController extends Controller
 
         $session->set('client', $client);
           
-        return $this->RedirectToRoute('cart_home');
+        return $this->RedirectToRoute('order_registration');
     }
 
     /**
@@ -108,25 +138,28 @@ class ClientController extends Controller
      
         $form = $this->createForm(ClientRegistrationType::class, $client);
         $form->handleRequest($request);
-        $errors = $validator->validate($client);
-
-        if($form->isSubmitted() && $form->isValid() ){
-
-            $client = $clientHydrate->hydrateClientRelationFromForm($client, $request->request->get('client_registration'));
+        
+        if($form->isSubmitted()){
+            $this->ErrorHandler->registerError($validator->validate($client));
             
-            foreach($client->getContacts()->toArray() as $contact){
-                $manager->persist($contact);
-            }
-                        
-            $manager->persist($client);
-            $manager->flush();
+            if($form->isValid()){
+                $client = $clientHydrate->hydrateClientRelationFromForm($client, $request->request->get('client_registration'));
 
-            return $this->redirectToRoute('client_home');/**/
+                foreach ($client->getContacts()->toArray() as $contact) {
+                    $manager->persist($contact);
+                }
+
+                $manager->persist($client);
+                $manager->flush();
+
+                
+
+                return $this->redirectToRoute('client_show', ['id' => $client->getId()]);/**/
+            }
         }       
 
         return $this->render('Client/registration.html.twig', [
             'formClient' => $form->createView(),
-            'errors' => $errors
         ]);
     }
 
@@ -138,7 +171,8 @@ class ClientController extends Controller
                                        ContactRepository $contactRepo, 
                                        Request $request,
                                        ClientHydrate $clientHydrate,
-                                       ObjectManager $manager) {
+                                       ObjectManager $manager,
+                                       ValidatorInterface $validator) {
 
         if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
             return $this->redirectToRoute('security_deny_access');
@@ -151,15 +185,18 @@ class ClientController extends Controller
      
         $form = $this->createForm(AddressRegistrationType::class, $address);
         $form->handleRequest($request);
+        
+        if($form->isSubmitted()){
+            $this->ErrorHandler->registerError($validator->validate($address));
+            
+           if($form->isValid()){
+                $address = $clientHydrate->hydrateAddressRelationFromForm($address, $request->request->get('client_address_registration'));
 
-        if($form->isSubmitted() && $form->isValid() ){
+                $manager->persist($address);
+                $manager->flush();
 
-            $address = $clientHydrate->hydrateAddressRelationFromForm($address, $request->request->get('client_address_registration'));
-
-            $manager->persist($address);
-            $manager->flush();
-
-            return $this->redirectToRoute('client_home');
+                return $this->redirectToRoute('client_home');
+           }
         }
 
         return $this->render('client/address_registration.html.twig', [
@@ -176,31 +213,41 @@ class ClientController extends Controller
                                        ClientRepository $clientRepo, 
                                        Request $request,
                                        ClientHydrate $clientHydrate,
-                                       ObjectManager $manager) {
+                                       ObjectManager $manager,
+                                       ValidatorInterface $validator) {
 
         if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
             return $this->redirectToRoute('security_deny_access');
         }
-       
-        if(!$contact)
+      
+        if(!$contact){
             $contact = new Contact();
+            if ($idClient)
+                $contact->setClient($clientRepo->find($idClient));
+        }
         
         $contact = $clientHydrate->hydrateContact($contact);
      
         $form = $this->createForm(ContactRegistrationType::class, $contact);
 
+        // dump($form);
+        //     dump($idClient);
+        //     die();
         $form->handleRequest($request);
+        if($form->isSubmitted()){
+            // dump($form);
+            // dump($idClient);
+            // die();
+            $this->ErrorHandler->registerError($validator->validate($contact));
+            if($form->isValid()){
+                $contact = $clientHydrate->hydrateContactRelationFromForm($contact, $request->request->get('contact_registration'));
 
-        if($form->isSubmitted() && $form->isValid()){
-            if($idClient)
-                $contact->setClient($clientRepo->find($idClient));  
+                $manager->persist($contact->getClient());
+                $manager->persist($contact);
+                $manager->flush();
 
-            $contact = $clientHydrate->hydrateContactRelationFromForm($contact, $request->request->get('contact_registration'));
-            
-            $manager->persist($contact);
-            $manager->flush();
-
-            return $this->redirectToRoute('client_home');
+                return $this->redirectToRoute('client_show', ['id' => $contact->getClient()->getId()]);
+           }
         }
 
         return $this->render('client/contact_registration.html.twig', [
@@ -212,15 +259,27 @@ class ClientController extends Controller
     /**
      * @Route("/admin/client/{id}/delete", options={"expose"=true}, name="client_delete")
      */
-    public function delete(Client $client, ObjectManager $manager) {
+    public function delete(Client $client, 
+                          ObjectManager $manager,
+                          QuoteOrderRepository $orderRepo) {
 
         if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
-        $manager->remove($client);
-        $manager->flush();
-
+        try {
+            $clientInfo = $client->getCompanyName();
+            foreach($client->getContacts() as $contact){
+                $manager->remove($client->removeContact($contact));
+            }
+            $manager->remove($client);
+            $manager->flush();
+            $this->ErrorHandler->success("Le client " . $clientInfo . " a été supprimé avec succés!");
+        } catch (ForeignKeyConstraintViolationException $ex) {
+            $orders = $orderRepo->findCustomBy(['client' => $client->getId()], $this->getUser());
+            $this->ErrorHandler->error("Suppression impossible, le client est référencé dans " . count($orders) . " commande(s) !");
+            return $this->redirectToRoute('client_edit', ['id' => $client->getId()]);
+        }
         return $this->RedirectToRoute('client_home');
     }
     
@@ -228,16 +287,109 @@ class ClientController extends Controller
     /**
      * @Route("/admin/client/contact/{id}/delete", options={"expose"=true}, name="client_contact_delete")
      */
-    public function contactDelete(Contact $contact, ObjectManager $manager) {
+    public function contactDelete(Contact $contact, 
+                                  ObjectManager $manager, 
+                                  QuoteOrderRepository $orderRepo) {
 
         if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
             return $this->redirectToRoute('security_deny_access');
         }
+        
+            try{
+                $ContactInfo = $contact->getFirstname() ." ". $contact->getLastName();
+                $manager->remove($contact->getAddress());
+                $manager->remove($contact);
+                $manager->flush();
+                $this->ErrorHandler->success("Le contact ". $ContactInfo ." a été supprimé avec succés!");
+            }catch(ForeignKeyConstraintViolationException $ex){
+                $orders = $orderRepo->findCustomBy(['clientContact' => $contact->getId()], $this->getUser());
+                $this->ErrorHandler->error("Suppression impossible, le contact est référencé dans ". count($orders) ." commande(s) !");
+            return $this->redirectToRoute('client_contact_edit', ['id' => $contact->getId()]);
+        }
 
-        $manager->remove($contact);
-        $manager->flush();
-
-        return $this->RedirectToRoute('client_home');
+        return $this->redirectToRoute('client_show', ['id' => $contact->getClient()->getId()]);
     }
 
+    /*-------------------------------------------------------------------------------------------------
+    ---------------------------------------------[ Json/ Ajax ]---------------------------------------*/
+
+    /**
+     * @Route("/admin/client/donnee", options={"expose"=true}, name="client_home_data")
+     */
+    public function data(
+        ClientRepository $clientRepo,
+        ClientHydrate $clientHydrate
+    ) {
+
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
+            $this->ErrorHandler->error("Vous n'avez pas les droits suffisants pour accéder à cette zone!");
+            return new Response("Zone à accés restreint!");
+        }
+
+        return new Response($this->serializer->serialize([
+            'object_array' =>['data' =>  $clientHydrate->hydrate($clientRepo->findAll())],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]));
+    }
+
+    /**
+     * @Route("/admin/client/{id}/contacts", options={"expose"=true}, name="client_contact_data")
+     */
+    public function contactsData(Client $client,
+                                ClientRepository $clientRepo,
+                                ClientHydrate $clientHydrate
+    ) {
+
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
+            $this->ErrorHandler->error("Vous n'avez pas les droits suffisants pour accéder à cette zone!");
+            return new Response("Zone à accés restreint!");
+        }
+
+        return new Response($this->serializer->serialize([
+            'object_array' =>['data' =>  $client->getContacts()],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]));
+    }
+
+    /**
+     * @Route("/admin/client/{id}/devis", options={"expose"=true}, name="client_quote_data")
+     */
+    public function quoteData(Client $client,
+                                QuoteOrderRepository $orderRepo,
+                                ClientHydrate $clientHydrate
+    ) {
+
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
+            $this->ErrorHandler->error("Vous n'avez pas les droits suffisants pour accéder à cette zone!");
+            return new Response("Zone à accés restreint!");
+        }
+
+        return new Response($this->serializer->serialize([
+            'object_array' =>['data' =>  $this->orderManager->getHydrater()->hydrateQuoteOrder($orderRepo->findCustomBy(['client' => $client->getId(), 'orderStatus' => 'STATUS_QUOTE'], $this->getUser()))],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]));
+    }
+
+    /**
+     * @Route("/admin/client/{id}/commande", options={"expose"=true}, name="client_order_data")
+     */
+    public function orderData(Client $client,
+                                QuoteOrderRepository $orderRepo,
+                                ClientHydrate $clientHydrate
+    ) {
+
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
+            $this->ErrorHandler->error("Vous n'avez pas les droits suffisants pour accéder à cette zone!");
+            return new Response("Zone à accés restreint!");
+        }
+
+        return new Response($this->serializer->serialize([
+            'object_array' =>['data' =>  $this->orderManager->getHydrater()->hydrateQuoteOrder($orderRepo->findCustomBy(['client' => $client->getId(), 'orderStatus' => 'STATUS_ORDER'], $this->getUser()))],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]));
+    }
 }

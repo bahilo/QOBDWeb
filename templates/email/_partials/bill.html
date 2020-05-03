@@ -4,12 +4,12 @@
 
 {% block body %}
 
-<div style="padding-top:20px;">
+    <div style="padding-top:20px;">
 
-    <div style="padding-top:30px;padding-bottom:30px;font-size:14px;">
-        {% include 'email/files/facture.txt' with {'nom_client': contact_name, 'nom_societe': search.get_setting("SOCIETE","SOCIETE_NOM").value, 'num_facture': bill_id } %}
+        <div style="padding-top:30px;padding-bottom:30px;font-size:14px;">
+            {% include 'email/files/facture.txt' with {'nom_client': contact_name, 'nom_societe': search.get_setting("SOCIETE","SOCIETE_NOM").value, 'num_facture': bill_id } %}
+        </div>
     </div>
-</div>
 
 
 <!-- <div style="padding-top:20px;line-height:165%;font-size:14px;">

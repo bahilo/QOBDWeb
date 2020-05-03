@@ -22,6 +22,7 @@ class ItemBrandRegistrationType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => ItemBrand::class,
+            "allow_extra_fields" => true,
         ]);
     }
 }

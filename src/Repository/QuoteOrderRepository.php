@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Bill;
 use App\Entity\Agent;
 use App\Entity\Delivery;
+use App\Entity\OrderStatus;
 use App\Entity\QuoteOrder;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -36,6 +37,13 @@ class QuoteOrderRepository extends ServiceEntityRepository
             $queryBuilder->andWhere('q.id = :id');
             $parameters['id'] = $form['order'];
         }
+
+        if (!empty($form['orderStatus'])) {
+            $queryBuilder->innerJoin('q.Status', 'q_status');
+            $queryBuilder->andWhere('q_status.Name = :status');
+            $parameters['status'] = $form['orderStatus'];
+        }
+
         if (!empty($form['bill'])) {
             $queryBuilder->innerJoin('q.quoteOrderDetails', 'q_ord_dtl');
             $queryBuilder->innerJoin('q_ord_dtl.quantityDeliveries', 'q_ord_dtl_qtdel');
@@ -47,6 +55,12 @@ class QuoteOrderRepository extends ServiceEntityRepository
             $queryBuilder->innerJoin('q.Client', 'q_c');
             $queryBuilder->andWhere('q_c.id = :clientid');
             $parameters['clientid'] = $form['client'];
+        }
+        if (!empty($form['clientContact'])) {
+            $queryBuilder->innerJoin('q.Client', 'q_c');
+            $queryBuilder->innerJoin('q_c.contacts', 'q_c_ct');
+            $queryBuilder->andWhere('q_c_ct.id = :contactid');
+            $parameters['contactid'] = $form['clientContact'];
         }
         if (!empty($form['agent']) && $agent->getIsAdmin()) {
             $queryBuilder->innerJoin('q.Agent', 'q_a');
@@ -95,6 +109,16 @@ class QuoteOrderRepository extends ServiceEntityRepository
             ->setParameter('delivery', $delivery)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    public function countByStatus(OrderStatus $status): ?int
+    {
+        return $this->createQueryBuilder('q')
+            ->andWhere('q.Status = :status')
+            ->setParameter('status', $status)
+            ->select('count(q.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
     /*

@@ -34,9 +34,124 @@ $(function () {
             openTableChildRow(this, { TableApi: api.table.orderBill, reccordRowTable: billDetailRows, rowFormat: billDetailformat });
         });
 
+        $('#btnAddItem').on('click', function(){
+            initTableAddItem();            
+        });
+
+        
+
     });
 
 /*================================[ Functions ]==================================*/
+
+    //-----------------------------------------------------------------------------
+    //-- popup Catalogue
+    //-----------------------------------------------------------------------------    
+    function displayItemTable(){
+        var $root = $('#mdlDefault');
+        var footer = '<button type="button" class="btn btn-secondary _mvalide">Valider</button>';
+
+        $.fn.displayMessage({
+            messageTitle: "Ajout d'un nouveau produit",
+            messageBody: getAddItemTable(),
+            footer: footer,
+            size: 'lg',
+            isCentered: false,
+            errorCode: 601
+        });
+
+        $("#tblNewItemToOrder").myTable({
+            com: 'async',
+            showLoding: false,
+            ajax: {
+                url: Routing.generate('catalogue_home_data'),
+            },
+            columns: getItemColumn(),
+            initComplete: function(){
+                getAddItemOnCartBtnClick();
+                validateQuoteItemsOnClick();
+                resetCartOnClick();
+            }
+        });  
+       
+    }
+
+    //-----------------------------------------------------------------------------
+    //-- Traitement action table ajout article dans le devis/commande
+    //----------------------------------------------------------------------------- 
+    function getAddItemOnCartBtnClick(){
+        $('#mdlDefault').find('.cart_add_js').on('click', function (e) {
+            e.preventDefault();
+            
+            $('.addToOrderMessage', '.addToOrderWrapper').empty();
+            $id = $(this).data('id');
+            $quantity = $('input[data-id="' + $id + '"]').val();
+            if (!isNaN(parseInt($quantity)) && parseInt($quantity) > 0) {
+                $.fn.ajaxLoader({
+                    url: Routing.generate('cart_quote_add', { id: $id, quantity: $quantity }),
+                    type: 'POST',
+                    data: [],
+                    onSuccess: function (result) {
+                        var data = JSON.parse(result);
+                        var rowDat = $('input[data-id="' + $id + '"]').parents('tr').find('td');
+                        $('#mdlDefault').find('.cart_total').text(data.total);
+                        if(data.code == 200)
+                            $('.addToOrderMessage', '.addToOrderWrapper').prepend('<div class="alert alert-success">Votre Article ref. ' + $(rowDat.get(1)).text() +' a été ajouté au panier avec succés!</div>');
+                        else if(data.code == 500)
+                            $('.addToOrderMessage', '.addToOrderWrapper').prepend('<div class="alert alert-danger">Erreur: Une erreur est survenue lors du traitement de votre requête!</div>');
+                        
+                    },
+                });
+            }
+            else {
+                alert('Veuillez renseigner une quantité supérieur à 0!');
+            }
+        });
+    }
+
+    function validateQuoteItemsOnClick(){
+        $('#mdlDefault').find('._mvalide').on('click', function(){
+            window.location = Routing.generate('order_quote_add', { id: $('#order_id').val(), status: $('#btnAddItem').data('status') });
+        });
+    }
+
+    function initTableAddItem(){
+        $.fn.ajaxLoader({
+            url: Routing.generate('cart_reset'),
+            type: 'POST',
+            data: [],
+            onSuccess: function (result) {
+                displayItemTable();                
+            },
+        });
+    }
+
+    function resetCartOnClick(){
+        $('#mdlDefault').find('.btnCartReset').on('click', function (e) {
+            e.preventDefault();
+            $('.addToOrderMessage', '.addToOrderWrapper').empty();
+            resetCart();
+        });
+    }
+
+    function resetCart(){
+        $.fn.ajaxLoader({
+            url: Routing.generate('cart_reset'),
+            type: 'POST',
+            data: [],
+            onSuccess: function (result) {
+                var data = JSON.parse(result);
+
+                if (data.code == 200) {
+                    $('#mdlDefault').find('.cart_total').text(0);
+                    $('.addToOrderMessage', '.addToOrderWrapper').prepend('<div class="alert alert-success">Votre panier a été vidé avec succés!</div>');
+                }
+                else if (data.code == 500)
+                    $('.addToOrderMessage', '.addToOrderWrapper').prepend('<div class="alert alert-danger">Erreur: Une erreur est survenue lors la réinitialisation de votre panier!</div>');
+
+            },
+        });
+    }
 
     //-----------------------------------------------------------------------------
     //-- initialise les variables globales
@@ -234,6 +349,7 @@ $(function () {
                             if ($("#control_can_open_row").length > 0)
                                 openTableChildRow(this, { TableApi: api, reccordRowTable: detailRows, rowFormat: format });
                         });
+                        $.fn.initEventBtnDelete();
                     },
                     rowCallback: function (nRow, aData, index) {
                     }
@@ -309,8 +425,42 @@ $(function () {
         }
     }
 
+    //-----------------------------------------------------------------------------
+    //-- Table des produits pour l'ajout d'un nouvel élément
+    //-----------------------------------------------------------------------------
+    function getAddItemTable() {
+        return '<div class="addToOrderWrapper">'+
+                    '<div class="row">'+
+                        '<div class="col-md-10">'+
+                            '<div class="addToOrderMessage"></div>'+
+                        '</div>'+
+                        '<div class="col-md-2">'+
+                            '<a href="#" class="btn"><i class="fa fa-shopping-cart"></i> <span class="cart_total">0</span></a>'+
+            '<a href="' + Routing.generate('cart_reset') +'" class="btn btn-danger btnCartReset"><i class="fa fa-trash"></i></a>'+
+                        '</div>'+
+                    '</div>' +
+                    
+                    '<table id="tblNewItemToOrder" class="table table-responsive-md table-bordered table-striped table-md"></table>'+
+                '</div>'
+    }
+
 /*================================[ Utlities ]==================================*/
 
+    function getItemColumn() {
+        var col = [];
+
+        col.push({ data: 'id', title: "", visible: false });
+        col.push({ data: 'IsErasable', title: "", visible: false });
+        col.push({ data: 'FullPathPicture', title: "", render: Renders.renderPictur });
+        col.push({ data: 'Ref', title: "N° Serie" });
+        col.push({ data: 'Name', title: "Désignation" });
+        col.push({ data: 'Ean', title: "EAN" });
+        col.push({ data: 'Imei', title: "IMEI" });
+        col.push({ data: 'id', title: "Ajouter", render: renderAddCart });
+
+        return col;
+    }
+    
     function getOrderColumn(){
         var col = [];
 
@@ -331,20 +481,28 @@ $(function () {
         var col = [];
         
         col.push({ data: 'id', visible: false });
+        col.push({ data: 'Item', visible: false });
         col.push({ data: 'ContentComment', visible: false });
         col.push({ data: 'null', title: "", class: "details-control", orderable: false, defaultContent: "" });
+        col.push({ data: 'Item.Ref', title: "Ref." });
         col.push({ data: 'ItemName', title: "Nom" });
         if($('#is_read_sensible','.access_pool').length > 0 && $('#is_read_sensible','.access_pool').val()){
             col.push({ data: 'ItemPurchasePrice', title: "P. achat" });
         }
-        col.push({ data: 'ItemSellPrice', title: "P. vente", render: inputSellPriceForm });
-        col.push({ data: 'Quantity', title: "Quantité", render: inputQuantityForm });
+        col.push({ data: 'ItemSellPrice', title: "P. vente" });
+        //col.push({ data: 'ItemSellPrice', title: "P. vente", render: inputSellPriceForm });
+        col.push({ data: 'Quantity', title: "Quantité" });
+        //col.push({ data: 'Quantity', title: "Quantité", render: inputQuantityForm });
         col.push({ data: 'null', title: "Qt. en attente", render: renderQtEnAttente });
         col.push({ data: 'ItemSellPriceTotal', title: "P. vente total", render: renderDigit });
         col.push({ data: 'ItemSellPriceVATTotal', title: "P. TTC total", render: renderDigit });
         if ($('#is_read_sensible', '.access_pool').length > 0 && $('#is_read_sensible', '.access_pool').val()) {
             col.push({ data: 'ItemROIPercent', title: "Marge (%)", render: renderDigit });
-            col.push({ data: 'ItemROICurrency', title: "Marge", render: renderDigit });
+            //col.push({ data: 'ItemROICurrency', title: "Marge", render: renderDigit });
+        }
+
+        if ($('#is_delete', '.access_pool').val()){
+            col.push({ data: 'id', title: "Supp.", render: renderDelete });
         }
         
         return col;
@@ -397,8 +555,18 @@ $(function () {
             '<textarea name="order_detail_form[tab][items][' + row.id + '][comment]" id="comment' + row.id + '" cols="30" rows="5" class="form-control">' + row.ContentComment+'</textarea>' +
                 '</div>' +
                 '<div class="col-md-6">' +
-                    '<label for="quantity' + row.id + '">Quantité reçu</label>' +
-                    '<input type="number" name="order_detail_form[tab][items][' + row.id + '][quantity_recieved]" id="quantity' + row.id + '" class="form-control">' +
+                    '<div class="form-group">'+
+                        '<label for="quantity_recieved' + row.id + '">Quantité reçu</label>' +
+                        '<input type="number" name="order_detail_form[tab][items][' + row.id + '][quantity_recieved]" id="quantity_recieved' + row.id + '" class="form-control">' +
+                    '</div>' +
+                    '<div class="form-group">'+
+                        '<label for="sell' + row.id + '">Prix d\'achat</label>' +
+                        '<input type="text" value="' + row.ItemSellPrice +'" name="order_detail_form[tab][items][' + row.id + '][sell]" id="sell' + row.id + '" class="form-control">' +
+                    '</div>' +
+                    '<div class="form-group">'+
+                        '<label for="quantity' + row.id + '">Quantité</label>' +
+                        '<input type="text" value="' + row.Quantity +'" name="order_detail_form[tab][items][' + row.id + '][quantity]" id="quantity' + row.id + '" class="form-control"></div>' +
+                    '</div>' +
                 '</div>' +
             '</div>' +
         '</div>'
@@ -507,6 +675,14 @@ $(function () {
         return myDate.getDate() + '/' + (myDate.getMonth()+1) + '/' + myDate.getFullYear();
     }
 
+    function renderDelete(data, type, row) {
+        var route = Routing.generate('order_quote_item_delete', { id: $('#order_id').val(), idItem: row.Item.id, status: $('#order_status').val() });
+        
+        return '<a href="' + route + '" class="btnDelete btn btn-danger" data-toggle="tooltip" data-placement="top" title="Supprimer">' +
+            '<i class="fa fa-trash"></i>' +
+            '</a>';
+    }
+
     function renderQtEnAttente(data, type, row) {
         var qtDel = 0;
         var qt = 0;
@@ -517,6 +693,17 @@ $(function () {
             qtDel = row.QuantityDelivery;
 
         return qt -qtDel;
+    }
+
+    function renderAddCart(data, type, row) {
+        
+        var regex = /\$\((.+?)\)/;
+        var compiledTemplate = _.template($('#template-cart_btn').html(), { interpolate: regex });
+        return compiledTemplate({
+            cart_route: '',
+            cart_default_value: 1,
+            cart_item_id: row.id
+        });
     }
 
 });

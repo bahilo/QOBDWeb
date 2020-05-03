@@ -4,16 +4,20 @@ namespace App\Services;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class Utility{
 
     protected $logger;
+    protected $session;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger, SessionInterface $session)
     {
         $this->logger = $logger;
+        $this->session = $session;
     }
    
     public function getMonthOfYear($date){

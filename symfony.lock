@@ -182,6 +182,9 @@
             "./config/packages/prod/jms_serializer.yaml"
         ]
     },
+    "league/oauth2-client": {
+        "version": "2.4.1"
+    },
     "linq/php-linq": {
         "version": "1.0.0"
     },
@@ -211,6 +214,9 @@
     },
     "phpdocumentor/type-resolver": {
         "version": "0.5.1"
+    },
+    "phpmailer/phpmailer": {
+        "version": "v6.1.5"
     },
     "psr/cache": {
         "version": "1.0.1"

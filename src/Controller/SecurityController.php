@@ -11,6 +11,7 @@ use App\Entity\Privilege;
 use App\Services\Utility;
 use App\Entity\ActionRole;
 use App\Services\Serializer;
+use App\Services\ErrorHandler;
 use App\Services\SecurityManager;
 use App\Form\RoleRegistrationType;
 use App\Repository\RoleRepository;
@@ -27,8 +28,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
@@ -41,19 +40,22 @@ class SecurityController extends Controller
     protected $actionRepo;
     protected $agentRepo;
     protected $eventDispatcher;
+    protected $ErrorHandler;
 
 
     public function __construct(SecurityManager $securityUtility, 
                                 ActionRepository $actionRepo, 
                                 AgentRepository $agentRepo, 
                                 EventDispatcherInterface $eventDispatcher, 
-                                ObjectManager $manager)
+                                ObjectManager $manager,
+                                ErrorHandler $ErrorHandler)
     {
         $this->securityUtility = $securityUtility;
         $this->actionRepo = $actionRepo;
         $this->agentRepo = $agentRepo;
         $this->manager = $manager;
         $this->eventDispatcher = $eventDispatcher;
+        $this->ErrorHandler = $ErrorHandler;
     }
     
     // /**
@@ -211,6 +213,10 @@ class SecurityController extends Controller
         $form->handleRequest($request);
         $errors = $validator->validate($agent);
 
+        foreach ($errors as $error) {
+            $this->ErrorHandler->error($error->getMessage());
+        }
+
         if($form->isSubmitted() && $form->isValid() && count($errors) == 0){
             
             $role = $roleRepo->findOneBy(['Name' => 'ROLE_ANONYMOUS']);
@@ -259,13 +265,11 @@ class SecurityController extends Controller
             return $this->render('agent/show.html.twig', [
                 'formAgent' => $form->createView(),
                 'agent' => $agent,
-                'errors' => $errors
             ]);  
         }
         else{
             return $this->render('security/anonymous_registration.html.twig', [
                 'formAgent' => $form->createView(),
-                'errors' => $errors
             ]);            
         }
     }
@@ -355,15 +359,15 @@ class SecurityController extends Controller
             $this->manager->persist($agent);
             $this->manager->flush();
             $mailer->send(
-                $agent->getEmail(),
+                ['to' => $agent->getEmail()],
                 "Mot de passe oublié",
                 $this->renderView("email/_partials/password_forgotten.html", ["url" => $this->generateUrl("security_form_password_forgotten", ["token" => $token], UrlGeneratorInterface::ABSOLUTE_URL)])
             );
-            $this->addFlash("success", "Un mail vous a été envoyé avec un lien, clicker sur le lien pour confirmer le reset de mot de passe!");
+            $this->ErrorHandler->success("Un mail vous a été envoyé avec un lien, clicker sur le lien pour confirmer le reset de mot de passe!");
             return $this->redirectToRoute("security_login");
         }
 
-        $this->addFlash("danger", "Votre nom d'utilisateur n'existe pas dans notre base de données!");
+        $this->ErrorHandler->error("Votre nom d'utilisateur n'existe pas dans notre base de données!");
         return $this->redirectToRoute("security_login");
     }
 
@@ -384,15 +388,15 @@ class SecurityController extends Controller
                 $agent->setToken(null);
                 $this->manager->persist($agent);
                 $this->manager->flush();
-                $this->addFlash("success", "Votre mot de passe a été regénéré avec succés!");
+                $this->ErrorHandler->success("Votre mot de passe a été regénéré avec succés!");
                 return $this->redirectToRoute("security_login");
             }
             else{
-                $this->addFlash("danger", "Votre mot de passe doit faire minimun 6 caractères!");
+                $this->ErrorHandler->error("Votre mot de passe doit faire minimun 6 caractères!");
                 return $this->redirectToRoute("security_form_password_forgotten", ["token" => $token]);
             }
         }
-        $this->addFlash("danger", "Mot de passe non reconnu!");
+        $this->ErrorHandler->error("Mot de passe non reconnu!");
         return $this->redirectToRoute("security_login");
     }
 

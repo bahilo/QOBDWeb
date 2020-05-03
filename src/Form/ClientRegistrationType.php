@@ -24,13 +24,13 @@ class ClientRegistrationType extends AbstractType
             ->add('MaxCredit')
             ->add('Denomination')
             ->add('City')
-            ->add('IsProspect')
+            //->add('IsProspect')
             ->add('Street')
             ->add('ZipCode')
             ->add('Country')
             ->add('ClientComment')
             ->add('AddressComment')
-            ->add('AddressName')
+            //->add('AddressName')
         ;
     }
 
@@ -38,6 +38,7 @@ class ClientRegistrationType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Client::class,
+            "allow_extra_fields" => true,
         ]);
     }
 }

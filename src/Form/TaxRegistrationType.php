@@ -25,6 +25,7 @@ class TaxRegistrationType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Tax::class,
+            "allow_extra_fields" => true,
         ]);
     }
 }

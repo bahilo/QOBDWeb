@@ -22,6 +22,7 @@ class RoleRegistrationType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Role::class,
+            "allow_extra_fields" => true,
         ]);
     }
 }

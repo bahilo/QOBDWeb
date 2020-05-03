@@ -14,6 +14,7 @@ use App\Entity\ItemGroupe;
 use App\Entity\OrderStatus;
 use App\Services\Serializer;
 use App\Entity\DeliveryStatus;
+use App\Services\ErrorHandler;
 use Hoa\Event\Test\Unit\Source;
 use App\Services\SettingManager;
 use App\Form\TaxRegistrationType;
@@ -48,17 +49,20 @@ class SettingController extends Controller
     protected $actionRepo;
     protected $settingManager;
     protected $validator;
+    protected $ErrorHandler;
 
 
     public function __construct(SecurityManager $securityUtility, 
                                 ActionRepository $actionRepo,
                                 SettingManager $settingManager,
-                                ValidatorInterface $validator)
+                                ValidatorInterface $validator,
+                                ErrorHandler $ErrorHandler)
     {
         $this->securityUtility = $securityUtility;
         $this->actionRepo = $actionRepo;
         $this->settingManager = $settingManager;
         $this->validator = $validator;
+        $this->ErrorHandler = $ErrorHandler;
     }
     
     /*______________________________________________________________________________________________________________________ 
@@ -228,9 +232,8 @@ class SettingController extends Controller
 
     /**
      * @Route("/admin/configuration/email", options={"expose"=true}, name="setting_email")
-     * @Route("/admin/configuration/email/erreur/{message}/{statut}", options={"expose"=true}, name="setting_email_report")
      */
-    public function showEmail(string $message = null, $statut = null){
+    public function showEmail(){
         
         return $this->render('email/index.html.twig', [
             'quote' => file_get_contents($this->getParameter('file.setting.email') . '/' . 'devis.txt'),
@@ -239,21 +242,15 @@ class SettingController extends Controller
             'seconde_reminder' => file_get_contents($this->getParameter('file.setting.email') . '/' . 'relance_paiement_2.txt'),
             'validate' => file_get_contents($this->getParameter('file.setting.email') . '/' . 'validation_commande.txt'),
             'inscription' => file_get_contents($this->getParameter('file.setting.email') . '/' . 'inscription.txt'),
-            'message' => $message,
-            'status' => $statut
         ]);
     }
 
     /**
      * @Route("/admin/configuration/produit/import", options={"expose"=true}, name="setting_catalogue_import")
-     * @Route("/admin/configuration/produit/import/erreur/{message}/{statut}", options={"expose"=true}, name="setting_catalogue_import_report")
      */
-    public function import(string $message = null, $statut = null){
+    public function import(){
         
-        return $this->render('setting/import_registration.html.twig', [
-            'message' => $message,
-            'status' => $statut
-        ]);
+        return $this->render('setting/import_registration.html.twig');
     }
 
     /*______________________________________________________________________________________________________________________ 
@@ -482,7 +479,8 @@ class SettingController extends Controller
      */
     public function groupRegistration(ItemGroupe $itemGroupe = null, 
                                       Request $request, 
-                                      ObjectManager $manager) {
+                                      ObjectManager $manager,
+                                      ValidatorInterface $validator) {
 
         if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
@@ -494,7 +492,7 @@ class SettingController extends Controller
         $form = $this->createForm(ItemGroupeRegistrationType::class, $itemGroupe);
 
         $form->handleRequest($request);
-        $errors = $this->validator->validate($itemGroupe);
+        $this->ErrorHandler->registerError($validator->validate($itemGroupe));
 
         if ($form->isSubmitted() && $form->isValid()) {
 
@@ -508,7 +506,6 @@ class SettingController extends Controller
 
         return $this->render('setting/group_registration.html.twig', [
             'formGroup' => $form->createView(),
-            'errors' => $errors
         ]);
     }
 
@@ -519,7 +516,8 @@ class SettingController extends Controller
      */
     public function providerRegistration(Provider $provider = null, 
                                          Request $request, 
-                                         ObjectManager $manager) {
+                                         ObjectManager $manager,
+                                         ValidatorInterface $validator) {
 
         if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
@@ -531,7 +529,7 @@ class SettingController extends Controller
         $form = $this->createForm(ProviderRegistrationType::class, $provider);
 
         $form->handleRequest($request);
-        $errors = $this->validator->validate($provider);
+        $this->ErrorHandler->registerError($validator->validate($provider));
 
         if ($form->isSubmitted() && $form->isValid()) {
 
@@ -545,7 +543,6 @@ class SettingController extends Controller
 
         return $this->render('setting/provider_registration.html.twig', [
             'formProvider' => $form->createView(),
-            'errors' => $errors
         ]);
     }
 
@@ -556,7 +553,8 @@ class SettingController extends Controller
      */
     public function orderStatusRegistration(OrderStatus $status = null, 
                                             Request $request, 
-                                            ObjectManager $manager) {
+                                            ObjectManager $manager,
+                                            ValidatorInterface $validator) {
 
         if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
@@ -568,7 +566,7 @@ class SettingController extends Controller
         $form = $this->createForm(OrderStatusRegistrationType::class, $status);
 
         $form->handleRequest($request);
-        $errors = $this->validator->validate($status);
+        $this->ErrorHandler->registerError($validator->validate($status));
 
         if ($form->isSubmitted() && $form->isValid()) {
 
@@ -580,7 +578,6 @@ class SettingController extends Controller
 
         return $this->render('setting/status_registration.html.twig', [
             'formStatus' => $form->createView(),
-            'errors' => $errors
         ]);
     }
 
@@ -610,10 +607,12 @@ class SettingController extends Controller
         if (!empty($form['brand']) && $error['statut'] == 0)
             $error = $this->settingManager->importCatalogueBrand($form['brand'], $this->getParameter('file.setting.catalogue.download_dir'));
 
-        return $this->redirectToRoute('setting_catalogue_import_report', [
-            'message' => ($error['statut'] == 0) ?  'Vos éléments ont été importés avec succès!' : $error['message'],
-            'statut' => ($error['statut'] == 0) ? 200 : $error['statut']
-        ]);
+        if($error['statut'] == 0)
+            $this->ErrorHandler->success('Vos éléments ont été importés avec succès!');
+        else
+        $this->ErrorHandler->error($error['message']);
+
+        return $this->redirectToRoute('setting_catalogue_import');
     }
 
     /**
@@ -624,11 +623,6 @@ class SettingController extends Controller
         if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
-
-        $error = [
-            'statut' => 0,
-            'message' => ''
-        ];
 
         $form = $request->request->get('emails');
 
@@ -641,16 +635,10 @@ class SettingController extends Controller
             file_put_contents($this->getParameter('file.setting.email') . '/' . 'inscription.txt', trim($form['inscription'], ' \t'));
         }
         else{
-            $error =  [
-                'message' => 'Une erreur s\'est produite lors de l\'enregistrement de vos modèles d\'email!',
-                'statut' => 500
-            ];
+             $this->errorHandler->error("Une erreur s'est produite lors de l'enregistrement de vos modèles d\'email!");
         }
         
-        return $this->redirectToRoute('setting_email_report', [
-            'message' => ($error['statut'] == 0) ?  'Vos modèles d\'email ont été sauvegardés avec succès!' : $error['message'],
-            'statut' => ($error['statut'] == 0) ? 200 : $error['statut']
-        ]);
+        return $this->redirectToRoute('setting_email');
     }
 
     /*______________________________________________________________________________________________________________________ 
@@ -778,7 +766,8 @@ class SettingController extends Controller
             $manager->flush();
             return $this->RedirectToRoute('order_home');
         }
-        return $this->RedirectToRoute('order_home', ['message' => 'Le status ne peut pas être supprimé. Il est en cours d\'utilisation pour au moins une commande!']);
+        $this->ErrorHandler->error("Le status ne peut pas être supprimé. Il est en cours d'utilisation pour au moins une commande!");
+        return $this->RedirectToRoute('order_home');
     }
 
 }

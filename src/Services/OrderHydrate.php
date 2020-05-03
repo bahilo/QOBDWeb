@@ -235,44 +235,46 @@ class OrderHydrate{
             $this->manager->persist($orderDetail);
         }
 
-        foreach ($form['tab']['bill'] as $key => $val) {
-            $bill = $this->billRepo->find($key);
-            if(!empty($bill)){
+        if(!empty($form['tab']['bill'])){
+            foreach ($form['tab']['bill'] as $key => $val) {
+                $bill = $this->billRepo->find($key);
+                if (!empty($bill)) {
 
-                if(!empty($val['pay_mode']))
-                    $bill->setPayMode($val['pay_mode']);
-                if (!empty($val['payed_amount']))
-                    $bill->setPayReceived($val['payed_amount']);
-                if (!empty($val['pay_date']))
-                    $bill->setPayedAt(new \Datetime($val['pay_date']));
-                
-                if (!empty($val['comment_private'])){
+                    if (!empty($val['pay_mode']))
+                        $bill->setPayMode($val['pay_mode']);
+                    if (!empty($val['payed_amount']))
+                        $bill->setPayReceived($val['payed_amount']);
+                    if (!empty($val['pay_date']))
+                        $bill->setPayedAt(new \Datetime($val['pay_date']));
 
-                    $privCom = $bill->getPrivateComment();
-                    if(empty($privCom))
-                        $privCom = new Comment();
+                    if (!empty($val['comment_private'])) {
 
-                    $privCom->setCreateAt(new \DateTime());
-                    $privCom->setContent($val['comment_private']);
-                    $bill->setPrivateComment($privCom);
+                        $privCom = $bill->getPrivateComment();
+                        if (empty($privCom))
+                            $privCom = new Comment();
 
-                    $this->manager->persist($privCom);
+                        $privCom->setCreateAt(new \DateTime());
+                        $privCom->setContent($val['comment_private']);
+                        $bill->setPrivateComment($privCom);
+
+                        $this->manager->persist($privCom);
+                    }
+
+                    if (!empty($val['comment_public'])) {
+
+                        $publicCom = $bill->getPublicComment();
+                        if (empty($publicCom))
+                            $publicCom = new Comment();
+
+                        $publicCom->setCreateAt(new \DateTime());
+                        $publicCom->setContent($val['comment_public']);
+                        $bill->setPublicComment($publicCom);
+
+                        $this->manager->persist($publicCom);
+                    }
+
+                    $this->manager->persist($bill);
                 }
-
-                if (!empty($val['comment_public'])) {
-
-                    $publicCom = $bill->getPublicComment();
-                    if (empty($publicCom))
-                        $publicCom = new Comment();
-
-                    $publicCom->setCreateAt(new \DateTime());
-                    $publicCom->setContent($val['comment_public']);
-                    $bill->setPublicComment($publicCom);
-
-                    $this->manager->persist($publicCom);
-                }
-
-                $this->manager->persist($bill);
             }
         }
 

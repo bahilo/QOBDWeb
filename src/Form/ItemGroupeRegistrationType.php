@@ -21,6 +21,7 @@ class ItemGroupeRegistrationType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => ItemGroupe::class,
+            "allow_extra_fields" => true,
         ]);
     }
 }

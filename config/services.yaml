@@ -5,9 +5,9 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     app.name: '/QOBDWeb'
-    app.name.base_dir: '%app.name%/public'
-    resource.download_dir: '%app.name.base_dir%/ressources/download'
-    file.download_dir: '/ressources/download'
+    app.name.base_dir: '%app.name%'
+    resource.download_dir: '/ressources/download'
+    file.download_dir: '%resource.download_dir%'
     file.agent.download_dir: '%file.download_dir%/agent/avatars'
     file.setting.catalogue.download_dir: '%file.download_dir%/setting/catalogue'
     file.setting.file.download_dir: '%file.download_dir%/setting/files'
@@ -21,6 +21,8 @@ parameters:
     file.type.download_refund: 2
     session_max_idle_time: 3800
     secret: '%env(APP_SECRET)%'
+    email.url: '%env(MAILER_URL)%'
+    email.swiftmailer: true
 
 services:
     # default configuration for services in *this* file
@@ -35,7 +37,9 @@ services:
             $avatar_dir: '%file.download_dir%/agent/avatars'
             $catalogue_dir: '%file.download_dir%/setting/catalogue'
             $maxIdleTime: '%session_max_idle_time%'
-            $root_dir: '%app.name.base_dir%'
+            $root_dir: '%app.name.base_dir%/public'
+            $email_swiftmailer: '%email.swiftmailer%'
+            $email_url: '%email.url%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name

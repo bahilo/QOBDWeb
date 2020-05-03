@@ -21,6 +21,7 @@ class OrderStatusRegistrationType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => OrderStatus::class,
+            "allow_extra_fields" => true,
         ]);
     }
 }

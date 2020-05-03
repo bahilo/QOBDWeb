@@ -31,7 +31,8 @@ class QuoteOrderDetail
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Item", inversedBy="quoteOrderDetails")
-     * @Groups({"class_relation"})
+     * @Groups({"class_relation", "class_property"})
+     * @SerializedName("Item") 
      */
     private $Item;
 

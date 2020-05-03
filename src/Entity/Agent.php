@@ -82,6 +82,8 @@ class Agent implements UserInterface
     private $Password;
 
     /**
+     * @Assert\NotBlank(message = "Ce champs ne peux pas être vide")
+     * @Assert\Length(min="6", minMessage="Votre mot de passe doit faire un minimun de {{ limit }} caractères")
      * @Assert\EqualTo(propertyPath="PlainTextPassword", message="Vous n'avez pas entré le même mot de passe")
      */
     private $Confirme_password;

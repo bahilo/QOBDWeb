@@ -50,14 +50,12 @@ class HomeController extends Controller
         if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_DASHBORD']))) {
             return $this->redirectToRoute('order');//('security_deny_access');
         }
-
-        //$mailer->send('joel.dago@yahoo.fr', 'test inscription', $this->renderView('email/registration.html.twig'));
-
+        
         return $this->render('home/index.html.twig', [
-            'nb_quote' => count($this->orderRepo->findBy(['Status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE'])])),
-            'nb_order' => count($this->orderRepo->findBy(['Status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_ORDER'])])),
-            'nb_refund' => count($this->orderRepo->findBy(['Status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUND'])])),
-            'nb_validation' => count($this->orderRepo->findBy(['Status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_VALID'])])),
+            'nb_quote' => $this->orderRepo->countByStatus($this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE'])),
+            'nb_order' => $this->orderRepo->countByStatus($this->statusRepo->findOneBy(['Name' => 'STATUS_ORDER'])),
+            'nb_refund' => $this->orderRepo->countByStatus($this->statusRepo->findOneBy(['Name' => 'STATUS_REFUND'])),
+            'nb_validation' => $this->orderRepo->countByStatus($this->statusRepo->findOneBy(['Name' => 'STATUS_VALID'])),
         ]);
     }
 }

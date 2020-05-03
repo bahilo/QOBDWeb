@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Bill;
+use App\Entity\Client;
 use App\Entity\Delivery;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -53,6 +54,30 @@ class BillRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function findScalarBillByClient(Client $client): ?int
+    {
+        return $this->createQueryBuilder('q')
+            ->innerJoin('q.Client', 'q_c')
+            ->andWhere('q_c.id = :idClient')
+            ->setParameter('idClient', $client->getId())
+            ->groupBy('q_c.id')
+            ->select('SUM(q.Pay)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function findScalarBillPayedByClient(Client $client): ?int
+    {
+        return $this->createQueryBuilder('q')
+            ->innerJoin('q.Client', 'q_c')
+            ->andWhere('q_c.id = :idClient')
+            ->setParameter('idClient', $client->getId())
+            ->groupBy('q_c.id')
+            ->select('SUM(q.PayReceived)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 
     public function findOneByDelivery(Delivery $delivery): ?Bill
     {

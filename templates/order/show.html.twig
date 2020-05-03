@@ -30,35 +30,35 @@
 <div class="row">
     <div class="col-md-3">
         <div class="c-callout">
-            <strong class="h4">{{ status.displayname }}</strong>
+            <strong class="h4">{{ order.status.displayname }}</strong>
         </div>
     </div>
     <div class="col-md-9">
         <div class="c-callout c-callout-info" >
             <div class="">
-                {{ status.displayname }} n°#{{ order.id }} du {{ order.createdat | date("Y/m/d") }} en cours pour la société <a href="#">{{ order.client.companyname }}</a><br/> géré par 
+                {{ order.status.displayname }} n°#{{ order.id }} du {{ order.createdat | date("Y/m/d") }} en cours pour la société <a href="{{ path("client_show", {id: order.client.id}) }}">{{ order.client.companyname }}</a><br/> géré par 
                 {{ order.agent.Firstname }} {{ order.agent.LastName }}
             </div>
             {% if status_preorder is defined %}
             <div class="btn-group">
-                <a href="{{ path(target.link, target.param[0]) }}" class="btn btn-success">Convertir en commande</a>
-                <a href="{{ path(target.link, target.param[1]) }}" class="btn btn-danger">Convertir en avoir</a>
+                <a href="{{ path(target.link, target.param[0]) }}" class="btn btn-success btnValidation">Convertir en commande</a>
+                <a href="{{ path(target.link, target.param[1]) }}" class="btn btn-danger btnValidation">Convertir en avoir</a>
             </div>
             {% endif %}
            
             {% if status_order is defined %}
             <div class="btn-group">
-               <a href="{{ path(target.link, target.param[0]) }}" class="btn btn-success">Convertir en commande</a>
-                <a href="{{ path(target.link, target.param[1]) }}" class="btn btn-warning">Re-valider avec le client</a>
+               <a href="{{ path(target.link, target.param[0]) }}" class="btn btn-success btnValidation">Convertir en commande</a>
+                <a href="{{ path(target.link, target.param[1]) }}" class="btn btn-warning btnValidation">Re-valider avec le client</a>
             </div>            
             {% elseif status_refund is defined %}
-            <a href="{{ path(target.link, target.param[0]) }}" class="btn btn-success">Convertir en avoir</a>
+            <a href="{{ path(target.link, target.param[0]) }}" class="btn btn-success btnValidation">Convertir en avoir</a>
             {% endif %}
 
             {% if order.status.name == "STATUS_ORDER" %}
             <div class="btn-group">
-                <a href="{{ path("order_validation", { id: order.id, idStatus: order_status_quote.id }) }}" class="btn btn-success">Convertir en devis</a>
-                <a href="{{ path("order_validation", { id: order.id, idStatus: order_status_refund.id }) }}" class="btn btn-danger">Convertir en avoir</a>
+                <a href="{{ path("order_validation", { id: order.id, idStatus: order_status_quote.id }) }}" class="btn btn-success btnValidation">Convertir en devis</a>
+                <a href="{{ path("order_validation", { id: order.id, idStatus: order_status_refund.id }) }}" class="btn btn-danger btnValidation">Convertir en avoir</a>
             </div>
             {% endif %}
 
@@ -88,7 +88,17 @@
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-header">
-                            <i class="fa fa-align-justify"></i> Liste des produits et tarifs</div>
+                            <div class="row">
+                                <div class="col-md-11">
+                                    <i class="fa fa-align-justify"></i> Liste des produits et tarifs
+                                </div>
+                                {% if order.status.name == "STATUS_ORDER" or order.status.name == "STATUS_QUOTE" %}
+                                <div class="col-md-1">
+                                    <a class="btn btn-primary" id="btnAddItem" href="#" data-status="{{ order.status.name }}"><i class="fa fa-plus"></i></a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
                         <div class="card-body">
                             <table id="order_detail_table_js" class="table table-responsive-md table-bordered table-striped table-md">
                             </table>
@@ -194,7 +204,7 @@
                             <i class="fa fa-align-justify"></i> TVA
                         </div>
                         <div class="card-body">
-                            <select name="order_detail_form[tax]" class="form-control">
+                            <select name="order_detail_form[tax]" class="form-control" >
                                 <option value="">Veuillez selectionner une TVA</option>
                                 {% for tax in taxes %}
                                     {% if order.tax is not null and tax.id == order.tax.id %}
@@ -462,7 +472,7 @@
         {% endif %}
 
         {# Email devis #}
-        {% if status.name == "STATUS_QUOTE" %}
+        {% if order.status.name == "STATUS_QUOTE" %}
         <form action="{{ path("order_email_quote",{id: order.id }) }}" method="post">
             <div class="row">
                 <div class="col-md-12">
@@ -495,7 +505,7 @@
         {% endif %}
 
         {# Email Commande #}
-        {% if (status.name == "STATUS_ORDER" or status.name == "STATUS_REFUND") and bills is defined and bills|length > 0 %}
+        {% if (order.status.name == "STATUS_ORDER" or order.status.name == "STATUS_REFUND") and bills is defined and bills|length > 0 %}
         <form action="{{ path("order_email_bill",{id: order.id }) }}" method="post">
             <div class="row">
                 <div class="col-md-12">
@@ -537,7 +547,7 @@
         {% endif %}
 
         {# Cloture commande #}
-        {% if (status.name == "STATUS_ORDER" or status.name == "STATUS_ORDER")  and bill_data_source != '[]' %}
+        {% if (order.status.name == "STATUS_ORDER" or order.status.name == "STATUS_ORDER")  and bill_data_source != '[]' %}
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
@@ -556,6 +566,8 @@
     </div>
     
 <input type="hidden" id="order_detail_data_source" value="{{ order_detail_data_source }}">
+<input type="hidden" id="order_id" value="{{ order.id }}">
+<input type="hidden" id="order_status" value="{{ order.status.name }}">
 
 {% if status_refund is defined %}
     <input type="hidden" id="status_refund" value="{{ status_refund.id }}">

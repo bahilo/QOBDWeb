@@ -22,6 +22,7 @@ class ProviderRegistrationType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Provider::class,
+            "allow_extra_fields" => true,
         ]);
     }
 }

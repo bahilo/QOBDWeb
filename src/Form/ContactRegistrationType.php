@@ -18,15 +18,15 @@ class ContactRegistrationType extends AbstractType
             ->add('Email')
             ->add('Phone')
             ->add('Mobile')
-            ->add('Fax')
-            ->add('IsPrincipal')
+            //->add('Fax')
+            //->add('IsPrincipal')
             ->add('ContentComment')
             ->add('City')
             ->add('Street')
             ->add('ZipCode')
             ->add('Country')
             ->add('AddressComment')
-            ->add('AddressName')
+            //->add('AddressName')
         ;
     }
     
@@ -34,6 +34,7 @@ class ContactRegistrationType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Contact::class,
+            "allow_extra_fields" => true,
         ]);
     }
 }

@@ -78,7 +78,7 @@ var RenderMethod = function(args){
         
         return '<a href="' + Routing.generate('client_select', { id: row.id })
             + '" class="bx_select" data-toggle="tooltip" data-placement="top" title="Sélectionner la société ' + row.CompanyName +' pour un devis"><i data-id="' + row['id'] 
-        +'" class="fa fa-check"></i></a>';
+            +'" class="fa fa-handshake"></i></a>';
     }
 
     this.construct(args);

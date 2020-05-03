@@ -9,6 +9,7 @@ use App\Services\Mailer;
 use App\Entity\QuoteOrder;
 use App\Entity\OrderStatus;
 use App\Services\Serializer;
+use App\Services\ErrorHandler;
 use App\Services\OrderManager;
 use App\Services\PdfWebService;
 use App\Entity\QuantityDelivery;
@@ -52,6 +53,7 @@ class OrderController extends Controller
     protected $tvaRepo;
     protected $quantityDelRepo;
     protected $eventDispatcher;
+    protected $ErrorHandler;
 
 
     public function __construct(Serializer $serializer, 
@@ -65,7 +67,8 @@ class OrderController extends Controller
                                 DeliveryRepository $deliveryRepo,
                                 BillRepository $billRepo,
                                 EventDispatcherInterface $eventDispatcher,
-                                TaxRepository $tvaRepo)
+                                TaxRepository $tvaRepo,
+                                ErrorHandler $ErrorHandler)
     {
         $this->orderDetailRepo = $orderDetailRepo;
         $this->orderRepo = $orderRepo;
@@ -79,6 +82,7 @@ class OrderController extends Controller
         $this->billRepo = $billRepo;
         $this->tvaRepo = $tvaRepo;
         $this->quantityDelRepo = $quantityDelRepo;
+        $this->ErrorHandler = $ErrorHandler;
     }
 
     /*______________________________________________________________________________________________________________________ 
@@ -100,9 +104,8 @@ class OrderController extends Controller
 
     /**
      * @Route("/admin/commande", options={"expose"=true}, name="order_home")
-     * @Route("/admin/commande/error/{message}", options={"expose"=true}, name="order_home_error")
      */
-    public function home($message = null) {
+    public function home() {
 
         if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
             return $this->redirectToRoute('security_deny_access');
@@ -112,7 +115,6 @@ class OrderController extends Controller
             'page_title' => "Commandes",
             'target' => 'order_data_source',
             'source' => $this->serializer->serialize(['object_array' => $this->orderManager->getHydrater()->hydrateQuoteOrder($this->orderRepo->findBy(['Status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_ORDER'])])), 'format' => 'json', 'group' => 'class_property']),
-            'message' => $message,
         ]);
     }
 
@@ -262,13 +264,10 @@ class OrderController extends Controller
 
     /**
      * @Route("/admin/commande/detail/{id}", options={"expose"=true}, requirements={"id"="\d+"}, name="order_show")
-     * @Route("/admin/commande/detail/{id}/erreur/{message}/{statut}", requirements={"id"="\d+"}, options={"expose"=true}, name="order_show_report")
      */
     public function show(
         QuoteOrder $order,
-        CurrencyRepository $currRepo,
-        string $message = null,
-        $statut = null) {
+        CurrencyRepository $currRepo) {
 
         if (!$this->securityUtility->checkHasUpdate($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
             return $this->redirectToRoute('security_deny_access');
@@ -287,7 +286,6 @@ class OrderController extends Controller
             'order_detail_bill_data_source' => $this->serializer->serialize(['object_array' => $roderDeliveries, 'format' => 'json', 'group' => 'class_property']),
             'bill_data_source' => $this->serializer->serialize(['object_array' => $bills, 'format' => 'json', 'group' => 'class_property']),
             'delivery_data_source' => $this->serializer->serialize(['object_array' => $CreateDeliveries, 'format' => 'json', 'group' => 'class_property']),
-            'status' => $order->getStatus(),
             'order' => $order,
             'currencies' => $currRepo->findAll(),
             'taxes' => $this->tvaRepo->findAll(),
@@ -299,20 +297,15 @@ class OrderController extends Controller
             'info' => $infos,
             'can_open_row' => true,
             'email_content' => file_get_contents($this->getParameter('file.setting.email') . '/' . 'facture.txt'),
-            'code_message' => $message,
-            'code_status' => $statut
         ]);
     }
 
     /**
      * @Route("/admin/commande/devis/detail/{id}", options={"expose"=true}, name="order_show_quote", requirements={"id"="\d+"})
-     * @Route("/admin/commande/devis/detail/erreur/{message}/{id}/{statut}", options={"expose"=true}, name="order_show_quote_report")
      */
-    public function showQuote(int $id, 
-                              string $message = null, 
+    public function showQuote(int $id,  
                               CurrencyRepository $currRepo,
-                              TaxRepository $tvaRepo,
-                              $statut = null) {
+                              TaxRepository $tvaRepo) {
 
         if (!$this->securityUtility->checkHasUpdate($this->actionRepo->findOneBy(['Name' => 'ACTION_QUOTE']))) {
             return $this->redirectToRoute('security_deny_access');
@@ -327,23 +320,17 @@ class OrderController extends Controller
             'order' => $order,
             'currencies' => $currRepo->findAll(),
             'taxes' => $tvaRepo->findAll(),
-            'status' => $order->getStatus(),
             'info' => $this->orderManager->getCommandeInfo($orderDetails, $order),
             'email_content' => file_get_contents($this->getParameter('file.setting.email') . '/' . 'devis.txt'),
-            'code_message' => $message,
-            'code_status' => $statut
         ]);
     }
 
     /**
      * @Route("/admin/commande/precommande/detail/{id}", options={"expose"=true}, name="order_show_preorder", requirements={"id"="\d+"})
-     * @Route("/admin/commande/precommande/detail/erreur/{message}/{id}/{statut}", options={"expose"=true}, name="order_show_preorder_report")
      */
     public function showPreOrder(int $id, 
-                                string $message = null,
                                 CurrencyRepository $currRepo,
-                                TaxRepository $tvaRepo, 
-                                $statut = null) {
+                                TaxRepository $tvaRepo) {
 
         if (!$this->securityUtility->checkHasUpdate($this->actionRepo->findOneBy(['Name' => 'ACTION_PREORDER']))) {
             return $this->redirectToRoute('security_deny_access');
@@ -359,22 +346,16 @@ class OrderController extends Controller
             'order' => $order,
             'currencies' => $currRepo->findAll(),
             'taxes' => $tvaRepo->findAll(),
-            'status' => $order->getStatus(),
             'info' => $this->orderManager->getCommandeInfo($orderDetails, $order),
-            'code_message' => $message,
-            'code_status' => $statut
         ]);
     }
 
     /**
      * @Route("/admin/commande/preavoir/detail/{id}", options={"expose"=true}, name="order_show_prerefund", requirements={"id"="\d+"})
-     * @Route("/admin/commande/preavoir/detail/erreur/{message}/{id}/{statut}", options={"expose"=true}, name="order_show_prerefund_report")
-     */
+    */
     public function showPreRefund(int $id, 
-                                  string $message = null,
                                   CurrencyRepository $currRepo,
-                                  TaxRepository $tvaRepo,
-                                  $statut = null) {
+                                  TaxRepository $tvaRepo) {
 
         if (!$this->securityUtility->checkHasUpdate($this->actionRepo->findOneBy(['Name' => 'ACTION_REFUND']))) {
             return $this->redirectToRoute('security_deny_access');
@@ -388,10 +369,7 @@ class OrderController extends Controller
             'order' => $order,
             'currencies' => $currRepo->findAll(),
             'taxes' => $tvaRepo->findAll(),
-            'status' => $order->getStatus(),
             'info' => $this->orderManager->getCommandeInfo($orderDetails, $order),
-            'code_message' => $message,
-            'code_status' => $statut
         ]);
     }
 
@@ -405,7 +383,6 @@ class OrderController extends Controller
         int $idStatus,
         QuoteOrder $order,
         SettingManager $settingManager,
-        Mailer $mailer,
         ObjectManager $manager) {
 
         if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
@@ -439,7 +416,7 @@ class OrderController extends Controller
 
         }
         else{
-            $this->orderManager->loggCommandeCritical($order, "la commande n'a pas de statut!");
+            $this->ErrorHandler->error("la commande N°". $order->getId() ." n'a pas de statut!");
         }
 
         return $this->getRouteFromStatus($status, $order);
@@ -513,7 +490,51 @@ class OrderController extends Controller
 
             return $this->RedirectToRoute('order_show_quote', ['id' => $order->getId()]);
         }
-        return $this->RedirectToRoute('cart_home_error', ['message' => "Veuillez renseigner un client !"]);
+        $this->ErrorHandler->error("Veuillez renseigner un client !");
+        return $this->RedirectToRoute('cart_home');
+    }
+
+    /**
+     * @Route("/admin/commande/devis/ajout/{id}/{status}", options={"expose"=true}, name="order_quote_add")
+     */
+    public function addItemToQuote(QuoteOrder $order, string $status,
+                                   ItemRepository $itemRepo, 
+                                   SessionInterface $session,
+                                   QuoteOrderDetailRepository $orderDetailRepo,
+                                   ObjectManager $manager){
+
+        $panier = $session->get('panier', []);
+        if(count($panier) > 0){
+            
+            foreach ($panier as $id => $quantity) {
+                $item = $itemRepo->find($id);
+                $orderDetail = $orderDetailRepo->findOneBy(['QuoteOrder' => $order, 'Item' => $item]);
+                if(empty($orderDetail)){
+                    $orderDetail = new QuoteOrderDetail();
+                    $item->setIsErasable(false);
+                    $orderDetail->setItem($item);
+                    $orderDetail->setQuantity($quantity);
+                    $orderDetail->setItemSellPrice(0);
+    
+                    $orderDetail->setQuoteOrder($order);
+    
+                    $manager->persist($order);
+                    $manager->persist($item);
+                    $manager->persist($orderDetail);
+                }
+            }   
+            $manager->flush();         
+        }
+        else{
+            $this->ErrorHandler->info("Votre panier est vide");
+        }
+
+        $session->set('panier', []);
+        if($status == 'STATUS_ORDER')
+            return $this->RedirectToRoute('order_show', ['id' => $order->getId()]);
+        else
+            return $this->RedirectToRoute('order_show_quote', ['id' => $order->getId()]);
+
     }
 
     /*______________________________________________________________________________________________________________________ 
@@ -533,18 +554,34 @@ class OrderController extends Controller
         }
 
         $contact = $order->getContact();
-        
-        $form = $request->request->get('order_detail_form')['setting']['email'];
-        
-        $file = $webservice->downloadQuote($order, $this->getParameter('file.pdf.quote.download_dir'), $this->getParameter('file.type.download_quote'));
-         
-        $mailer->sendAttachedFile($contact->getEmail(), $form['subject'], $this->renderView('email/_partials/quote.html',[
-            'contact_name' => $contact->getLastName(),
-         ]), $file);
 
-        return $this->redirectToRoute('order_show_quote_report', [
-            'message' => "Le devis devis ". basename($file) . " a été envoyé au client avec succès!",
-            'statut' => 200,
+        if (!empty($contact) && !empty($contact->getEmail())) {
+
+            $form = $request->request->get('order_detail_form')['setting']['email'];
+            $file = $webservice->downloadQuote($order, $this->getParameter('file.pdf.quote.download_dir'), $this->getParameter('file.type.download_quote'));
+
+            // $mailer->sendAttachedFile(['to' => $contact->getEmail()], $form['subject'], $this->renderView('email/_partials/quote.html', [
+            //     'contact_name' => $contact->getLastName(),
+            // ]), $file);
+
+            $view = $this->renderView('email/_partials/quote.html', [
+                'contact_name' => $contact->getLastName(),
+            ]);
+
+            $event = new GenericEvent([
+                'to' => $contact->getEmail(),
+                'form' => $form,
+                'file' => $file,
+                'view' => $view,
+            ]);
+            $this->eventDispatcher->dispatch(MyEvents::ORDER_EMAIL_BILL, $event);
+
+            $this->ErrorHandler->success("Le devis devis " . basename($file) . " a été envoyé au client avec succès!");
+        } else {
+            $this->ErrorHandler->error("Veuillez Renseigner une adresse de livraison!");
+        }
+
+        return $this->redirectToRoute('order_show', [
             'id' => $order->getId()
         ]);
     }
@@ -569,25 +606,32 @@ class OrderController extends Controller
 
         $contact = $order->getContact();
 
-        $form = $request->request->get('order_detail_form')['setting']['email'];
-        $bill = $billRepo->find($form['bill']);
-        $file = $webservice->downloadBill($bill, $this->getParameter('file.pdf.bill.download_dir'), $this->getParameter('file.type.download_order'), $this->getParameter('file.type.download_refund'));
-        $view = $this->renderView('email/_partials/bill.html', [
-            'contact_name' => $contact->getLastName(),
-            'bill_id' => $setManager->get("PDF", "FACTURE_PREFIX")->getValue() . $bill->getId(),
-        ]);
+        if(!empty($contact) && !empty($contact->getEmail())){
 
-        $event = new GenericEvent([
-            'to' => $contact->getEmail(),
-            'form' => $form,
-            'file' => $file,
-            'view' => $view,
-        ]);
-        $this->eventDispatcher->dispatch(MyEvents::ORDER_EMAIL_BILL, $event);
-        
-        return $this->redirectToRoute('order_show_report', [
-            'message' => "La facture " . basename($file) . " a été envoyé au client avec succès!",
-            'statut' => 200,
+            $form = $request->request->get('order_detail_form')['setting']['email'];
+            $bill = $billRepo->find($form['bill']);
+            $file = $webservice->downloadBill($bill, $this->getParameter('file.pdf.bill.download_dir'), $this->getParameter('file.type.download_order'), $this->getParameter('file.type.download_refund'));
+            $view = $this->renderView('email/_partials/bill.html', [
+                'contact_name' => $contact->getLastName(),
+                'bill_id' => $setManager->get("PDF", "FACTURE_PREFIX")->getValue() . $bill->getId(),
+            ]);
+
+            $event = new GenericEvent([
+                'to' => $contact->getEmail(),
+                'form' => $form,
+                'file' => $file,
+                'view' => $view,
+            ]);
+            $this->eventDispatcher->dispatch(MyEvents::ORDER_EMAIL_BILL, $event);
+
+            $this->ErrorHandler->success("La facture " . basename($file) . " a été envoyé au client avec succès!");
+           
+        }
+        else{
+            $this->ErrorHandler->error("Veuillez Renseigner une adresse de livraison!");            
+        }
+
+        return $this->redirectToRoute('order_show', [
             'id' => $order->getId()
         ]);
     }
@@ -635,7 +679,6 @@ class OrderController extends Controller
         }
                 
         $form = $request->request->get('order_detail_form');
-        //dump($form);die();
         $this->orderManager->loggCommandeSaveInfo($order, $form);
         $order = $this->orderManager->getHydrater()->hydrateQuoteOrderRelationFromForm($order, $form);
         $manager->persist($order);        
@@ -728,7 +771,6 @@ class OrderController extends Controller
         $bill->setContact($order->getContact());
         
         $amount = 0;
-        //dump($form);die();
         foreach ($form['bill']['delivery'] as $val) {
             
             $delivery = $deliveryRepo->find($val);
@@ -770,7 +812,6 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        //dump($request->request); die();
         $status = $delStatusRepo->findOneBy(['Name' => 'STATUS_CANCELED']);
 
         foreach ($deliveryRepo->findByBill($bill) as $delivery) {
@@ -815,8 +856,6 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        //dump('stop');die();
-
         $orderDetail = $qtDelivery->getOrderDetail();
 
         if (!empty($orderDetail->getQuantityDelivery()))
@@ -833,11 +872,6 @@ class OrderController extends Controller
         $manager->remove($qtDelivery);
         
         $manager->persist($orderDetail);
-
-        /*if (!empty($qtDelivery->getDelivery())) {
-            $idDelivery = $qtDelivery->getDelivery()->getId();
-            $manager->remove($deliveryRepo->find($idDelivery));
-        }*/
         
         $manager->flush();
 
@@ -875,11 +909,17 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        $result = $this->checkContact($this->orderRepo->findOneByBill($bill));
-        if ($result !== true)
-            return $result;
+        $order = $this->orderRepo->findOneByBill($bill);
+        $contact = $order->getContact();
+        if (!empty($contact)) {
+            return $this->file($webservice->downloadBill($bill, $this->getParameter('file.pdf.bill.download_dir'), $this->getParameter('file.type.download_order'), $this->getParameter('file.type.download_refund')));
+        } else {
+            $this->ErrorHandler->error("Veuillez Renseigner une adresse de livraison!");
+        }
 
-        return $this->file($webservice->downloadBill($bill, $this->getParameter('file.pdf.bill.download_dir'), $this->getParameter('file.type.download_order'), $this->getParameter('file.type.download_refund')));   
+        return $this->redirectToRoute('order_show', [
+            'id' => $order->getId()
+        ]);
     }
 
     /**
@@ -892,12 +932,17 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        $result = $this->checkContact($order);
-        if($result !== true){
-            return $result;
+        $contact =$order->getContact();
+        if(!empty($contact)){
+            return $this->file($webservice->downloadQuote($order, $this->getParameter('file.pdf.quote.download_dir'), $this->getParameter('file.type.download_quote')));   
+        }
+        else{
+            $this->ErrorHandler->error("Veuillez Renseigner une adresse de livraison!");
         }
 
-        return $this->file($webservice->downloadQuote($order, $this->getParameter('file.pdf.quote.download_dir'), $this->getParameter('file.type.download_quote')));   
+        return $this->redirectToRoute('order_show', [
+            'id' => $order->getId()
+        ]);
     }
 
     /**
@@ -910,11 +955,17 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        $result = $this->checkContact($this->orderRepo->findOneByDelivery($delivery));
-        if ($result !== true)
-            return $result;
-            
-        return $this->file($webservice->downloadDelivery($delivery, $this->getParameter('file.pdf.delivery.download_dir')));   
+        $order = $this->orderRepo->findOneByDelivery($delivery);
+        $contact = $order->getContact();
+        if (!empty($contact)) {            
+            return $this->file($webservice->downloadDelivery($delivery, $this->getParameter('file.pdf.delivery.download_dir')));
+        } else {
+            $this->ErrorHandler->error("Veuillez Renseigner une adresse de livraison!");
+        }
+
+        return $this->redirectToRoute('order_show', [
+            'id' => $order->getId()
+        ]);
     }
 
     /*______________________________________________________________________________________________________________________ 
@@ -935,7 +986,7 @@ class OrderController extends Controller
             $qtDeliveries = $orderDetail->getQuantityDeliveries();
             $item = $orderDetail->getItem();
             $item->setIsErasable(true);
-            //dump($qtDeliveries); die();
+          
             if($qtDeliveries){
                 foreach ($qtDeliveries as $qtDelivery) {
                     $bill = $qtDelivery->getBill();
@@ -955,6 +1006,40 @@ class OrderController extends Controller
         $manager->remove($order);
         $manager->flush();
         return $this->RedirectToRoute('order_home');
+    }
+
+    /**
+     * @Route("/admin/commande/devis/produit/{id}/{idItem}/delete/{status}", options={"expose"=true}, name="order_quote_item_delete", requirements={"id"="\d+"})
+     */
+    public function deleteQuoteItem(QuoteOrder $order, string $status,
+                                    int $idItem,
+                                    ItemRepository $itemRepo,
+                                    QuoteOrderDetailRepository $orderDetailRepo,
+                                    ObjectManager $manager
+    ) {
+
+        if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+        //dump($order);die();
+        $item = $itemRepo->find($idItem);
+        $orderDetail = $orderDetailRepo->findOneBy(['QuoteOrder' => $order, 'Item' => $item]);
+        if (!empty($orderDetail)) {
+            $item->setIsErasable(true);
+            
+            $manager->remove($orderDetail);
+            $manager->persist($order);
+            $manager->persist($item);
+            $manager->flush();
+            $this->ErrorHandler->success("Le produit Ref. ". $item->getRef() . " a été supprimé avec succés!");
+        }
+        else
+            $this->ErrorHandler->error("Une erreur s'est produite lors la suppression du produit Ref. " . $item->getRef() . "!");
+
+        if($status == "STATUS_ORDER")
+            return $this->RedirectToRoute('order_show', ['id' => $order->getId()]);
+        else
+            return $this->RedirectToRoute('order_show_quote', ['id' => $order->getId()]);
     }
 
     /*_____________________________________________[ private ]_________________________ */
@@ -986,34 +1071,27 @@ class OrderController extends Controller
                 case 'STATUS_REFUND':
                 case 'STATUS_VALID':
                 case 'STATUS_ORDER':
-                    $myRoute = 'order_show_report';
+                    $myRoute = 'order_show';
                     $message = "Veuillez renseigner une adresse de livraison!";
                 case 'STATUS_PREREFUND':
-                    $myRoute = 'order_show_prerefund_report';
+                    $myRoute = 'order_show_prerefund';
                     $message = "Veuillez renseigner une adresse de livraison pour le pré-avoir";
                 case 'STATUS_PREORDER':
-                    $myRoute = 'order_show_preorder_report';
+                    $myRoute = 'order_show_preorder';
                     $message = "Veuillez renseigner une adresse de livraison pour la pré-commande";
                 case 'STATUS_QUOTE':
-                    $myRoute = 'order_show_quote_report';
+                    $myRoute = 'order_show_quote';
                     $message = "Veuillez renseigner une adresse de livraison pour le devis";
             }
-            //dump($myRoute);die();
+            $this->ErrorHandler->error($message);
             if(!empty($myRoute)){
                 return $this->redirectToRoute($myRoute, [
-                    'id' => $order->getId(),
-                    'statut' => 500,
-                    'message' => $message,
                     'id' => $order->getId()
                 ]);
             }
             else
                 $this->orderManager->loggCommandeErr($order, "La route retour apres le check du contact n'a pas pu être trouvée!");
-            // return $this->redirectToRoute('order_show_quote_report', [
-            //     'message' => "Veuillez renseigner un contact pour le devis",
-            //     'statut' => 500,
-            //     'id' => $order->getId()
-            // ]);
+            
         }
         return true;
     }

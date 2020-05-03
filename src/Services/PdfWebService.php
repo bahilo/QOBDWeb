@@ -23,6 +23,7 @@ class PdfWebService{
     protected $billRepo;
     protected $statusRepo;
     protected $deliveryRepo;
+    protected $baseDir;
 
     public function __construct(SettingManager $settingManager,
                                 QuoteOrderRepository $orderRepo,
@@ -41,6 +42,8 @@ class PdfWebService{
         $this->deliveryRepo = $deliveryRepo;
         $this->statusRepo = $statusRepo;
         $this->apiManager = $apiManager;
+        $dir = dirname(__DIR__);
+        $this->baseDir = dirname($dir) . '/public/';
 
     }
 
@@ -69,9 +72,9 @@ class PdfWebService{
             $fileName = $setting->getValue() . $param['bill']->getId() . '.pdf';
         }
 
-        file_put_contents(dirname(__DIR__). '\..\public' . $param['download_dir'] .'/'. $fileName, $res[0]['Value']);
+        file_put_contents($this->baseDir . $param['download_dir'] .'/'. $fileName, $res[0]['Value']);
 
-        return dirname(__DIR__) . '\..\public' . $param['download_dir'] . '/' . $fileName;
+        return $this->baseDir . $param['download_dir'] . '/' . $fileName;
     }
 
     public function downloadQuote(QuoteOrder $order, $downloadDir, int $target)
@@ -96,9 +99,9 @@ class PdfWebService{
         // dump($res[0]['Name']);
         // dump($param['download_dir']);
         // die();
-        file_put_contents(dirname(__DIR__) . '\..\public' . $param['download_dir'] . '/' . $fileName, $res[0]['Value']);
+        file_put_contents($this->baseDir . $param['download_dir'] . '/' . $fileName, $res[0]['Value']);
 
-        return dirname(__DIR__) . '\..\public' . $param['download_dir'] . '/' . $fileName;
+        return $this->baseDir . $param['download_dir'] . '/' . $fileName;
     }
 
     public function downloadDelivery(Delivery $delivery, $downloadDir)
@@ -122,9 +125,9 @@ class PdfWebService{
         if (!empty($setting)) {
             $fileName = $setting->getValue() . $param['delivery']->getId() . '.pdf';
         }
-        file_put_contents(dirname(__DIR__) . '\..\public' . $param['download_dir'] . '/' . $fileName, $res[0]['Value']);
+        file_put_contents($this->baseDir . $param['download_dir'] . '/' . $fileName, $res[0]['Value']);
 
-        return dirname(__DIR__) . '\..\public' . $param['download_dir'] . '/' . $fileName;
+        return $this->baseDir . $param['download_dir'] . '/' . $fileName;
     }
 
     private function getSource(QuoteOrder $order, ?Bill $bill, $target){

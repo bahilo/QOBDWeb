@@ -1,16 +1,16 @@
-Bonjour  Madame, Monsieur {{ nom_client }},
+Bonjour  Madame, Monsieur {{ nom_client }}, <br><br>
 
-Il m’est demandé de faire auprès de vous une ultime démarche amiable avant de régulariser la procédure devant la juridiction compétente. 
+Il m’est demandé de faire auprès de vous une ultime démarche amiable avant de régulariser la procédure devant la juridiction compétente.  <br>
 
-Vous voudrez donc bien me faire parvenir, par retour, le montant de votre dette équivalente à votre Facture n°"{NUM_FACT}" par chèque ou virement.  
+Vous voudrez donc bien me faire parvenir, par retour, le montant de votre dette équivalente à votre Facture n°"{NUM_FACT}" par chèque ou virement. <br>
 
-Si pour un motif quelconque, vous contestiez, soit le principe, soit le montant de votre dette, Je vous remercie de me le faire savoir par retour, en me précisant vos observations. 
+Si pour un motif quelconque, vous contestiez, soit le principe, soit le montant de votre dette, Je vous remercie de me le faire savoir par retour, en me précisant vos observations.  <br>
 
-A défaut de réponse de votre part, nous solliciterons  que soit rendue à votre encontre UNE ORDONNANCE PORTANT INJONCTION DE PAYER les dites sommes et les dépens.
+A défaut de réponse de votre part, nous solliciterons  que soit rendue à votre encontre UNE ORDONNANCE PORTANT INJONCTION DE PAYER les dites sommes et les dépens. <br>
 
-Veuillez agréer, Madame, Monsieur, l’assurance de nos salutations distinguées.
+Veuillez agréer, Madame, Monsieur, l’assurance de nos salutations distinguées. <br>
 
-Le service contentieux,
+Le service contentieux, <br><br>
 
 L’équipe {{ nom_societe }}.
 

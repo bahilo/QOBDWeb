@@ -122,6 +122,11 @@ class ClientHydrate{
         if(!$comment)
                 $comment = new Comment();
 
+        if(!empty($form['is_principal'])){
+            $contact->setClient($this->resetContactPrincipal($contact->getClient()));
+            $contact->setIsPrincipal(true);
+        }
+
         $commentAddress->setContent($form['AddressComment']);
         $commentAddress->setCreateAt(new \DateTime());
 
@@ -129,7 +134,7 @@ class ClientHydrate{
         $comment->setCreateAt(new \DateTime());
 
         $contactAddress->setIsPrincipal(false);
-        $contactAddress->setName($form['AddressName']);
+        $contactAddress->setName('');
         $contactAddress->setStreet($form['Street']);
         $contactAddress->setZipCode($form['ZipCode']);
         $contactAddress->setCity($form['City']);
@@ -143,7 +148,7 @@ class ClientHydrate{
     }
 
     public function hydrateAddressRelationFromForm(Address $address, $form){
-
+        $comment = $address->getComment();
         if(!$comment)
                 $comment = new Comment();
             $comment->setContent($form['ContentComment']);
@@ -157,13 +162,19 @@ class ClientHydrate{
     public function hydrateClientRelationFromForm(Client $client, $form){
         $client->setIsActivated(true);
         $contactPrincipal = null;
+
+        // dump($form);die();        
+        $client->setIsProspect(true);
+        if(!empty($form['client_prospect'])){
+            $client->setIsProspect(false);
+        }
         
         foreach($client->getContacts() as $contact){
             if($contact->getIsPrincipal())
             $contactPrincipal = $contact;
         }
 
-        if(!$contactPrincipal)
+        if($contactPrincipal)
             $contactPrincipal = new Contact();
         
         $contactAddress = $contactPrincipal->getAddress();
@@ -183,10 +194,9 @@ class ClientHydrate{
 
         $clientComment->setContent($form['ClientComment']);
         $clientComment->setCreateAt(new \DateTime());
-
                 
         $contactAddress->setIsPrincipal(true);
-        $contactAddress->setName($form['AddressName']);
+        $contactAddress->setName($form['FirstName'] . ' ' . $form['LastName']);
         $contactAddress->setStreet($form['Street']);
         $contactAddress->setZipCode($form['ZipCode']);
         $contactAddress->setCity($form['City']);
@@ -204,9 +214,17 @@ class ClientHydrate{
         $client->addContact($contactPrincipal);
         $client->setComment($clientComment);
 
-        if(!isset($form['IsProspect']))
-            $client->setIsProspect(false);
+        // if(!empty($form['IsProspect']))
+        //     $client->setIsProspect(false);
               
+        return $client;
+    }
+
+    private function resetContactPrincipal($client){
+        foreach ($client->getContacts() as $contact) {
+            if ($contact->getIsPrincipal())
+                $contact->setIsPrincipal(false);
+        }
         return $client;
     }
 

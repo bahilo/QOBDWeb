@@ -26,6 +26,7 @@ class CurrencyRegistrationType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Currency::class,
+            "allow_extra_fields" => true,
         ]);
     }
 }

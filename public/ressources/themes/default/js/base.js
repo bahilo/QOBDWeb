@@ -21,13 +21,42 @@ $(document).ready(function ($) {
         $.fn.initEventBtnDelete();
         $.fn.initEventBtnValidation();
 
+        protectOnChange();
+
     });
     
 /*================================[ Functions ]==================================*/
 
+    function protectOnChange(){
+
+        $('.c-main').on('change', '*', function(e){
+            if (!$(this).attr('data-changed')){
+               $(this).attr('data-changed', 'true');
+                e.stopPropagation();
+           }
+        });
+
+        $('.c-sidebar, .c-header').on('click', 'a', function(e){
+            if ($('[data-changed="true"]').length > 0){
+                e.preventDefault();
+                $('[data-changed="true"]').parent().css({'border':'2px solid red'});
+                var elt = $(this);
+                $.fn.displayConfirm('Attentions: élements non sauvegardés', 'Voulez-continuer et annuler vos mofifications?', function (response) {
+                    if (response) {
+                        window.location = elt.attr('href');
+                    }
+                }, ['Oui', 'Non']);
+            }
+        });
+    }
+
     function displayPoolMessage() {
-        var $feedback = $('input[name="report-feedback"]');
-        if ($feedback.length > 0 && $feedback.val()) {
+        var $messagePool = $(".messagePool");
+        displayMessage('Succés requête', $messagePool.find('input[data-status="200"]'), 200);
+        displayMessage('Erreur requête', $messagePool.find('input[data-status="500"]'), 500);
+        displayMessage('Attention requête', $messagePool.find('input[data-status="600"]'), 600);
+
+        /*if ($feedback.length > 0 && $feedback.val()) {
 
             var title = '';
             var $status = $('input[name="report-status"]');
@@ -41,6 +70,20 @@ $(document).ready(function ($) {
             $status.val('');
             $feedback.val('');
 
+        }*/
+    }
+
+    function displayMessage(title, elts, status){
+        if (elts.length > 0){
+            var message = '<ul>';
+            $.each(elts, function (index, elt) {
+                message += '<li>' + $(elt).val() + '</li>';
+                $(elt).val('');
+                $(elt).attr('data-status', '');
+            });
+            message += '</ul>';
+
+            $.fn.displayMessage({ messageTitle: title, messageBody: message, errorCode: status });
         }
     }
 

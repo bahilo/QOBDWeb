@@ -23,6 +23,7 @@ class BlogSettingRegistrationType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => BlogSetting::class,
+            "allow_extra_fields" => true,
         ]);
     }
 }

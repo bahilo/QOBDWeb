@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\Collection;
 use JMS\Serializer\Annotation\SerializedName;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -29,6 +30,7 @@ class Contact
     private $Client;
 
     /**
+     * @Assert\NotBlank(message = "Le prénom du contact ne peux pas être vide")
      * @ORM\Column(type="string", length=255)
      * @Groups({"class_property"})
      * @SerializedName("FirstName")
@@ -36,6 +38,7 @@ class Contact
     private $Firstname;
 
     /**
+     * @Assert\NotBlank(message = "Le nom du contact ne peux pas être vide")
      * @ORM\Column(type="string", length=255)
      * @Groups({"class_property"})
      * @SerializedName("LastName")
@@ -50,6 +53,7 @@ class Contact
     private $Position;
 
     /**
+     * @Assert\NotBlank(message = "L'email du contact ne peux pas être vide")
      * @ORM\Column(type="string", length=255)
      * @Groups({"class_property"})
      * @SerializedName("Email")
@@ -103,35 +107,45 @@ class Contact
      * @SerializedName("ContentComment")
      * */
     private $ContentComment;
+
     /**
+     * @Assert\NotBlank(message = "La ville ne peux pas être vide")
      * @Groups({"class_property"})
-     * @SerializedName("City")     * 
+     * @SerializedName("City") 
      * */
     private $City;
+
     /**
+     * @Assert\NotBlank(message = "La rue ne peux pas être vide")
      * @Groups({"class_property"})
-     * @SerializedName("Street")     * 
+     * @SerializedName("Street") 
      * */
     private $Street;
+
     /**
+     * @Assert\NotBlank(message = "Le code postal ne peux pas être vide")
      * @Groups({"class_property"})
-     * @SerializedName("ZipCode")     * 
-     * */
+     * @SerializedName("ZipCode") 
+     */
     private $ZipCode;
+
     /**
+     * @Assert\NotBlank(message = "Le pays ne peux pas être vide")
      * @Groups({"class_property"})
-     * @SerializedName("Country")     * 
-     * */
+     * @SerializedName("Country") 
+     */
     private $Country;
+
     /**
      * @Groups({"class_property"})
-     * @SerializedName("AddressComment")     * 
-     * */
+     * @SerializedName("AddressComment") 
+     */
     private $AddressComment;
+
     /**
      * @Groups({"class_property"})
-     * @SerializedName("AddressName")     * 
-     * */
+     * @SerializedName("AddressName")
+     */
     private $AddressName;
 
     /**

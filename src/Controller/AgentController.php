@@ -5,8 +5,8 @@ namespace App\Controller;
 use App\Entity\Agent;
 use App\Services\Utility;
 use App\Services\Serializer;
+use App\Services\ErrorHandler;
 use App\Services\SecurityManager;
-use App\Form\AgentRegistrationType;
 use App\Repository\AgentRepository;
 use App\Repository\ActionRepository;
 use Symfony\Component\Routing\Annotation\Route;
@@ -17,12 +17,16 @@ class AgentController extends Controller
 
     protected $securityUtility;
     protected $actionRepo;
+    protected $ErrorHandler;
 
 
-    public function __construct(SecurityManager $securityUtility, ActionRepository $actionRepo)
+    public function __construct(SecurityManager $securityUtility, 
+                                ActionRepository $actionRepo,
+                                ErrorHandler $ErrorHandler)
     {
         $this->securityUtility = $securityUtility;
         $this->actionRepo = $actionRepo;
+        $this->ErrorHandler = $ErrorHandler;
     }
     
     /**
@@ -43,16 +47,6 @@ class AgentController extends Controller
      * @Route("/admin/agent/{id}/show", options={"expose"=true}, name="agent_show")
      */
     public function show(Agent $agent) {
-
-        // if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_AGENT']))) {
-        //     return $this->redirectToRoute('security_deny_access');
-        // }
         return $this->redirectToRoute('security_edit',['id' => $agent->getId()]);
-        // $form = $this->createForm(AgentRegistrationType::class, $agent);
-        
-        // return $this->render('agent/show.html.twig', [
-        //     'formAgent' => $form->createView(),
-        //     'agent' => $agent
-        // ]);
     }
 }

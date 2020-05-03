@@ -30,12 +30,12 @@ class NotifyOrder implements EventSubscriberInterface
         $result = $event->getSubject();
         $form = $result['form'];
 
-        $this->mailer->sendAttachedFile($result['to'], $form['subject'], $result['view'], $result['file']);
+        $this->mailer->send(['to' => $result['to']], $form['subject'], $result['view'], $result['file']);
     }
 
     public function onOrderValidated(GenericEvent $event): void
     {
         $result = $event->getSubject();
-        $this->mailer->send($result['to'], $result['subject'], $result['view']);
+        $this->mailer->send(['to' => $result['to']], $result['subject'], $result['view']);
     }
 }

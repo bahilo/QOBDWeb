@@ -49,70 +49,14 @@
                 </div>
                 <br />
         
-        
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Prénom">
-                            <i class="fa fa-user"></i>
-                        </span>
-                    </div>
-                    {{ form_widget(formContact.Firstname,{'attr': {'placeholder': 'Prénom'}}) }}
-                </div>
-        
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Nom">
-                            <i class="fa fa-user"></i>
-                        </span>
-                    </div>
-                    {{ form_widget(formContact.LastName,{'attr': {'placeholder': 'Nom'}}) }}
-                </div>
-        
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Fonction">
-                            <i class="fa fa-chess-board"></i>
-                        </span>
-                    </div>
-                    {{ form_widget(formContact.Position,{'attr': {'placeholder': 'Fonction'}}) }}
-                </div>
-        
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Email">
-                            @
-                        </span>
-                    </div>
-                    {{ form_widget(formContact.Email,{'attr': {'placeholder': 'Email'}}) }}
-                </div>
-        
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Téléphone">
-                            <i class="fa fa-phone"></i>
-                        </span>
-                    </div>
-                    {{ form_widget(formContact.Phone,{'attr': {'placeholder': 'Téléphone'}}) }}
-                </div>
-        
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Téléphone mobile">
-                            <i class="fa fa-mobile"></i>
-                        </span>
-                    </div>
-                    {{ form_widget(formContact.Mobile,{'attr': {'placeholder': 'Téléphone mobile'}}) }}
-                </div>
-        
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Commentaires">
-                            <i class="fa fa-comments"></i>
-                        </span>
-                    </div>
-                    {{ form_widget(formContact.ContentComment,{'attr': {'placeholder': 'Commentaires'}}) }}
-                </div>
-        
+                {{ form_row(formContact.Firstname,{'label': 'Prénom', 'attr': {'placeholder': 'Prénom'}}) }}
+                {{ form_row(formContact.LastName,{'label': 'Nom', 'attr': {'placeholder': 'Nom'}}) }}
+                {{ form_row(formContact.Position,{'label': 'Fonction', 'attr': {'placeholder': 'Fonction'}}) }}
+                {{ form_row(formContact.Email,{'label': 'Email', 'attr': {'placeholder': 'Email'}}) }}
+                {{ form_row(formContact.Phone,{'label': 'Téléphone', 'attr': {'placeholder': 'Téléphone'}}) }}
+                {{ form_row(formContact.Mobile,{'label': 'Téléphone mobile', 'attr': {'placeholder': 'Téléphone mobile'}}) }}
+                {{ form_row(formContact.ContentComment,{'label': 'Commentaires', 'attr': {'placeholder': 'Commentaires'}}) }}
+                 
             </div>
         </div>
 
@@ -121,51 +65,12 @@
                 <i class="fa fa-align-justify"></i> Adresse</div>
             <div class="card-body">
                 
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Rue">
-                            <i class="fa fa-address-card"></i>
-                        </span>
-                    </div>
-                    {{ form_widget(formContact.Street,{'attr': {'placeholder': 'Rue'}}) }}
-                </div>
-
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Code postale">
-                            <i class="fa fa-map"></i>
-                        </span>
-                    </div>
-                    {{ form_widget(formContact.ZipCode,{'attr': {'placeholder': 'Code postale'}}) }}
-                </div>
-
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Ville">
-                            <i class="fa fa-map"></i>
-                        </span>
-                    </div>
-                    {{ form_widget(formContact.City,{'attr': {'placeholder': 'Ville'}}) }}
-                </div>
-
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Country">
-                            <i class="fa fa-map-marker-alt"></i>
-                        </span>
-                    </div>
-                    {{ form_widget(formContact.Country,{'attr': {'placeholder': 'Pays'}}) }}
-                </div>
-
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Commentaire">
-                            <i class="fa fa-comments"></i>
-                        </span>
-                    </div>
-                    {{ form_widget(formContact.AddressComment,{'attr': {'placeholder': 'Commentaire'}}) }}
-                </div>        
-                
+                {{ form_row(formContact.Street,{'label': 'Rue', 'attr': {'placeholder': 'Rue'}}) }}
+                {{ form_row(formContact.ZipCode,{'label': 'Code postale', 'attr': {'placeholder': 'Code postale'}}) }}
+                {{ form_row(formContact.City,{'label': 'Ville', 'attr': {'placeholder': 'Ville'}}) }}
+                {{ form_row(formContact.Country,{'label': 'Pays', 'attr': {'placeholder': 'Pays'}}) }}
+                {{ form_row(formContact.AddressComment,{'label': 'Commentaire', 'attr': {'placeholder': 'Commentaire'}}) }}
+        
             </div>
         </div>
         {{ form_end(formContact) }}

@@ -30,22 +30,11 @@
                     <div class="card-body">
 
                         {% include "notify.html.twig" %}
-                        
                         {{ form_start(formBrand, { 'attr': {'id': 'global_form' }}) }}
-
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" data-toggle="tooltip" data-placement="top"
-                                    title="Clé utilisée dans le code pour faire référence à la configuration">
-                                    <span class="fa fa-key"></span>
-                                </span>
-                            </div>
-                            {{ form_widget(formBrand.Name,{'label': 'désignation de la marque', 'attr': {'placeholder': 'désignation de la marque'}})
-                            }}
-                        </div>
-
                         
-                        
+                        {{ form_row(formBrand.Name,{'label': 'désignation de la marque', 'attr': {'placeholder': 'désignation de la marque'}})
+                        }}
+
                         {{ form_end(formBrand) }}
                     </div> 
                 </div> 

@@ -165,6 +165,11 @@ class Item
      */
     private $ImeiCode;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $SerieCode;
+
 
     public function __construct()
     {
@@ -470,6 +475,18 @@ class Item
     public function setEan(?string $Ean): self
     {
         $this->Ean = $Ean;
+
+        return $this;
+    }
+
+    public function getSerieCode(): ?string
+    {
+        return $this->SerieCode;
+    }
+
+    public function setSerieCode(?string $SerieCode): self
+    {
+        $this->SerieCode = $SerieCode;
 
         return $this;
     }

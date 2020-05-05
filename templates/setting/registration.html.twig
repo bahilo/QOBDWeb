@@ -36,11 +36,6 @@
                         <div class="switch-wrapper" style="display: none;">
                             <span class="badge badge-success">Text</span>
                             <label class="c-switch c-switch-3d switch-primary">
-                                {#% if formSetting.vars.data.IsFile %}
-                                <input name="setting[switch]" class="c-switch-input" type="checkbox" checked>
-                                {% else %}
-                                <input name="setting[switch]" class="c-switch-input" type="checkbox">
-                                {% endif %#}
                                 <input name="setting[switch]" class="c-switch-input" type="checkbox" checked>
                                 <span class="c-switch-slider"></span>
                             </label>
@@ -48,64 +43,18 @@
                         </div>
 
                         {% if search.get_right_admin() %}
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Clé utilisée dans le code pour faire référence à la configuration">
-                                    <span class="fa fa-key"></span>
-                                </span>
-                            </div>
-                            {{ form_widget(formSetting.Code,{'label': 'Catégorie', 'attr': {'placeholder': 'Catégorie'}}) }}
-                        </div>                        
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Nom de la configuration">
-                                    <span class="fa fa-comment-dots"></span>
-                                </span>
-                            </div>
-                            {{ form_widget(formSetting.Name,{'label': 'Nom de la configuration', 'attr': {'placeholder': 'Nom de la configuration'}})
-                            }}
-                        </div>
-                        
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Nom de la configuration">
-                                    <span class="fa fa-comment-dots"></span>
-                                </span>
-                            </div>
-                            {{ form_widget(formSetting.DisplayName,{'label': 'Nom à l\'affichage', 'attr': {'placeholder': 'Nom à l\'affichage'}})
-                            }}
-                        </div>
-                        
+                        {{ form_row(formSetting.Code,{'label': 'Catégorie', 'attr': {'placeholder': 'Catégorie'}}) }}
+                        {{ form_row(formSetting.Name,{'label': 'Nom de la configuration', 'attr': {'placeholder': 'Nom de la configuration'}})
+                        }}
+                        {{ form_row(formSetting.DisplayName,{'label': 'Nom à l\'affichage', 'attr': {'placeholder': 'Nom à l\'affichage'}})
+                        }}
+                                                
                         {% else %}
-                        <div class="input-group mb-3" style="display:none;">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Clé utilisée dans le code pour faire référence à la configuration">
-                                    <span class="fa fa-key"></span>
-                                </span>
-                            </div>
-                            {{ form_widget(formSetting.Code,{'attr': {'style': 'display:none;'}}) }}
-                            {{ form_widget(formSetting.Name,{'attr': {'style': 'display:none;'}}) }}
-                        </div>
-
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Description">
-                                    <span class="fa fa-comment-dots"></span>
-                                </span>
-                            </div>
-                            {{ form_widget(formSetting.DisplayName,{'label': 'Nom à l\'affichage', 'attr': {'placeholder': 'Nom à l\'affichage'}})
-                            }}
-                        </div>
-                        
-                        <!-- <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Logo de la société">
-                                    <span class="fa fa-comment-dots"></span>
-                                </span>
-                            </div>
-                            {#{ form_widget(formSetting.Value,{'label': 'Nom de la configuration', 'attr': {'placeholder': 'Nom de la configuration', 'disabled':'disabled'}})
-                            }#}
-                        </div> -->
+                        {{ form_row(formSetting.Code,{'attr': {'style': 'display:none;'}}) }}
+                        {{ form_row(formSetting.Name,{'attr': {'style': 'display:none;'}}) }}
+                        {{ form_row(formSetting.DisplayName,{'label': 'Nom à l\'affichage', 'attr': {'placeholder': 'Nom à l\'affichage'}})
+                        }}
+                                                
                         {% endif %}
 
                         {% if formSetting.vars.data.name == 'SOCIETE_LOGO' %}
@@ -113,7 +62,7 @@
                             {% if formSetting.vars.data.IsFile %}
                             <div class="value-default">
                                 <img class="navbar-brand-full" src="{{ search.logo }}" width="89" height="25" alt="CoreUI Logo">
-                                {{ form_widget(formSetting.Value,{'attr': {'style': 'display:none;'}}) }}
+                                {{ form_row(formSetting.Value,{'attr': {'style': 'display:none;'}}) }}
                             </div>
                             {% endif %}
                             <div class="value-file">
@@ -121,18 +70,8 @@
                             </div>
                         </div>
                         {% else %}
-                        <div class="value-wrapper">
-                            <div class="value-default">
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Valeur">
-                                            <span class="fa fa-chess-board"></span>
-                                        </span>
-                                    </div>
-                                    {{ form_widget(formSetting.Value,{'label': 'Valeur', 'attr': {'placeholder': 'Valeur'}}) }}
-                                </div>
-                            </div>
-                        </div>
+                        {{ form_row(formSetting.Value,{'label': 'Valeur', 'attr': {'placeholder': 'Valeur'}}) }}
+                        
                         {% endif %}
                         {{ form_end(formSetting) }}
                     </div> 

@@ -32,17 +32,8 @@
                         {% include "notify.html.twig" %}
 
                         {{ form_start(formProvider, { 'attr': {'id': 'global_form' }}) }}
-
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" data-toggle="tooltip" data-placement="top"
-                                    title="Clé utilisée dans le code pour faire référence à la configuration">
-                                    <span class="fa fa-key"></span>
-                                </span>
-                            </div>
-                            {{ form_widget(formProvider.Name,{'label': 'désignation du fournisseur', 'attr': {'placeholder': 'désignation du fournisseur'}})
-                            }}
-                        </div>
+                        {{ form_row(formProvider.Name,{'label': 'désignation du fournisseur', 'attr': {'placeholder': 'désignation du fournisseur'}})
+                        }}
 
                         {{ form_end(formProvider) }}
                     </div> 

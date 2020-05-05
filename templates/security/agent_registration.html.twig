@@ -38,91 +38,21 @@
                             {% include "notify.html.twig" %}
 
                             {{ form_start(formAgent, {'enctype':'multipart/form-data', 'attr': {'id': 'global_form' }}) }}
-
-                            <input type="hidden" name="token" value="{{ csrf_token('upload') }}" />
                             
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Nom">
-                                        <span class="fa fa-chess-board"></span>
-                                    </span>
-                                </div>
-                                {{ form_widget(formAgent.LastName,{'attr': {'placeholder': 'Nom'}}) }}
-                            </div>
-                            
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Prénom">
-                                        <i class="fa fa-chess-board"></i>
-                                    </span>
-                                </div>
-                                {{ form_widget(formAgent.FirstName,{'attr': {'placeholder': 'Prénom'}}) }}
-                            </div>
-                            
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Email">@</span>
-                                </div>
-                                {{ form_widget(formAgent.Email,{'attr': {'placeholder': 'Email...'}}) }}
-                            </div>
-                            
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Pseudo">
-                                        <i class="fa fa-user"></i>
-                                    </span>
-                                </div>
-                                {{ form_widget(formAgent.UserName,{'attr': {'placeholder': 'Pseudo'}}) }}
-                            </div>
-                            
-                            <div class="input-group mb-4">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Mot de passe">
-                                        <i class="fa fa-lock"></i>
-                                    </span>
-                                </div>
-                                {{ form_widget(formAgent.PlainTextPassword,{'attr': {'placeholder': 'mot de passe'}}) }}
-                            </div>
-                            
-                            <div class="input-group mb-4">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Veuillez répéter le mot de passe">
-                                        <i class="fa fa-lock"></i>
-                                    </span>
-                                </div>
-                                {{ form_widget(formAgent.Confirme_password,{'attr': {'placeholder': 'Veuillez répéter le mot de passe'}}) }}
-                            </div>                            
-                                                       
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Numéro de téléphone">
-                                        <i class="fa fa-phone"></i>
-                                    </span>
-                                </div>
-                                {{ form_widget(formAgent.Phone,{'attr': {'placeholder': 'Numéro de téléphone'}}) }}
-                            </div>
-                            
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Fax">
-                                        <i class="fa fa-fax"></i>
-                                    </span>
-                                </div>
-                                {{ form_widget(formAgent.Fax,{'attr': {'placeholder': 'Fax'}}) }}
-                            </div>
-
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Taille par defaut des listes">
-                                        <i class="fa fa-list"></i>
-                                    </span>
-                                </div>
-                                {{ form_widget(formAgent.ListSize,{'attr': {'placeholder': 'Taille par defaut des listes', }})}}
-                            </div>
-
                             <div class="form-group">
-                                {{ form_widget(formAgent.PictureFile,{'attr': {'class':'form-control'}}) }}
+                                {{ form_row(formAgent.PictureFile,{'label': 'Image profile', 'attr': {'class':'form-control'}}) }}
                             </div>
+                            <input type="hidden" name="token" value="{{ csrf_token('upload') }}" />
+                            {{ form_row(formAgent.LastName,{'label': 'Nom', 'attr': {'placeholder': 'Nom'}}) }}
+                            {{ form_row(formAgent.FirstName,{'label': 'Prénom', 'attr': {'placeholder': 'Prénom'}}) }}
+                            {{ form_row(formAgent.Email,{'label': 'Email', 'attr': {'placeholder': 'Email...'}}) }}
+                            {{ form_row(formAgent.UserName,{'label': 'Pseudo', 'attr': {'placeholder': 'Pseudo'}}) }}
+                            {{ form_row(formAgent.PlainTextPassword,{'label': 'mot de passe', 'attr': {'placeholder': 'mot de passe'}}) }}
+                            {{ form_row(formAgent.Confirme_password,{'label': 'Veuillez répéter le mot de passe', 'attr': {'placeholder': 'Veuillez répéter le mot de passe'}}) }}
+                            {{ form_row(formAgent.Phone,{'label': 'Numéro de téléphone', 'attr': {'placeholder': 'Numéro de téléphone'}}) }}
+                            {{ form_row(formAgent.Fax,{'label': 'Fax', 'attr': {'placeholder': 'Fax'}}) }}
+                            {{ form_row(formAgent.ListSize,{'label': 'Taille par defaut des listes', 'attr': {'placeholder': 'Taille par defaut des listes', }})}}
+                            
 
                             {{ form_end(formAgent) }}
                         </div> 

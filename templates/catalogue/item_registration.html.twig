@@ -22,133 +22,49 @@
 <div class="item-wrapper">
 
     <div class="animated fadeIn">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fa fa-align-justify"></i> {{ page_title }}</div>
-
-                        <div class="card-body">
-
-                            {% include "notify.html.twig" %}
-                        
-                            {{ form_start(formItem, {'enctype':'multipart/form-data', 'attr': {'id': 'global_form' }}) }}
-                        
-                            <input type="hidden" name="token" value="{{ csrf_token('upload') }}" />
-                        
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Nom du produit">
-                                        <span class="fa fa-chess-board"></span>
-                                    </span>
-                                </div>
-                                {{ form_widget(formItem.Name,{'label': 'désignation du produit', 'attr': {'placeholder': 'désignation du produit'}}) }}
-                            </div>
-                        
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Numéro de série">
-                                        <i class="fa fa-chess-board"></i>
-                                    </span>
-                                </div>
-                                {{ form_widget(formItem.Ref,{'label': 'Numéro de série', 'attr': {'placeholder': 'Numéro de série'}}) }}
-                            </div>
-                        
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Marque">
-                                        <i class="fa fa-copyright"></i>
-                                    </span>
-                                </div>
-                                {{ form_widget(formItem.ItemBrand,{'label': 'Marque', 'attr': {'placeholder': 'Marque'}}) }}
-                            </div>
-                        
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Famille">
-                                        <i class="fa fa-layer-group"></i>
-                                    </span>
-                                </div>
-                                {{ form_widget(formItem.ItemGroupe,{'label': 'Famille', 'attr': {'placeholder': 'Famille'}}) }}
-                            </div>
-                        
-                            <div class="input-group mb-4">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Fournisseur">
-                                        <i class="fa fa-truck"></i>
-                                    </span>
-                                </div>
-                                {{ form_widget(formItem.Provider,{'label': 'Fournisseur', 'attr': {'placeholder': 'Fournisseur'}}) }}
-                            </div>
-                        
-                            <div class="input-group mb-4">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top"
-                                        title="Prix d'achat">
-                                        <i class="fa fa-hand-holding-usd"></i>
-                                    </span>
-                                </div>
-                                {{ form_widget(formItem.PurchasePrice,{'label': 'Prix dachat', 'attr': {'placeholder': 'Prix dchat'}}) }}
-                            </div>
-                        
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Prix de vente">
-                                        <i class="fa fa-hand-holding-usd"></i>
-                                    </span>
-                                </div>
-                                {{ form_widget(formItem.SellPrice,{'label': 'Prix de vente conseillé', 'attr': {'placeholder': 'Prix de vente conseillé'}}) }}
-                            </div>
-                        
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Stock">
-                                        <i class="fa fa-cubes"></i>
-                                    </span>
-                                </div>
-                                {{ form_widget(formItem.Stock,{'label': 'Stock', 'attr': {'placeholder': 'Stock'}}) }}
-                            </div>
-                        
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top"
-                                        title="EAN est un système global destiné à l'identification univoque d'objets. L'EAN est composé de 8, 13 ou 128 chiffres">
-                                        <i class="fa fa-barcode"></i>
-                                    </span>
-                                </div>
-                                {{ form_widget(formItem.Ean,{'label': 'Code EAN', 'attr': {'placeholder': 'Code EAN'}})}}
-                            </div>
-                        
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top"
-                                        title="Code IMEI">
-                                        <i class="fa fa-qrcode"></i>
-                                    </span>
-                                </div>
-                                {{ form_widget(formItem.Imei,{'label': 'Code IMEI', 'attr': {'placeholder': 'Code IMEI'}})}}
-                            </div>
-                        
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top"
-                                        title="Commentaire">
-                                        <i class="fa fa-list"></i>
-                                    </span>
-                                </div>
-                                {{ form_widget(formItem.ContentComment,{'label': 'Commentaire', 'attr': {'placeholder': 'Commentaire'}})}}
-                            </div>
-                        
-                            <div class="form-group">
-                                {{ form_widget(formItem.PictureFile,{'attr': {'class':'form-control'}}) }}
-                            </div>
-                        
-                            {{ form_end(formItem) }}
-                        </div>
-
-                </div> 
-            </div> 
+        {% include "notify.html.twig" %}
+        
+        {{ form_start(formItem, {'enctype':'multipart/form-data', 'attr': {'id': 'global_form' }}) }}
+        
+        {# Produit #}
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-align-justify"></i> Produit
+            </div>
+        
+            <div class="card-body">
+                <input type="hidden" name="token" value="{{ csrf_token('upload') }}" />
+        
+                
+                {{ form_row(formItem.PictureFile,{'label': 'Image produit', 'attr': {'class':'form-control'}}) }}
+                {{ form_row(formItem.Name,{'label': 'Nom du produit','attr': {'placeholder': 'désignation du produit'}}) }}
+                {{ form_row(formItem.Ref,{'label': 'Reférence du produit','attr': {'placeholder': 'Réfference du produit'}}) }}
+                {{ form_row(formItem.SerieCode,{'label': 'N° de serie du produit','attr': {'placeholder': 'N° de serie du produit'}}) }}
+                {{ form_row(formItem.PurchasePrice,{'label': 'Prix dchat', 'attr': {'placeholder': 'Prix dchat'}}) }}
+                {{ form_row(formItem.SellPrice,{'label': 'Prix de vente conseillé', 'attr': {'placeholder': 'Prix de vente conseillé'}}) }}
+                {{ form_row(formItem.Stock,{'label': 'Stock', 'attr': {'placeholder': 'Stock'}}) }}
+                
+                {{ form_row(formItem.ContentComment,{'label': 'Commentaire', 'attr': {'placeholder': 'Commentaire'}})}}
+                
+            </div>
         </div>
+        
+        {# Fournisseur #}
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-align-justify"></i> Fournisseur
+            </div>            
+            <div class="card-body">
+                {{ form_row(formItem.ItemBrand,{'label': 'Marque', 'attr': {'placeholder': 'Marque'}}) }}
+                {{ form_row(formItem.ItemGroupe,{'label': 'Famille', 'attr': {'placeholder': 'Famille'}}) }}
+                {{ form_row(formItem.Provider,{'label': 'Fournisseur', 'attr': {'placeholder': 'Fournisseur'}}) }}
+                {{ form_row(formItem.Ean,{'label': 'Code EAN', 'attr': {'placeholder': 'Code EAN'}})}}
+                {{ form_row(formItem.Imei,{'label': 'Code IMEI', 'attr': {'placeholder': 'Code IMEI'}})}}
+                        
+            </div>
+        </div>
+        
+        {{ form_end(formItem) }}
     </div>
 </div>
 

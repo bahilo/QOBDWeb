@@ -32,37 +32,35 @@
                         {% include "notify.html.twig" %}
 
                         {{ form_start(formTax, { 'attr': {'id': 'global_form' }}) }}
-
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" data-toggle="tooltip" data-placement="top"
-                                    title="Clé utilisée dans le code pour faire référence à la configuration">
-                                    <span class="fa fa-chess-board"></span>
-                                </span>
-                            </div>
-                            {{ form_widget(formTax.Type,{'label': 'désignation de la Tax', 'attr': {'placeholder': 'désignation de la Tax'}})
-                            }}
-                        </div>
-
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" data-toggle="tooltip" data-placement="top"
-                                    title="Clé utilisée dans le code pour faire référence à la configuration">
-                                    <span class="fa fa-copyright"></span>
-                                </span>
-                            </div>
-                            {{ form_widget(formTax.Value,{'label': 'Valeur', 'attr': {'placeholder': 'Valeur'}}) }}
-                        </div>
                         
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" data-toggle="tooltip" data-placement="top"
-                                    title="Clé utilisée dans le code pour faire référence à la configuration">
-                                    <span class="fa fa-layer-group"></span>
-                                </span>
-                            </div>
-                            {{ form_widget(formTax.CommentContent,{'label': 'Commentiare', 'attr': {'placeholder': 'Commentaire'}}) }}
+                        <div class="c-switch-wrapper">
+                            <span class="badge badge-success">Taxe par défaut</span>
+                            <label class="c-switch c-switch-label c-switch-primary">
+                                {% if formTax.vars.data.IsCurrent %}
+                                <input name="Tax_registration[is_current]" class="c-switch-input" type="checkbox" checked>
+                                {% else %}
+                                <input name="Tax_registration[is_current]" class="c-switch-input" type="checkbox">
+                                {% endif %}
+                                <span class="c-switch-slider" data-checked="Oui" data-unchecked="Non"></span>
+                            </label>
                         </div>
+                        <div class="c-switch-wrapper">
+                            <span class="badge badge-success">TVA/MARGE</span>
+                            <label class="c-switch c-switch-label c-switch-primary">
+                                {% if formTax.vars.data.IsTVAMarge %}
+                                <input name="Tax_registration[is_TVAMarge]" class="c-switch-input" type="checkbox" checked>
+                                {% else %}
+                                <input name="Tax_registration[is_TVAMarge]" class="c-switch-input" type="checkbox">
+                                {% endif %}
+                                <span class="c-switch-slider" data-checked="Oui" data-unchecked="Non"></span>
+                            </label>
+                        </div>
+                        <br />
+                        
+                        {{ form_row(formTax.Type,{'label': 'désignation de la Tax', 'attr': {'placeholder': 'désignation de la Tax'}})
+                        }}
+                        {{ form_row(formTax.Value,{'label': 'Valeur', 'attr': {'placeholder': 'Valeur'}}) }}
+                        {{ form_row(formTax.CommentContent,{'label': 'Commentiare', 'attr': {'placeholder': 'Commentaire'}}) }}
 
                         {{ form_row(formTax.IsCurrent, {'label': 'TVA par défaut'}) }}
                         {{ form_row(formTax.IsTVAMarge, {'label': 'TVA/Marge'}) }}

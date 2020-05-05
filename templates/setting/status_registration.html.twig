@@ -32,27 +32,8 @@
                         {% include "notify.html.twig" %}
 
                         {{ form_start(formStatus, { 'attr': {'id': 'global_form' }}) }}
-
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" data-toggle="tooltip" data-placement="top"
-                                    title="Clé utilisée dans le code pour faire référence à la configuration">
-                                    <span class="fa fa-chess-board"></span>
-                                </span>
-                            </div>
-                            {{ form_widget(formStatus.Name,{'label': 'désignation du statut', 'attr': {'placeholder': 'désignation du statut'}}) }}
-                        </div>
-                        
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" data-toggle="tooltip" data-placement="top"
-                                    title="Decription">
-                                    <span class="fa fa-layer-group"></span>
-                                </span>
-                            </div>
-                            {{ form_widget(formStatus.DisplayName,{'label': 'description', 'attr': {'placeholder': 'description'}}) }}
-                        </div>
-                        
+                        {{ form_row(formStatus.Name,{'label': 'désignation du statut', 'attr': {'placeholder': 'désignation du statut'}}) }}
+                        {{ form_row(formStatus.DisplayName,{'label': 'description', 'attr': {'placeholder': 'description'}}) }}
 
                         {{ form_end(formStatus) }}
                     </div> 

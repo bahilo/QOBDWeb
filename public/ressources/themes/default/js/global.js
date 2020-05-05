@@ -156,4 +156,11 @@ $(document).ready(function(){
         });
     }
 
+    //-----------------------------------------------------------------------------
+    //-- demande de confirmation la validation
+    //-----------------------------------------------------------------------------
+    $.fn.initTooltip = function () {
+        $('[data-toggle="tooltip"]').tooltip();
+    }
+
 });

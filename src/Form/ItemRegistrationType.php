@@ -28,7 +28,7 @@ class ItemRegistrationType extends AbstractType
             ->add('ItemBrand')
             //->add('deliveries')
             //->add('orders')
-            //->add('Tax')
+            ->add('SerieCode')
             ->add('PictureFile', FileType::class, [
                 'label' => 'avatar',
 

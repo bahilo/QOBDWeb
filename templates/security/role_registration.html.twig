@@ -37,40 +37,18 @@
                             {{ form_start(formRole, { 'attr': {'id': 'global_form' }}) }}
 
                             {% if is_granted('ROLE_OPERATOR') %}
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" data-toggle="tooltip" data-placement="top"
-                                            title="Clé utilisée dans le code pour faire référence à la configuration">
-                                            <span class="fa fa-key"></span>
-                                        </span>
-                                    </div>
-                                    {{ form_widget(formRole.Name,{'label': 'Nom du rôle', 'attr': {'placeholder': 'Nom du rôle'}})
-                                    }}
-                                </div>
+                            {{ form_row(formRole.Name,{'label': 'Nom du rôle', 'attr': {'placeholder': 'Nom du rôle'}})
+                            }}
+                              
                             {% else %}
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top"
-                                        title="Clé utilisée dans le code pour faire référence à la configuration">
-                                        <span class="fa fa-key"></span>
-                                    </span>
-                                </div>
-                                {{ form_widget(formRole.Name,{'label': 'Nom du rôle', 'attr': {'placeholder': 'Nom du rôle', 'disabled': 'disabled'}})
-                                }}
-                            </div>
+                            {{ form_row(formRole.Name,{'label': 'Nom du rôle', 'attr': {'placeholder': 'Nom du rôle', 'disabled': 'disabled'}})
+                            }}
+                            
                             {% endif %}
 
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" data-toggle="tooltip" data-placement="top"
-                                        title="Nom de la configuration">
-                                        <span class="fa fa-comment-dots"></span>
-                                    </span>
-                                </div>
-                                {{ form_widget(formRole.DisplayName,{'label': 'Description', 'attr': {'placeholder': 'Description'}})
-                                }}
-                            </div>
-
+                            {{ form_row(formRole.DisplayName,{'label': 'Description', 'attr': {'placeholder': 'Description'}})
+                            }}
+                            
                             {{ form_end(formRole) }}
                         </div>
                     </div>

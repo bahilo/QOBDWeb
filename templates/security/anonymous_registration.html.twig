@@ -40,68 +40,22 @@
 
                         {{ form_start(formAgent, {'action': path("security_registration"), 'enctype':'multipart/form-data', 'attr': {'id': 'global_form' }}) }}
                         
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">
-                                    <i class="fa fa-chess-board"></i>
-                                </span>
-                            </div>
-                            {{ form_widget(formAgent.LastName,{'attr': {'placeholder': 'Nom'}}) }}
-                        </div>
-                        
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">
-                                    <i class="fa fa-chess-board"></i>
-                                </span>
-                            </div>
-                            {{ form_widget(formAgent.FirstName,{'attr': {'placeholder': 'Prénom'}}) }}
-                        </div>
-
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">@</span>
-                            </div>
-                            {{ form_widget(formAgent.Email,{'attr': {'placeholder': 'Email...'}}) }}
-                        </div>
-
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">
-                                    <i class="fa fa-user"></i>
-                                </span>
-                            </div>
-                            {{ form_widget(formAgent.UserName,{'attr': {'placeholder': 'Pseudo'}}) }}
-                        </div>
-
-                        <div class="input-group mb-4">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">
-                                    <i class="fa fa-lock"></i>
-                                </span>
-                            </div>
-                            {{ form_widget(formAgent.PlainTextPassword,{'attr': {'placeholder': 'mot de passe'}}) }}
-                        </div>
-
-                        <div class="input-group mb-4">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">
-                                    <i class="fa fa-lock"></i>
-                                </span>
-                            </div>
-                            {{ form_widget(formAgent.Confirme_password,{'attr': {'placeholder': 'Veuillez répéter le mot de passe'}}) }}
-                        </div>
-
                         <div class="form-group">
-                            {{ form_widget(formAgent.PictureFile,{'attr': {'placeholder': 'Avatar', 'class':'form-control'}}) }}
+                            {{ form_row(formAgent.PictureFile,{'label': 'Image profile', 'attr': {'placeholder': 'Avatar', 'class':'form-control'}}) }}
                         </div>
                         
-                        {{ form_widget(formAgent.Phone,{'attr': {'placeholder': 'Numéro de téléphone', 'style': 'display:none'}}) }}
-                        {{ form_widget(formAgent.Fax,{'attr': {'placeholder': 'Fax', 'style': 'display:none'}}) }}
+                        {{ form_row(formAgent.LastName,{'label': 'Nom', 'attr': {'placeholder': 'Nom'}}) }}
+                        {{ form_row(formAgent.FirstName,{'label': 'Prénom', 'attr': {'placeholder': 'Prénom'}}) }}
+                        {{ form_row(formAgent.Email,{'label': 'Email', 'attr': {'placeholder': 'Email...'}}) }}
+                        {{ form_row(formAgent.UserName,{'label': 'Pseudo', 'attr': {'placeholder': 'Pseudo'}}) }}
+                        {{ form_row(formAgent.PlainTextPassword,{'label': 'mot de passe', 'attr': {'placeholder': 'mot de passe'}}) }}
+                        {{ form_row(formAgent.Confirme_password,{'label': 'Veuillez répéter le mot de passe', 'attr': {'placeholder': 'Veuillez répéter le mot de passe'}}) }}
+                        {{ form_row(formAgent.Phone,{'label': 'Numéro de téléphone', 'attr': {'placeholder': 'Numéro de téléphone', 'style': 'display:none'}}) }}
+                        {{ form_row(formAgent.Fax,{'label': 'Fax', 'attr': {'placeholder': 'Fax', 'style': 'display:none'}}) }}
                         
                         
                         
-                        {{ form_widget(formAgent.ListSize,{'attr': {'placeholder': 'Taille par defaut des listes', 'style': 'display:none'}})
+                        {{ form_row(formAgent.ListSize,{'label': 'Taille par defaut des listes', 'attr': {'placeholder': 'Taille par defaut des listes', 'style': 'display:none'}})
                         }}
                         
                         

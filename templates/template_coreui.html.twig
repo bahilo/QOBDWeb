@@ -90,26 +90,26 @@
       {% if search.get_right_read("ACTION_DASHBORD") %}
       <li class="c-sidebar-nav-item">
         <a class="c-sidebar-nav-link c-active" href="{{ path("home") }}">
-          <i class="fa fa-tachometer-alt"></i> Tableau de bord
+          <i class="fa fa-tachometer-alt"></i> TABLEAU DE BORD
         </a>
       </li>
       {% endif %}
 
       {% if search.get_right_read("ACTION_CATALOGUE") %}
-      <li class="c-sidebar-nav-title">Catyalogue</li>      
+      <li class="c-sidebar-nav-title">CATALOGUE</li>      
       <li class="c-sidebar-nav-item">
         <a class="c-sidebar-nav-link" href="{{ path("catalogue_home") }}">
-          <i class="fa fa-clone"></i> Produits
+          <i class="fa fa-clone"></i> PRODUITS
         </a>
       </li>
       {% endif %}
 
-      <li class="c-sidebar-nav-title">Commandes/Avoirs</li>
+      <li class="c-sidebar-nav-title">COMMANDE/AVOIR</li>
 
       {% if search.get_right_read("ACTION_QUOTE") %}
       <li class="c-sidebar-nav-item">
         <a class="c-sidebar-nav-link" href="{{ path("order_quote")}}">
-          <i class="fa fa-align-justify"></i> Devis
+          <i class="fa fa-align-justify"></i> DEVIS
         </a>
       </li>
       {% endif %}
@@ -117,91 +117,91 @@
       {% if search.get_right_read("ACTION_ORDER") %}
       <li class="c-sidebar-nav-dropdown">
         <a class="c-sidebar-nav-dropdown-toggle" href="#">
-          <i class="fa fa-align-justify"></i> Commandes</a>
+          <i class="fa fa-align-justify"></i> COMMANDES</a>
         </a>
         <ul class="c-sidebar-nav-dropdown-items">
           <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ path("order_preorder") }}">
-              <i class="fa fa-calendar"></i> A valider
+              <i class="fa fa-calendar"></i> CMD A VALIDER
             </a>
           </li>
           <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ path("order_home") }}">
-              <i class="fa fa-clipboard-check"></i> validées
+              <i class="fa fa-clipboard-check"></i> CMD VALIDEES
             </a>
           </li>
           <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ path("order_customer_valid") }}">
-              <i class="fa fa-calendar-check"></i> Revalidation client
+              <i class="fa fa-calendar-check"></i> DEMANDE REVALIDATION
             </a>
           </li>
           <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ path("order_bill") }}">
-              <i class="fa fa-cubes"></i> Expédiées</a>
+              <i class="fa fa-cubes"></i> CMD EXPEDIEE</a>
           </li>
           <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ path("order_closed") }}">
-              <i class="fa fa-closed-captioning"></i> Cloturées</a>
+              <i class="fa fa-closed-captioning"></i> CMD PAYEE & CLOTUREE</a>
           </li>
         </ul>
       </li>
 
       <li class="c-sidebar-nav-dropdown">
         <a class="c-sidebar-nav-dropdown-toggle" href="#">
-          <i class="fa fa-align-justify"></i> Avoirs</a>
+          <i class="fa fa-align-justify"></i> AVOIRS</a>
         </a>
         <ul class="c-sidebar-nav-dropdown-items">
           <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ path("order_prerefund") }}">
-              <i class="fa fa-calendar"></i> A valider
+              <i class="fa fa-calendar"></i> AVOIR A VALIDER
             </a>
           </li>
           <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ path("order_refund") }}">
-              <i class="fa fa-clipboard-check"></i> validées
+              <i class="fa fa-clipboard-check"></i> AVOIR VALIDE
             </a>
           </li>
           <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ path("order_bill_refund") }}">
-              <i class="fa fa-cubes"></i> Expédiées</a>
+              <i class="fa fa-cubes"></i> AVOIR EXPEDIE</a>
           </li>
           <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ path("order_refund_closed") }}">
-              <i class="fa fa-closed-captioning"></i> Cloturées</a>
+              <i class="fa fa-closed-captioning"></i> AVOIR PAYE & CLOTURE</a>
           </li>
         </ul>
       </li>
       {% endif %}
 
       {% if search.get_right_read("ACTION_CLIENT") %}
-      <li class="c-sidebar-nav-title">Suivi Clientèle</li>
+      <li class="c-sidebar-nav-title">SUIVI CLIENTELE</li>
       <li class="c-sidebar-nav-item">
         <a class="c-sidebar-nav-link" href="{{ path("client_home") }}">
-          <i class="fa fa-user"></i> Clients
+          <i class="fa fa-user"></i> CLIENTS
         </a>
       </li>
       {% endif %}
       
-      <li class="c-sidebar-nav-title">Administration / Securité</li>
+      <li class="c-sidebar-nav-title">SECURITE/CONFIGURATION</li>
       {% if search.get_right_read("ACTION_SECURITY") %}      
       <li class="c-sidebar-nav-dropdown">
         <a class="c-sidebar-nav-dropdown-toggle" href="#">
-          <i class="fa fa-user-secret"></i> Securité</a>
+          <i class="fa fa-user-secret"></i> SECURITE</a>
         </a>
         <ul class="c-sidebar-nav-dropdown-items">
           <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ path("agent_home") }}">
-              <i class="fa fa-fingerprint"></i> commerciaux
+              <i class="fa fa-fingerprint"></i> COMMERCIAUX
             </a>
           </li>
           <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ path("security_agent_role") }}">
-              <i class="fa fa-id-card"></i> Accès
+              <i class="fa fa-id-card"></i> ACCES
             </a>
           </li>
           <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ path("security_profile") }}">
-              <i class="fa fa-passport"></i> profiles
+              <i class="fa fa-passport"></i> PROFILES
             </a>
           </li>
         </ul>
@@ -211,74 +211,88 @@
       {% if search.get_right_read("ACTION_SETTING") %}
       <li class="c-sidebar-nav-dropdown">
         <a class="c-sidebar-nav-dropdown-toggle" href="#">
-          <i class="fa fa-user-secret"></i> Configuration
+          <i class="fa fa-user-secret"></i> CONFIGURATION
         </a>        
         <ul class="c-sidebar-nav-dropdown-items">
           <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ path("setting_home") }}">
-              <i class="fa fa-sliders-h"></i> Générale
+              <i class="fa fa-sliders-h"></i> GENERALE
             </a>
           </li>
           <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ path("setting_currency") }}">
-              <i class="fa fa-coins"></i> Monnaie
+              <i class="fa fa-coins"></i> MONNAIE
             </a>
           </li>
           <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ path("setting_tax") }}">
-              <i class="fa fa-money-bill-wave-alt"></i> Taxe
-            </a>
-          </li>
-          <li class="c-sidebar-nav-item">
-            <a class="c-sidebar-nav-link" href="{{ path("setting_delivery_status") }}">
-              <i class="fa fa-star"></i> Statut Facturation
-            </a>
-          </li>
-          <li class="c-sidebar-nav-item">
-            <a class="c-sidebar-nav-link" href="{{ path("setting_order_status") }}">
-              <i class="fa fa-star-half-alt"></i> Statut Commande
+              <i class="fa fa-money-bill-wave-alt"></i> TAXE
             </a>
           </li>
           <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ path("setting_email") }}">
-              <i class="fa fa-star-half-alt"></i> Emails
+              <i class="fa fa-star-half-alt"></i> EMAIL
             </a>
-          </li>
-          <li class="c-sidebar-nav-item">
-            <a class="c-sidebar-nav-link" href="{{ path("setting_catalogue_brand") }}">
-              <i class="fa fa-random"></i> Marques produits
-            </a>
-          </li>
-          <li class="c-sidebar-nav-item">
-            <a class="c-sidebar-nav-link" href="{{ path("setting_catalogue_group") }}">
-              <i class="fa fa-caret-square-down"></i> Familles produits
-            </a>
-          </li>
-          <li class="c-sidebar-nav-item">
-            <a class="c-sidebar-nav-link" href="{{ path("setting_catalogue_provider") }}">
-              <i class="fa fa-hourglass-half"></i> Fournisseurs produits
-            </a>
-          </li>          
+          </li>                   
           <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ path("setting_catalogue_import") }}">
               <i class="fa fa-upload"></i> Imports
             </a>
           </li>
-
-          {% if search.get_right_read("ACTION_SECURITY") %}
           <li class="c-sidebar-nav-dropdown">
             <a class="c-sidebar-nav-dropdown-toggle" href="#">
-              <i class="fa fa-user-secret"></i> Securité
+              <i class="fa fa-user-secret"></i> CATALOGUE
+            </a>
+            <ul class="c-sidebar-nav-dropdown-items">
+              <li class="c-sidebar-nav-item">
+                <a class="c-sidebar-nav-link" href="{{ path("setting_catalogue_brand") }}">
+                  <i class="fa fa-random"></i> MARQUES
+                </a>
+              </li>
+              <li class="c-sidebar-nav-item">
+                <a class="c-sidebar-nav-link" href="{{ path("setting_catalogue_group") }}">
+                  <i class="fa fa-caret-square-down"></i> FAMILLES
+                </a>
+              </li>
+              <li class="c-sidebar-nav-item">
+                <a class="c-sidebar-nav-link" href="{{ path("setting_catalogue_provider") }}">
+                  <i class="fa fa-hourglass-half"></i> FOURNISSEURS
+                </a>
+              </li>
+            </ul>
+          </li> 
+
+          {% if app.user.isadmin %}
+          <li class="c-sidebar-nav-dropdown">
+            <a class="c-sidebar-nav-dropdown-toggle" href="#">
+              <i class="fa fa-user-secret"></i> STATUS
+            </a>
+            <ul class="c-sidebar-nav-dropdown-items">
+              <li class="c-sidebar-nav-item">
+                <a class="c-sidebar-nav-link" href="{{ path("setting_delivery_status") }}">
+                  <i class="fa fa-star"></i> FACTURATION
+                </a>
+              </li>
+              <li class="c-sidebar-nav-item">
+                <a class="c-sidebar-nav-link" href="{{ path("setting_order_status") }}">
+                  <i class="fa fa-star-half-alt"></i> COMMANDE
+                </a>
+              </li>
+            </ul>
+          </li>          
+          <li class="c-sidebar-nav-dropdown">
+            <a class="c-sidebar-nav-dropdown-toggle" href="#">
+              <i class="fa fa-user-secret"></i> SECURITE
             </a>
             <ul class="c-sidebar-nav-dropdown-items">
               <li class="c-sidebar-nav-item">
                 <a class="c-sidebar-nav-link" href="{{ path("security_action") }}">
-                  <i class="fa fa-fingerprint"></i> Actions
+                  <i class="fa fa-fingerprint"></i> ACTIONS
                 </a>
               </li>
               <li class="c-sidebar-nav-item">
                 <a class="c-sidebar-nav-link" href="{{ path("security_role") }}">
-                  <i class="fa fa-passport"></i> Roles
+                  <i class="fa fa-passport"></i> ROLES
                 </a>
               </li>
             </ul>
@@ -702,13 +716,16 @@
     </div>
   </div>
 
-  <script src="{{ asset('js/jquery-3.4.1.js','theme_default') }}"></script>
- <script src="{{ asset('javascript/popper.min.js','theme_coreui') }}"></script>
-  <script src="{{ asset('js/bootstrap/bootstrap.js','theme_default') }}"></script>
-  <script src="{{ asset('js/moment.js','theme_default') }}"></script>
-
-  <script src="{{ asset('javascript/src/coreui.bundle.min.js','theme_coreui') }}"></script>
-        
+    <script src="{{ asset('js/jquery-3.4.1.js','theme_default') }}"></script>
+    
+    <script src="{{ asset('javascript/popper.min.js','theme_coreui') }}"></script> 
+<!--  
+    <script src="{{ asset('js/bootstrap/bootstrap.js','theme_default') }}"></script>-->
+    <script src="{{ asset('js/moment.js','theme_default') }}"></script>
+    <!--   
+    <script src="{{ asset('javascript/src/coreui.js','theme_coreui') }}"></script>-->
+ 
+    <script src="{{ asset('javascript/src/coreui.bundle.min.js','theme_coreui') }}"></script>
     <script src="{{ asset('datatables.js','datatable_dir') }}"></script>    
     <script src="{{ asset('dataTables.responsive.min.js','datatable_dir') }}"></script>
     <script src="{{ asset('all.min.js','font_awsome_js') }}"></script>

@@ -32,7 +32,10 @@ $(document).ready(function ($) {
             ajax:{
                 url: Routing.generate('client_home_data'),
             },
-            columns: getCLientColumn()
+            columns: getCLientColumn(),
+            initComplete: function (setting, json) {
+                $.fn.initTooltip();
+            },
         });
 
         $("#contact_table_js").myTable({
@@ -42,7 +45,10 @@ $(document).ready(function ($) {
             ajax: {
                 url: Routing.generate('client_contact_data', {id: $('#client_id').val()}),
             },
-            columns: getContactColumn()
+            columns: getContactColumn(),
+            initComplete: function (setting, json) {
+                $.fn.initTooltip();
+            },
         });
 
         $("#quote_table_js").myTable({
@@ -51,7 +57,10 @@ $(document).ready(function ($) {
             ajax: {
                 url: Routing.generate('client_quote_data', { id: $('#client_id').val()}),
             },
-            columns: getQuoteColumn()
+            columns: getQuoteColumn(),
+            initComplete: function (setting, json) {
+                $.fn.initTooltip();
+            },
         });
 
         $("#order_table_js").myTable({
@@ -60,7 +69,10 @@ $(document).ready(function ($) {
             ajax: {
                 url: Routing.generate('client_order_data', { id: $('#client_id').val()}),
             },
-            columns: getOrderColumn()
+            columns: getOrderColumn(),
+            initComplete: function (setting, json) {
+                $.fn.initTooltip();
+            },
         });
 
     });

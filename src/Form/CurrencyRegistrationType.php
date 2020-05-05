@@ -17,7 +17,7 @@ class CurrencyRegistrationType extends AbstractType
             ->add('Rate')
             ->add('CountryCode')
             ->add('Country')
-            ->add('IsDefault')
+            //->add('IsDefault')
             //->add('CreatedAt')
         ;
     }

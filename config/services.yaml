@@ -6,15 +6,38 @@
 parameters:
     app.name: '/QOBDWeb'
     app.name.base_dir: '%app.name%'
-    resource.download_dir: '/ressources/download'
+    download_dir: '/ressources/download'
+
+    agent_dir: 'agent/avatars'
+    setting.catalogue_dir: 'setting/catalogue'
+    setting.file_dir: 'setting/files'
+    setting.image_dir: 'setting/image'
+    pdf.bill_dir: 'pdf/order'
+    pdf.quote_dir: 'pdf/quote'
+    pdf.delivery_dir: 'pdf/delivery'
+
+
+    resource.download_dir: '%app.name.base_dir%/%download_dir%'
     file.download_dir: '%resource.download_dir%'
-    file.agent.download_dir: '%file.download_dir%/agent/avatars'
-    file.setting.catalogue.download_dir: '%file.download_dir%/setting/catalogue'
-    file.setting.file.download_dir: '%file.download_dir%/setting/files'
-    file.setting.image.download_dir: '%file.download_dir%/setting/image'
-    file.pdf.bill.download_dir: '%file.download_dir%/pdf/order'
-    file.pdf.quote.download_dir: '%file.download_dir%/pdf/quote'
-    file.pdf.delivery.download_dir: '%file.download_dir%/pdf/delivery'
+    file.agent.download_dir: '%file.download_dir%/%agent_dir%'
+    file.setting.catalogue.download_dir: '%file.download_dir%/%setting.catalogue_dir%'
+    file.setting.file.download_dir: '%file.download_dir%/%setting.file_dir%'
+    file.setting.image.download_dir: '%file.download_dir%/%setting.image_dir%'
+    file.pdf.bill.download_dir: '%file.download_dir%/%pdf.bill_dir%'
+    file.pdf.quote.download_dir: '%file.download_dir%/%pdf.quote_dir%'
+    file.pdf.delivery.download_dir: '%file.download_dir%/pdf/%pdf.delivery_dir%'
+
+    abs.public: '%app.name.base_dir%/public'
+    abs.resource.download_dir: '%abs.public%/%download_dir%'
+    abs.file.download_dir: '%abs.resource.download_dir%'
+    abs.file.agent.download_dir: '%abs.file.download_dir%/%agent_dir%'
+    abs.file.setting.catalogue.download_dir: '%abs.file.download_dir%/%setting.catalogue_dir%'
+    abs.file.setting.file.download_dir: '%abs.file.download_dir%/%setting.file_dir%'
+    abs.file.setting.image.download_dir: '%abs.file.download_dir%/%setting.image_dir%'
+    abs.file.pdf.bill.download_dir: '%abs.file.download_dir%/%pdf.bill_dir%'
+    abs.file.pdf.quote.download_dir: '%abs.file.download_dir%/%pdf.quote_dir%'
+    abs.file.pdf.delivery.download_dir: '%abs.file.download_dir%/pdf/%pdf.delivery_dir%'
+
     file.setting.email: '../templates/email/files'
     file.type.download_quote: 0
     file.type.download_order: 1

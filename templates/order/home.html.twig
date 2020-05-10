@@ -1,20 +1,15 @@
 {% extends 'template_coreui.html.twig' %}
 
 
-{% block title %}{{ parent() }} - {{ page_title }} {% endblock %}
+{% block title %}{{ parent() }}{% endblock %}
 
 {% block home_path %}
 <li class="breadcrumb-item">
-    <a href="#">Commande</a>
-</li>
-<li class="breadcrumb-item">
-    {{ page_title }}
+    Commande & Avoir
 </li>
 {% endblock %}
 
-{% block body_header_right %}
-    <a href="{{ path("catalogue_home") }}" class="btn btn-primary"><i class="fa fa-plus"></i></a>
-{% endblock %}
+{% block body_header_right %}{% endblock %}
 
 {% block body %}
 
@@ -22,13 +17,7 @@
 
     {% include "notify.html.twig" %}
     
-    <table id="" class="table">
-    </table>
-
-    
-
-    <input type="hidden" id="order_target" value="{{ target }}">
-    <input type="hidden" id="order_data_source" value="{{ source }}">
+    <input type="hidden" id="order_status" value="{{ status.name }}">
 
     <div class="animated fadeIn">
         <div class="row">
@@ -43,7 +32,6 @@
                     </div>
                 </div>
             </div>
-            <!-- /.col-->
         </div>
     </div>
 </div>

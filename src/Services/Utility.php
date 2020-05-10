@@ -19,6 +19,10 @@ class Utility{
         $this->logger = $logger;
         $this->session = $session;
     }
+
+    public function getAbsoluteRootPath(){
+        return dirname(__FILE__) . '/../../..';
+    }
    
     public function getMonthOfYear($date){
         //Convert the date string into a unix timestamp.

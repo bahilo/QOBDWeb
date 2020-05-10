@@ -28,7 +28,7 @@ $(document).ready(function () {
             });
 
             var lang = {
-                "emptyTable": "Auncune donnée dans la table",
+                "emptyTable": "Aucune donnée dans la table",
                 "lengthMenu": "Nombre de lignes _MENU_",
                 "zeroRecords": "Aucun résultat trouvé",
                 "loadingRecords": "Chargement...",
@@ -55,7 +55,7 @@ $(document).ready(function () {
                 dom: '<"top"<"row"<"col-md-10"f><"col-md-2"l>>>rt<"bottom nav-wrapper"p><"clear">',
                 BeforeSend: setting.beforeSend,
                 initComplete: function (settings, json) {
-                    setting.initComplete(settings, json, this.api());
+                    setting.initComplete(settings, json, this.api());                    
                 },
                 fnRowCallback: function (nRow, aData, index) {
                     setting.rowCallback(nRow, aData, index);

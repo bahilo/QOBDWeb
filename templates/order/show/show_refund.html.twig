@@ -1,0 +1,68 @@
+{% extends 'order/show.html.twig' %}
+
+
+{% block title %}{{ parent() }} - Avoir à valider {% endblock %}
+
+{% block home_path %}
+<li class="breadcrumb-item">
+    Commande & Avoir
+</li>
+<li class="breadcrumb-item">
+    <a href="#">Avoirs</a>
+</li>
+<li class="breadcrumb-item">
+    Détail avoir
+</li>
+{% endblock %}
+
+{% block control_btn_area %}
+<div class="btn-group">
+    <a href="{{ path("order_validation", {id: order.id, idStatus: status_prerefund.id}) }}"
+        class="btn btn-success btnValidation">Avoir à valider</a>
+    <a href="{{ path("order_validation", {id: order.id, idStatus: order_status_quote.id}) }}"
+        class="btn btn-danger btnValidation">Convertir en devis</a>
+</div>
+{% endblock %}
+
+{% block email_area %}
+<!-- Email devis -->
+<form action="{{ path("order_email_bill",{id: order.id }) }}" method="post">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa fa-align-justify"></i> Email
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+
+                            <div class="form-group">
+                                <label for="emailSubject">Object</label>
+                                <input type="text" name="order_detail_form[setting][email][subject]" id="emailSubject"
+                                    class="form-control"
+                                    value="** {{ search.get_setting("SOCIETE","SOCIETE_NOM").value }} Votre facture **">
+                            </div>
+                            <div class="form-group">
+                                <label for="emailBody">Message</label>
+                                <textarea name="order_detail_form[setting][email][body]" id="" cols="30" rows="10"
+                                    class="form-control">{{ email_content }}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="emailBody">Factures</label>
+                                <select name="order_detail_form[setting][email][bill]" class="form-control">
+                                    {% for bill in bills %}
+                                    <option value="{{ bill.id }}">
+                                        {{ search.get_setting("PDF","FACTURE_PREFIX").value ~ bill.id }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <input type="submit" value="Envoyer" class="btn btn-primary">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

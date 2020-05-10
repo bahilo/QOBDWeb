@@ -1,0 +1,43 @@
+{% extends 'order/show.html.twig' %}
+
+{% block home_path %}
+<li class="breadcrumb-item">
+    Commande & Avoir
+</li>
+<li class="breadcrumb-item">
+    <a href="#">Cmd expédiée</a>
+</li>
+<li class="breadcrumb-item">
+    Détail commande
+</li>
+{% endblock %}
+
+{% block control_btn_area %}
+<div class="btn-group">
+    <a href="{{ path("order_validation", {id: order.id, idStatus: status_order.id}) }}"
+        class="btn btn-success btnValidation">Convertir en commande</a>
+    <a href="{{ path("order_validation", {id: order.id, idStatus: status_refund.id}) }}"
+        class="btn btn-danger btnValidation">Convertir en avoir</a>
+</div>
+{% endblock %}
+
+{% block product_area %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-md-11">
+                        <i class="fa fa-align-justify"></i> Liste des produits et tarifs
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <table id="order_detail_table_js"
+                    class="table table-responsive-md table-bordered table-striped table-md">
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

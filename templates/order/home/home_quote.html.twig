@@ -1,0 +1,14 @@
+{% extends 'order/home.html.twig' %}
+
+{% block title %}{{ parent() }} - Devis{% endblock %}
+
+{% block body_header_right %}
+<a href="{{ path("catalogue_home") }}" class="btn btn-primary"><i class="fa fa-plus"></i></a>
+{% endblock %}
+
+{% block home_path %}
+{{ parent() }}
+<li class="breadcrumb-item">
+    Devis
+</li>
+{% endblock %}

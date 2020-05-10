@@ -121,6 +121,20 @@ class QuoteOrderRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    public function findScalarOrderBill(QuoteOrder $order): ?float
+    {
+        return $this->createQueryBuilder('q')
+            ->innerJoin('q.quoteOrderDetails', 'q_ord_dtl')
+            ->innerJoin('q_ord_dtl.quantityDeliveries', 'q_ord_dtl_qt_del')
+            ->innerJoin('q.Tax', 'q_tx')
+            ->andWhere('q = :order')
+            ->setParameter('order', $order)
+            ->groupBy('q.id')
+            ->select('SUM(q_ord_dtl.Quantity * q_ord_dtl.ItemSellPrice)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     /*
     public function findOneBySomeField($value): ?QuoteOrder
     {

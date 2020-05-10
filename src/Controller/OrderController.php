@@ -94,12 +94,10 @@ class OrderController extends Controller
     public function index(AgentRepository $agentRepo, ClientRepository $clientRepo)
     {
         return $this->render('order/index.html.twig', [
-            'page_title' => "Commandes",
-            'target' => 'order_data_source',
+            'status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_ORDER']),
             'agents' => $agentRepo->findAll(),
             'clients' => $clientRepo->findAll(),
-            'source' => $this->serializer->serialize(['object_array' => $this->orderManager->getHydrater()->hydrateQuoteOrder($this->orderRepo->findBy(['Status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_ORDER'])])), 'format' => 'json', 'group' => 'class_property']),
-         ]);
+          ]);
     }
 
     /**
@@ -111,10 +109,8 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        return $this->render('order/home.html.twig', [
-            'page_title' => "Commandes",
-            'target' => 'order_data_source',
-            'source' => $this->serializer->serialize(['object_array' => $this->orderManager->getHydrater()->hydrateQuoteOrder($this->orderRepo->findBy(['Status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_ORDER'])])), 'format' => 'json', 'group' => 'class_property']),
+        return $this->render('order/home/home_order.html.twig', [
+            'status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_ORDER']),
         ]);
     }
 
@@ -127,10 +123,8 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
         
-        return $this->render('order/home.html.twig', [
-            'page_title' => "Devis",
-            'target' => 'quote_data_source',
-            'source' => $this->serializer->serialize(['object_array' => $this->orderManager->getHydrater()->hydrateQuoteOrder($this->orderRepo->findBy(['Agent' => $this->getUser() ,'Status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE'])])), 'format' => 'json', 'group' => 'class_property'])
+        return $this->render('order/home/home_quote.html.twig', [
+            'status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE']),
         ]);
     }
 
@@ -143,10 +137,8 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
         
-        return $this->render('order/home.html.twig', [
-            'page_title' => "Commande à valider",
-            'target' => 'preorder_data_source',
-            'source' => $this->serializer->serialize(['object_array' => $this->orderManager->getHydrater()->hydrateQuoteOrder($this->orderRepo->findBy(['Agent' => $this->getUser(), 'Status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_PREORDER'])])), 'format' => 'json', 'group' => 'class_property'])
+        return $this->render('order/home/home_preorder.html.twig', [
+            'status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_PREORDER']),
         ]);
     }
 
@@ -159,10 +151,8 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
         
-        return $this->render('order/home.html.twig', [
-            'page_title' => "Avoirs à valider",
-            'target' => 'prerefund_data_source',
-            'source' => $this->serializer->serialize(['object_array' => $this->orderManager->getHydrater()->hydrateQuoteOrder($this->orderRepo->findBy(['Agent' => $this->getUser(), 'Status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_PREREFUND'])])), 'format' => 'json', 'group' => 'class_property'])
+        return $this->render('order/home/home_prerefund.html.twig', [
+            'status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_PREREFUND']),
         ]);
     }
 
@@ -175,10 +165,8 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
         
-        return $this->render('order/home.html.twig', [
-            'page_title' => "Avoirs",
-            'target' => 'refund_data_source',
-            'source' => $this->serializer->serialize(['object_array' => $this->orderManager->getHydrater()->hydrateQuoteOrder($this->orderRepo->findBy(['Agent' => $this->getUser(), 'Status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUND'])])), 'format' => 'json', 'group' => 'class_property'])
+        return $this->render('order/home/home_refund.html.twig', [
+            'status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUND']),
         ]);
     }
 
@@ -191,10 +179,8 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
         
-        return $this->render('order/home.html.twig', [
-            'page_title' => "Factures expédiées",
-            'target' => 'bill_data_source',
-            'source' => $this->serializer->serialize(['object_array' => $this->orderManager->getHydrater()->hydrateQuoteOrder($this->orderRepo->findBy(['Agent' => $this->getUser(), 'Status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_BILL'])])), 'format' => 'json', 'group' => 'class_property'])
+        return $this->render('order/home/home_order_sent.html.twig', [
+            'status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_BILL']),
         ]);
     }
 
@@ -207,11 +193,10 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
         
-        return $this->render('order/home.html.twig', [
-            'page_title' => "Avoirs Expédiés",
-            'target' => 'bill_refund_data_source',
-            'source' => $this->serializer->serialize(['object_array' => $this->orderManager->getHydrater()->hydrateQuoteOrder($this->orderRepo->findBy(['Agent' => $this->getUser(), 'Status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUNDBILL'])])), 'format' => 'json', 'group' => 'class_property'])
+        return $this->render('order/home/home_refund_sent.html.twig', [
+            'status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUNDBILL']),
         ]);
+        
     }
 
     /**
@@ -223,10 +208,8 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
         
-        return $this->render('order/home.html.twig', [
-            'page_title' => "Commandes à re-valider avec le client",
-            'target' => 'customer_valid_data_source',
-            'source' => $this->serializer->serialize(['object_array' => $this->orderManager->getHydrater()->hydrateQuoteOrder($this->orderRepo->findBy(['Agent' => $this->getUser(), 'Status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_VALID'])])), 'format' => 'json', 'group' => 'class_property'])
+        return $this->render('order/home/home_valid.html.twig', [
+            'status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_VALID']),
         ]);
     }
 
@@ -239,10 +222,8 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        return $this->render('order/home.html.twig', [
-            'page_title' => "Commandes cloturées",
-            'target' => 'closed_data_source',
-            'source' => $this->serializer->serialize(['object_array' => $this->orderManager->getHydrater()->hydrateQuoteOrder($this->orderRepo->findBy(['Agent' => $this->getUser(), 'Status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_CLOSED'])])), 'format' => 'json', 'group' => 'class_property'])
+        return $this->render('order/home/home_order_closed.html.twig', [
+            'status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_CLOSED']),
         ]);
     }
 
@@ -255,11 +236,9 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        return $this->render('order/home.html.twig', [
-            'page_title' => "Avoirs cloturés",
-            'target' => 'refund_closed_data_source',
-            'source' => $this->serializer->serialize(['object_array' => $this->orderManager->getHydrater()->hydrateQuoteOrder($this->orderRepo->findBy(['Agent' => $this->getUser(), 'Status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUNDCLOSED'])])), 'format' => 'json', 'group' => 'class_property'])
-        ]);
+        return $this->render('order/home/home_refund_closed.html.twig', [
+            'status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUNDCLOSED']),
+         ]);
     }
 
     /**
@@ -280,7 +259,7 @@ class OrderController extends Controller
         $CreateDeliveries = $this->deliveryRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']);
         $infos = $this->orderManager->getCommandeInfo($orderDetail, $order);
         
-        return $this->render('order/show.html.twig', [
+        return $this->render('order/show/show_order.html.twig', [
             'order_detail_data_source' => $this->serializer->serialize(['object_array' => $orderDetail, 'format' => 'json', 'group' => 'class_property']),
             'order_detail_delivery_data_source' => $this->serializer->serialize(['object_array' => $orderDetrailQtReceived, 'format' => 'json', 'group' => 'class_property']),
             'order_detail_bill_data_source' => $this->serializer->serialize(['object_array' => $roderDeliveries, 'format' => 'json', 'group' => 'class_property']),
@@ -291,6 +270,7 @@ class OrderController extends Controller
             'taxes' => $this->tvaRepo->findAll(),
             'status_close' => $this->statusRepo->findOneBy(['Name' => 'STATUS_CLOSED']),
             'bills' => $bills,
+            'order_status_valid' => $this->statusRepo->findOneBy(['Name' => 'STATUS_VALID']),
             'order_status_refund' => $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUND']),
             'order_status_quote' => $this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE']),
             'deliveries' => $this->deliveryRepo->findByBillStatus(['order' => $order, 'status' => 'STATUS_NOT_BILLED']),
@@ -313,7 +293,7 @@ class OrderController extends Controller
         $order = $this->orderRepo->find($id);
         $orderDetails = $this->orderDetailRepo->findBy(['QuoteOrder' => $order]);
 
-        return $this->render('order/show.html.twig', [
+        return $this->render('order/show/show_quote.html.twig', [
             'order_detail_data_source' => $this->serializer->serialize(['object_array' => $this->orderManager->getHydrater()->hydrateOrderDetail($orderDetails, $order), 'format' => 'json', 'group' => 'class_property']),
             'status_prerefund' => $this->statusRepo->findOneBy(['Name' => 'STATUS_PREREFUND']),
             'status_preorder' => $this->statusRepo->findOneBy(['Name' => 'STATUS_PREORDER']),
@@ -338,15 +318,77 @@ class OrderController extends Controller
 
         $order = $this->orderRepo->find($id);
         $orderDetails = $this->orderDetailRepo->findBy(['QuoteOrder' => $order]);
-        return $this->render('order/show.html.twig', [
+        return $this->render('order/show/show_preorder.html.twig', [
             'order_detail_data_source' => $this->serializer->serialize(['object_array' => $this->orderManager->getHydrater()->hydrateOrderDetail($orderDetails, $order), 'format' => 'json', 'group' => 'class_property']),
             'status_order' => $this->statusRepo->findOneBy(['Name' => 'STATUS_ORDER']),
-            'status_valid' => $this->statusRepo->findOneBy(['Name' => 'STATUS_VALID']),
-            'status_close' => $this->statusRepo->findOneBy(['Name' => 'STATUS_CLOSED']),
+            'order_status_quote' => $this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE']),
             'order' => $order,
             'currencies' => $currRepo->findAll(),
             'taxes' => $tvaRepo->findAll(),
             'info' => $this->orderManager->getCommandeInfo($orderDetails, $order),
+        ]);
+    }
+
+    /**
+     * @Route("/admin/commande/revalidation/detail/{id}", options={"expose"=true}, name="order_show_valid", requirements={"id"="\d+"})
+     */
+    public function showValid(int $id, 
+                                CurrencyRepository $currRepo,
+                                TaxRepository $tvaRepo) {
+
+        if (!$this->securityUtility->checkHasUpdate($this->actionRepo->findOneBy(['Name' => 'ACTION_PREORDER']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
+        $order = $this->orderRepo->find($id);
+        $orderDetails = $this->orderDetailRepo->findBy(['QuoteOrder' => $order]);
+        return $this->render('order/show/show_valid.html.twig', [
+            'order_detail_data_source' => $this->serializer->serialize(['object_array' => $this->orderManager->getHydrater()->hydrateOrderDetail($orderDetails, $order), 'format' => 'json', 'group' => 'class_property']),
+            'status_order' => $this->statusRepo->findOneBy(['Name' => 'STATUS_ORDER']),
+            'order_status_quote' => $this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE']),
+            'order' => $order,
+            'currencies' => $currRepo->findAll(),
+            'taxes' => $tvaRepo->findAll(),
+            'info' => $this->orderManager->getCommandeInfo($orderDetails, $order),
+        ]);
+    }
+
+    /**
+     * @Route("/admin/commande/avoir/detail/{id}", options={"expose"=true}, requirements={"id"="\d+"}, name="order_show_refund")
+     */
+    public function showRefund(
+        QuoteOrder $order,
+        CurrencyRepository $currRepo
+    ) {
+
+        if (!$this->securityUtility->checkHasUpdate($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
+        $bills = $this->orderManager->getHydrater()->hydrateBill($this->billRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']), $order);
+        $orderDetail = $this->orderManager->getHydrater()->hydrateOrderDetail($this->orderDetailRepo->findBy(['QuoteOrder' => $order]), $order);
+        $orderDetrailQtReceived = $this->orderManager->getHydrater()->hydrateOrderDetail($this->orderDetailRepo->findByQuantityRecieved($order), $order);
+        $roderDeliveries = $this->orderManager->getHydrater()->hydrateQuantityDelivery($this->quantityDelRepo->findByBillStatus($order), $order);
+        $CreateDeliveries = $this->deliveryRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']);
+        $infos = $this->orderManager->getCommandeInfo($orderDetail, $order);
+
+        return $this->render('order/show/show_refund.html.twig', [
+            'order_detail_data_source' => $this->serializer->serialize(['object_array' => $orderDetail, 'format' => 'json', 'group' => 'class_property']),
+            'order_detail_delivery_data_source' => $this->serializer->serialize(['object_array' => $orderDetrailQtReceived, 'format' => 'json', 'group' => 'class_property']),
+            'order_detail_bill_data_source' => $this->serializer->serialize(['object_array' => $roderDeliveries, 'format' => 'json', 'group' => 'class_property']),
+            'bill_data_source' => $this->serializer->serialize(['object_array' => $bills, 'format' => 'json', 'group' => 'class_property']),
+            'delivery_data_source' => $this->serializer->serialize(['object_array' => $CreateDeliveries, 'format' => 'json', 'group' => 'class_property']),
+            'order' => $order,
+            'currencies' => $currRepo->findAll(),
+            'taxes' => $this->tvaRepo->findAll(),
+            'status_prerefund' => $this->statusRepo->findOneBy(['Name' => 'STATUS_PREREFUND']),
+            'refund_status_close' => $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUNDCLOSED']),
+            'order_status_quote' => $this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE']),
+            'bills' => $bills,
+            'deliveries' => $this->deliveryRepo->findByBillStatus(['order' => $order, 'status' => 'STATUS_NOT_BILLED']),
+            'info' => $infos,
+            'can_open_row' => true,
+            'email_content' => file_get_contents($this->getParameter('file.setting.email') . '/' . 'facture.txt'),
         ]);
     }
 
@@ -363,9 +405,10 @@ class OrderController extends Controller
 
         $order = $this->orderRepo->find($id);
         $orderDetails = $this->orderDetailRepo->findBy(['QuoteOrder' => $order]);
-        return $this->render('order/show.html.twig', [
+        return $this->render('order/show/show_prerefund.html.twig', [
             'order_detail_data_source' => $this->serializer->serialize(['object_array' => $this->orderManager->getHydrater()->hydrateOrderDetail($orderDetails, $order), 'format' => 'json', 'group' => 'class_property']),
             'status_refund' => $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUND']),
+            'order_status_quote' => $this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE']),
             'order' => $order,
             'currencies' => $currRepo->findAll(),
             'taxes' => $tvaRepo->findAll(),
@@ -414,9 +457,6 @@ class OrderController extends Controller
             ]);
             $this->eventDispatcher->dispatch(MyEvents::ORDER_EMAIL_VALIDATION, $event);
 
-        }
-        else{
-            $this->ErrorHandler->error("la commande N°". $order->getId() ." n'a pas de statut!");
         }
 
         return $this->getRouteFromStatus($status, $order);
@@ -667,22 +707,44 @@ class OrderController extends Controller
 
     /**
      * @Route("/admin/commande/detail/sauvegarde/{id}", options={"expose"=true}, name="order_detail_save", requirements={"id"="\d+"})
-     * @Route("/admin/commande/detail/sauvegarde/error/{id}/{message}", options={"expose"=true}, name="order_detail_save_error", requirements={"id"="\d+"})
      */
     public function save(QuoteOrder $order,
-                         $message = null,
+                         BillRepository $billRepo,
+                         OrderStatusRepository $statusRepo,
                          Request $request,
                          ObjectManager $manager) {
 
         if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
             return $this->redirectToRoute('security_deny_access');
         }
-                
         $form = $request->request->get('order_detail_form');
         $this->orderManager->loggCommandeSaveInfo($order, $form);
         $order = $this->orderManager->getHydrater()->hydrateQuoteOrderRelationFromForm($order, $form);
         $manager->persist($order);        
         $manager->flush();
+
+
+        $TotoalOrderBill = $this->orderRepo->findScalarOrderBill($order);
+        $totalBilled = $billRepo->findScalarBilledOrder($order);
+
+        dump($TotoalOrderBill);
+        dump($totalBilled);die();
+
+        if($TotoalOrderBill == $totalBilled){
+            dump($TotoalOrderBill);
+            dump($totalBilled);die();
+            $status = null;
+            if($order->getStatus()->getName() == "STATUS_ORDER")
+                $status = $statusRepo->findOneBy(['Name' => 'STATUS_BILL']);
+            else if($order->getStatus()->getName() == "STATUS_REFUND")
+                $status = $statusRepo->findOneBy(['Name' => 'STATUS_REFUNDBILL']);
+
+            if(!empty($status)){
+                $order->setStatus($status);
+                $manager->persist($order);
+                $manager->flush();
+            }
+        }
         
         return $this->getRouteFromStatus($order->getStatus(), $order);
     }
@@ -1042,21 +1104,224 @@ class OrderController extends Controller
             return $this->RedirectToRoute('order_show_quote', ['id' => $order->getId()]);
     }
 
+    /*_____________________________________________[ Ajax/Data ]_________________________ */
+
+    /**
+     * @Route("/admin/commande/donnee", options={"expose"=true}, name="order_data")
+     */
+    public function dataOrder() {
+        
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+            return new Response($this->serializer->serialize([
+                'object_array' => ['message' => 'Zone à accés restreint!"'],
+                'format' => 'json',
+            ]));
+        }
+
+        return new Response($this->serializer->serialize([
+            'object_array' => ['data' => $this->orderManager->getHydrater()->hydrateQuoteOrder($this->orderRepo->findBy(['Agent' => $this->getUser(), 'Status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_ORDER'])]))],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]));
+    }
+
+    /**
+     * @Route("/admin/commande/donnee/devis", options={"expose"=true}, name="order_data_quote")
+     */
+    public function dataQuote()
+    {
+
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+            return new Response($this->serializer->serialize([
+                'object_array' => ['message' => 'Zone à accés restreint!"'],
+                'format' => 'json',
+            ]));
+        }
+
+        return new Response($this->serializer->serialize([
+            'object_array' => ['data' => $this->orderManager->getHydrater()->hydrateQuoteOrder($this->orderRepo->findBy(['Agent' => $this->getUser(), 'Status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE'])]))],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]));
+    }
+
+    /**
+     * @Route("/admin/commande/donnee/precommande", options={"expose"=true}, name="order_data_preorder")
+     */
+    public function dataPreorder()
+    {
+
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+            return new Response($this->serializer->serialize([
+                'object_array' => ['message' => 'Zone à accés restreint!"'],
+                'format' => 'json',
+            ]));
+        }
+
+        return new Response($this->serializer->serialize([
+            'object_array' => ['data' => $this->orderManager->getHydrater()->hydrateQuoteOrder($this->orderRepo->findBy(['Agent' => $this->getUser(), 'Status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_PREORDER'])]))],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]));
+    }
+
+    /**
+     * @Route("/admin/commande/donnee/preavoir", options={"expose"=true}, name="order_data_prerefund")
+     */
+    public function dataPrerefund()
+    {
+
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+            return new Response($this->serializer->serialize([
+                'object_array' => ['message' => 'Zone à accés restreint!"'],
+                'format' => 'json',
+            ]));
+        }
+
+        return new Response($this->serializer->serialize([
+            'object_array' => ['data' => $this->orderManager->getHydrater()->hydrateQuoteOrder($this->orderRepo->findBy(['Agent' => $this->getUser(), 'Status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_PREREFUND'])]))],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]));
+    }
+
+    /**
+     * @Route("/admin/commande/donnee/avoir", options={"expose"=true}, name="order_data_refund")
+     */
+    public function dataRefund()
+    {
+
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+            return new Response($this->serializer->serialize([
+                'object_array' => ['message' => 'Zone à accés restreint!"'],
+                'format' => 'json',
+            ]));
+        }
+
+        return new Response($this->serializer->serialize([
+            'object_array' => ['data' => $this->orderManager->getHydrater()->hydrateQuoteOrder($this->orderRepo->findBy(['Agent' => $this->getUser(), 'Status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUND'])]))],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]));
+    }
+
+    /**
+     * @Route("/admin/commande/donnee/Facture", options={"expose"=true}, name="order_data_bill")
+     */
+    public function dataBill()
+    {
+
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+            return new Response($this->serializer->serialize([
+                'object_array' => ['message' => 'Zone à accés restreint!"'],
+                'format' => 'json',
+            ]));
+        }
+
+        return new Response($this->serializer->serialize([
+            'object_array' => ['data' => $this->orderManager->getHydrater()->hydrateQuoteOrder($this->orderRepo->findBy(['Agent' => $this->getUser(), 'Status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_BILL'])]))],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]));
+    }
+
+    /**
+     * @Route("/admin/commande/donnee/avoir/Facture", options={"expose"=true}, name="order_data_bill_refund")
+     */
+    public function dataBillRefund()
+    {
+
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+            return new Response($this->serializer->serialize([
+                'object_array' => ['message' => 'Zone à accés restreint!"'],
+                'format' => 'json',
+            ]));
+        }
+
+        return new Response($this->serializer->serialize([
+            'object_array' => ['data' => $this->orderManager->getHydrater()->hydrateQuoteOrder($this->orderRepo->findBy(['Agent' => $this->getUser(), 'Status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUNDBILL'])]))],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]));
+    }
+
+    /**
+     * @Route("/admin/commande/donnee/validation", options={"expose"=true}, name="order_data_valid")
+     */
+    public function dataCustomerValid()
+    {
+
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+            return new Response($this->serializer->serialize([
+                'object_array' => ['message' => 'Zone à accés restreint!"'],
+                'format' => 'json',
+            ]));
+        }
+
+        return new Response($this->serializer->serialize([
+            'object_array' => ['data' => $this->orderManager->getHydrater()->hydrateQuoteOrder($this->orderRepo->findBy(['Agent' => $this->getUser(), 'Status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_VALID'])]))],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]));
+    }
+
+    /**
+     * @Route("/admin/commande/donnee/cloturee", options={"expose"=true}, name="order_data_closed")
+     */
+    public function dataClosed()
+    {
+
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+            return new Response($this->serializer->serialize([
+                'object_array' => ['message' => 'Zone à accés restreint!"'],
+                'format' => 'json',
+            ]));
+        }
+
+        return new Response($this->serializer->serialize([
+            'object_array' => ['data' => $this->orderManager->getHydrater()->hydrateQuoteOrder($this->orderRepo->findBy(['Agent' => $this->getUser(), 'Status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_CLOSED'])]))],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]));
+    }
+
+    /**
+     * @Route("/admin/commande/donnee/avoir/cloture", options={"expose"=true}, name="order_data_refund_closed")
+     */
+    public function dataRefundClosed()
+    {
+
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+            return new Response($this->serializer->serialize([
+                'object_array' => ['message' => 'Zone à accés restreint!"'],
+                'format' => 'json',
+            ]));
+        }
+
+        return new Response($this->serializer->serialize([
+            'object_array' => ['data' => $this->orderManager->getHydrater()->hydrateQuoteOrder($this->orderRepo->findBy(['Agent' => $this->getUser(), 'Status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUNDCLOSED'])]))],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]));
+    }
+
     /*_____________________________________________[ private ]_________________________ */
 
     private function getRouteFromStatus(OrderStatus $status, $order){
         
         switch ($status->getName()) {
             case 'STATUS_REFUND':
+                return $this->redirectToRoute('order_show_refund', ['id' => $order->getId()]);
             case 'STATUS_VALID':
+                return $this->redirectToRoute('order_show_valid', ['id' => $order->getId()]);
             case 'STATUS_ORDER':
                 return $this->redirectToRoute('order_show', ['id' => $order->getId()]);
             case 'STATUS_PREREFUND':
                 return $this->redirectToRoute('order_show_prerefund', ['id' => $order->getId()]);
-                case 'STATUS_PREORDER':
-                    return $this->redirectToRoute('order_show_preorder', ['id' => $order->getId()]);
-                case 'STATUS_QUOTE':
-                    return $this->redirectToRoute('order_show_quote', ['id' => $order->getId()]);
+            case 'STATUS_PREORDER':
+                return $this->redirectToRoute('order_show_preorder', ['id' => $order->getId()]);
+            case 'STATUS_QUOTE':
+                return $this->redirectToRoute('order_show_quote', ['id' => $order->getId()]);
         }
 
         return $this->redirectToRoute('order_home');

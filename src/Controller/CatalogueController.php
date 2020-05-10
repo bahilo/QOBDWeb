@@ -26,17 +26,19 @@ class CatalogueController extends Controller
     protected $securityUtility;
     protected $actionRepo;
     protected $ErrorHandler;
-
+    protected $rootDir;
 
     public function __construct(Serializer $serializer, 
                                 SecurityManager $securityUtility, 
                                 ActionRepository $actionRepo,
-                                ErrorHandler $ErrorHandler)
+                                ErrorHandler $ErrorHandler,
+                                    $root_dir)
     {
         $this->serializer = $serializer;
         $this->securityUtility = $securityUtility;
         $this->actionRepo = $actionRepo;
         $this->ErrorHandler = $ErrorHandler;
+        $this->rootDir = $root_dir;
     }
     
     /**
@@ -77,37 +79,40 @@ class CatalogueController extends Controller
         
         $form = $this->createForm(ItemRegistrationType::class, $item);
         $form->handleRequest($request);
-        $this->ErrorHandler->registerError($validator->validate($item));
+        
+        if($form->isSubmitted() ){
 
-        if($form->isSubmitted() && $form->isValid() ){
+            $this->ErrorHandler->registerError($validator->validate($item));
+            
+            if($form->isValid()){
+                $item = $catHydrate->hydrateItemRelationFromForm($item);
 
-            $item = $catHydrate->hydrateItemRelationFromForm($item);
-
-            $file = $request->files->get('item_registration')['PictureFile'];
-
-            $fileName = $utility->uploadFile($file, $this->getParameter('file.setting.catalogue.download_dir'));
-            if (!empty($fileName)) {
-                if (!empty($item->getPicture())) {
-                    unlink($this->getParameter('file.setting.catalogue.download_dir') . '/' . $item->getPicture());
+                $file = $request->files->get('item_registration')['PictureFile'];
+                
+                $fileName = $utility->uploadFile($file, $utility->getAbsoluteRootPath() . '/' . $this->getParameter('abs.file.setting.catalogue.download_dir'));
+                if (!empty($fileName)) {
+                    if (!empty($item->getPicture()) && file_exists($utility->getAbsoluteRootPath() . '/' . $this->getParameter('abs.file.setting.catalogue.download_dir') . '/' . $item->getPicture())) {
+                        unlink($utility->getAbsoluteRootPath() . '/' . $this->getParameter('abs.file.setting.catalogue.download_dir') . '/' . $item->getPicture());
+                    }
+                    $item->setPicture($fileName);
                 }
-                $item->setPicture($fileName);
+
+                $item->setIsErasable(true);
+
+                if ($item->getComment())
+                    $manager->persist($item->getComment());
+
+                if ($item->getImeiCode()) {
+                    $manager->persist($item->getImeiCode());
+                    if ($item->getImeiCode()->getEanCode())
+                        $manager->persist($item->getImeiCode()->getEanCode());
+                }
+
+                $manager->persist($item);
+                $manager->flush();
+
+                return $this->redirectToRoute('catalogue_home');
             }
-
-            $item->setIsErasable(true);
-
-            if($item->getComment())
-                $manager->persist($item->getComment());
-
-            if($item->getImeiCode()){
-                $manager->persist($item->getImeiCode());
-                if($item->getImeiCode()->getEanCode())
-                    $manager->persist($item->getImeiCode()->getEanCode());
-            }
-
-            $manager->persist($item);
-            $manager->flush();
-
-            return $this->redirectToRoute('catalogue_home');
         }        
         
 

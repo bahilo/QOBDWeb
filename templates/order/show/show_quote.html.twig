@@ -1,0 +1,95 @@
+{% extends 'order/show.html.twig' %}
+
+
+{% block title %}{{ parent() }} - Devis {% endblock %}
+
+{% block home_path %}
+<li class="breadcrumb-item">
+    Commande & Devis
+</li>
+<li class="breadcrumb-item">
+    <a href="#">Devis</a>
+</li>
+<li class="breadcrumb-item">
+    Détail devis
+</li>
+{% endblock %}
+
+
+{% block control_btn_area %}
+<div class="btn-group">
+    <a href="{{ path("order_validation", {id: order.id, idStatus: status_preorder.id}) }}"
+        class="btn btn-success btnValidation">Convertir en
+        commande</a>
+    <a href="{{ path("order_validation", {id: order.id, idStatus: status_prerefund.id}) }}"
+        class="btn btn-danger btnValidation">Convertir en
+        avoir</a>
+</div>
+{% endblock %}
+
+{# Produits #}
+{% block product_area %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-md-11">
+                        <i class="fa fa-align-justify"></i> Liste des produits et tarifs
+                    </div>
+                   <div class="col-md-1">
+                        <a class="btn btn-primary" id="btnAddItem" href="#" data-status="{{ order.status.name }}"><i
+                                class="fa fa-plus"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <table id="order_detail_table_js"
+                    class="table table-responsive-md table-bordered table-striped table-md">
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{# Commentaires #}
+{% block comment_area %}
+
+{% endblock %}
+
+
+{# Email devis #}
+{% block email_area %}
+<form action="{{ path("order_email_quote",{id: order.id }) }}" method="post">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa fa-align-justify"></i> Email
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+
+                            <div class="form-group">
+                                <label for="emailSubject">Object</label>
+                                <input type="text" name="order_detail_form[setting][email][subject]" id="emailSubject"
+                                    class="form-control"
+                                    value="** {{ search.get_setting("SOCIETE","SOCIETE_NOM").value }} Votre devis n° #{{ order.id }}**">
+                            </div>
+                            <div class="form-group">
+                                <label for="emailBody">Message</label>
+                                <textarea name="order_detail_form[setting][email][body]" id="" cols="30" rows="10"
+                                    class="form-control">{{ email_content }}</textarea>
+                            </div>
+                            <input type="submit" value="Envoyer" class="btn btn-primary">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

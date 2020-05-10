@@ -1,0 +1,13 @@
+{% extends 'order/home.html.twig' %}
+
+{% block title %}{{ parent() }} - Revalidation client{% endblock %}
+
+{% block home_path %}
+{{ parent() }}
+<li class="breadcrumb-item">
+    Commandes
+</li>
+<li class="breadcrumb-item">
+    Demande revalidation
+</li>
+{% endblock %}

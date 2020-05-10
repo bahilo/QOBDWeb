@@ -41,7 +41,7 @@ $(function () {
 
         col.push({ data: 'id', title: "", visible: false });
         col.push({ data: 'IsErasable', title: "", visible: false });
-        col.push({ data: 'FullPathPicture', title: "", render: Renders.renderPictur });
+        col.push({ data: 'FullPathPicture', title: "", render: Renders.renderPicture });
         col.push({ data: 'Ref', title: "Ref." });
         col.push({ data: 'Name', title: "Désignation" });
         col.push({ data: 'Ean', title: "EAN" });

@@ -1,0 +1,25 @@
+{% extends 'order/show.html.twig' %}
+
+
+{% block title %}{{ parent() }} - Cmd à valider {% endblock %}
+
+{% block home_path %}
+<li class="breadcrumb-item">
+    Commande & Avoir
+</li>
+<li class="breadcrumb-item">
+    <a href="#">Cmd à valider</a>
+</li>
+<li class="breadcrumb-item">
+    Détail commande
+</li>
+{% endblock %}
+
+{% block control_btn_area %}
+<div class="btn-group">
+    <a href="{{ path("order_validation", {id: order.id, idStatus: status_order.id}) }}"
+        class="btn btn-success btnValidation">Convertir en commande</a>
+    <a href="{{ path("order_validation", {id: order.id, idStatus: order_status_quote.id}) }}"
+        class="btn btn-danger btnValidation">Convertir en devis</a>
+</div>
+{% endblock %}

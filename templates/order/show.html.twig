@@ -1,71 +1,51 @@
 {% extends 'template_coreui.html.twig' %}
 
-{% set target = {link: "", param: {id: 0, idStatus: 0 }} %}
-{% set page_title = "Détail Commande n° #" ~ order.id %}
 
-
-
-{% if status_preorder is defined %}
-{% set target = { link: "order_validation", param: [{id: order.id, idStatus: status_preorder.id}, {id: order.id, idStatus: status_prerefund.id}]} %}
-{% set page_title = "Détail Devis n° #" ~ order.id %}
-{% elseif status_order is defined %}
-{% set target = { link: "order_validation", param: [{id: order.id, idStatus: status_order.id}, {id: order.id, idStatus: status_valid.id}]} %}
-{% elseif status_refund is defined %}
-{% set target = { link: "order_validation", param: [{id: order.id, idStatus: status_refund.id}]} %}
-{% endif %}
-
-{% block title %}{{ parent() }} - {{ page_title }} {% endblock %}
+{% block title %}{{ parent() }} - Devis {% endblock %}
 
 {% block home_path %}
-<li class="breadcrumb-item">
-    <a href="#">Commande</a>
-</li>
-<li class="breadcrumb-item">
-    {{ page_title }}
-</li>
+    <li class="breadcrumb-item">
+        Commande & Devis
+    </li>
+    <li class="breadcrumb-item">
+        <a href="#">Commandes</a>
+    </li>
+    <li class="breadcrumb-item">
+        Détail commande
+    </li>
 {% endblock %}
 
 {% block body_header_left %}
+    <div class="row">
+        <div class="col-md-3">
+            <div class="c-callout">
+                <strong class="h4">{{ order.status.displayname }}</strong>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="c-callout c-callout-info">
 
-<div class="row">
-    <div class="col-md-3">
-        <div class="c-callout">
-            <strong class="h4">{{ order.status.displayname }}</strong>
+                {% block callout_resume %}
+                <div class="">
+                    {{ order.status.displayname }} n°#{{ order.id }} du {{ order.createdat | date("Y/m/d") }} en cours pour
+                    la société <a
+                        href="{{ path("client_show", {id: order.client.id}) }}">{{ order.client.companyname }}</a><br />
+                    géré par
+                    {{ order.agent.Firstname }} {{ order.agent.LastName }}
+                </div>
+                {% endblock %}
+
+                {% block control_btn_area %}
+                <div class="btn-group">
+                    <a href="{{ path("order_validation", {id: order.id, idStatus: order_status_quote.id}) }}"
+                        class="btn btn-success btnValidation">Convertir en devis</a>
+                    <a href="{{ path("order_validation", {id: order.id, idStatus: order_status_refund.id}) }}"
+                        class="btn btn-danger btnValidation">Convertir en avoir</a>
+                </div>
+                {% endblock %}
+            </div>
         </div>
     </div>
-    <div class="col-md-9">
-        <div class="c-callout c-callout-info" >
-            <div class="">
-                {{ order.status.displayname }} n°#{{ order.id }} du {{ order.createdat | date("Y/m/d") }} en cours pour la société <a href="{{ path("client_show", {id: order.client.id}) }}">{{ order.client.companyname }}</a><br/> géré par 
-                {{ order.agent.Firstname }} {{ order.agent.LastName }}
-            </div>
-            {% if status_preorder is defined %}
-            <div class="btn-group">
-                <a href="{{ path(target.link, target.param[0]) }}" class="btn btn-success btnValidation">Convertir en commande</a>
-                <a href="{{ path(target.link, target.param[1]) }}" class="btn btn-danger btnValidation">Convertir en avoir</a>
-            </div>
-            {% endif %}
-           
-            {% if status_order is defined %}
-            <div class="btn-group">
-               <a href="{{ path(target.link, target.param[0]) }}" class="btn btn-success btnValidation">Convertir en commande</a>
-                <a href="{{ path(target.link, target.param[1]) }}" class="btn btn-warning btnValidation">Re-valider avec le client</a>
-            </div>            
-            {% elseif status_refund is defined %}
-            <a href="{{ path(target.link, target.param[0]) }}" class="btn btn-success btnValidation">Convertir en avoir</a>
-            {% endif %}
-
-            {% if order.status.name == "STATUS_ORDER" %}
-            <div class="btn-group">
-                <a href="{{ path("order_validation", { id: order.id, idStatus: order_status_quote.id }) }}" class="btn btn-success btnValidation">Convertir en devis</a>
-                <a href="{{ path("order_validation", { id: order.id, idStatus: order_status_refund.id }) }}" class="btn btn-danger btnValidation">Convertir en avoir</a>
-            </div>
-            {% endif %}
-
-        </div>
-    </div>
-</div>
-
 {% endblock %}
 
 {% block body_header_right %}
@@ -74,308 +54,336 @@
     {% endif %}
 {% endblock %}
 
+
 {% block body %}
+    <div class="order-detail-wrapper">
+        
+        <form id="global_form" action="{{ path("order_detail_save", {id: order.id}) }}" method="POST">
+            <input type="hidden" name="order" value="{{ order.id }}">
 
-
-<div class="order-detail-wrapper">
-    <form id="global_form" action="{{ path("order_detail_save", {id: order.id}) }}" method="POST">
-        <input type="hidden" name="order" value="{{ order.id }}">
-
-        <div class="animated fadeIn">
-
-            {# Produits #}
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="row">
-                                <div class="col-md-11">
-                                    <i class="fa fa-align-justify"></i> Liste des produits et tarifs
+            <div class="animated fadeIn">
+                
+                {# Produits #}
+                {% block product_area %}
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="row">
+                                    <div class="col-md-11">
+                                        <i class="fa fa-align-justify"></i> Liste des produits et tarifs
+                                    </div>
+                                    {% if order.status.name == "STATUS_ORDER" or order.status.name == "STATUS_QUOTE" %}
+                                    <div class="col-md-1">
+                                        <a class="btn btn-primary" id="btnAddItem" href="#"
+                                            data-status="{{ order.status.name }}"><i class="fa fa-plus"></i></a>
+                                    </div>
+                                    {% endif %}
                                 </div>
-                                {% if order.status.name == "STATUS_ORDER" or order.status.name == "STATUS_QUOTE" %}
-                                <div class="col-md-1">
-                                    <a class="btn btn-primary" id="btnAddItem" href="#" data-status="{{ order.status.name }}"><i class="fa fa-plus"></i></a>
-                                </div>
-                                {% endif %}
                             </div>
-                        </div>
-                        <div class="card-body">
-                            <table id="order_detail_table_js" class="table table-responsive-md table-bordered table-striped table-md">
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {# Statistic #}
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card border border-info">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-sm-2">
-                                    <div class="c-callout c-callout-warning">
-                                        <small class="text-muted">Total HT ({{ order.currency.symbol }})</small>
-                                        <br>
-                                        <strong class="h4">{{ info.total_HT }}</strong>
-                                        <div class="chart-wrapper">
-                                            <canvas id="sparkline-chart-3" width="100" height="30"></canvas>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- /.col-->
-                                <div class="col-sm-2">
-                                    <div class="c-callout c-callout-success">
-                                        <small class="text-muted">Total TTC ({{ order.currency.symbol }})</small>
-                                        <br>
-                                        <strong class="h4">{{ info.total_TTC }}</strong>
-                                        <div class="chart-wrapper">
-                                            <canvas id="sparkline-chart-4" width="100" height="30"></canvas>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {% if search.get_right_read("ACTION_SENSIBLE") %}
-                                <!-- Marges -->
-                                <div class="col-sm-2">
-                                    <div class="c-callout c-callout-primary">
-                                        <small class="text-muted">Marge (%)</small>
-                                        <br>
-                                        <strong class="h4">{{ info.marge_perc }}%</strong>
-                                        <div class="chart-wrapper">
-                                            <canvas id="sparkline-chart-4" width="100" height="30"></canvas>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-sm-2">
-                                    <div class="c-callout c-callout-secondary">
-                                        <small class="text-muted">Marge ({{ order.currency.symbol }})</small>
-                                        <br>
-                                        <strong class="h4">{{ info.marge_amount }}</strong>
-                                        <div class="chart-wrapper">
-                                            <canvas id="sparkline-chart-4" width="100" height="30"></canvas>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endif %}
-
-                                <!-- /.col-->
-                                <div class="col-sm-2">
-                                    <div class="c-callout c-callout-danger">
-                                        <small class="text-muted">Montant TVA ({{ order.currency.symbol }})</small>
-                                        <br>
-                                        <strong class="h4">{{ info.VAT_amount }}</strong>
-                                        <div class="chart-wrapper">
-                                            <canvas id="sparkline-chart-4" width="100" height="30"></canvas>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- /.col-->
-                                <div class="col-sm-2">
-                                    <div class="c-callout c-callout-info">
-                                        <small class="text-muted">TVA</small>
-                                        <br>
-                                        {% if order.tax.IsTVAMarge %}
-                                        <h6>TVA/MARGE</h6>
-                                        {% else %}
-                                        <strong class="h4">{{ order.tax.value }}%</strong>                                        
-                                        {% endif %}
-                                        <div class="chart-wrapper">
-                                            <canvas id="sparkline-chart-4" width="100" height="30"></canvas>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- /.col-->
+                            <div class="card-body">
+                                <table id="order_detail_table_js"
+                                    class="table table-responsive-md table-bordered table-striped table-md">
+                                </table>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+                {% endblock %}
 
-            {# Devise & TVA #}
-            {% if order.status.name != "STATUS_CLOSED" and order.status.name != "STATUS_CLOSED" %}
-            <div class="row">
+                {# Statistic #}
+                {% block statistic_area %}
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card border border-info">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <div class="c-callout c-callout-warning">
+                                            <small class="text-muted">Total HT ({{ order.currency.symbol }})</small>
+                                            <br>
+                                            <strong class="h4">{{ info.total_HT }}</strong>
+                                            <div class="chart-wrapper">
+                                                <canvas id="sparkline-chart-3" width="100" height="30"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {# /.col#}
+                                    <div class="col-sm-2">
+                                        <div class="c-callout c-callout-success">
+                                            <small class="text-muted">Total TTC ({{ order.currency.symbol }})</small>
+                                            <br>
+                                            <strong class="h4">{{ info.total_TTC }}</strong>
+                                            <div class="chart-wrapper">
+                                                <canvas id="sparkline-chart-4" width="100" height="30"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                {# TVA #}
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <i class="fa fa-align-justify"></i> TVA
+                                    {% if search.get_right_read("ACTION_SENSIBLE") %}
+                                    {# Marges #}
+                                    <div class="col-sm-2">
+                                        <div class="c-callout c-callout-primary">
+                                            <small class="text-muted">Marge (%)</small>
+                                            <br>
+                                            <strong class="h4">{{ info.marge_perc }}%</strong>
+                                            <div class="chart-wrapper">
+                                                <canvas id="sparkline-chart-4" width="100" height="30"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-2">
+                                        <div class="c-callout c-callout-secondary">
+                                            <small class="text-muted">Marge ({{ order.currency.symbol }})</small>
+                                            <br>
+                                            <strong class="h4">{{ info.marge_amount }}</strong>
+                                            <div class="chart-wrapper">
+                                                <canvas id="sparkline-chart-4" width="100" height="30"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    {# /.col#}
+                                    <div class="col-sm-2">
+                                        <div class="c-callout c-callout-danger">
+                                            <small class="text-muted">Montant TVA ({{ order.currency.symbol }})</small>
+                                            <br>
+                                            <strong class="h4">{{ info.VAT_amount }}</strong>
+                                            <div class="chart-wrapper">
+                                                <canvas id="sparkline-chart-4" width="100" height="30"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {# /.col#}
+                                    <div class="col-sm-2">
+                                        <div class="c-callout c-callout-info">
+                                            <small class="text-muted">TVA</small>
+                                            <br>
+                                            {% if order.tax.IsTVAMarge %}
+                                            <h6>TVA/MARGE</h6>
+                                            {% else %}
+                                            <strong class="h4">{{ order.tax.value }}%</strong>
+                                            {% endif %}
+                                            <div class="chart-wrapper">
+                                                <canvas id="sparkline-chart-4" width="100" height="30"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {# /.col#}
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <select name="order_detail_form[tax]" class="form-control" >
-                                <option value="">Veuillez selectionner une TVA</option>
-                                {% for tax in taxes %}
+                    </div>
+                </div>
+                {% endblock %}
+
+                {# Devise & TVA #}
+                {% block devis_tva_area %}
+                <div class="row">
+
+                    {# TVA #}
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fa fa-align-justify"></i> TVA
+                            </div>
+                            <div class="card-body">
+                                <select name="order_detail_form[tax]" class="form-control">
+                                    <option value="">Veuillez selectionner une TVA</option>
+                                    {% for tax in taxes %}
                                     {% if order.tax is not null and tax.id == order.tax.id %}
                                     <option value="{{ tax.id }}" selected>{{ tax.value ~ "% - " ~ tax.type }}</option>
                                     {% else %}
                                     <option value="{{ tax.id }}">{{ tax.value ~ "% - " ~ tax.type }}</option>
-                                    {% endif %}    
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                {# Devise #}
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <i class="fa fa-align-justify"></i> Devise
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <select name="order_detail_form[currency]" class="form-control">
-                                        <option value="">Veuillez selectionner une devise</option>
-                                        {% for currency in currencies %}
-                                            {% if order.currency is not null and currency.id == order.currency.id %}
-                                            <option value="{{ currency.id }}" selected>{{ currency.symbol ~ " - " ~ currency.Country }}</option>
-                                            {% else %}
-                                            <option value="{{ currency.id }}">{{ currency.symbol ~ " - " ~ currency.Country }}</option>
-                                            {% endif %}    
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>                
-            </div>
-            {% endif %}
-            
-            {# Commentaires #}
-            <div class="row">
-                <div class="col-sm-6 col-md-4">
-                    <div class="card border-primary">
-                        <div class="card-header">
-                            <i class="fa fa-align-justify"></i> commentaire(interne) 
-                        </div>
-                        <div class="card-body">
-                            <textarea name="order_detail_form[commentaire][prive]" id="" cols="30" rows="10">{{ order.PrivateComment.Content| default("") }}</textarea>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-md-4">
-                    <div class="card border-danger">
-                        <div class="card-header">
-                            <i class="fa fa-align-justify"></i> commentaire visible par le client
-                        </div>
-                        <div class="card-body">
-                            <textarea name="order_detail_form[commentaire][public]" id="" cols="30" rows="10">{{ order.PublicComment.Content| default("") }}</textarea>
-                        </div>
-                    </div>
-                </div>
-                {% if search.get_right_read("ACTION_SENSIBLE") %}
-                <div class="col-sm-6 col-md-4">
-                    <div class="card  border-info">
-                        <div class="card-header">
-                            <i class="fa fa-align-justify"></i> commentaire admin
-                        </div>
-                        <div class="card-body">
-                            <textarea name="order_detail_form[commentaire][admin]" id="" rows="10">{{ order.AdminComment.Content | default("") }}</textarea>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-
-            {# Adresse de livraison #}
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <i class="fa fa-align-justify"></i> Adresse de livraison
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <select name="order_detail_form[contact]" class="form-control">
-                                        <option value="">Veuillez selectionner un contact</option>
-                                        {% for contact in order.Client.Contacts %}
-                                            {% if order.contact and contact.id == order.contact.id %}
-                                            <option value="{{ contact.id }}" selected>{{ contact.Firstname ~ " " ~ contact.LastName }}</option>
-                                            {% else %}
-                                            <option value="{{ contact.id }}">{{ contact.Firstname ~ " " ~ contact.LastName }}</option>
-                                            {% endif %}    
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="adresse-wrapper">
-                                    {% if order.contact %}
-                                    {{ order.contact.Address.Street  }}<br />
-                                    {{ order.contact.Address.ZipCode ~ " " ~ order.contact.Address.City }}<br />
-                                    {{ order.contact.Address.Country }}
-                                    {% else %}
-                                    Veuillez renseigner un contact pour l'adresse de livraison
                                     {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    {# Devise #}
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fa fa-align-justify"></i> Devise
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <select name="order_detail_form[currency]" class="form-control">
+                                            <option value="">Veuillez selectionner une devise</option>
+                                            {% for currency in currencies %}
+                                            {% if order.currency is not null and currency.id == order.currency.id %}
+                                            <option value="{{ currency.id }}" selected>
+                                                {{ currency.symbol ~ " - " ~ currency.Country }}</option>
+                                            {% else %}
+                                            <option value="{{ currency.id }}">
+                                                {{ currency.symbol ~ " - " ~ currency.Country }}</option>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </select>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            {# Devis #}
-            {% if order.status.name != "STATUS_CLOSED" and order.status.name != "STATUS_CLOSED" %}
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <i class="fa fa-align-justify"></i> Devis
+                {% endblock %}
+
+                {# Commentaires #}
+                {% block comment_area %}
+                <div class="row">
+                    <div class="col-sm-6 col-md-4">
+                        <div class="card border-primary">
+                            <div class="card-header">
+                                <i class="fa fa-align-justify"></i> commentaire(interne)
+                            </div>
+                            <div class="card-body">
+                                <textarea name="order_detail_form[commentaire][prive]" id="" cols="30"
+                                    rows="10">{{ order.PrivateComment.Content| default("") }}</textarea>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-check">
-                                        {% if order.IsQuote or order.IsQuote is null %}
-                                            <input type="radio" name="order_detail_form[setting][devis][type]" id="rbDevis" value="devis" class="form-check-input" checked>
-                                        {% else %}
-                                            <input type="radio" name="order_detail_form[setting][devis][type]" id="rbDevis" value="devis" class="form-check-input">
-                                        {% endif %}
-                                        <label for="rbDevis" class="orm-check-label">Devis</label>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                        <div class="card border-danger">
+                            <div class="card-header">
+                                <i class="fa fa-align-justify"></i> commentaire visible par le client
+                            </div>
+                            <div class="card-body">
+                                <textarea name="order_detail_form[commentaire][public]" id="" cols="30"
+                                    rows="10">{{ order.PublicComment.Content| default("") }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    {% if search.get_right_read("ACTION_SENSIBLE") %}
+                    <div class="col-sm-6 col-md-4">
+                        <div class="card  border-info">
+                            <div class="card-header">
+                                <i class="fa fa-align-justify"></i> commentaire admin
+                            </div>
+                            <div class="card-body">
+                                <textarea name="order_detail_form[commentaire][admin]" id=""
+                                    rows="10">{{ order.AdminComment.Content | default("") }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endblock %}
+
+                {# Adresse de livraison #}
+                {% block delivery_address_area %}
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fa fa-align-justify"></i> Adresse de livraison
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <select name="order_detail_form[contact]" class="form-control">
+                                            <option value="">Veuillez selectionner un contact</option>
+                                            {% for contact in order.Client.Contacts %}
+                                            {% if order.contact and contact.id == order.contact.id %}
+                                            <option value="{{ contact.id }}" selected>
+                                                {{ contact.Firstname ~ " " ~ contact.LastName }}</option>
+                                            {% else %}
+                                            <option value="{{ contact.id }}">
+                                                {{ contact.Firstname ~ " " ~ contact.LastName }}</option>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </select>
                                     </div>
-                                    <div class="form-check">
-                                        {% if not order.IsQuote and order.IsQuote is not null %}
-                                        <input type="radio" name="order_detail_form[setting][devis][type]" id="rbProformat" value="pro forma"
-                                            class="form-check-input" checked>
-                                        {% else %}
-                                        <input type="radio" name="order_detail_form[setting][devis][type]" id="rbProformat" value="pro forma"
-                                            class="form-check-input">
-                                        {% endif %}
-                                        
-                                        <label for="rbProformat" class="orm-check-label">Pro forma</label>
-                                    </div>
-                                   <div class="form-check">
-                                       {% if order.IsRefVisible %}
-                                            <input type="checkbox" name="order_detail_form[setting][devis][ref_visible]" id="chkRef" class="form-check-input" checked>
-                                        {% else %}
-                                            <input type="checkbox" name="order_detail_form[setting][devis][ref_visible]" id="chkRef" class="form-check-input">
-                                        {% endif %}                                        
-                                        <label for="chkRef" class="form-check-label">Référence visible sur le devis</label>
-                                    </div>                                
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="inptDuree">Duree de validité du devis</label>
-                                        <input type="number" name="order_detail_form[setting][devis][duree]" id="inptDuree" class="form-control" value="{{ order.ValidityPeriode | default(2) }}">
-                                    </div>
-                                    <div class="btndevis-wrapper">
-                                        <a href="{{ path("order_pdf_quote", {id: order.id}) }}" class="btn btn-primary">Générer le devis</a>
+                                    <div class="col-md-6">
+                                        <div class="adresse-wrapper">
+                                            {% if order.contact %}
+                                            {{ order.contact.Address.Street  }}<br />
+                                            {{ order.contact.Address.ZipCode ~ " " ~ order.contact.Address.City }}<br />
+                                            {{ order.contact.Address.Country }}
+                                            {% else %}
+                                            Veuillez renseigner un contact pour l'adresse de livraison
+                                            {% endif %}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div> 
-            {% endif %}
-        </form> 
+                {% endblock %}
+
+                {# Devis #}
+                {% block quote_area %}
+                    {% if order.status.name != "STATUS_CLOSED" and order.status.name != "STATUS_REFUNDCLOSED" %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <i class="fa fa-align-justify"></i> Devis
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                {% if order.IsQuote or order.IsQuote is null %}
+                                                <input type="radio" name="order_detail_form[setting][devis][type]" id="rbDevis"
+                                                    value="devis" class="form-check-input" checked>
+                                                {% else %}
+                                                <input type="radio" name="order_detail_form[setting][devis][type]" id="rbDevis"
+                                                    value="devis" class="form-check-input">
+                                                {% endif %}
+                                                <label for="rbDevis" class="orm-check-label">Devis</label>
+                                            </div>
+                                            <div class="form-check">
+                                                {% if not order.IsQuote and order.IsQuote is not null %}
+                                                <input type="radio" name="order_detail_form[setting][devis][type]"
+                                                    id="rbProformat" value="pro forma" class="form-check-input" checked>
+                                                {% else %}
+                                                <input type="radio" name="order_detail_form[setting][devis][type]"
+                                                    id="rbProformat" value="pro forma" class="form-check-input">
+                                                {% endif %}
+
+                                                <label for="rbProformat" class="orm-check-label">Pro forma</label>
+                                            </div>
+                                            <div class="form-check">
+                                                {% if order.IsRefVisible %}
+                                                <input type="checkbox" name="order_detail_form[setting][devis][ref_visible]"
+                                                    id="chkRef" class="form-check-input" checked>
+                                                {% else %}
+                                                <input type="checkbox" name="order_detail_form[setting][devis][ref_visible]"
+                                                    id="chkRef" class="form-check-input">
+                                                {% endif %}
+                                                <label for="chkRef" class="form-check-label">Référence visible sur le
+                                                    devis</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="inptDuree">Duree de validité du devis</label>
+                                                <input type="number" name="order_detail_form[setting][devis][duree]"
+                                                    id="inptDuree" class="form-control"
+                                                    value="{{ order.ValidityPeriode | default(2) }}">
+                                            </div>
+                                            <div class="btndevis-wrapper">
+                                                <a href="{{ path("order_pdf_quote", {id: order.id}) }}"
+                                                    class="btn btn-primary">Générer le devis</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endblock %}
+        </form>
 
         {# Creation bon de livraison #}
+        {% block delivery_recipt_creation_area %}
         {% if order_detail_delivery_data_source is defined and order_detail_delivery_data_source != '[]' %}
         <form action="{{ path("order_delivery_save", { id: order.id }) }}" method="post">
             <div class="row">
@@ -388,7 +396,7 @@
                             <table id="order_detail_delivery_table_js"
                                 class="table table-responsive-md table-bordered table-striped table-md">
                             </table>
-        
+
                             <div class="form-group">
                                 <label for="order_detail_form[delivery][package]" class="">Nombre de colis</label>
                                 <input type="number" name="order_detail_form[delivery][package]"
@@ -402,8 +410,10 @@
         </form>
         <input type="hidden" id="order_detail_delivery_data_source" value="{{ order_detail_delivery_data_source }}">
         {% endif %}
+        {% endblock %}
 
         {# Creation factures #}
+        {% block bill_creation_area %}
         {% if order_detail_bill_data_source is defined and order_detail_bill_data_source != '[]' %}
         <form action="{{ path("order_bill_save", {id: order.id}) }}" method="post">
             <div class="row">
@@ -418,13 +428,13 @@
                             </table>
                             <div class="form-group">
                                 <label for="selectDeliveries" class="">Inclure dans la facture les BL suivants</label>
-                                <select name="order_detail_form[bill][delivery][]" id="selectDeliveries" class="form-control"
-                                    multiple>
+                                <select name="order_detail_form[bill][delivery][]" id="selectDeliveries"
+                                    class="form-control" multiple>
                                     {% for delivery in deliveries %}
                                     <option value="{{ delivery.id }}" selected> #{{ delivery.id }}</option>
                                     {% endfor %}
                                 </select>
-                            </div>                            
+                            </div>
                             <input type="submit" class="btn btn-warning" value="Etape 2/3 Création de la facture">
                         </div>
                     </div>
@@ -433,8 +443,10 @@
         </form>
         <input type="hidden" id="order_detail_bill_data_source" value="{{ order_detail_bill_data_source }}">
         {% endif %}
+        {% endblock %}
 
         {# Bons de livraison #}
+        {% block delivery_recipt_area %}
         {% if delivery_data_source is defined %}
         <div class="row">
             <div class="col-md-12">
@@ -452,8 +464,10 @@
         </div>
         <input type="hidden" id="delivery_data_source" value="{{ delivery_data_source }}">
         {% endif %}
+        {% endblock %}
 
         {# Factures emises #}
+        {% block bill_recipt_area %}
         {% if bill_data_source is defined  %}
         <div class="row">
             <div class="col-md-12">
@@ -470,115 +484,28 @@
         </div>
         <input type="hidden" id="bill_data_source" value="{{ bill_data_source }}">
         {% endif %}
+        {% endblock %}
 
-        {# Email devis #}
-        {% if order.status.name == "STATUS_QUOTE" %}
-        <form action="{{ path("order_email_quote",{id: order.id }) }}" method="post">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <i class="fa fa-align-justify"></i> Email
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-12">
-            
-                                    <div class="form-group">
-                                        <label for="emailSubject">Object</label>
-                                        <input type="text" name="order_detail_form[setting][email][subject]" id="emailSubject"
-                                            class="form-control" value="** {{ search.get_setting("SOCIETE","SOCIETE_NOM").value }} Votre devis n° #{{ order.id }}**">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="emailBody">Message</label>
-                                        <textarea name="order_detail_form[setting][email][body]" id="" cols="30" rows="10"
-                                            class="form-control">{{ email_content }}</textarea>
-                                    </div>
-                                    <input type="submit" value="Envoyer" class="btn btn-primary">
-                                </div>
-                            </div>
-                        </div>                        
-                    </div>
-                </div>
-            </div>            
-        </form>
-        {% endif %}
-
-        {# Email Commande #}
-        {% if (order.status.name == "STATUS_ORDER" or order.status.name == "STATUS_REFUND") and bills is defined and bills|length > 0 %}
-        <form action="{{ path("order_email_bill",{id: order.id }) }}" method="post">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <i class="fa fa-align-justify"></i> Email
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-12">
-        
-                                    <div class="form-group">
-                                        <label for="emailSubject">Object</label>
-                                        <input type="text" name="order_detail_form[setting][email][subject]" id="emailSubject"
-                                            class="form-control"
-                                            value="** {{ search.get_setting("SOCIETE","SOCIETE_NOM").value }} Votre facture **">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="emailBody">Message</label>
-                                        <textarea name="order_detail_form[setting][email][body]" id="" cols="30" rows="10"
-                                            class="form-control">{{ email_content }}</textarea>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="emailBody">Factures</label>
-                                        <select name="order_detail_form[setting][email][bill]" class="form-control">
-                                            {% for bill in bills %}
-                                            <option value="{{ bill.id }}">{{ search.get_setting("PDF","FACTURE_PREFIX").value ~ bill.id }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                    <input type="submit" value="Envoyer" class="btn btn-primary">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </form>
-        {% endif %}
+        {# Email #}
+        {% block email_area %}{% endblock %}
 
         {# Cloture commande #}
-        {% if (order.status.name == "STATUS_ORDER" or order.status.name == "STATUS_ORDER")  and bill_data_source != '[]' %}
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fa fa-align-justify"></i> Clôture de la commande
-                    </div>
-                    <div class="card-body">                        
-                        <a href="{{  path("order_validation", {id: order.id, idStatus: status_close.id })}}" class="btn btn-danger btnValidation">Etape 3/3 Confirmer l'expédition de tous les élements</a>
-                        
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endif %}
+        {% block close_btn_area %}{% endblock %}
 
     </div>
-    
-<input type="hidden" id="order_detail_data_source" value="{{ order_detail_data_source }}">
-<input type="hidden" id="order_id" value="{{ order.id }}">
-<input type="hidden" id="order_status" value="{{ order.status.name }}">
+    <input type="hidden" id="order_detail_data_source" value="{{ order_detail_data_source }}">
+    <input type="hidden" id="order_id" value="{{ order.id }}">
+    <input type="hidden" id="order_status" value="{{ order.status.name }}">
 
-{% if status_refund is defined %}
+    {% if status_refund is defined %}
     <input type="hidden" id="status_refund" value="{{ status_refund.id }}">
-{% endif %}
+    {% endif %}
 
-{% if can_open_row is defined %}
+    {% if can_open_row is defined %}
     <input type="hidden" id="control_can_open_row" value="{{ can_open_row }}">
-{% endif %}
-
-
+    {% endif %}
 {% endblock %}
+
 {% block javascripts %}
 <script src="{{  asset('js/order.js','theme_default') }}"></script>
 {% endblock %}

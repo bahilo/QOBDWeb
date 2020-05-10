@@ -174,6 +174,9 @@ class OrderHydrate{
         return $output;
     }
 
+    /**
+     * Polulate order from form
+     */
     public function hydrateQuoteOrderRelationFromForm(QuoteOrder $order, $form)
     {
 
@@ -228,13 +231,16 @@ class OrderHydrate{
             $order->setTax($this->taxRepo->find($form['tax']));
         }
 
-        foreach ($form['tab']['items'] as $key => $val) {
-            $orderDetail = $this->hydrateQuoteOrderDetailRelationFromForm($this->orderDetailRepo->find($key), $val);
-
-            $this->manager->persist($orderDetail->getItem());
-            $this->manager->persist($orderDetail);
+        //---[ saving items table data ]
+        if(!empty($form['tab']['items'])){
+            foreach ($form['tab']['items'] as $key => $val) {
+                $orderDetail = $this->hydrateQuoteOrderDetailRelationFromForm($this->orderDetailRepo->find($key), $val);
+                $this->manager->persist($orderDetail->getItem());
+                $this->manager->persist($orderDetail);
+            }
         }
 
+        //---[ saving bill table data ]
         if(!empty($form['tab']['bill'])){
             foreach ($form['tab']['bill'] as $key => $val) {
                 $bill = $this->billRepo->find($key);
@@ -303,7 +309,7 @@ class OrderHydrate{
 
         $orderDetail->setItemSellPrice($form['sell']);
         $orderDetail->setQuantity($form['quantity']);
-        if (!empty($form['quantity_recieved']) ){
+        if (!empty($form['quantity_recieved']) &&  $form['quantity_recieved'] > 0){
             if(!empty($orderDetail->getQuantityRecieved())){
                 if ($form['quantity_recieved'] + $orderDetail->getQuantityRecieved() <= $form['quantity']) {
                     $orderDetail->setQuantityRecieved($form['quantity_recieved']);
@@ -317,8 +323,7 @@ class OrderHydrate{
             else{
                 $orderDetail->setQuantityRecieved($form['quantity']);
             }
-        }            
-
+        }
         return $orderDetail;
     }
 

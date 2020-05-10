@@ -3,12 +3,20 @@
 {% set page_title = 'Editer action' %}
 
 {% block home_path %}
+{% if search.get_right_read("ACTION_SECURITY") %}
+<li class="breadcrumb-item">
+    Securité & Configuration
+</li>
+<li class="breadcrumb-item">
+    Configuration
+</li>
 <li class="breadcrumb-item">
     Securité
 </li>
 <li class="breadcrumb-item">
     <a href="{{ path("security_action") }}">Action</a>
 </li>
+{% endif %}
 <li class="breadcrumb-item">
     {{ page_title }}
 </li>

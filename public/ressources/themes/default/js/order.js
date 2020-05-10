@@ -3,7 +3,6 @@ $(function () {
 
     var detailRows = [];
     var billDetailRows = [];
-    var path = "";
     var Renders = {};
     var api = {};  
 
@@ -20,15 +19,14 @@ $(function () {
     $(function () {
 
         $("#global_search_form").submit(function (event) {
-            event.preventDefault(); //prevent default action
+            event.preventDefault();
             $.fn.loading('show');
-            api.table.order.ajax.reload();
+            api.table.order.ajax.reload(searchTableInitComplete);
         });
 
         $('#order_detail_table_js').on('click', 'td.details-control', function () {
             openTableChildRow(this, { TableApi: api.table.orderDetail, reccordRowTable: detailRows, rowFormat: format });
         });
-
 
         $('#bill_table_js tr td.details-control').on('click', function () {
             openTableChildRow(this, { TableApi: api.table.orderBill, reccordRowTable: billDetailRows, rowFormat: billDetailformat });
@@ -36,9 +34,7 @@ $(function () {
 
         $('#btnAddItem').on('click', function(){
             initTableAddItem();            
-        });
-
-        
+        });        
 
     });
 
@@ -210,42 +206,11 @@ $(function () {
 
     function initGlobal(){
 
-        switch ($('#order_target').val()) {
-            case "order_data_source":
-                path = "order_show";
-                break;
-            case "quote_data_source":
-                path = "order_show_quote";
-                break;
-            case "preorder_data_source":
-                path = "order_show_preorder";
-                break;
-            case "prerefund_data_source":
-                path = "order_show_prerefund";
-                break;
-            case "refund_data_source":
-                path = "order_show";
-                break;
-            case "bill_data_source":
-                path = "order_show";
-                break;
-            case "bill_refund_data_source":
-                path = "order_show";
-                break;
-            case "customer_valid_data_source":
-                path = "order_show_quote";
-                break;
-            case "closed_data_source":
-                path = "order_show";
-                break;
-            case "refund_closed_data_source":
-                path = "order_show";
-                break;
-        }
-
+        var info = getTargetInfo();
         Renders = new RenderMethod({
-            routeShow: { route: path, logo: 'fa-eye' },
-            routeDelete: { route: 'order_delete', logo: 'fa-trash-alt' }
+            ajaxSource: info.source,
+            routeShow: { route: info.showPath, logo: 'fa-eye' },
+            routeDelete: { route: info.deletePath, logo: 'fa-trash-alt' }
         });
     }
 
@@ -253,6 +218,8 @@ $(function () {
     //-- charge les données des tableaux
     //-----------------------------------------------------------------------------
     function loadTables(){
+
+        loadSearchOrderTable();
 
         loadOrderTable();
         
@@ -268,70 +235,63 @@ $(function () {
         
     }
 
-    function getParams(){
-        var params = [];
-        params['order'] = $('search[order]', "#global_search_form").val();
-        params['bill'] = $('search[bill]', "#global_search_form").val();
-        params['client'] = $('search[client]', "#global_search_form").val();
-        params['agent'] = $('search[agent]', "#global_search_form").val();
-        params['dtDebut'] = $('search[dtDebut]', "#global_search_form").val();
-        params['dtFin'] = $('search[dtFin]', "#global_search_form").val();
-
-        var data = { 
-            search: {
-                order: params['order'],
-                bill: params['bill'],
-                client: params['client'],
-                agent: params['agent'],
-                dtDebut: params['dtDebut'],
-                dtFin: params['dtFin'], 
-            }   
-        } 
-
-        return data;
-    }
-
     //-----------------------------------------------------------------------------
     //-- charge les données des tableaux pour les commandes
     //-----------------------------------------------------------------------------
     function loadOrderTable(){
-        if ($("#order_table_js").length > 0) {
+        if ($("#order_table_js").length > 0 && $("#CmdSearch").length == 0) {
 
-            
-            if ($('#order_data_source').length > 0){
-                api.table.order = $("#order_table_js").myTable({
-                    com: 'sync',
-                    destroy: true,
-                    columns: api.column.order,
-                    dataSource: $('#order_data_source').val(),
-                });
-            }
-            // recherche commande
-            else{
-                $('#order_table_js', '.tbResult').show();
-                $('.no-result', '.tbResult').hide();
-
+            var info = getTargetInfo();
+            if (info.sourcePath){
                 api.table.order = $("#order_table_js").myTable({
                     com: 'async',
                     destroy: true,
                     columns: api.column.order,
                     ajax: {
                         type: "POST",
-                        url: Routing.generate('order_search'),
-                        data: function (d) {
-                            d.search = {
-                                order: $('[name="search[order]"]', "#global_search_form").val(),
-                                bill: $('[name="search[bill]"]', "#global_search_form").val(),
-                                client: $('[name="search[client]"]', "#global_search_form").val(),
-                                agent: $('[name="search[agent]"]', "#global_search_form").val(),
-                                dtDebut: $('[name="search[dtDebut]"]', "#global_search_form").val(),
-                                dtFin: $('[name="search[dtFin]"]', "#global_search_form").val(),
-                            }
-                        }
+                        url: Routing.generate(info.sourcePath),
                     },
                 });
             }
         }
+    }
+
+
+
+    //-----------------------------------------------------------------------------
+    //-- Recherche: charge les données des tableaux pour les commandes
+    //-----------------------------------------------------------------------------
+    function loadSearchOrderTable() {
+        if ($("#CmdSearch").length > 0) {
+
+            $('#order_table_js', '.tbResult').show();
+            $('.no-result', '.tbResult').hide();
+
+            api.table.order = $("#order_table_js").myTable({
+                com: 'async',
+                destroy: true,
+                columns: api.column.order,
+                ajax: {
+                    type: "POST",
+                    url: Routing.generate('order_search'),
+                    data: function (d) {
+                        d.search = {
+                            order: $('[name="search[order]"]', "#global_search_form").val(),
+                            bill: $('[name="search[bill]"]', "#global_search_form").val(),
+                            client: $('[name="search[client]"]', "#global_search_form").val(),
+                            agent: $('[name="search[agent]"]', "#global_search_form").val(),
+                            dtDebut: $('[name="search[dtDebut]"]', "#global_search_form").val(),
+                            dtFin: $('[name="search[dtFin]"]', "#global_search_form").val(),
+                        }
+                    }
+                },
+                initComplete: searchTableInitComplete,
+            });
+        }
+    }
+
+    function searchTableInitComplete(){
+        $.fn.loading('hide');
     }
 
     //-----------------------------------------------------------------------------
@@ -445,6 +405,60 @@ $(function () {
     }
 
 /*================================[ Utlities ]==================================*/
+
+    function getTargetInfo(){
+        var output = {
+            status: $('#order_status').val(),
+            showPath: "",
+            deletePath: 'order_delete',
+            sourcePath: "",
+        };
+
+        switch (output.status) {
+            case "STATUS_ORDER":
+                output.showPath = "order_show";
+                output.sourcePath = 'order_data';
+                break;
+            case "STATUS_QUOTE":
+                output.showPath = "order_show_quote";
+                output.sourcePath = "order_data_quote";
+                break;
+            case "STATUS_PREORDER":
+                output.showPath = "order_show_preorder";
+                output.sourcePath = 'order_data_preorder';
+                break;
+            case "STATUS_PREREFUND":
+                output.showPath = "order_show_prerefund";
+                output.sourcePath = 'order_data_prerefund';
+                break;
+            case "STATUS_REFUND":
+                output.showPath = "order_show_refund";
+                output.sourcePath = 'order_data_refund';
+                break;
+            case "STATUS_BILL":
+                output.showPath = "order_bill";
+                output.sourcePath = 'order_data_bill';
+                break;
+            case "STATUS_REFUNDBILL":
+                output.showPath = "order_bill_refund";
+                output.sourcePath = 'order_data_bill_refund';
+                break;
+            case "STATUS_VALID":
+                output.showPath = "order_show_valid";
+                output.sourcePath = 'order_data_valid';
+                break;
+            case "STATUS_CLOSED":
+                output.showPath = "order_closed";
+                output.sourcePath = 'order_data_closed';
+                break;
+            case "STATUS_REFUNDCLOSED":
+                output.showPath = "order_refund_closed";
+                output.sourcePath = 'order_data_refund_closed';
+                break;
+        }
+
+        return output;
+    }
 
     function getItemColumn() {
         var col = [];

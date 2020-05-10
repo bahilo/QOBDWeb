@@ -1,0 +1,13 @@
+{% extends 'order/home.html.twig' %}
+
+{% block title %}{{ parent() }} - Avoir validé{% endblock %}
+
+{% block home_path %}
+{{ parent() }}
+<li class="breadcrumb-item">
+    Avoirs
+</li>
+<li class="breadcrumb-item">
+    Avoir validé
+</li>
+{% endblock %}

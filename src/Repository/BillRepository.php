@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Bill;
 use App\Entity\Client;
 use App\Entity\Delivery;
+use App\Entity\QuoteOrder;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
@@ -55,7 +56,7 @@ class BillRepository extends ServiceEntityRepository
     }
     */
 
-    public function findScalarBillByClient(Client $client): ?int
+    public function findScalarBillByClient(Client $client): ?float
     {
         return $this->createQueryBuilder('q')
             ->innerJoin('q.Client', 'q_c')
@@ -67,7 +68,7 @@ class BillRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
-    public function findScalarBillPayedByClient(Client $client): ?int
+    public function findScalarBillPayedByClient(Client $client): ?float
     {
         return $this->createQueryBuilder('q')
             ->innerJoin('q.Client', 'q_c')
@@ -75,6 +76,24 @@ class BillRepository extends ServiceEntityRepository
             ->setParameter('idClient', $client->getId())
             ->groupBy('q_c.id')
             ->select('SUM(q.PayReceived)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function findScalarBilledOrder(QuoteOrder $order): ?float
+    {
+        return $this->createQueryBuilder('q')
+            ->innerJoin('q.quantityDeliveries', 'q_qt_del')
+            ->innerJoin('q_qt_del.Delivery', 'q_qt_del_delivery')
+            ->innerJoin('q_qt_del_delivery.Status', 'q_qt_del_delivery_status')
+            ->innerJoin('q_qt_del.OrderDetail', 'q_qt_del_q_ord')
+            ->innerJoin('q_qt_del_q_ord.QuoteOrder', 'q_qt_del_q_ord_ord')
+            ->andWhere('q_qt_del_q_ord.QuoteOrder = :order')
+            ->andWhere('q_qt_del_delivery_status.Name = :billStatus')
+            //->having('SUM(q.Pay) = SUM(q.PayReceived)')
+            ->setParameters(['order' => $order, 'billStatus' => 'STATUS_BILLED'])
+            ->groupBy('q_qt_del_q_ord_ord.id')
+            ->select('SUM(q.Pay)')
             ->getQuery()
             ->getSingleScalarResult();
     }

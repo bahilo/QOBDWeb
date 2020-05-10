@@ -1,9 +1,15 @@
 {% extends 'template_coreui.html.twig' %}
 
-{% set page_title = 'Mon compte' %}
+{% set page_title = 'Compte commercial' %}
 
 {% block home_path %}
     {% if search.get_right_read("ACTION_SECURITY") %}
+    <li class="breadcrumb-item">
+        Securité & Configuration
+    </li>
+    <li class="breadcrumb-item">
+        Securité
+    </li>
     <li class="breadcrumb-item">
         <a href="{{ path("agent_home") }}">Commerciaux</a>
     </li>

@@ -6,6 +6,11 @@
   text-decoration: none;
 }
 
+.c-app pre {
+  font-family: Arial, Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
+  font-size: 14px;
+}
+
 .c-app ul.error-wrapper {
   color: red;
 }
@@ -16,6 +21,15 @@
 
 .c-app .c-sidebar svg {
   margin-right: 10px;
+}
+
+.c-app .switch-wrapper label {
+  display: inline-block;
+  margin-bottom: -0.5rem;
+}
+
+.c-app li ul li {
+  font-size: 12px;
 }
 
 .c-app .c-sidebar-nav-dropdown-items .c-sidebar-nav-dropdown-items .c-sidebar-nav-link {
@@ -97,11 +111,6 @@
 
 .c-app .c-body .setting-wrapper .switch-label {
   width: 96px;
-}
-
-.c-app .c-body .setting-wrapper .switch-wrapper label {
-  display: inline-block;
-  margin-bottom: -0.5rem;
 }
 
 .c-app .c-body .img-avatar, .c-app .c-body .avatar > img, .c-app .c-body .img-circle {

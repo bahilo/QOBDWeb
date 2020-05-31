@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -11,12 +10,12 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class Utility{
 
-    protected $logger;
+    protected $errorHandler;
     protected $session;
 
-    public function __construct(LoggerInterface $logger, SessionInterface $session)
+    public function __construct(ErrorHandler $errorHandler, SessionInterface $session)
     {
-        $this->logger = $logger;
+        $this->errorHandler = $errorHandler;
         $this->session = $session;
     }
 
@@ -93,31 +92,35 @@ class Utility{
     public function checkCSRFAttack(Controller $ctrl, Request $request){
         $token = $request->get("token");
         if (!$ctrl->isCsrfTokenValid('upload', $token)) {
-            $this->logger->info("CSRF failure");
+            $this->errorHandler->error("CSRF failure");
 
             return  true;
         } 
         return false;
     }
 
-    public function uploadFile($file, string $saveDir){
-        //dump($file);die();
+    public function uploadFile($file, string $saveDir, $defaultFilename = null){
+        
         if ($file) {
             $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
 
             $safeFilename = transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $originalFilename);
             $newFilename = $safeFilename . '-' . uniqid() . '.' . $file->guessExtension();
 
+            if(empty($defaultFilename)){
+                $defaultFilename = $newFilename;
+            }
+
             try {
                 $file->move(
                     $saveDir,
-                    $newFilename
+                    $defaultFilename
                 );
             } catch (FileException $e) {
-                // ... handle exception if something happens during file upload
+                $this->errorHandler->error("Une erreur s'est produite durant la sauvegarde de votre fichier!");
             }
 
-            return $newFilename;
+            return $defaultFilename;
         }
         return null;
     }
@@ -130,7 +133,7 @@ class Utility{
             if($obj->getId() == $object->getId())
                 return $key;
         }
-        return -1;
+        return false;
     }
 
     /**
@@ -169,6 +172,7 @@ class Utility{
      * Récupère les données d'un array sans doublon
      */
     public function getDistinct($sourceArray){
+
         $outputArray = [];
         foreach($sourceArray as $key => $obj){
             if(!$this->in_array($outputArray, $obj))

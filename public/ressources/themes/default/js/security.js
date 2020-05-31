@@ -25,33 +25,66 @@ $(function () {
     api = {
         table:{},
         column: {
-            role: [
-                { data: 'id', title: "", visible: false },
-                { data: 'Name', title: "Nom" },
-                { data: 'DisplayName', title: "Description" },
-                { data: 'null', title: "", render: Renders.renderEdit },
-                { data: 'null', title: "", render: Renders.renderDelete },
-            ],
-            action: [
-                { data: 'id', title: "", visible: false },
-                { data: 'Name', title: "Nom" },
-                { data: 'DisplayName', title: "Description" },
-                { data: 'null', title: "", render: Renders.renderEdit },
-                { data: 'null', title: "", render: Renders.renderDelete },
-            ]
+            role: getRoleColumns(),
+            action: getActionColumns(),
         },
     }  
 
     api.table.action = $("#action_table_js").myTable({
         dataSource: $("#action_data_source").val(),
-        columns: api.column.action
+        columns: api.column.action,
+        initComplete: function (setting, json) {
+            $.fn.initTooltip();
+            $.fn.initEventBtnDelete();
+        },
     });
 
     api.table.role = $("#role_table_js").myTable({
         dataSource: $("#role_data_source").val(),
-        columns: api.column.role
+        columns: api.column.role,
+        initComplete: function (setting, json) {
+            $.fn.initTooltip();
+            $.fn.initEventBtnDelete();
+        },
     });
 
+    function getActionColumns(){
+
+        var col = [];
+        col.push({ data: 'id', title: "", visible: false });
+        col.push({ data: 'Name', title: "Nom" });
+        col.push({ data: 'DisplayName', title: "Description" });
+        col.push({
+            data: 'id', title: "",
+            render: function (data, type, row, meta) {
+                meta.settings.oInit.customParam = {
+                    access: $.fn.getAccess()
+                };
+                return Renders.renderControl(data, type, row, meta);
+            }
+        });
+        return col;
+    }
+
+    function getRoleColumns(){
+
+        var col = [];
+        col.push({ data: 'id', title: "", visible: false });
+        col.push({ data: 'Name', title: "Nom" });
+        col.push({ data: 'DisplayName', title: "Description" });
+        col.push({
+            data: 'id', title: "",
+            render: function (data, type, row, meta) {
+                meta.settings.oInit.customParam = {
+                    access: $.fn.getAccess()
+                };
+                return Renders.renderControl(data, type, row, meta);
+            }
+        });
+        return col;
+    }
+
+    
     
     
 })

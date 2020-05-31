@@ -2,12 +2,15 @@
 
 namespace App\Controller;
 
+use Exception;
 use App\Entity\Tax;
 use App\Entity\Item;
 use App\Entity\Comment;
+use App\Entity\EanCode;
 use App\Entity\Setting;
 use App\Entity\Currency;
 use App\Entity\Provider;
+use App\Events\MyEvents;
 use App\Entity\ItemBrand;
 use App\Services\Utility;
 use App\Entity\ItemGroupe;
@@ -21,7 +24,9 @@ use App\Form\TaxRegistrationType;
 use App\Repository\TaxRepository;
 use App\Services\SecurityManager;
 use App\Repository\ActionRepository;
+use App\Form\EanCodeRegistrationType;
 use App\Form\SettingRegistrationType;
+use App\Repository\EanCodeRepository;
 use App\Repository\SettingRepository;
 use App\Form\CurrencyRegistrationType;
 use App\Form\ProviderRegistrationType;
@@ -36,11 +41,15 @@ use App\Form\OrderStatusRegistrationType;
 use App\Repository\OrderStatusRepository;
 use App\Form\DeliveryStatusRegistrationType;
 use App\Repository\DeliveryStatusRepository;
+use App\Repository\ImeiCodeRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Persistence\ObjectManager;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SettingController extends Controller
 {
@@ -49,43 +58,49 @@ class SettingController extends Controller
     protected $actionRepo;
     protected $settingManager;
     protected $validator;
+    protected $serializer;
     protected $ErrorHandler;
+    protected $settingRepo;
+    protected $eventDispatcher;
 
 
-    public function __construct(SecurityManager $securityUtility, 
+    public function __construct(Serializer $serializer, 
+                                SecurityManager $securityUtility, 
                                 ActionRepository $actionRepo,
                                 SettingManager $settingManager,
                                 ValidatorInterface $validator,
+                                SettingRepository $settingRepo,
+                                EventDispatcherInterface $eventDispatcher, 
                                 ErrorHandler $ErrorHandler)
     {
         $this->securityUtility = $securityUtility;
         $this->actionRepo = $actionRepo;
         $this->settingManager = $settingManager;
         $this->validator = $validator;
+        $this->serializer = $serializer;
         $this->ErrorHandler = $ErrorHandler;
+        $this->settingRepo = $settingRepo;
+        $this->eventDispatcher = $eventDispatcher;
     }
-    
+
+#region [ Views ]
     /*______________________________________________________________________________________________________________________ 
     --------------------------------------------[ Views ]--------------------------------------------------------*/
 
     /**
      * @Route("/admin/configuration", name="setting_home")
      */
-    public function home(SettingRepository $settingRepo,
-                        Utility $utility) {
+    public function home(Utility $utility) {
 
         if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
         
-        return $this->render('setting/index.html.twig', [
+        return $this->render('setting/home/general.html.twig', [
             'data_table' => 'general_table_js',
             'data_table_source' => 'general_data_source',
-            'page_title' => '',
-            'source' => $this->settingManager->getGeneralSettingDataSource($settingRepo->findAll()),
-            'codes' => $utility->getDistinctByCode($settingRepo->findAll()),
+            'codes' => $utility->getDistinctByCode($this->settingRepo->findAll()),
             'create_url' => $this->generateUrl('setting_registration'),
-            'page' => 'setting/_partials/general.html',
         ]);
     }
 
@@ -98,14 +113,11 @@ class SettingController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        return $this->render('setting/index.html.twig', [
+        return $this->render('setting/home/currency.html.twig', [
             'data_table' => 'currency_table_js',
             'data_table_source' => 'currency_data_source',
-            'page_title' => 'Monnaie',
-            'source' => $this->settingManager->getSettingDataSource($currencyRepo->findAll()),
             'codes' => ["CURRENCY"],
             'create_url' => $this->generateUrl('setting_currency_registration'),
-            'page' => 'setting/_partials/index.html',
         ]);
     }
 
@@ -118,14 +130,11 @@ class SettingController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
         //dump($this->settingManager->getSettingDataSource($taxRepo->findAll()));die();
-        return $this->render('setting/index.html.twig', [
+        return $this->render('setting/home/tax.html.twig', [
             'data_table' => 'tax_table_js',
             'data_table_source' => 'tax_data_source',
-            'page_title' => 'Tax',
             'codes' => ["TAX"],
-            'source' => $this->settingManager->getSettingDataSource($taxRepo->findAll()),
             'create_url' => $this->generateUrl('setting_tax_registration'),
-            'page' => 'setting/_partials/index.html',
         ]);
     }
 
@@ -138,14 +147,11 @@ class SettingController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        return $this->render('setting/index.html.twig', [
+        return $this->render('setting/home/delivery_status.html.twig', [
             'data_table' => 'delivery_status_table_js',
             'data_table_source' => 'delivery_status_data_source',
-            'page_title' => 'Statut Facturation',
-            'source' => $this->settingManager->getSettingDataSource($delStatusRepo->findAll()),
             'codes' => ["STATUS"],
             'create_url' => $this->generateUrl('setting_delivery_status_registration'),
-            'page' => 'setting/_partials/index.html',
         ]);
     }
 
@@ -159,14 +165,11 @@ class SettingController extends Controller
         }
 
         //dump($orderStatusRepo->findAll());die();
-        return $this->render('setting/index.html.twig', [
+        return $this->render('setting/home/order_status.html.twig', [
             'data_table' => 'status_table_js',
             'data_table_source' => 'order_status_data_source',
-            'page_title' => 'Statut Commande',
-            'source' => $this->settingManager->getSettingDataSource($orderStatusRepo->findAll()),
             'codes' => ["STATUS"],
             'create_url' => $this->generateUrl('setting_order_status_registration'),
-            'page' => 'setting/_partials/index.html',
         ]);
     }
 
@@ -179,14 +182,11 @@ class SettingController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        return $this->render('setting/index.html.twig', [
+        return $this->render('setting/home/catalogue_brand.html.twig', [
             'data_table' => 'brand_table_js',
             'data_table_source' => 'brand_data_source',
-            'page_title' => 'Marque Produit',
-            'source' => $this->settingManager->getSettingDataSource($brandRepo->findAll()),
             'codes' => ["BRAND"],
             'create_url' => $this->generateUrl('setting_brand_registration'),
-            'page' => 'setting/_partials/index.html',
         ]);
     }
 
@@ -199,14 +199,11 @@ class SettingController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        return $this->render('setting/index.html.twig', [
+        return $this->render('setting/home/catalogue_group.html.twig', [
             'data_table' => 'group_table_js',
             'data_table_source' => 'group_data_source',
-            'page_title' => 'Famille Produit',
-            'source' => $this->settingManager->getSettingDataSource($groupRepo->findAll()),
             'codes' => ["GROUP"],
             'create_url' => $this->generateUrl('setting_group_registration'),
-            'page' => 'setting/_partials/index.html',
         ]);
     }
 
@@ -219,14 +216,28 @@ class SettingController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        return $this->render('setting/index.html.twig', [
+        return $this->render('setting/home/catalogue_provider.html.twig', [
             'data_table' => 'provider_table_js',
             'data_table_source' => 'provider_data_source',
-            'page_title' => 'Fournisseur Produit',
-            'source' => $this->settingManager->getSettingDataSource($providerRepo->findAll()),
             'codes' => ["PROVIDER"],
             'create_url' => $this->generateUrl('setting_provider_registration'),
-            'page' => 'setting/_partials/index.html',
+        ]);
+    }
+
+    /**
+     * @Route("/admin/configuration/produit/ean", options={"expose"=true}, name="setting_catalogue_ean")
+     */
+    public function catalogueEan(EanCodeRepository $eanRepo) {
+
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
+        return $this->render('setting/home/catalogue_ean.html.twig', [
+            'data_table' => 'ean_table_js',
+            'data_table_source' => 'ean_data_source',
+            'codes' => ["EAN"],
+            'create_url' => $this->generateUrl('setting_ean_registration'),
         ]);
     }
 
@@ -234,7 +245,10 @@ class SettingController extends Controller
      * @Route("/admin/configuration/email", options={"expose"=true}, name="setting_email")
      */
     public function showEmail(){
-        
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
         return $this->render('email/index.html.twig', [
             'quote' => file_get_contents($this->getParameter('file.setting.email') . '/' . 'devis.txt'),
             'bill' => file_get_contents($this->getParameter('file.setting.email') . '/' . 'facture.txt'),
@@ -246,6 +260,20 @@ class SettingController extends Controller
     }
 
     /**
+     * @Route("/admin/configuration/texte", options={"expose"=true}, name="setting_text")
+     */
+    public function showText(Utility $utility){
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
+        return $this->render('document/index.html.twig', [
+            'cgv' => file_get_contents($utility->getAbsoluteRootPath() . $this->getParameter('file.setting.text') . '/' . 'cgv.txt'),
+            'quote' => file_get_contents($utility->getAbsoluteRootPath() . $this->getParameter('file.setting.text') . '/' . 'quote.txt'),
+        ]);
+    }
+
+    /**
      * @Route("/admin/configuration/produit/import", options={"expose"=true}, name="setting_catalogue_import")
      */
     public function import(){
@@ -253,6 +281,9 @@ class SettingController extends Controller
         return $this->render('setting/import_registration.html.twig');
     }
 
+#endregion
+
+#region [ Registrations ]
     /*______________________________________________________________________________________________________________________ 
     --------------------------------------------[ Registrations ]--------------------------------------------------------*/
 
@@ -280,19 +311,24 @@ class SettingController extends Controller
 
         //dump($request);die();
         if($form->isSubmitted() && $form->isValid() ){
-
-            //dump($request);die();
             
-            if(empty($request->files->get('setting')['switch'])){
-                $file = $request->files->get('setting')['file'];
-                $fileName = $utility->uploadFile($file, $this->getParameter('file.setting.image.download_dir'));
+            if(isset($request->request->get('setting_registration')['switch'])){
+                $file = $request->files->get('setting_registration')['file'];
+                $fileName = $utility->uploadFile($file, $utility->getAbsoluteRootPath() . $this->getParameter('abs.file.setting.image.download_dir'), 'logo.png');
+                
                 if (!empty($fileName)) {
-                    if ( $setting->getIsFile() && !empty($setting->getValue())) {
-                        unlink($this->getParameter('file.setting.image.download_dir').'/'. $setting->getValue());
+                    if ( file_exists($utility->getAbsoluteRootPath() . $this->getParameter('abs.file.setting.image.download_dir') . '/' . $setting->getValue())) {
+                        unlink( $utility->getAbsoluteRootPath() . $this->getParameter('abs.file.setting.image.download_dir').'/'. $setting->getValue());
                     }
                     $setting->setValue($fileName);
                     $setting->setIsFile(true);
                 }
+
+                $fileFullPath = $utility->getAbsoluteRootPath() . $this->getParameter('file.setting.image.download_dir').'/' . $fileName;
+                $event = new GenericEvent([
+                    "files" => [$fileFullPath],
+                ]);
+                $this->eventDispatcher->dispatch(MyEvents::FTP_IMAGE_SEND, $event);
             }
             else{
                 $setting->setIsFile(false);
@@ -547,6 +583,40 @@ class SettingController extends Controller
     }
 
     /**
+     * @Route("/admin/configuration/ean/inscription", options={"expose"=true}, name="setting_ean_registration")
+     * @Route("/admin/configuration/ean/{id}/edit", options={"expose"=true}, requirements={"id"="\d+"}, name="setting_ean_edit")
+     * 
+     */
+    public function eanRegistration(EanCode $ean = null, 
+                                         Request $request, 
+                                         ObjectManager $manager,
+                                         ValidatorInterface $validator) {
+
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
+        if (!$ean)
+            $ean = new EanCode();
+
+        $form = $this->createForm(EanCodeRegistrationType::class, $ean);
+
+        $form->handleRequest($request);
+        $this->ErrorHandler->registerError($validator->validate($ean));
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $manager->persist($ean);
+            $manager->flush();
+
+            return $this->redirectToRoute('setting_catalogue_ean');
+        }
+
+        return $this->render('catalogue/ean_registration.html.twig', [
+            'formEAN' => $form->createView(),
+        ]);
+    }
+
+    /**
      * @Route("/admin/configuration/commande/statut/inscription", options={"expose"=true}, name="setting_order_status_registration")
      * @Route("/admin/configuration/commande/statut/{id}/edit", options={"expose"=true}, requirements={"id"="\d+"}, name="setting_order_status_edit")
      * 
@@ -627,12 +697,14 @@ class SettingController extends Controller
         $form = $request->request->get('emails');
 
         if(!empty($form)){
-            file_put_contents($this->getParameter('file.setting.email') . '/' . 'devis.txt',trim($form['quote'], ' \t'));
+            $quoteFile = $this->getParameter('file.setting.email') . '/' . 'quote.txt';
+            file_put_contents($quoteFile,trim($form['quote'], ' \t'));
             file_put_contents($this->getParameter('file.setting.email') . '/' . 'facture.txt', trim($form['bill'], ' \t'));
             file_put_contents($this->getParameter('file.setting.email') . '/' . 'relance_paiement_1.txt', trim($form['first_reminder'], ' \t'));
             file_put_contents($this->getParameter('file.setting.email') . '/' . 'relance_paiement_2.txt', trim($form['seconde_reminder'], ' \t'));
             file_put_contents($this->getParameter('file.setting.email') . '/' . 'validation_commande.txt', trim($form['validate'], ' \t'));
             file_put_contents($this->getParameter('file.setting.email') . '/' . 'inscription.txt', trim($form['inscription'], ' \t'));
+                    
         }
         else{
              $this->errorHandler->error("Une erreur s'est produite lors de l'enregistrement de vos modèles d\'email!");
@@ -641,6 +713,39 @@ class SettingController extends Controller
         return $this->redirectToRoute('setting_email');
     }
 
+    /**
+     * @Route("/admin/configuration/texte/edit", options={"expose"=true}, name="setting_text_edit") 
+     */
+    public function textRegistration(Request $request, Utility $utility) {
+
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
+        $form = $request->request->get('texts');
+
+        if(!empty($form)){
+            $cgvFile = $utility->getAbsoluteRootPath() . $this->getParameter('file.setting.text') . '/' . 'cgv.txt';
+            $quoteFile = $utility->getAbsoluteRootPath() . $this->getParameter('file.setting.text') . '/' . 'quote.txt';
+            //dump(trim($form['cgv']));die();
+            file_put_contents($cgvFile,trim($form['cgv'], ' \t'));
+            file_put_contents($quoteFile, trim($form['quote'], ' \t'));
+            
+            $event = new GenericEvent([
+                'files' => [$cgvFile, $quoteFile]
+            ]);
+            $this->eventDispatcher->dispatch(MyEvents::FTP_TEXT_SEND, $event);
+        }
+        else{
+             $this->errorHandler->error("Une erreur s'est produite lors de l'enregistrement de vos modèles d\'email!");
+        }
+        
+        return $this->redirectToRoute('setting_text');
+    }
+
+#endregion
+
+#region [ deletes ]
     /*______________________________________________________________________________________________________________________ 
     --------------------------------------------[ Deletes ]--------------------------------------------------------*/
 
@@ -652,9 +757,14 @@ class SettingController extends Controller
         if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
-
-        $manager->remove($setting);
-        $manager->flush();
+        
+        try {
+            $manager->remove($setting);
+            $manager->flush();
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la suppression de la configuration");
+            $this->ErrorHandler->error($ex->getMessage());
+        }
 
         return $this->RedirectToRoute('setting_home');
     }
@@ -667,11 +777,16 @@ class SettingController extends Controller
         if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
+        
+        try {
+            $manager->remove($currency);
+            $manager->flush();
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la suppression de la monnaie");
+            $this->ErrorHandler->error($ex->getMessage());
+        }
 
-        $manager->remove($currency);
-        $manager->flush();
-
-        return $this->RedirectToRoute('setting_home');
+        return $this->RedirectToRoute('setting_currency');
     }
 
     /**
@@ -682,11 +797,16 @@ class SettingController extends Controller
         if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
+        
+        try {
+            $manager->remove($tax);
+            $manager->flush();
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la suppression de la TVA");
+            $this->ErrorHandler->error($ex->getMessage());
+        }
 
-        $manager->remove($tax);
-        $manager->flush();
-
-        return $this->RedirectToRoute('setting_home');
+        return $this->RedirectToRoute('setting_tax');
     }
 
     /**
@@ -697,11 +817,16 @@ class SettingController extends Controller
         if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
+        
+        try {
+            $manager->remove($status);
+            $manager->flush();
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la suppression du status livraison");
+            $this->ErrorHandler->error($ex->getMessage());
+        }
 
-        $manager->remove($status);
-        $manager->flush();
-
-        return $this->RedirectToRoute('setting_home');
+        return $this->RedirectToRoute('setting_delivery_status');
     }
 
     /**
@@ -713,11 +838,41 @@ class SettingController extends Controller
         if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
+        
+        try {
+            $manager->remove($provider);
+            $manager->flush();
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la suppression du fournisseur");
+            $this->ErrorHandler->error($ex->getMessage());
+        }
 
-        $manager->remove($provider);
-        $manager->flush();
+        return $this->RedirectToRoute('setting_catalogue_provider');
+    }
 
-        return $this->RedirectToRoute('setting_home');
+    /**
+     * @Route("/admin/configuration/ean/{id}/delete", options={"expose"=true}, requirements={"id"="\d+"}, name="setting_ean_delete")
+     */
+    public function eanDelete(EanCode $ean, ImeiCodeRepository $imeiRepo, ObjectManager $manager)
+    {
+
+        if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
+        try{
+            $imei = $imeiRepo->findOneBy(["EanCode"=> $ean]);
+            if(!empty($imei)){
+                $imei->setEanCode(null);
+                $manager->remove($ean);
+                $manager->flush();
+            }
+        }catch(Exception $ex){
+            $this->ErrorHandler->error("Une erreur s'est produite durant la suppression du code EAN");
+            $this->ErrorHandler->error($ex->getMessage());
+        }
+
+        return $this->RedirectToRoute('setting_catalogue_ean');
     }
 
     /**
@@ -730,10 +885,15 @@ class SettingController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        $manager->remove($group);
-        $manager->flush();
+        try {
+            $manager->remove($group);
+            $manager->flush();
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la suppression de la famille!");
+            $this->ErrorHandler->error($ex->getMessage());
+        }
 
-        return $this->RedirectToRoute('setting_home');
+        return $this->RedirectToRoute('setting_catalogue_group');
     }
 
     /**
@@ -745,11 +905,16 @@ class SettingController extends Controller
         if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
+        
+        try {
+            $manager->remove($brand);
+            $manager->flush();
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la suppression de la marque!");
+            $this->ErrorHandler->error($ex->getMessage());
+        }
 
-        $manager->remove($brand);
-        $manager->flush();
-
-        return $this->RedirectToRoute('setting_home');
+        return $this->RedirectToRoute('setting_catalogue_brand');
     }
 
     /**
@@ -760,14 +925,215 @@ class SettingController extends Controller
         if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
-        
-        if (count($orderRepo->findBy(['Status' => $status])) == 0) {
-            $manager->remove($status);
-            $manager->flush();
-            return $this->RedirectToRoute('order_home');
+
+        try{
+            if (count($orderRepo->findBy(['Status' => $status])) == 0) {
+                $manager->remove($status);
+                $manager->flush();
+            } else
+                $this->ErrorHandler->error("Le status ne peut pas être supprimé. Il est en cours d'utilisation par au moins une commande!");
+        }catch(Exception $ex){
+            $this->ErrorHandler->error("Une erreur s'est produite durant la suppression du status commande!");
+            $this->ErrorHandler->error($ex->getMessage());
         }
-        $this->ErrorHandler->error("Le status ne peut pas être supprimé. Il est en cours d'utilisation pour au moins une commande!");
-        return $this->RedirectToRoute('order_home');
+        return $this->RedirectToRoute('setting_order_status');
     }
+
+#endregion
+
+#region [ Ajax/Data ]
+    /*_____________________________________________[ Ajax/Data ]_________________________ */
+
+    /**
+     * @Route("/admin/configuration/generale/donnee/{code}", options={"expose"=true}, name="setting_data")
+     */
+    public function dataSetting(string $code)
+    {
+       
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+            return new Response($this->serializer->serialize([
+                'object_array' => ['message' => 'Zone à accés restreint!"'],
+                'format' => 'json',
+            ]));
+        }
+        
+        return new Response($this->serializer->serialize([
+            'object_array' => ['data' => $this->settingRepo->findBy(['Code' => $code])],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]));
+    }
+
+
+    /**
+     * @Route("/admin/configuration/monnaie/donnee", options={"expose"=true}, name="setting_data_currency")
+     */
+    public function dataCurrency(CurrencyRepository $currencyRepo)
+    {
+
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+            return new Response($this->serializer->serialize([
+                'object_array' => ['message' => 'Zone à accés restreint!"'],
+                'format' => 'json',
+            ]));
+        }
+
+        return new Response($this->serializer->serialize([
+            'object_array' => ['data' => $currencyRepo->findAll()],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]));
+    }
+
+
+    /**
+     * @Route("/admin/configuration/taxe/donnee", options={"expose"=true}, name="setting_data_tax")
+     */
+    public function dataTax(TaxRepository $taxRepo)
+    {
+
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+            return new Response($this->serializer->serialize([
+                'object_array' => ['message' => 'Zone à accés restreint!"'],
+                'format' => 'json',
+            ]));
+        }
+
+        return new Response($this->serializer->serialize([
+            'object_array' => ['data' => $taxRepo->findAll()],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]));
+    }
+
+
+    /**
+     * @Route("/admin/configuration/statut/facturation/donnee", options={"expose"=true}, name="setting_data_delivery_status")
+     */
+    public function dataDeliveryStatus(DeliveryStatusRepository $delStatusRepo)
+    {
+
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+            return new Response($this->serializer->serialize([
+                'object_array' => ['message' => 'Zone à accés restreint!"'],
+                'format' => 'json',
+            ]));
+        }
+
+        return new Response($this->serializer->serialize([
+            'object_array' => ['data' => $delStatusRepo->findAll()],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]));
+    }
+
+
+    /**
+     * @Route("/admin/configuration/statut/commande/donnee", options={"expose"=true}, name="setting_data_order_status")
+     */
+    public function dataOrderStatus(OrderStatusRepository $orderStatusRepo)
+    {
+
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+            return new Response($this->serializer->serialize([
+                'object_array' => ['message' => 'Zone à accés restreint!"'],
+                'format' => 'json',
+            ]));
+        }
+
+        return new Response($this->serializer->serialize([
+            'object_array' => ['data' => $orderStatusRepo->findAll()],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]));
+    }
+
+
+    /**
+     * @Route("/admin/configuration/marque/donnee", options={"expose"=true}, name="setting_data_brand")
+     */
+    public function dataCatalogueBrand(ItemBrandRepository $brandRepo)
+    {
+
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+            return new Response($this->serializer->serialize([
+                'object_array' => ['message' => 'Zone à accés restreint!"'],
+                'format' => 'json',
+            ]));
+        }
+
+        return new Response($this->serializer->serialize([
+            'object_array' => ['data' => $brandRepo->findAll()],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]));
+    }
+
+
+    /**
+     * @Route("/admin/configuration/famille/donnee", options={"expose"=true}, name="setting_data_group")
+     */
+    public function dataCatalogueGroup(ItemGroupeRepository $groupRepo)
+    {
+
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+            return new Response($this->serializer->serialize([
+                'object_array' => ['message' => 'Zone à accés restreint!"'],
+                'format' => 'json',
+            ]));
+        }
+
+        return new Response($this->serializer->serialize([
+            'object_array' => ['data' =>$groupRepo->findAll()],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]));
+    }
+
+
+    /**
+     * @Route("/admin/configuration/fournisseur/donnee", options={"expose"=true}, name="setting_data_provider")
+     */
+    public function dataCatalogueProvider(ProviderRepository $providerRepo)
+    {
+
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+            return new Response($this->serializer->serialize([
+                'object_array' => ['message' => 'Zone à accés restreint!"'],
+                'format' => 'json',
+            ]));
+        }
+
+        return new Response($this->serializer->serialize([
+            'object_array' => ['data' => $providerRepo->findAll()],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]));
+    }
+
+
+    /**
+     * @Route("/admin/configuration/ean/donnee", options={"expose"=true}, name="setting_data_ean")
+     */
+    public function dataCatalogueEan(EanCodeRepository $eanRepo)
+    {
+
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+            return new Response($this->serializer->serialize([
+                'object_array' => ['message' => 'Zone à accés restreint!"'],
+                'format' => 'json',
+            ]));
+        }
+
+        //dump($eanRepo->findAll());die();
+
+        return new Response($this->serializer->serialize([
+            'object_array' => ['data' => $eanRepo->findAll()],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]));
+    }
+
+#endregion
 
 }

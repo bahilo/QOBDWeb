@@ -30,14 +30,14 @@ $(document).ready(function ($) {
     function protectOnChange(){
 
         $('.c-main').on('change', '*', function(e){
-            if (!$(this).attr('data-changed')){
+            if (!$(this).attr('data-changed') && !$(this).hasClass('saveIgnore') && $(this).parents('.saveIgnore').length == 0){
                $(this).attr('data-changed', 'true');
-                e.stopPropagation();
-           }
+            }
+            e.stopPropagation();
         });
 
         $('.c-sidebar, .c-header').on('click', 'a', function(e){
-            if ($('[data-changed="true"]').length > 0){
+            if ($(this).attr('href')!= "#" && $('[data-changed="true"]').length > 0){
                 e.preventDefault();
                 $('[data-changed="true"]').parent().css({'border':'2px solid red'});
                 var elt = $(this);

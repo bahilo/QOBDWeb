@@ -1,0 +1,63 @@
+{% extends 'security/home.html.twig' %}
+
+{% block title %}{{ parent() }} - Commerciaux{% endblock %}
+
+{% block home_path %}
+{{ parent() }}
+<li class="breadcrumb-item">
+    Commerciaux
+</li>
+{% endblock %}
+
+
+{% block content_area %}
+
+<form id="global_form" action="{{ path('security_agent_profile') }}" method="POST">
+    <div class="card">
+        <div class="card-header">
+            <i class="fa fa-align-justify"></i> Commerciaux
+        </div>
+        <div class="card-body">
+            <div class="">
+                <table class="table table-responsive-md table-bordered table-striped table-md">
+                    <tr>
+                        <th scope="col">Roles</th>
+                        {% for agent in agents %}
+                        <th scope="col"><span data-toggle="tooltip" data-placement="top"
+                                title="{{ agent.FirstName }} {{ agent.LastName }}"> <i class="fa fa-question-circle"></i></span>
+                            {{ agent.UserName }}</th>
+                        {% endfor %}
+                    </tr>
+                    {% for role in roles %}
+            
+                    <tr>
+                        <td>{{ role.displayname }}</td>
+            
+                        {% for agent in agents %}
+                        {% if agent.ObjectRoles | length > 0 %}
+                        <td>
+                            <input type="hidden" name="profile[{{ agent.id }}][{{ role.id }}]" />
+                            {% for agent_role in agent.ObjectRoles if agent_role != null and agent_role.id == role.id %}
+                            <input type="checkbox" class="input-control" name="profile[{{ agent.id }}][{{ role.id }}]" checked />
+                            {% else %}
+                            <input type="checkbox" class="input-control" name="profile[{{ agent.id }}][{{ role.id }}]" />
+                            {% endfor %}
+                        </td>
+                        {% else %}
+                        <td>
+                            <input type="hidden" name="profile[{{ agent.id }}][{{ role.id }}]" />
+                            <input type="checkbox" class="input-control" name="profile[{{ agent.id }}][{{ role.id }}]" />
+                        </td>
+                        {% endif %}
+                        {% endfor %}
+                    </tr>
+            
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+{% endblock %}

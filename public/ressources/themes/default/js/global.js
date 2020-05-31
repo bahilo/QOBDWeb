@@ -157,10 +157,22 @@ $(document).ready(function(){
     }
 
     //-----------------------------------------------------------------------------
-    //-- demande de confirmation la validation
+    //-- Tooltips - aide
     //-----------------------------------------------------------------------------
     $.fn.initTooltip = function () {
         $('[data-toggle="tooltip"]').tooltip();
+    }
+
+    //-----------------------------------------------------------------------------
+    //-- vérification des droits d'accés
+    //-----------------------------------------------------------------------------
+    $.fn.getAccess = function() {
+        return {
+            update: $('#is_update', '.access_pool').length > 0 && $('#is_update', '.access_pool').val(),
+            write: $('#is_write', '.access_pool').length > 0 && $('#is_write', '.access_pool').val(),
+            read: $('#is_read', '.access_pool').length > 0 && $('#is_read', '.access_pool').val(),
+            delete: $('#is_delete', '.access_pool').length > 0 && $('#is_delete', '.access_pool').val(),
+        }
     }
 
 });

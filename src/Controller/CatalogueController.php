@@ -14,6 +14,7 @@ use App\Repository\ActionRepository;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\QuoteOrderDetailRepository;
 use Doctrine\Common\Persistence\ObjectManager;
+use Exception;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -72,8 +73,10 @@ class CatalogueController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
     
-        if(!$item)
+        if(!$item){
             $item = new Item();
+            $item->setIsErasable(true);
+        }
         
         $item = $catHydrate->hydrateItem([$item])[0];
         
@@ -85,31 +88,29 @@ class CatalogueController extends Controller
             $this->ErrorHandler->registerError($validator->validate($item));
             
             if($form->isValid()){
-                $item = $catHydrate->hydrateItemRelationFromForm($item);
+               try{
 
-                $file = $request->files->get('item_registration')['PictureFile'];
-                
-                $fileName = $utility->uploadFile($file, $utility->getAbsoluteRootPath() . '/' . $this->getParameter('abs.file.setting.catalogue.download_dir'));
-                if (!empty($fileName)) {
-                    if (!empty($item->getPicture()) && file_exists($utility->getAbsoluteRootPath() . '/' . $this->getParameter('abs.file.setting.catalogue.download_dir') . '/' . $item->getPicture())) {
-                        unlink($utility->getAbsoluteRootPath() . '/' . $this->getParameter('abs.file.setting.catalogue.download_dir') . '/' . $item->getPicture());
+                    $file = $request->files->get('item_registration')['PictureFile'];
+
+                    $fileName = $utility->uploadFile($file, $utility->getAbsoluteRootPath() . '/' . $this->getParameter('abs.file.setting.catalogue.download_dir'));
+                    if (!empty($fileName)) {
+                        if (!empty($item->getPicture()) && file_exists($utility->getAbsoluteRootPath() . '/' . $this->getParameter('abs.file.setting.catalogue.download_dir') . '/' . $item->getPicture())) {
+                            unlink($utility->getAbsoluteRootPath() . '/' . $this->getParameter('abs.file.setting.catalogue.download_dir') . '/' . $item->getPicture());
+                        }
+                        $item->setPicture($fileName);
                     }
-                    $item->setPicture($fileName);
-                }
 
-                $item->setIsErasable(true);
+                    if (empty($item->getComment()->getId()))
+                        $item->getComment()->setCreateAt(new \Datetime());
 
-                if ($item->getComment())
-                    $manager->persist($item->getComment());
+                    $manager->persist($item);
+                    $manager->flush();
+                    $this->ErrorHandler->success("Le produit a été enregistré avec succès.");
 
-                if ($item->getImeiCode()) {
-                    $manager->persist($item->getImeiCode());
-                    if ($item->getImeiCode()->getEanCode())
-                        $manager->persist($item->getImeiCode()->getEanCode());
-                }
-
-                $manager->persist($item);
-                $manager->flush();
+               }catch(Exception $ex){
+                    $this->ErrorHandler->error("Une erreur s'est produite durant la sauvegarde du produit.");
+                    $this->ErrorHandler->error($ex->getMessage());
+               }
 
                 return $this->redirectToRoute('catalogue_home');
             }
@@ -132,13 +133,18 @@ class CatalogueController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        if($item->getIsErasable()){
-            if(!empty($item->getPicture()))
-                unlink($this->getParameter('file.setting.catalogue.download_dir').'/'.$item->getPicture());
-            
-            $manager->remove($item);            
-            $manager->flush();
-        } 
+        try{
+            if ($item->getIsErasable()) {
+                if (!empty($item->getPicture()))
+                    unlink($this->getParameter('file.setting.catalogue.download_dir') . '/' . $item->getPicture());
+
+                $manager->remove($item);
+                $manager->flush();
+            } 
+        }catch(Exception $ex){
+            $this->ErrorHandler->error("Une erreur s'est produite durant la suppression du produit.");
+            $this->ErrorHandler->error($ex->getMessage());
+        }
 
         return $this->redirectToRoute('catalogue_home');
     }

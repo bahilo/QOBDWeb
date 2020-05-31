@@ -57,7 +57,7 @@
                     <tr>
                         <td> </td>
                         <td bgcolor="#2982cc" align="center">
-                            <font color="white" size="6">
+                            <font color="white" size="3">
                                 {% block body_title %}{% endblock body_title %}
                             </font><br>
                             <font color="white" size="5">
@@ -81,7 +81,10 @@
                                 </table>
                             </div>
                             <br>
-                            {% block body %}{% endblock body %}            
+                            {% block body %}
+                            <pre
+                                style="font-family: Arial, Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;font-size: 14px;">{% block content_area %}{% endblock %}</pre>
+                            {% endblock body %}            
                         </td>
             
                         <td width="100"> </td>
@@ -95,12 +98,12 @@
         <div class="email-wrapper">
             {% block footer %}
             
-            <div style="padding:0px 0 5px 0;line-height:180%;font-size:14px;color:#000;border-bottom:1px #bbb solid;border-top:1px #bbb solid;">
+            {# <div style="padding:0px 0 5px 0;line-height:180%;font-size:14px;color:#000;border-bottom:1px #bbb solid;border-top:1px #bbb solid;">
                 <b>
                     <!-- <center>NE PAS REPONDRE A CET EMAIL</center> -->
                 </b>
             </div>
-            >> ici les conditions générales d'utilisation! <<
+            >> ici les conditions générales d'utilisation! << #}
             {% endblock footer %}
         </div>        
     </footer>

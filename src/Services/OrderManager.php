@@ -2,9 +2,14 @@
 
 namespace App\Services;
 
+use App\Entity\Currency;
+use Exception;
 use App\Entity\QuoteOrder;
 use Psr\Log\LoggerInterface;
 use App\Services\OrderHydrate;
+use App\Entity\QuoteOrderDetail;
+use App\Repository\BillRepository;
+use App\Repository\OrderStatusRepository;
 use App\Repository\QuoteOrderRepository;
 use App\Repository\QuoteOrderDetailRepository;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -21,13 +26,21 @@ class OrderManager{
     protected $orderDetailRepo;
     protected $webApi;
     protected $logger;
+    protected $errorHandler;
+    protected $statusRepo;
+    protected $billRepo;
+    protected $utility;
 
     public function __construct(QuoteOrderRepository $orderRepo, 
                                 QuoteOrderDetailRepository $orderDetailRepo,  
                                 ApiManager $webApi,
                                 ObjectManager $manager, 
                                 LoggerInterface $logger,
+                                ErrorHandler $errorHandler,
                                 OrderHydrate $orderHydrate, 
+                                OrderStatusRepository $statusRepo, 
+                                BillRepository $billRepo, 
+                                Utility $utility, 
                                 TokenStorageInterface $tokenStorage, 
                                 ContainerInterface $container)
     {
@@ -39,6 +52,10 @@ class OrderManager{
         $this->orderDetailRepo = $orderDetailRepo;
         $this->manager = $manager;
         $this->container = $container;
+        $this->errorHandler = $errorHandler;
+        $this->statusRepo = $statusRepo;
+        $this->billRepo = $billRepo;
+        $this->utility = $utility;
     }
 
     public function getHydrater(){
@@ -46,7 +63,16 @@ class OrderManager{
     }
 
     public function getCommandeInfo($orderDetails, QuoteOrder $order){
+        return $this->getOrderDetailStats($orderDetails, $order->getCurrency());
+    }
+
+    /**
+     * Calcul des stats de la commande
+     */
+    public function getOrderDetailStats(array $orderDetails, Currency $currency){
         $output = [
+            'total_PA' => 0,
+            'total_PV' => 0,
             'total_HT' => 0,
             'total_TTC' => 0,
             'marge_perc' => 0,
@@ -54,80 +80,123 @@ class OrderManager{
             'VAT_amount' => 0,
             'VAT' => 0,
         ];
-        $currency = $order->getCurrency();
-        $currencyValue = 1;
-        if(!empty($currency))
-            $currencyValue = $this->webApi->execCurrencyRequest($currency->getSymbol());
-        else
-            $this->loggCommandeInfo($order, "La commande ne possède pas de Devis");
 
-        foreach ($orderDetails as $orderDetail) {
+        if(count($orderDetails) > 0){
 
-            $qt = $orderDetail->getQuantity();
-            $pa = $orderDetail->getItemPurchasePrice();
-            $pv = $orderDetail->getItemSellPrice(); 
+            /** @var QuoteOrder */
+            $order = $orderDetails[0]->getQuoteOrder();
+            $currencyValue = ($order->getCurrency() && !empty($order->getCurrency()->getRate()) ) ? $order->getCurrency()->getRate() : 1;
 
-            $total_HT = $pv * $qt;
-            $marge_perc = ($pv - $pa) / $pv * 100;
-            $marge_amount = $pv - $pa;
-                        
-            $output['total_HT'] += $total_HT;
-            $output['marge_perc'] += $marge_perc;
-            $output['marge_amount'] += $marge_amount; 
-            
-            $tax = empty($orderDetail->getTax()) ? $order->getTax() : $orderDetail->getTax();
+            try{
+                /** @var QuoteOrderDetail */
+                foreach ($orderDetails as $orderDetail) {
+                   
+                    $qt = $orderDetail->getQuantity();
+                    $pa = $orderDetail->getItemPurchasePrice();
+                    $pv = $orderDetail->getItemSellPrice();
 
-            if(!empty($tax)){
-                $bTvaMarge = $tax->getIsTVAMarge();
-                $tva = $tax->getValue();                
-                $VAT_amount = $orderDetail->getItemSellPrice() * $orderDetail->getQuantity();
+                    $total_HT = $pv * $qt;
+                    $marge_perc = $pv > 0 ?  ($pv - $pa) / $pv * 100 : 0;
+                    $marge_amount = $pv - $pa;
 
-                $output['VAT'] = $tva;
-                $output['VAT_amount'] += ($bTvaMarge ? $marge_amount : $pv) * $qt * $tva/100 ;
-                $output['total_TTC'] += $bTvaMarge ? ($pv + $marge_amount * $tva/100) * $qt : $pv * (1 + $tva/100) * $qt;
+                    $output['total_PA'] += $pa;
+                    $output['total_PV'] += $pv;
+                    $output['total_HT'] += $total_HT;
+                    $output['marge_perc'] += $marge_perc;
+                    $output['marge_amount'] += $marge_amount;
+
+                    $tax = empty($orderDetail->getTax()) ? $order->getTax() : $orderDetail->getTax();
+
+                    if (!empty($tax)) {
+                        $bTvaMarge = $tax->getIsTVAMarge();
+                        $tva = $tax->getValue();
+                        $VAT_amount = $orderDetail->getItemSellPrice() * $orderDetail->getQuantity();
+
+                        $output['VAT'] = $tva;
+                        $output['VAT_amount'] += ($bTvaMarge ? $marge_amount : $pv) * $qt * $tva / 100;
+                        $output['total_TTC'] += $bTvaMarge ? ($pv + $marge_amount * $tva / 100) * $qt : $pv * (1 + $tva / 100) * $qt;
+                    } else {
+                        $output['total_TTC'] += $orderDetail->getItemSellPrice() * $orderDetail->getQuantity();
+                    }
+                }
+
+                if (!empty($currency)) {
+
+                    $output['total_HT'] = round($output['total_HT'] * $currencyValue, 2);
+                    $output['total_TTC'] = round($output['total_TTC'] * $currencyValue, 2);
+                    $output['marge_perc'] = round(($output['total_PV'] - $output['total_PA']) / $output['total_PV']*100, 2);
+                    $output['marge_amount'] = round(($output['total_PV'] - $output['total_PA']) * $currencyValue, 2);
+                    $output['VAT_amount'] = round($output['VAT_amount'] * $currencyValue, 2);
+                }
+
+                if($pv == 0)
+                throw new Exception('Division par zéro.');
+
+            }catch(Exception $ex){
+                if($ex->getMessage() == 'Division par zéro.'){
+                    $this->errorHandler->error("Veuillez verifier la liste de vos produits, car une référence possède un prix de vente à 0!");                
+                }
+                else
+                    $this->errorHandler->error($ex->getMessage());
+
             }
-            else{
-                $output['total_TTC'] += $orderDetail->getItemSellPrice() * $orderDetail->getQuantity();
-            }            
-        }
-        $output['marge_perc'] = round($output['marge_perc'], 2);
-        $output['total_HT'] = round($output['total_HT'] * $currencyValue , 2);
-        $output['total_TTC'] = round($output['total_TTC'] * $currencyValue , 2);
-        $output['marge_amount'] = round($output['marge_amount'] * $currencyValue , 2);
-        $output['VAT_amount'] = round($output['VAT_amount'] * $currencyValue , 2);
+        }        
+        
         return $output;
     }
 
-    public function loggCommandeInfo(QuoteOrder $order, $message){
-        $this->logger->info($this->token->getUser()->getUsername() . "(id agent = " . $this->token->getUser()->getId() . ") - commande n°" . $order->getId(), [
-            'detail' => $message
-        ]);
+    /**
+     * alimentation de la commande avec les données stats + relation
+     */
+    public function hydrateOrderDetailStats($orderDetails)
+    {
+        $output = [];
+        foreach ($this->orderHydrate->hydrateOrderDetail($orderDetails) as $orderDetail) {
+            /** @var QuoteOrder */
+            $order = $orderDetail->getQuoteOrder();
+            $stats = $this->getOrderDetailStats([$orderDetail], $order->getCurrency());
+            $orderDetail->setItemSellPriceTotal($stats['total_HT']);
+            $orderDetail->setItemSellPriceVATTotal($stats['total_TTC']);
+
+            $orderDetail->setItemROIPercent($stats['marge_perc']);
+            $orderDetail->setItemROICurrency($stats['marge_amount']);
+
+            $this->manager->persist($orderDetail);
+            array_push($output, $orderDetail);
+        }
+        $this->manager->flush();
+        return $output;
     }
 
-    public function loggCommandeAccessInfo(QuoteOrder $order){
-        $this->logger->info($this->token->getUser()->getUsername() . "(id agent = " . $this->token->getUser()->getId() . ") - Accède à la commande n°" . $order->getId());
-    }
+    /**
+     * Facture la commande
+     */
+    function setOrderbilled($order){
+        dump('setOrderbilled');
+        $TotoalOrderBill = $this->orderRepo->findScalarOrderBill($order);
+        //dump($TotoalOrderBill);die();
 
-    public function loggCommandeRegisterInfo(QuoteOrder $order){
-        $this->logger->info($this->token->getUser()->getUsername() . "(id agent = " . $this->token->getUser()->getId() . ") - vient de créer la commande n°" . $order->getId());
-    }
+        //---- recherche le montant de la facture
+        $bills = $this->utility->getDistinct($this->billRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']));
+        $totalBilled = 0;
+        foreach ($bills as $bill) {
+            $totalBilled += $bill->getPay();
+        }
 
-    public function loggCommandeSaveInfo(QuoteOrder $order, $data){
-        $this->logger->info($this->token->getUser()->getUsername() . "(id agent = " . $this->token->getUser()->getId() . ") - vient de modifier la commande n°" . $order->getId(),[
-            'détail' => print_r($data, true)
-        ]);
-    }
+        //--- facturer et expedier la commande
+        if (!empty($TotoalOrderBill) && $TotoalOrderBill > 0 && $TotoalOrderBill == $totalBilled) {
+           
+            $status = null;
+            if ($order->getStatus()->getName() == "STATUS_ORDER")
+                $status = $this->statusRepo->findOneBy(['Name' => 'STATUS_BILL']);
+            else if ($order->getStatus()->getName() == "STATUS_REFUND")
+                $status = $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUNDBILL']);
 
-    public function loggCommandeErr(QuoteOrder $order, $message){
-        $this->logger->error($this->token->getUser()->getUsername() . "(id agent = " . $this->token->getUser()->getId() . ") - une erreur s'est produite sur la commande n°" . $order->getId(),[
-            'détail' => $message
-        ]);
-    }
-
-    public function loggCommandeCritical(QuoteOrder $order, $message){
-        $this->logger->critical($this->token->getUser()->getUsername() . "(id agent = " . $this->token->getUser()->getId() . ") - une erreur critique s'est produite sur la commande n°" . $order->getId(),[
-            'détail' => $message
-        ]);
+            if (!empty($status)) {
+                $order->setStatus($status);
+            }
+        }
+        return $order;
     }
 
 }

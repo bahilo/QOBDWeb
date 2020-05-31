@@ -4,8 +4,8 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Groups;
-use Doctrine\Common\Collections\Collection;
 use JMS\Serializer\Annotation\SerializedName;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -43,6 +43,7 @@ class Item
     /**
      * @ORM\Column(type="float")
      * @Assert\NotNull(message = "Le prix de vente ne peut pas être null.")
+     * @Assert\GreaterThan(0, message = "Le prix de vente ne peut pas être inférieur ou égual à {{ compared_value }}.")
      * @Groups({"class_property"})
      * @SerializedName("SellPrice")
      */
@@ -51,6 +52,7 @@ class Item
     /**
      * @ORM\Column(type="float")
      * @Assert\NotNull(message = "Le prix d'achat ne peut pas être null.")
+     * @Assert\GreaterThan(0, message = "Le prix d'achat ne peut pas être inférieur ou égual à {{ compared_value }}.")
      * @Groups({"class_property"})
      * @SerializedName("PurchasePrice")
      */
@@ -82,20 +84,21 @@ class Item
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Comment", cascade={"persist", "remove"})
      * @Groups({"class_property"})
-     * @Groups({"class_relation"})
+     * @SerializedName("Comment")
      */
     private $Comment;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Provider", inversedBy="items")
-     * @Assert\NotNull(message = "Veuillez choisir au moins un fournisseur.")
-     * @Groups({"class_relation"})
+     * @Groups({"class_property"})
+     * @SerializedName("Provider")
      */
     private $Provider;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\ItemGroupe", inversedBy="items")
-     * @Groups({"class_relation"})
+     * @Groups({"class_property"})
+     * @SerializedName("ItemGroupe")
      */
     private $ItemGroupe;
 
@@ -108,7 +111,8 @@ class Item
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\ItemBrand", inversedBy="items")
-     * @Groups({"class_relation"})
+     * @Groups({"class_property"})
+     * @SerializedName("ItemBrand")
      */
     private $ItemBrand;
 
@@ -117,22 +121,6 @@ class Item
      * @Groups({"class_relation"})
      */
     private $Tax;
-
-    /**
-     * @Groups({"class_property"})
-     * @SerializedName("ContentComment")
-     */
-    private $ContentComment;
-    /**
-     * @Groups({"class_property"})
-     * @SerializedName("ItemBrandName")
-     */
-    private $ItemBrandName;
-    /**
-     * @Groups({"class_property"})
-     * @SerializedName("ItemGroupeName")
-     */
-    private $ItemGroupeName;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\QuoteOrderDetail", mappedBy="Item")
@@ -146,29 +134,14 @@ class Item
      */
     private $FullPathPicture;
 
-    /**
-     * @Groups({"class_property"})
-     * @SerializedName("Imei")
-     */
-    private $Imei;
-
-    /**
-     * @Groups({"class_property"})
-     * @SerializedName("Ean")
-     */
-    private $Ean;
-
     private $PictureFile;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\ImeiCode", inversedBy="item", cascade={"persist", "remove"})
+     * @Groups({"class_property"})
+     * @SerializedName("ImeiCode")
      */
     private $ImeiCode;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $SerieCode;
 
 
     public function __construct()
@@ -352,42 +325,6 @@ class Item
         return $this;
     }
 
-    public function getContentComment(): ?string
-    {
-        return $this->ContentComment;
-    }
-
-    public function setContentComment(?string $ContentComment): self
-    {
-        $this->ContentComment = $ContentComment;
-
-        return $this;
-    }
-
-    public function getItemBrandName(): ?string
-    {
-        return $this->ItemBrandName;
-    }
-
-    public function setItemBrandName(?string $ItemBrandName): self
-    {
-        $this->ItemBrandName = $ItemBrandName;
-
-        return $this;
-    }
-
-    public function getItemGroupeName(): ?string
-    {
-        return $this->ItemGroupeName;
-    }
-
-    public function setItemGroupeName(?string $ItemGroupeName): self
-    {
-        $this->ItemGroupeName = $ItemGroupeName;
-
-        return $this;
-    }
-
     /**
      * @return Collection|QuoteOrderDetail[]
      */
@@ -451,42 +388,6 @@ class Item
     public function setImeiCode(?ImeiCode $ImeiCode): self
     {
         $this->ImeiCode = $ImeiCode;
-
-        return $this;
-    }
-
-    public function getImei(): ?string
-    {
-        return $this->Imei;
-    }
-
-    public function setImei(?string $Imei): self
-    {
-        $this->Imei = $Imei;
-
-        return $this;
-    }
-
-    public function getEan(): ?string
-    {
-        return $this->Ean;
-    }
-
-    public function setEan(?string $Ean): self
-    {
-        $this->Ean = $Ean;
-
-        return $this;
-    }
-
-    public function getSerieCode(): ?string
-    {
-        return $this->SerieCode;
-    }
-
-    public function setSerieCode(?string $SerieCode): self
-    {
-        $this->SerieCode = $SerieCode;
 
         return $this;
     }

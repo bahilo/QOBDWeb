@@ -15,6 +15,7 @@ $(document).ready(function () {
             columns: [],
             initComplete: function (setting, json) {},
             rowCallback: function (nRow, aData, index) { },
+            fnDrawCallback: function (oSettings) { },
         }, options);
         
         if (setting.dataSource.length > 0 && setting.com == "sync" || setting.ajax && setting.com == "async") {
@@ -52,7 +53,7 @@ $(document).ready(function () {
                 order: setting.order,
                 columns: setting.columns,
                 info: false,
-                dom: '<"top"<"row"<"col-md-10"f><"col-md-2"l>>>rt<"bottom nav-wrapper"p><"clear">',
+                dom: '<"top"<"row"<"col-md-10 saveIgnore"f><"col-md-2 saveIgnore"l>>>rt<"bottom nav-wrapper"p><"clear">',
                 BeforeSend: setting.beforeSend,
                 initComplete: function (settings, json) {
                     setting.initComplete(settings, json, this.api());                    
@@ -60,6 +61,9 @@ $(document).ready(function () {
                 fnRowCallback: function (nRow, aData, index) {
                     setting.rowCallback(nRow, aData, index);
                 },
+                fnDrawCallback: function(oSettings){
+                    setting.fnDrawCallback(oSettings);
+                }
             }
 
             if (setting.com == "sync" && setting.dataSource && JSON.parse(setting.dataSource).length > 0) {

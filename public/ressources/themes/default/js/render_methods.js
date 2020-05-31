@@ -15,7 +15,7 @@ var RenderMethod = function(args){
     /*____________________________[ Fonctions ]________________________________ */
 
     this.renderShow = function (data, type, row) {
-        if (!vars.routeShow)
+        if (!vars.routeShow.route)
             return '';
         return '<a href="' + Routing.generate(vars.routeShow.route, { id: row.id }) + '" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Page détail">'+
                     '<i class="fa ' + vars.routeShow.logo +'"></i>'+
@@ -23,7 +23,7 @@ var RenderMethod = function(args){
     }
 
     this.renderEdit = function (data, type, row) {
-        if (!vars.routeEdit)
+        if (!vars.routeEdit.route)
             return '';
         return '<a href="' + Routing.generate(vars.routeEdit.route, { id: row.id }) + '" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Modifier">'+
                     '<i class="fa ' + vars.routeEdit.logo +'"></i>'
@@ -36,12 +36,48 @@ var RenderMethod = function(args){
         if (typeof row.IsErasable != 'undefined' && !row.IsErasable)
             canDelete = false;
 
-        if (!vars.routeDelete || !canDelete)
+        if (!vars.routeDelete.route || !canDelete)
             return '<a href="#" class="btn btn-danger"><i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="Produit utilisé dans une commande"></i></a>';
 
         return '<a href="' + Routing.generate(vars.routeDelete.route, { id: row.id }) + '" class="btnDelete btn btn-danger" data-toggle="tooltip" data-placement="top" title="Supprimer">'+
                     '<i class="fa ' + vars.routeDelete.logo + '"></i>'+
                 '</a>';
+    }
+
+    this.renderControl = function (data, type, row, meta) {
+        var showCtn = '';
+        var editCtn = '';
+        var deleteCtn = '';
+
+        var access = meta.settings.oInit.customParam ? meta.settings.oInit.customParam.access : {};
+        if (vars.routeShow.route && access && access.read){
+            showCtn = '<a href="' + Routing.generate(vars.routeShow.route, { id: row.id }) + '" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Page détail">' +
+                '<i class="fa ' + vars.routeShow.logo + '"></i>' +
+                '</a>';
+        }
+
+        if (vars.routeEdit.route && access && access.update){
+            editCtn = '<a href="' + Routing.generate(vars.routeEdit.route, { id: row.id }) + '" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Modifier">' +
+                '<i class="fa ' + vars.routeEdit.logo + '"></i>'
+                + '</a>';
+        }
+
+        if (access && access.delete){
+            var canDelete = true;
+            if (typeof row.IsErasable != 'undefined' && !row.IsErasable)
+                canDelete = false;
+
+            if (!vars.routeDelete.route || !canDelete) {
+                deleteCtn = '<a href="#" class="btn btn-danger"><i class="btnDelete fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="Produit utilisé dans une commande"></i></a>';
+            }
+            else {
+                deleteCtn = '<a href="' + Routing.generate(vars.routeDelete.route, { id: row.id }) + '" class="btnDelete btn btn-danger" data-toggle="tooltip" data-placement="top" title="Supprimer">' +
+                    '<i class="fa ' + vars.routeDelete.logo + '"></i>' +
+                    '</a>';
+            }
+        }
+
+        return '<div class="btn-group">' + showCtn + editCtn + deleteCtn + '</div>';
     }
     /*
     <button type="button" class="btn btn-brand btn-behance">
@@ -79,6 +115,34 @@ var RenderMethod = function(args){
         return '<a href="' + Routing.generate('client_select', { id: row.id })
             + '" class="bx_select" data-toggle="tooltip" data-placement="top" title="Sélectionner la société ' + row.CompanyName +' pour un devis"><i data-id="' + row['id'] 
             +'" class="fa fa-handshake"></i></a>';
+    }
+
+    this.renderImei = function (data, type, row, meta) {
+        if (data) {
+            return data.Code
+        }
+        return "";
+    }
+
+    this.renderEAN = function (data, type, row, meta) {
+        if (data && data.EanCode) {
+            return data.EanCode.Code
+        }
+        return "";
+    }
+
+    this.renderItemName = function (data, type, row, meta) {
+        if (data && data.Item.Name) {
+            return data.Item.Name
+        }
+        return "";
+    }
+
+    this.renderItemRef = function (data, type, row, meta) {
+        if (data && data.Item.Ref) {
+            return data.Item.Ref
+        }
+        return "";
     }
 
     this.construct(args);

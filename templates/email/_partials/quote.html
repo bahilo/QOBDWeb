@@ -2,12 +2,4 @@
 
 {% block body_title %}Votre devis{% endblock body_title %}
 
-{% block body %}
-
-<div class="row">
-    <div class="col-md-12">
-        {% include 'email/files/devis.txt' with {'nom_client': contact_name, 'nom_societe': search.get_setting("SOCIETE","SOCIETE_NOM").value } %}
-    </div>
-</div>
-
-{% endblock body %}
+{% block content_area %}{% include 'email/files/devis.txt' with {'nom_client': contact_name, 'nom_societe': search.get_setting("SOCIETE","SOCIETE_NOM").value } %}{% endblock %}

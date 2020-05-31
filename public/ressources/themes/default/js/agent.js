@@ -17,7 +17,10 @@ $(function(){
         if (agentTable.length > 0){
             $("#agent_table_js").myTable({
                 dataSource: $("#agent_data_source").val(),
-                columns: getColumn()
+                columns: getColumn(),
+                initComplete: function (setting, json, api) {
+                    $.fn.initEventBtnDelete();
+                },
             }); 
         }
 
@@ -65,19 +68,29 @@ $(function(){
         col.push({ data: 'LastName', title: "Nom" });
         col.push({ data: 'FirstName', title: "Prénom" });
         col.push({ data: 'Email', title: "Email" });
-
-        if($('#is_admin','.access_pool').length > 0 && $('#is_admin','.access_pool').val()){
+        
+        if ($('#is_write', '.access_pool').length > 0 && $('#is_write','.access_pool').val()){
             col.push({ data: 'null', title: "", render: renderActivateAgent });
         }
 
-        if($('#is_update','.access_pool').length > 0 && $('#is_update','.access_pool').val()){
+        col.push({
+            data: 'id', title: "",
+            render: function (data, type, row, meta) {
+                meta.settings.oInit.customParam = {
+                    access: $.fn.getAccess()
+                };
+                return Renders.renderControl(data, type, row, meta);
+            }
+        });
+
+        /*if($('#is_update','.access_pool').length > 0 && $('#is_update','.access_pool').val()){
             col.push({ data: 'null', title: "", render: Renders.renderShow });
             col.push({ data: 'null', title: "", render: Renders.renderEdit });
         }
 
         if($('#is_delete','.access_pool').length > 0 && $('#is_delete','.access_pool').val()){
             col.push({ data: 'null', title: "", render: Renders.renderDelete });
-        }
+        }*/
 
         return col;
     }

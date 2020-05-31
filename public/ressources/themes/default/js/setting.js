@@ -10,6 +10,7 @@ $(function(){
         item_brand: 5,
         item_group: 6,
         item_provider: 7,
+        item_ean: 8,
     };
 
     api = {
@@ -27,18 +28,17 @@ $(function(){
 /*================================[ Events ]==================================*/
 
     $(function(){
-
-        // $('input.c-switch-input','.switch-wrapper').on('click', function(){
-        //      if($(this).prop('checked')){
-        //           $('.value-file', '.value-wrapper').show();
-        //          $('.value-default', '.value-wrapper').hide();
-        //      }
-        //      else{
-        //          $('.value-file', '.value-wrapper').hide();
-        //          $('.value-default', '.value-wrapper').show();
-        //      }
-        // });
-        
+        $('input[name="setting_registration[switch]"]', '.setting-wrapper').on('change', function(){
+            var root = $('.value-wrapper', '.setting-wrapper');
+            if($(this).is(':checked')){
+                root.find('.value-default').hide();
+                root.find('.value-file').show();
+            }
+            else{
+                root.find('.value-default').show();
+                root.find('.value-file').hide();
+            }
+        });
     });
 
 /*================================[ Functions ]==================================*/
@@ -47,46 +47,72 @@ $(function(){
         if ($('#setting_target_tables').val()) {
             var tables_target = JSON.parse($('#setting_target_tables').val());
             for (var i = 0; i < tables_target.length; i++) {
+                var params = getColumn(api, tables_target[i]);
                 api.table[tables_target[i]] = $("#" + tables_target[i] + "_setting_target_table_js").myTable({
-                    dataSource: $("#" + tables_target[i] + "_setting_target").val(),
-                    columns: getColumn(api, tables_target[i])
+                    com: "async",
+                    ajax: {
+                        type: "POST",
+                        url: Routing.generate(params.sourcePath, { code: tables_target[i]}),
+                    },
+                    columns: params.column,
+                    initComplete: function (setting, json, api) {
+                        $.fn.initEventBtnDelete();
+                        $.fn.initTooltip();
+                    },
                 });
             }
         }
     } 
 
     function getColumn(api, target) {
-        var info = [];
+        var output = {
+            target: target,
+            column: [],
+            sourcePath: "",
+        };
 
         var target = $('#'+ target +'_setting_target').data('source');
         switch (target) {
             case "currency_data_source":
-                info = getCurrencyColumn();
+                output.column = getCurrencyColumn();
+                output.sourcePath = 'setting_data_currency';
                 break;
             case "tax_data_source":
-                info = getTaxColumn();
+                output.column = getTaxColumn();
+                output.sourcePath = 'setting_data_tax';
                 break;
             case "delivery_status_data_source":               
-                info = getStatusColumn(ETarget.delivery_status);
+                output.column = getStatusColumn(ETarget.delivery_status);
+                output.sourcePath = 'setting_data_delivery_status';
                 break;
             case "order_status_data_source":                
-                info = getStatusColumn(ETarget.order_status);
+                output.column = getStatusColumn(ETarget.order_status);
+                output.sourcePath = 'setting_data_order_status';
                 break;
             case "brand_data_source":
-                info = getItemColumn(ETarget.item_brand);
+                output.column = getItemColumn(ETarget.item_brand);
+                output.sourcePath = 'setting_data_brand';
                 break;
             case "group_data_source":
-                info = getItemColumn(ETarget.item_group);
+                output.column = getItemColumn(ETarget.item_group);
+                output.sourcePath = 'setting_data_group';
                 break;
             case "provider_data_source":                
-                info = getItemColumn(ETarget.item_provider);
+                output.column = getItemColumn(ETarget.item_provider);
+                output.sourcePath = 'setting_data_provider';
+                break;
+            case "ean_data_source":                
+                output.column = getItemEanColumn();
+                output.sourcePath = 'setting_data_ean';
                 break;
             default:                
-                info = getGeneralColumn();
+                output.column = getGeneralColumn();
+                output.sourcePath = 'setting_data';
                 break;
         }
-        return info;
+        return output;
     }
+
 
     /*================================[ Renders ]==================================*/
 
@@ -118,15 +144,15 @@ $(function(){
         col.push({ data: 'id', visible: false });
         col.push({ data: 'IsEnabled', visible: false });
         col.push({ data: 'Name', title: "Nom" });
-
-        if($('#is_update','.access_pool').length > 0 && $('#is_update','.access_pool').val()){
-            col.push({ data: 'null', title: "Modif.", render: oRender.renderEdit });
-        }
-
-        if($('#is_delete','.access_pool').length > 0 && $('#is_delete','.access_pool').val()){
-            col.push({ data: 'null', title: "Supp.", render: oRender.renderDelete });
-        }
-
+        col.push({
+            data: 'id', title: "",
+            render: function (data, type, row, meta) {
+                meta.settings.oInit.customParam = {
+                    access: $.fn.getAccess()
+                };
+                return oRender.renderControl(data, type, row, meta);
+            }
+        });
         return col;
     }
 
@@ -153,15 +179,15 @@ $(function(){
         col.push({ data: 'id', visible: false });
         col.push({ data: 'Name', title: "Nom" });
         col.push({ data: 'DisplayName', title: "Description" });
-
-        if($('#is_update','.access_pool').length > 0 && $('#is_update','.access_pool').val()){
-            col.push({ data: 'null', title: "Modif.", render: oRender.renderEdit });
-        }
-
-        if($('#is_admin','.access_pool').length > 0 && $('#is_admin','.access_pool').val()){
-            col.push({ data: 'null', title: "Supp.", render: oRender.renderDelete });
-        }
-
+        col.push({
+            data: 'id', title: "",
+            render: function (data, type, row, meta) {
+                meta.settings.oInit.customParam = {
+                    access: $.fn.getAccess()
+                };
+                return oRender.renderControl(data, type, row, meta);
+            }
+        });
         return col;
     }
 
@@ -178,15 +204,15 @@ $(function(){
         col.push({ data: 'Type', title: "Type" });
         col.push({ data: 'Value', title: "Valeur" });
         col.push({ data: 'IsCurrent', title: "Valeur Par défaut" });
-        //col.push({ data: 'CreateAt', title: "Date" });
-
-        if($('#is_update','.access_pool').length > 0 && $('#is_update','.access_pool').val()){
-            col.push({ data: 'null', title: "Modif.", render: oRender.renderEdit });
-        }
-
-        if($('#is_admin','.access_pool').length > 0 && $('#is_admin','.access_pool').val()){
-            col.push({ data: 'null', title: "Supp.", render: oRender.renderDelete });
-        }
+        col.push({
+            data: 'id', title: "",
+            render: function (data, type, row, meta) {
+                meta.settings.oInit.customParam = {
+                    access: $.fn.getAccess()
+                };
+                return oRender.renderControl(data, type, row, meta);
+            }
+        });
 
         return col;
     }
@@ -206,15 +232,15 @@ $(function(){
         col.push({ data: 'Rate', visible: false });
         col.push({ data: 'CountryCode', title: "Code Pays" });
         col.push({ data: 'IsDefault', title: "Sélection par défaut" });
-        //col.push({ data: 'CreatedAt', visible: false });
-
-        if($('#is_update','.access_pool').length > 0 && $('#is_update','.access_pool').val()){
-            col.push({ data: 'null', title: "Modif.", render: oRender.renderEdit });
-        }
-
-        if($('#is_admin','.access_pool').length > 0 && $('#is_admin','.access_pool').val()){
-            col.push({ data: 'null', title: "Supp.", render: oRender.renderDelete });
-        }
+        col.push({
+            data: 'id', title: "",
+            render: function (data, type, row, meta) {
+                meta.settings.oInit.customParam = {
+                    access: $.fn.getAccess()
+                };
+                return oRender.renderControl(data, type, row, meta);
+            }
+        });
 
         return col;
     }
@@ -233,20 +259,48 @@ $(function(){
         col.push({ data: 'Name', visible: false });
         col.push({ data: 'DisplayName', title: "Nom" });
         col.push({ data: 'Value', title: "Valeur" });
-
-        if($('#is_update','.access_pool').length > 0 && $('#is_update','.access_pool').val()){
-            col.push({ data: 'null', title: "Modif.", render: oRender.renderEdit });
-        }
-
-        if($('#is_admin','.access_pool').length > 0 && $('#is_admin','.access_pool').val()){
-            col.push({ data: 'null', title: "Supp.", render: oRender.renderDelete });
-        }
+        col.push({ data: null, title: "", 
+            render: function (data, type, row, meta){
+                meta.settings.oInit.customParam = {
+                    access: $.fn.getAccess()
+                };
+                return oRender.renderControl(data, type, row, meta);
+            } 
+        });
 
         return col;
     }
 
-    function getRender(){
+    function getItemEanColumn(){
+        
+        var oRender = new RenderMethod({
+            routeEdit: { route: "setting_ean_edit", logo: 'fa-edit' },
+            routeDelete: { route: "setting_ean_delete", logo: 'fa-trash-alt' }
+        });
 
+        var col = [];
+
+        col.push({ data: 'id', visible: false });
+        col.push({ data: 'Code', title: "Code" });
+        col.push({ data: 'Country', title: "Pays", render: rendCountry });
+        col.push({ data: null, title: "", 
+            render: function (data, type, row, meta){
+                meta.settings.oInit.customParam = {
+                    access: $.fn.getAccess()
+                };
+                return oRender.renderControl(data, type, row, meta);
+            } 
+        });
+
+        return col;
+    }
+
+
+    function rendCountry(data, type, row, meta){
+        if (data){
+            return data.Name;
+        }
+        return "";
     }
 
 });

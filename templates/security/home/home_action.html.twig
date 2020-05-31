@@ -1,0 +1,29 @@
+{% extends 'security/home.html.twig' %}
+
+{% block title %}{{ parent() }} - Actions{% endblock %}
+
+{% block home_path %}
+{{ parent() }}
+<li class="breadcrumb-item">
+    Actions
+</li>
+{% endblock %}
+
+{% block body_header_right %}
+<a href="{{ path("security_action_registration") }}" class="btn btn-primary"><i class="fa fa-plus"></i></a>
+{% endblock %}
+
+
+{% block content_area %}
+    <div class="card">
+        <div class="card-header">
+            <i class="fa fa-align-justify"></i> Actions
+        </div>
+
+        <div class="card-body">
+            <table id="action_table_js" class="table table-responsive-md table-bordered table-striped table-md">
+            </table>            
+            <input type="hidden" id="action_data_source" value="{{ action_data_source }}">
+        </div>
+    </div>
+{% endblock %}

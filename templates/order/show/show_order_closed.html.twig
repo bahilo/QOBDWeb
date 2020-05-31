@@ -8,7 +8,7 @@
     Commande & Devis
 </li>
 <li class="breadcrumb-item">
-    <a href="#">Cmd payée & cloturée</a>
+    <a href="{{ path("order_closed")}}">Cmd payée & cloturée</a>
 </li>
 <li class="breadcrumb-item">
     Détail commande
@@ -17,10 +17,8 @@
 
 {% block control_btn_area %}
 <div class="btn-group">
-    <a href="{{ path("order_validation", {id: order.id, idStatus: status_order.id}) }}"
-        class="btn btn-success btnValidation">Convertir en commande</a>
-    <a href="{{ path("order_validation", {id: order.id, idStatus: status_refund.id}) }}"
-        class="btn btn-danger btnValidation">Convertir en avoir</a>
+    <a href="{{ path("order_validation", {id: order.id, idStatus: order_status_quote.id}) }}"
+        class="btn btn-success btnValidation">Convertir en devis</a>
 </div>
 {% endblock %}
 
@@ -46,3 +44,38 @@
 {% endblock %}
 
 {% block quote_area %}{% endblock %}
+
+
+{# Bons de livraison #}
+{% block delivery_recipt_area %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-align-justify"></i> Bon(s) de livraison émis
+            </div>
+            <div class="card-body">
+                <table id="delivery_table_js" class="table table-responsive-md table-bordered table-striped table-md">
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{# Factures emises #}
+{% block bill_recipt_area %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-align-justify"></i> Factures émises
+            </div>
+            <div class="card-body">
+                <table id="bill_table_js" class="table table-responsive-md table-bordered table-striped table-md">
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

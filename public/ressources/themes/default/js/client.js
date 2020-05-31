@@ -35,6 +35,8 @@ $(document).ready(function ($) {
             columns: getCLientColumn(),
             initComplete: function (setting, json) {
                 $.fn.initTooltip();
+                $.fn.initEventBtnDelete();
+                onClientSectBtnClick();
             },
         });
 
@@ -48,6 +50,7 @@ $(document).ready(function ($) {
             columns: getContactColumn(),
             initComplete: function (setting, json) {
                 $.fn.initTooltip();
+                $.fn.initEventBtnDelete();
             },
         });
 
@@ -60,6 +63,7 @@ $(document).ready(function ($) {
             columns: getQuoteColumn(),
             initComplete: function (setting, json) {
                 $.fn.initTooltip();
+                $.fn.initEventBtnDelete();
             },
         });
 
@@ -72,6 +76,7 @@ $(document).ready(function ($) {
             columns: getOrderColumn(),
             initComplete: function (setting, json) {
                 $.fn.initTooltip();
+                $.fn.initEventBtnDelete();
             },
         });
 
@@ -81,14 +86,18 @@ $(document).ready(function ($) {
   
     $(function(){
 
-        $(".bx_select").on('click', function(e){
-            e.preventDefault();
-            confirmSelection(this);
-        });
+        onClientSectBtnClick();
 
     });
 
     /*================================[ Functions ]==================================*/
+
+    function onClientSectBtnClick(){
+        $(".bx_select").on('click', function (e) {
+            e.preventDefault();
+            confirmSelection(this);
+        });
+    }
 
     function confirmSelection(elt) {
         $.fn.displayConfirm('Sélection client', 'Confirmez-vous la sélection de ce client pour un devis ?', function (response) {
@@ -107,15 +116,23 @@ $(document).ready(function ($) {
         col.push({ data: 'LastName', title: "Nom" });
         col.push({ data: 'Phone', title: "Téléphone" });
         col.push({ data: 'Email', title: "Email" });
-
-        col.push({ data: 'id', title: "", render: contactRenders.renderEdit });
+        col.push({
+            data: 'id', title: "",
+            render: function (data, type, row, meta) {
+                meta.settings.oInit.customParam = {
+                    access: $.fn.getAccess()
+                };
+                return contactRenders.renderControl(data, type, row, meta);
+            }
+        });
+        /*col.push({ data: 'id', title: "", render: contactRenders.renderEdit });
         if($('#is_update','.access_pool').length > 0 && $('#is_update','.access_pool').val()){
             col.push({ data: 'id', title: "", render: renderShow });
         }
 
         if($('#is_delete','.access_pool').length > 0 && $('#is_delete','.access_pool').val()){
             col.push({ data: 'id', title: "", render: contactRenders.renderDelete });
-        }
+        }*/
 
         return col;
     }
@@ -135,11 +152,20 @@ $(document).ready(function ($) {
         col.push({ data: 'FirstName', title: "Prénom" });
         col.push({ data: 'Phone', title: "Téléphone" });
         col.push({ data: 'Email', title: "Email" });
+        col.push({
+            data: 'id', title: "",
+            render: function (data, type, row, meta) {
+                meta.settings.oInit.customParam = {
+                    access: $.fn.getAccess()
+                };
+                return Renders.renderControl(data, type, row, meta);
+            }
+        });
 
-        if($('#is_update','.access_pool').length > 0 && $('#is_update','.access_pool').val()){
+        /*if($('#is_update','.access_pool').length > 0 && $('#is_update','.access_pool').val()){
             col.push({ data: 'id', title: "", render: Renders.renderShow });
             // col.push({ data: 'id', title: "", render: Renders.renderEdit });
-        }
+        }*/
 
         // if($('#is_delete','.access_pool').length > 0 && $('#is_delete','.access_pool').val()){
         //     col.push({ data: 'id', title: "", render: Renders.renderDelete });
@@ -165,18 +191,26 @@ $(document).ready(function ($) {
         col.push({ data: 'CreatedAtToString', title: "date" });
         col.push({ data: 'ClientCompanyName', title: "Société" });
         col.push({ data: 'AgentFirstName', title: "Commercial", render: renderAgent });
-        if (quoteCols.length > 0)
+        col.push({
+            data: 'id', title: "",
+            render: function (data, type, row, meta) {
+                meta.settings.oInit.customParam = {
+                    access: $.fn.getAccess()
+                };
+                return Renders.renderControl(data, type, row, meta);
+            }
+        });
+        /*if (quoteCols.length > 0)
             col.push({ data: 'id', title: "Détail", render: quoteRenders.renderShow });
         else
             col.push({ data: 'id', title: "Détail", render: orderRenders.renderShow });
-            
+            */
         // if ($('#is_delete', '.access_pool').length > 0 && $('#is_delete', '.access_pool').val()) {
         //     col.push({ data: 'id', title: "Supp.", render: Renders.renderDelete });
         // }
 
         return col;
     }
-
 
 
     /*================================[ Renders ]==================================*/

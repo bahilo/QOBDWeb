@@ -24,8 +24,10 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-header">
-                        <i class="fa fa-align-justify"></i> Liste des produits et tarifs</div>
-                    <div class="card-body">
+                        {% block body_title_are %}
+                        <i class="fa fa-align-justify"></i> Commandes validées</div>
+                        {% endblock %}
+                        <div class="card-body">
                         <table id="order_table_js"
                             class="table table-responsive-md table-bordered table-striped table-md">
                         </table>

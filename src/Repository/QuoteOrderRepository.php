@@ -96,6 +96,7 @@ class QuoteOrderRepository extends ServiceEntityRepository
             ->innerJoin('q_ord_dtl.quantityDeliveries', 'q_ord_dtl_qt_del')
             ->andWhere('q_ord_dtl_qt_del.Bill = :bill')
             ->setParameter('bill', $bill)
+            ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
     }
@@ -107,32 +108,39 @@ class QuoteOrderRepository extends ServiceEntityRepository
             ->innerJoin('q_ord_dtl.quantityDeliveries', 'q_ord_dtl_qt_del')
             ->andWhere('q_ord_dtl_qt_del.Delivery = :delivery')
             ->setParameter('delivery', $delivery)
+            ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
     }
 
     public function countByStatus(OrderStatus $status): ?int
     {
-        return $this->createQueryBuilder('q')
+        $result = $this->createQueryBuilder('q')
             ->andWhere('q.Status = :status')
             ->setParameter('status', $status)
-            ->select('count(q.id)')
+            ->select('count(q)')
+            ->setMaxResults(1)
             ->getQuery()
-            ->getSingleScalarResult();
+            ->getOneOrNullResult();
+        
+        return empty($result) ? 0 : reset($result);
     }
 
     public function findScalarOrderBill(QuoteOrder $order): ?float
     {
-        return $this->createQueryBuilder('q')
+        $result = $this->createQueryBuilder('q')
             ->innerJoin('q.quoteOrderDetails', 'q_ord_dtl')
-            ->innerJoin('q_ord_dtl.quantityDeliveries', 'q_ord_dtl_qt_del')
-            ->innerJoin('q.Tax', 'q_tx')
+            //->innerJoin('q_ord_dtl.quantityDeliveries', 'q_ord_dtl_qt_del')
+            //->andWhere('q_ord_dtl.QuantityDelivery = q_ord_dtl.Quantity')
             ->andWhere('q = :order')
             ->setParameter('order', $order)
             ->groupBy('q.id')
             ->select('SUM(q_ord_dtl.Quantity * q_ord_dtl.ItemSellPrice)')
+            ->setMaxResults(1)
             ->getQuery()
-            ->getSingleScalarResult();
+            ->getOneOrNullResult();
+
+        return empty($result) ? 0 : reset($result);
     }
 
     /*

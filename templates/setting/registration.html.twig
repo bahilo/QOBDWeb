@@ -1,8 +1,11 @@
 {% extends 'template_coreui.html.twig' %}
 
-{% set page_title = 'Nouvelle configuration' %}
+{% set page_title = 'Création & modification' %}
 
 {% block home_path %}
+<li class="breadcrumb-item">
+    Securité & Configuration
+</li>
 <li class="breadcrumb-item">
     <a href="{{ path("setting_home") }}">Configuration</a>
 </li>
@@ -32,15 +35,34 @@
                     {% include "notify.html.twig" %}
 
                         {{ form_start(formSetting, {'attr': {'enctype': "multipart/form-data", 'id': 'global_form'}}) }}
-                                                
-                        <div class="switch-wrapper" style="display: none;">
+                             
+                        {# <div class="c-switch-wrapper">
+                            <span class="badge badge-success">Fichier</span>
+                            <label class="c-switch c-switch-label c-switch-primary">                                
+                                {% if formSetting.vars.data.IsFile %}
+                                <input name="setting[switch]" class="c-switch-input" type="checkbox" checked>
+                                {% else %}
+                                <input name="setting[switch]" class="c-switch-input" type="checkbox">
+                                {% endif %}
+                                <span class="c-switch-slider" data-checked="Oui" data-unchecked="Non"></span>
+                            </label>
+                            <span class="badge badge-warning">Texte</span>
+                        </div>
+                        <br /> #}
+                        
+                        <div class="switch-wrapper">
                             <span class="badge badge-success">Text</span>
                             <label class="c-switch c-switch-3d switch-primary">
-                                <input name="setting[switch]" class="c-switch-input" type="checkbox" checked>
+                                {% if formSetting.vars.data.IsFile %}
+                                <input name="setting_registration[switch]" class="c-switch-input" type="checkbox" checked>
+                                {% else %}
+                                <input name="setting_registration[switch]" class="c-switch-input" type="checkbox">
+                                {% endif %}
                                 <span class="c-switch-slider"></span>
                             </label>
                             <span class="badge badge-warning">Fichier</span>
                         </div>
+                        <br>
 
                         {% if search.get_right_admin() %}
                         {{ form_row(formSetting.Code,{'label': 'Catégorie', 'attr': {'placeholder': 'Catégorie'}}) }}
@@ -57,7 +79,7 @@
                                                 
                         {% endif %}
 
-                        {% if formSetting.vars.data.name == 'SOCIETE_LOGO' %}
+                        {# {% if formSetting.vars.data.name == 'SOCIETE_LOGO' %}
                         <div class="value-wrapper">
                             {% if formSetting.vars.data.IsFile %}
                             <div class="value-default">
@@ -66,13 +88,34 @@
                             </div>
                             {% endif %}
                             <div class="value-file">
-                                <input type="file" name="setting[file]">
+                                <input type="file" name="setting_registration[file]">
                             </div>
                         </div>
                         {% else %}
                         {{ form_row(formSetting.Value,{'label': 'Valeur', 'attr': {'placeholder': 'Valeur'}}) }}
                         
-                        {% endif %}
+                        {% endif %} #}
+
+                        <div class="value-wrapper">
+                            {% if formSetting.vars.data.IsFile %}
+                            <div class="value-display">
+                                <img class="navbar-brand-full" src="{{ search.logo }}" width="89" height="25" alt="Logo">
+                                {# {{ form_row(formSetting.Value,{'attr': {'style': 'display:none;'}}) }} #}
+                            </div>
+                            <div class="value-file">
+                                <input type="file" name="setting_registration[file]">
+                            </div>
+                            {% else %}
+                            <div class="value-file" style="display:none">
+                                <input type="file" name="setting_registration[file]">
+                            </div>
+                            {% endif %}   
+
+                            <div class="value-default">
+                                {{ form_row(formSetting.Value,{'label': 'Valeur', 'attr': {'placeholder': 'Valeur'}}) }}
+                            </div>
+                        </div>
+
                         {{ form_end(formSetting) }}
                     </div> 
                 </div> 

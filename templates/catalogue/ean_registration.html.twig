@@ -1,0 +1,53 @@
+{% extends 'template_coreui.html.twig' %}
+
+{% set page_title = 'Nouveau produit' %}
+
+{% block home_path %}
+<li class="breadcrumb-item">
+    <a href="{{ path("setting_catalogue_ean") }}">EAN</a>
+</li>
+<li class="breadcrumb-item">
+    {{ page_title }}
+</li>
+{% endblock %}
+
+{% block title %}{{ parent() }} - {{ page_title }} {% endblock %}
+
+{% block body_header_right %}
+<button form="global_form" type="submit" class="btn btn-primary"><i class="fa fa-save"></i></button>
+{% endblock %}
+
+{% block body %}
+
+<div class="item-wrapper">
+
+    <div class="animated fadeIn">
+        {% include "notify.html.twig" %}
+
+        {{ form_start(formEAN, {'attr': {'id': 'global_form' }}) }}
+
+        {# EAN #}
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-align-justify"></i> EAN
+            </div>
+
+            <div class="card-body">
+                <input type="hidden" name="token" value="{{ csrf_token('upload') }}" />
+
+
+                {{ form_row(formEAN.Code,{'label': 'Code','attr': {'placeholder': 'désignation du produit'}})
+                }}
+                {{ form_row(formEAN.Country,{'label': 'Pays','attr': {'placeholder': 'Réfference du produit'}})
+                }}
+            </div>
+        </div>
+
+        {{ form_end(formEAN) }}
+    </div>
+</div>
+
+{% endblock %}
+{% block javascripts %}
+<!-- <script src="{#{  asset('client.js','qobd_web_js') }#}"></script> -->
+{% endblock %}

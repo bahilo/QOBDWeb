@@ -1,6 +1,6 @@
 {% extends 'template_coreui.html.twig' %}
 
-{% set page_title = 'Nouveau produit' %}
+{% set page_title = 'Création & modification' %}
 
 {% block home_path %}
 <li class="breadcrumb-item">
@@ -29,7 +29,7 @@
         {# Produit #}
         <div class="card">
             <div class="card-header">
-                <i class="fa fa-align-justify"></i> Produit
+                <i class="fa fa-align-justify"></i> {{ page_title }}
             </div>
         
             <div class="card-body">
@@ -39,12 +39,11 @@
                 {{ form_row(formItem.PictureFile,{'label': 'Image produit', 'attr': {'class':'form-control'}}) }}
                 {{ form_row(formItem.Name,{'label': 'Nom du produit','attr': {'placeholder': 'désignation du produit'}}) }}
                 {{ form_row(formItem.Ref,{'label': 'Reférence du produit','attr': {'placeholder': 'Réfference du produit'}}) }}
-                {{ form_row(formItem.SerieCode,{'label': 'N° de serie du produit','attr': {'placeholder': 'N° de serie du produit'}}) }}
                 {{ form_row(formItem.PurchasePrice,{'label': 'Prix dchat', 'attr': {'placeholder': 'Prix dchat'}}) }}
                 {{ form_row(formItem.SellPrice,{'label': 'Prix de vente conseillé', 'attr': {'placeholder': 'Prix de vente conseillé'}}) }}
                 {{ form_row(formItem.Stock,{'label': 'Stock', 'attr': {'placeholder': 'Stock'}}) }}
                 
-                {{ form_row(formItem.ContentComment,{'label': 'Commentaire', 'attr': {'placeholder': 'Commentaire'}})}}
+                {{ form_widget(formItem.Comment,{'label': 'Commentaire', 'attr': {'placeholder': 'Commentaire'}})}}
                 
             </div>
         </div>
@@ -58,8 +57,7 @@
                 {{ form_row(formItem.ItemBrand,{'label': 'Marque', 'attr': {'placeholder': 'Marque'}}) }}
                 {{ form_row(formItem.ItemGroupe,{'label': 'Famille', 'attr': {'placeholder': 'Famille'}}) }}
                 {{ form_row(formItem.Provider,{'label': 'Fournisseur', 'attr': {'placeholder': 'Fournisseur'}}) }}
-                {{ form_row(formItem.Ean,{'label': 'Code EAN', 'attr': {'placeholder': 'Code EAN'}})}}
-                {{ form_row(formItem.Imei,{'label': 'Code IMEI', 'attr': {'placeholder': 'Code IMEI'}})}}
+                {{ form_widget(formItem.ImeiCode)}}
                         
             </div>
         </div>

@@ -58,29 +58,35 @@ class BillRepository extends ServiceEntityRepository
 
     public function findScalarBillByClient(Client $client): ?float
     {
-        return $this->createQueryBuilder('q')
+        $result = $this->createQueryBuilder('q')
             ->innerJoin('q.Client', 'q_c')
             ->andWhere('q_c.id = :idClient')
             ->setParameter('idClient', $client->getId())
             ->groupBy('q_c.id')
             ->select('SUM(q.Pay)')
+            ->setMaxResults(1)
             ->getQuery()
-            ->getSingleScalarResult();
+            ->getOneOrNullResult();
+
+        return empty($result) ? 0 : reset($result);
     }
 
     public function findScalarBillPayedByClient(Client $client): ?float
     {
-        return $this->createQueryBuilder('q')
+        $result = $this->createQueryBuilder('q')
             ->innerJoin('q.Client', 'q_c')
             ->andWhere('q_c.id = :idClient')
             ->setParameter('idClient', $client->getId())
             ->groupBy('q_c.id')
             ->select('SUM(q.PayReceived)')
+            ->setMaxResults(1)
             ->getQuery()
-            ->getSingleScalarResult();
+            ->getOneOrNullResult();
+
+        return empty($result) ? 0 : reset($result);
     }
 
-    public function findScalarBilledOrder(QuoteOrder $order): ?float
+    /*public function findScalarBilledOrder(QuoteOrder $order): ?float
     {
         return $this->createQueryBuilder('q')
             ->innerJoin('q.quantityDeliveries', 'q_qt_del')
@@ -96,7 +102,7 @@ class BillRepository extends ServiceEntityRepository
             ->select('SUM(q.Pay)')
             ->getQuery()
             ->getSingleScalarResult();
-    }
+    }*/
 
     public function findOneByDelivery(Delivery $delivery): ?Bill
     {
@@ -104,6 +110,7 @@ class BillRepository extends ServiceEntityRepository
             ->innerJoin('q.quantityDeliveries', 'q_qt_del')
             ->andWhere('q_qt_del.Delivery = :delivery')
             ->setParameter('delivery', $delivery)
+            ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
     }

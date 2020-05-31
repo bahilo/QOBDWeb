@@ -1,0 +1,29 @@
+{% extends 'security/home.html.twig' %}
+
+{% block title %}{{ parent() }} - Role{% endblock %}
+
+{% block home_path %}
+{{ parent() }}
+<li class="breadcrumb-item">
+    Roles
+</li>
+{% endblock %}
+
+{% block body_header_right %}
+<a href="{{ path("security_role_registration") }}" class="btn btn-primary"><i class="fa fa-plus"></i></a>
+{% endblock %}
+
+
+{% block content_area %}
+<div class="card">
+    <div class="card-header">
+        <i class="fa fa-align-justify"></i> Roles
+    </div>
+
+    <div class="card-body">
+        <table id="role_table_js" class="table table-responsive-md table-bordered table-striped table-md">
+        </table>        
+        <input type="hidden" id="role_data_source" value="{{ role_data_source }}">
+    </div>
+</div>
+{% endblock %}

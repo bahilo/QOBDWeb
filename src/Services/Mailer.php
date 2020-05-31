@@ -67,15 +67,15 @@ class Mailer{
         }
     }
 
-    public function send($Recipients, $subject, $body, $fileFullPath = null, $contentType = 'text/html'){
+    public function send($Recipients, $subject, $body, Array $files = null, $contentType = 'text/html'){
         
         $isSuccess = true;
 
         if ($this->isWitfmailer) {
-            $isSuccess = $this->sendSwiftMailer($Recipients, $subject, $body, $fileFullPath, $contentType);
+            $isSuccess = $this->sendSwiftMailer($Recipients, $subject, $body, $files, $contentType);
         }
         else{
-            $isSuccess = $this->sendPhpMailer($Recipients, $subject, $body, $fileFullPath, $contentType);
+            $isSuccess = $this->sendPhpMailer($Recipients, $subject, $body, $files, $contentType);
         }
 
         if (!$isSuccess){
@@ -85,7 +85,7 @@ class Mailer{
         }
     }
 
-    public function sendSwiftMailer($Recipients, $subject, $body, $fileFullPath = null, $contentType = 'text/html'){
+    public function sendSwiftMailer($Recipients, $subject, $body, Array $files = null, $contentType = 'text/html'){
         $message = (new \Swift_Message($subject))
             ->setFrom($this->setting->get('SOCIETE', 'email_validation')->getValue(), $this->setting->get('SOCIETE', 'SOCIETE_NOM')->getValue())
             ->setTo($Recipients['to'])
@@ -97,14 +97,17 @@ class Mailer{
                     $message->addCc($value);
             }
         }
-        if (!empty($fileFullPath)) {
-            $attachment = \Swift_Attachment::fromPath($fileFullPath, $contentType);
-            $message->attach($attachment);
+        if (!empty($files)) {
+            foreach ($files as $fileFullPath) {
+                $attachment = \Swift_Attachment::fromPath($fileFullPath, $contentType);
+                $message->attach($attachment);
+            }
+            
         }
         return $this->custMailer->send($message);
     }
 
-    public function sendPhpMailer($Recipients, $subject, $body, $fileFullPath = null, $contentType = 'text/html'){
+    public function sendPhpMailer($Recipients, $subject, $body, Array $files = null, $contentType = 'text/html'){
         //dump($Recipients);die();
         $this->phpMailer->AddAddress($Recipients['to']);
         $this->phpMailer->Subject = $subject;
@@ -119,8 +122,11 @@ class Mailer{
             }
         }
 
-        if (!empty($fileFullPath)) {
-            $this->phpMailer->addAttachment($fileFullPath);
+        if (!empty($files)) {
+            foreach ($files as $fileFullPath) {
+                $this->phpMailer->addAttachment($fileFullPath);
+            }
+            
         }
 
         return $this->phpMailer->send();

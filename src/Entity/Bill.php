@@ -91,12 +91,15 @@ class Bill
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Contact", inversedBy="bills")
      * @Groups({"class_relation"})
+     * @Groups({"class_relation","class_property"})
+     * @SerializedName("Contact")
      */
     private $Contact;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Client", inversedBy="bills")
-     * @Groups({"class_relation"})
+     * @Groups({"class_relation","class_property"})
+     * @SerializedName("Client")
      */
     private $Client;
 
@@ -123,6 +126,12 @@ class Bill
      * @SerializedName("BillPrivateComment") 
      */
     private $BillPrivateComment;
+
+    /**
+     * @Groups({"class_property"})
+     * @SerializedName("IsRefVisible") 
+     */
+    private $IsRefVisible;
     
 
     public function __construct()
@@ -360,6 +369,18 @@ class Bill
     public function setBillPrivateComment(?string $BillPrivateComment): self
     {
         $this->BillPrivateComment = $BillPrivateComment;
+
+        return $this;
+    }
+
+    public function getIsRefVisible(): ?bool
+    {
+        return $this->IsRefVisible;
+    }
+
+    public function setIsRefVisible(?bool $IsRefVisible): self
+    {
+        $this->IsRefVisible = $IsRefVisible;
 
         return $this;
     }

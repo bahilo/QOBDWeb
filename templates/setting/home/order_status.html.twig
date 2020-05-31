@@ -1,0 +1,16 @@
+{% extends 'setting/index.html.twig' %}
+
+{% block title %}{{ parent() }} - Statut Commande{% endblock %}
+
+{% block home_path %}
+{{ parent() }}
+<li class="breadcrumb-item">
+    Configuration
+</li>
+<li class="breadcrumb-item">
+    Statut
+</li>
+<li class="breadcrumb-item">
+    Commande
+</li>
+{% endblock %}

@@ -21,29 +21,35 @@ class ImeiCode
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\EanCode", inversedBy="imeiCodes")
+     * @Groups({"class_property"})
+     * @SerializedName("EanCode")
      */
     private $EanCode;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"class_property"})
+     * @SerializedName("Code")
      */
     private $Code;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\NotNull(message = "Le numéro de série ne peut pas être null.")
+     * @Groups({"class_property"})
+     * @SerializedName("SerieCode")
      */
     private $SerieCode;
-
-    /**
-     * @Groups({"class_property"})
-     * @SerializedName("Ean")
-     */
-    private $Ean;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Item", mappedBy="ImeiCode", cascade={"persist", "remove"})
      */
     private $item;
+
+    public function __toString()
+    {
+        return $this->getCode();
+    }
 
     public function getId(): ?int
     {
@@ -67,7 +73,7 @@ class ImeiCode
         return $this->Code;
     }
 
-    public function setCode(string $Code): self
+    public function setCode(?string $Code): self
     {
         $this->Code = $Code;
 
@@ -82,18 +88,6 @@ class ImeiCode
     public function setSerieCode(?string $SerieCode): self
     {
         $this->SerieCode = $SerieCode;
-
-        return $this;
-    }
-
-    public function getEan(): ?string
-    {
-        return $this->Ean;
-    }
-
-    public function setEan(?string $Ean): self
-    {
-        $this->Ean = $Ean;
 
         return $this;
     }

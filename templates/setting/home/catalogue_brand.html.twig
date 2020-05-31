@@ -1,0 +1,18 @@
+{% extends 'setting/index.html.twig' %}
+
+{% set page_title = 'Marque' %}
+
+{% block title %}{{ parent() }} - {{ page_title }}{% endblock %}
+
+{% block home_path %}
+<li class="breadcrumb-item">
+    Catalogue
+</li>
+<li class="breadcrumb-item">
+    {{ page_title }}
+</li>
+{% endblock %}
+
+{% block body_title_are %}
+<i class="fa fa-align-justify"></i> {{ page_title }}</div>
+{% endblock %}

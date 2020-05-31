@@ -2,9 +2,13 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Entity\Country;
+use App\Entity\Currency;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Groups;
+use Doctrine\Common\Collections\Collection;
+use JMS\Serializer\Annotation\SerializedName;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\EanCodeRepository")
@@ -15,23 +19,37 @@ class EanCode
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"class_property"})
+     * @SerializedName("id")
      */
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Pays", inversedBy="eanCodes")
-     */
-    private $Pays;
-
-    /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"class_property"})
+     * @SerializedName("Code")
      */
     private $Code;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\ImeiCode", mappedBy="EanCode")
+     * @Groups({"class_relation"})
+     * @SerializedName("imeiCodes")
      */
     private $imeiCodes;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Country", inversedBy="eanCodes")
+     * @Groups({"class_property"})
+     * @SerializedName("Country")
+     */
+    private $Country;
+
+    public function __toString()
+    {
+        return $this->getCode();
+    }
+
 
     public function __construct()
     {
@@ -41,18 +59,6 @@ class EanCode
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getPays(): ?Pays
-    {
-        return $this->Pays;
-    }
-
-    public function setPays(?Pays $Pays): self
-    {
-        $this->Pays = $Pays;
-
-        return $this;
     }
 
     public function getCode(): ?string
@@ -97,4 +103,17 @@ class EanCode
 
         return $this;
     }
+
+    public function getCountry(): ?Country
+    {
+        return $this->Country;
+    }
+
+    public function setCountry(?Country $Country): self
+    {
+        $this->Country = $Country;
+
+        return $this;
+    }
+
 }

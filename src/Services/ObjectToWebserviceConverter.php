@@ -108,8 +108,11 @@ class ObjectToWebserviceConverter{
             $output['bill'] = $this->convertBillToObject($bill, $order, $order->getClient());
         else
             $output['bill']=$this->convertBillToObject(null, $order, $order->getClient());
+
+
+        $output['info'] =$this-> convertAllInfoToObject();
         $output['order']=$this->convertOrderToObject($order);
-        $output['client']=$this->convertClientContactToObject($order->getContact(), $order->getAgent());
+        $output['client']=$this->convertClientContactToObject($order->getContact(), $order->getClient(), $order->getAgent());
         $output['currency']=$this->convertCurrencyToObject($this->currencyRepo->findOneBy(['IsDefault' => true]));
         $output['delivery_address']=$this->convertAddressToObject($order->getContact()->getAddress(), $order->getClient());
         $output['bill_address']=$this->convertAddressToObject($order->getContact()->getAddress(), $order->getClient());
@@ -122,6 +125,24 @@ class ObjectToWebserviceConverter{
 
     /*______________________________________________________________________________________________________ 
     */
+
+    public function convertAllInfoToObject(): array
+    {
+        $obj = [];
+        $obj = $this->convertInfoToObject($obj, $this->settingRepo->findBy(['Code' => 'SOCIETE']));
+        $obj = $this->convertInfoToObject($obj, $this->settingRepo->findBy(['Code' => 'BANQUE']));
+        $obj = $this->convertInfoToObject($obj, $this->settingRepo->findBy(['Code' => 'PDF']));
+        
+        return $obj;
+    }
+
+    public function convertInfoToObject(Array $obj, Array $source) : Array
+    {
+        foreach ($source as $setting) {
+            array_push($obj, $this->convertSettingToObject($setting));
+        }
+        return $obj;
+    }
 
     public function convertOrderToObject(?QuoteOrder $order){
         $obj = [];
@@ -191,7 +212,7 @@ class ObjectToWebserviceConverter{
 
             $obj['Date'] = $order->getCreatedAt();
             if (!empty($obj['Date']))
-                $obj['Date'] = $obj['Date']->format('y-m-d');
+                $obj['Date'] = $obj['Date']->format('d/m/Y');
 
             $obj['Tax']  = 0;
         }
@@ -240,7 +261,7 @@ class ObjectToWebserviceConverter{
            
             $obj['Date'] = $delivery->getCreatedAt();
             if (!empty($obj['Date']))
-                $obj['Date'] = $obj['Date']->format('y-m-d');
+                $obj['Date'] = $obj['Date']->format('d/m/Y');
 
             $obj['Package']  = $delivery->getPackage();
         }
@@ -283,8 +304,8 @@ class ObjectToWebserviceConverter{
 
             $obj['Name'] = $item->getName();
             $obj['Ref'] = $item->getRef();
-            $obj['Price_purchase'] = $item->getPurchasePrice();
-            $obj['Price_sell'] = $item->getSellPrice();
+            $obj['Price_purchase'] = !empty($item->getPurchasePrice()) ? $item->getPurchasePrice() : 0;
+            $obj['Price_sell'] = !empty($item->getSellPrice()) ? $item->getSellPrice() : 0;
             $obj['Stock']  = $item->getStock();
             $obj['Erasable']  = $item->getIsErasable();
             $obj['Source']  = 0;
@@ -382,7 +403,7 @@ class ObjectToWebserviceConverter{
         return $obj;
     }
 
-    public function convertClientContactToObject(?Contact $contact, Agent $agent)
+    public function convertClientContactToObject(?Contact $contact, Client $client, Agent $agent)
     {
         $obj = [];
         if (!empty($contact)) {
@@ -391,17 +412,17 @@ class ObjectToWebserviceConverter{
             $obj['AgentId'] = $agent->getId();
             $obj['FirstName'] = $contact->getFirstname();
             $obj['LastName'] = $contact->getLastName();
-            $obj['Company'] = $contact->getPosition();
+            $obj['Company'] = $client->getCompanyName();
             $obj['Email']  = $contact->getEmail();
             $obj['Phone']  = "0x " . $contact->getPhone();
             $obj['Fax']  = $contact->getFax();
-            $obj['Rib']  = '';
-            $obj['CRN']  = '';
-            $obj['PayDelay']  = '';
-            $obj['Comment']  = '';
-            $obj['MaxCredit']  = '';
-            $obj['Status']  = '';
-            $obj['CompanyName']  = '';
+            $obj['Rib']  = $client->getRib();
+            $obj['CRN']  = $client->getCRN();
+            $obj['PayDelay']  = $client->getPayDelay();
+            $obj['Comment']  = !empty($client->getComment()) ? $client->getComment()->getContent() : "";
+            $obj['MaxCredit']  = $client->getMaxCredit();
+            $obj['Status']  = $client->getIsProspect();
+            $obj['CompanyName']  = $client->getCompanyName();
         }
         else{
             $obj['ID'] = 0;
@@ -450,9 +471,11 @@ class ObjectToWebserviceConverter{
 
             $obj['Date_insert'] = $tax->getCreateAt();
             if (!empty($obj['Date_insert']))
-                $obj['Date_insert'] = $obj['Date_insert']->format('y-m-d');
+                $obj['Date_insert'] = $obj['Date_insert']->format('d/m/Y');
 
             $obj['Value'] = $tax->getValue();
+            if ($tax->getIsTVAMarge())
+                $obj['Value'] = 0;
             $obj['Comment'] = '';
             $obj['Tax_current'] = $tax->getIsCurrent();
         }
@@ -460,7 +483,7 @@ class ObjectToWebserviceConverter{
             $obj['ID'] = 0;
             $obj['Type'] =  '';
             $obj['Date_insert'] =  '';
-            $obj['Value'] =  '';
+            $obj['Value'] =  0;
             $obj['Comment'] = '';
             $obj['Tax_current'] =  '';
         }
@@ -478,7 +501,7 @@ class ObjectToWebserviceConverter{
 
             $obj['Date_insert'] = $tax->getCreateAt();
             if (!empty($obj['Date_insert']))
-                $obj['Date_insert'] = $obj['Date_insert']->format('y-m-d');
+                $obj['Date_insert'] = $obj['Date_insert']->format('d/m/Y');
 
             $obj['Tax_value'] = $tax->getValue();
             $obj['Target'] = 'commande';
@@ -510,7 +533,7 @@ class ObjectToWebserviceConverter{
 
             $obj['Date'] = $currency->getCreatedAt();
             if (!empty($obj['Date']))
-                $obj['Date'] = $obj['Date']->format('y-m-d');
+                $obj['Date'] = $obj['Date']->format('d/m/Y');
         }
         else{
             $obj['ID'] = 0;
@@ -553,15 +576,15 @@ class ObjectToWebserviceConverter{
 
             $obj['Date'] = $bill->getCreatedAt();
              if(!empty($obj['Date']))
-                $obj['Date'] = $obj['Date']->format('y-m-d');
+                $obj['Date'] = $obj['Date']->format('d/m/Y');
 
             $obj['DateLimit'] = $bill->getLimitDateAt();
             if (!empty($obj['DateLimit']))
-                $obj['DateLimit'] = $obj['DateLimit']->format('y-m-d');
+                $obj['DateLimit'] = $obj['DateLimit']->format('d/m/Y');
 
             $obj['DatePay'] = $bill->getPayedAt();
             if (!empty($obj['DatePay']))
-                $obj['DatePay'] = $obj['DatePay']->format('y-m-d');
+                $obj['DatePay'] = $obj['DatePay']->format('d/m/Y');
         }
         else{
             $obj['ID'] = 0;
@@ -588,11 +611,11 @@ class ObjectToWebserviceConverter{
             $obj['OrderId'] = $orderDetail->getQuoteOrder()->getId();
             $obj['ItemId'] = $orderDetail->getItem()->getId();
             $obj['Item_ref'] = $orderDetail->getItem()->getRef();
-            $obj['Quantity'] = $orderDetail->getQuantity();
-            $obj['Quantity_delivery'] = $orderDetail->getQuantityDelivery();
-            $obj['Quantity_current'] = $orderDetail->getQuantityRecieved();
-            $obj['Price'] = $orderDetail->getItemSellPrice();
-            $obj['Price_purchase'] = $orderDetail->getItemPurchasePrice();
+            $obj['Quantity'] = !empty($orderDetail->getQuantity()) ? $orderDetail->getQuantity() : 0;
+            $obj['Quantity_delivery'] = !empty($orderDetail->getQuantityDelivery()) ? $orderDetail->getQuantityDelivery() : 0;
+            $obj['Quantity_current'] = !empty($orderDetail->getQuantityRecieved()) ? $orderDetail->getQuantityRecieved() : 0;
+            $obj['Price'] = !empty($orderDetail->getItemSellPrice()) ? $orderDetail->getItemSellPrice() : 0;
+            $obj['Price_purchase'] = !empty($orderDetail->getItemPurchasePrice()) ? $orderDetail->getItemPurchasePrice() : 0;
             $obj['Comment_Purchase_Price'] = '';
             $obj['Rank'] = 1;
         }
@@ -620,7 +643,7 @@ class ObjectToWebserviceConverter{
             $obj['ID'] = $qtDelivery->getId();
             $obj['DeliveryId'] = $qtDelivery->getDelivery()->getId();
             $obj['Item_ref'] = $qtDelivery->getOrderDetail()->getItem()->getRef();
-            $obj['Quantity_delivery'] = $qtDelivery->getOrderDetail()->getQuantityDelivery();
+            $obj['Quantity_delivery'] = !empty($qtDelivery->getOrderDetail()->getQuantityDelivery()) ? $qtDelivery->getOrderDetail()->getQuantityDelivery() : 0;
         }
         else{
             $obj['ID'] = 0;

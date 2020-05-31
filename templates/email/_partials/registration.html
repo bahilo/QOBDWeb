@@ -1,13 +1,4 @@
 {% extends 'email_template.html.twig' %}
 
 {% block body_title %}Votre inscription{% endblock body_title %}
-
-{% block body %}
-
-    <div class="row">
-        <div class="col-md-12">            
-            <pre>{% include 'email/files/inscription.txt' with {'pseudo': agent.username, 'nom_societe': search.get_setting("SOCIETE","SOCIETE_NOM").value } %}</pre>
-        </div>
-    </div>
-
-{% endblock body %}
+{% block content_area %}{% include 'email/files/inscription.txt' with {'pseudo': agent.username, 'nom_societe': search.get_setting("SOCIETE","SOCIETE_NOM").value } %}{% endblock %}

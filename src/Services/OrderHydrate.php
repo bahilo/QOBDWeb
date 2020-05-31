@@ -2,15 +2,18 @@
 
 namespace App\Services;
 
+use Exception;
+use App\Entity\Item;
 use App\Entity\Comment;
 use App\Entity\QuoteOrder;
-use App\Repository\BillRepository;
+use App\Entity\QuoteOrderDetail;
 use App\Repository\TaxRepository;
+use App\Repository\BillRepository;
 use App\Services\CatalogueHydrate;
 use App\Repository\ContactRepository;
 use App\Repository\CurrencyRepository;
-use App\Repository\QuoteOrderDetailRepository;
 use JMS\Serializer\SerializerInterface;
+use App\Repository\QuoteOrderDetailRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 
 
@@ -25,6 +28,7 @@ class OrderHydrate{
     protected $catHydrate;
     protected $manager;
     protected $webApi;
+    protected $errorHandler;
 
     public function __construct( SerializerInterface $serializer,
                                 ContactRepository $contactRepo,
@@ -34,6 +38,7 @@ class OrderHydrate{
                                 QuoteOrderDetailRepository $orderDetailRepo,
                                 BillRepository $billRepo,
                                 CatalogueHydrate $catHydrate,
+                                ErrorHandler $errorHandler,
                                 ObjectManager $manager){
 
         $this->serializer = $serializer;
@@ -45,56 +50,43 @@ class OrderHydrate{
         $this->orderDetailRepo = $orderDetailRepo;
         $this->catHydrate = $catHydrate;
         $this->manager = $manager;
+        $this->errorHandler = $errorHandler;
     }
 
-    public function hydrateOrderDetail($orderDetails, QuoteOrder $order){
+    public function hydrateOrderDetail($orderDetails){
 
         $output = [];
-
-        foreach( $orderDetails as $orderDetail){
+        foreach ($orderDetails as $orderDetail) {
             
             $item = $orderDetail->getItem();
-            $tax = empty($orderDetail->getTax()) ? $order->getTax() : $orderDetail->getTax();
             
-            if($item){
+            if ($item) {
+                /** @var Item */
                 $item = $this->catHydrate->hydrateItem([$item])[0];
-
-                $bTvaMarge = (!empty($tax)) ? $tax->getIsTVAMarge() : false;
-                $qt = $orderDetail->getQuantity();
-                $pa = $orderDetail->getItemPurchasePrice();
-                $pv = $orderDetail->getItemSellPrice();
-                $marge_amount = $pv - $pa;
-                $tva = (!empty($tax)) ? $tax->getValue() : 0;
-
-                $orderDetail->setContentComment($item->getContentComment());
-                $orderDetail->setItemRef($item->getRef());
-                $orderDetail->setItemName($item->getName());
-
-                if(empty($pv) || $pv == 0){
-                    $pv = $item->getSellPrice();
-                    $orderDetail->setItemSellPrice($pv);                   
-                }
-
-                if(empty($pa) || $pa == 0){
-                    $pa = $item->getPurchasePrice();
-                    $orderDetail->setItemPurchasePrice($pa);                                       
-                }
-
-                $marge_amount = $pv - $pa;
-                $total_HT = $pv * $qt;
-                $total_TTC = ($bTvaMarge) ? ($pv + $marge_amount * $tva / 100) * $qt : $pv * (1 + $tva / 100) * $qt;
-                $marge_perc = ($pv - $pa) / $pv * 100;
-
-                $orderDetail->setItemSellPriceTotal($total_HT);
-                $orderDetail->setItemSellPriceVATTotal($total_TTC);
-
-                $orderDetail->setItemROIPercent($marge_perc);
-                $orderDetail->setItemROICurrency($marge_amount);
                 
-                $this->manager->persist($orderDetail); 
+                $qt = $orderDetail->getQuantity();
+                $pa = $item->getPurchasePrice() ? $item->getPurchasePrice() : 0 ;//$orderDetail->getItemPurchasePrice();
+                $pv = $item->getSellPrice() ? $item->getSellPrice() : 0;
+                
+                // $orderDetail->setItemRef($item->getRef());
+                // $orderDetail->setItemName($item->getName());
+
+                if (empty($orderDetail->getItemSellPrice())) {
+                    $orderDetail->setItemSellPrice($pv);
+                }
+
+                if (empty($orderDetail->getItemPurchasePrice())) {
+                    $orderDetail->setItemPurchasePrice($pa);
+                }
+
+                if (empty($orderDetail->getQuantity())) {
+                    $orderDetail->setQuantity($qt);
+                }
+
+                $this->manager->persist($orderDetail);
             }
             $this->manager->flush();
-            array_push($output, $orderDetail);
+            array_push($output, $orderDetail);                
         }
         
         return $output;
@@ -179,34 +171,36 @@ class OrderHydrate{
      */
     public function hydrateQuoteOrderRelationFromForm(QuoteOrder $order, $form)
     {
-
-        $agent = $order->getAgent();
-        $client = $order->getClient();
         $privateComment = $order->getPrivateComment();
         $adminComment = $order->getAdminComment();
         $publicComment = $order->getPublicComment();
         $contact = $this->contactRepo->find($form['contact']);
 
-        $privateComment = $order->getPrivateComment();
-        if (!$privateComment) {
-            $privateComment = new Comment();
-            $privateComment->setCreateAt(new \DateTime());
-        }
-        $privateComment->setContent($form['commentaire']['prive']);
+       
+        if(isset($form['commentaire'])){
 
-        $adminComment = $order->getAdminComment();
-        if (!$adminComment) {
-            $adminComment = new Comment();
-            $adminComment->setCreateAt(new \DateTime());
+            $privateComment = $order->getPrivateComment();
+            if (!$privateComment) {
+                $privateComment = new Comment();
+                $privateComment->setCreateAt(new \DateTime());
+            }
+            $privateComment->setContent($form['commentaire']['prive']);
+            
+            $adminComment = $order->getAdminComment();
+            if (!$adminComment) {
+                $adminComment = new Comment();
+                $adminComment->setCreateAt(new \DateTime());
+            }
+            $adminComment->setContent($form['commentaire']['admin']);
+    
+            $publicComment = $order->getPublicComment();
+            if (!$publicComment) {
+                $publicComment = new Comment();
+                $publicComment->setCreateAt(new \DateTime());
+            }
+            $publicComment->setContent($form['commentaire']['public']);
         }
-        $adminComment->setContent($form['commentaire']['admin']);
 
-        $publicComment = $order->getPublicComment();
-        if (!$publicComment) {
-            $publicComment = new Comment();
-            $publicComment->setCreateAt(new \DateTime());
-        }
-        $publicComment->setContent($form['commentaire']['public']);
 
         if (isset($form['setting']['devis']['type'])) {
             if ($form['setting']['devis']['type'] == 'devis')
@@ -235,6 +229,7 @@ class OrderHydrate{
         if(!empty($form['tab']['items'])){
             foreach ($form['tab']['items'] as $key => $val) {
                 $orderDetail = $this->hydrateQuoteOrderDetailRelationFromForm($this->orderDetailRepo->find($key), $val);
+                
                 $this->manager->persist($orderDetail->getItem());
                 $this->manager->persist($orderDetail);
             }
@@ -245,6 +240,10 @@ class OrderHydrate{
             foreach ($form['tab']['bill'] as $key => $val) {
                 $bill = $this->billRepo->find($key);
                 if (!empty($bill)) {
+
+                    $order->setIsRefVisible(false);
+                    if(!empty($val['ref_visible']))
+                        $order->setIsRefVisible(true);
 
                     if (!empty($val['pay_mode']))
                         $bill->setPayMode($val['pay_mode']);
@@ -292,9 +291,9 @@ class OrderHydrate{
         return $order;
     }
 
-    public function hydrateQuoteOrderDetailRelationFromForm($orderDetail, $form)
+    public function hydrateQuoteOrderDetailRelationFromForm(QuoteOrderDetail $orderDetail, $form)
     {
-
+        
         $item = $orderDetail->getItem();
         $comment = $item->getComment();
 
@@ -310,7 +309,10 @@ class OrderHydrate{
         $orderDetail->setItemSellPrice($form['sell']);
         $orderDetail->setQuantity($form['quantity']);
         if (!empty($form['quantity_recieved']) &&  $form['quantity_recieved'] > 0){
+            //dump($form);
             if(!empty($orderDetail->getQuantityRecieved())){
+                // dump("(".$form['quantity_recieved']." + ".$orderDetail->getQuantityRecieved()." <= ".$form['quantity'].")");
+                // die();
                 if ($form['quantity_recieved'] + $orderDetail->getQuantityRecieved() <= $form['quantity']) {
                     $orderDetail->setQuantityRecieved($form['quantity_recieved']);
                 } else {
@@ -322,8 +324,15 @@ class OrderHydrate{
             }
             else{
                 $orderDetail->setQuantityRecieved($form['quantity']);
-            }
+            }           
+            
         }
+
+        //dump($item);
+        $this->manager->persist($item);
+
+        $orderDetail->setItem($item);
+
         return $orderDetail;
     }
 

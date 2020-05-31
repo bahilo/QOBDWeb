@@ -1,14 +1,18 @@
 {% extends 'template_coreui.html.twig' %}
 
-{% set page_title = 'Editer famille produit' %}
+{% set page_title = 'Création & modification' %}
 
 {% block home_path %}
 <li class="breadcrumb-item">
-    <a href="{{ path("setting_home") }}">Configuration</a>
+    Catalogue
+</li>
+<li class="breadcrumb-item">
+    <a href="{{ path("setting_catalogue_group") }}">Famille</a>
 </li>
 <li class="breadcrumb-item">
     {{ page_title }}
 </li>
+
 {% endblock %}
 
 {% block title %}{{ parent() }} - {{ page_title }} {% endblock %}

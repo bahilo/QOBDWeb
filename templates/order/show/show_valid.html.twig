@@ -1,14 +1,14 @@
 {% extends 'order/show.html.twig' %}
 
 
-{% block title %}{{ parent() }} - Avoir à valider {% endblock %}
+{% block title %}{{ parent() }} - Commande à revalider {% endblock %}
 
 {% block home_path %}
 <li class="breadcrumb-item">
     Commande & Avoir
 </li>
 <li class="breadcrumb-item">
-    <a href="#">Commande à revalider</a>
+    <a href="{{ path("order_customer_valid") }}">Demande revalidation</a>
 </li>
 <li class="breadcrumb-item">
     Détail commande

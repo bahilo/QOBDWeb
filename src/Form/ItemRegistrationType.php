@@ -3,8 +3,12 @@
 namespace App\Form;
 
 use App\Entity\Item;
+use App\Entity\EanCode;
+use App\Entity\ImeiCode;
+use App\Entity\Provider;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -19,16 +23,24 @@ class ItemRegistrationType extends AbstractType
             ->add('SellPrice')
             ->add('PurchasePrice')
             ->add('Stock')
-            ->add('Imei')
-            ->add('Ean')
+            //->add('Imei')
+            ->add('ImeiCode', ImeiCodeRegistrationType::class)
+            /*->add(
+                $builder->create('ImeiCode', EntityType::class, array('by_reference' => true))
+                ->add('Code', 'text')
+            )
+            ->add('Ean', EntityType:: class,[
+                'class' => EanCode::class,
+                'choice_label' => 'Code',
+            ])*/
             //->add('CreatedAt')
-            ->add('ContentComment')
+            ->add('Comment', CommentRegistrationType::class)
             ->add('Provider')
             ->add('ItemGroupe')
             ->add('ItemBrand')
             //->add('deliveries')
             //->add('orders')
-            ->add('SerieCode')
+            //->add('SerieCode')
             ->add('PictureFile', FileType::class, [
                 'label' => 'avatar',
 

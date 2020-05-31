@@ -19,6 +19,8 @@
 
 <div class="email-wrapper">
 
+    {% include "notify.html.twig" %}
+    
     <div class="animated fadeIn">
         <form id="global_form" action="{{ path("setting_email_edit") }}" method="post">
 
@@ -79,9 +81,4 @@
         </form>
     </div>
 </div>
-{% endblock %}
-
-{% block message_pool %}
-<input type="hidden" name="report-feedback" class="report-feedback" value="{{ message }}">
-<input type="hidden" name="report-status" class="report-status" value="{{ status }}">
 {% endblock %}

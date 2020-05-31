@@ -1,9 +1,9 @@
-Bonjour  Madame, Monsieur {{ nom_client }}, <br><br>
+Bonjour  Madame, Monsieur {{ nom_client }},
 
-Veuillez trouver ci-joint notre meilleure offre suite à votre demande. <br>
-Je reste disponible pour tout complément d'information. <br>
+Veuillez trouver ci-joint notre meilleure offre suite à votre demande.
+Je reste disponible pour tout complément d'information.
 
-Cordialement, <br><br>
+Cordialement,
 
 L'equipe {{ nom_societe }}.
 

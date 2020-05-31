@@ -29,6 +29,8 @@ class QuantityDelivery
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\QuoteOrderDetail", inversedBy="quantityDeliveries")
+     * @Groups({"class_property"})
+     * @SerializedName("OrderDetail")
      */
     private $OrderDetail;
 

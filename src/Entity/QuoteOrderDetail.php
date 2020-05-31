@@ -49,25 +49,6 @@ class QuoteOrderDetail
      */
     private $Tax;
 
-
-    /**
-     * @Groups({"class_property"})
-     * @SerializedName("ItemRef") 
-     */
-    private $ItemRef;
-
-    /**
-     * @Groups({"class_property"})
-     * @SerializedName("ItemName") 
-     */
-    private $ItemName;
-
-    /**
-     * @Groups({"class_property"})
-     * @SerializedName("ContentComment") 
-     */
-    private $ContentComment;
-
     /**
      * @Groups({"class_property"})
      * @SerializedName("ItemPurchasePrice") 
@@ -185,42 +166,6 @@ class QuoteOrderDetail
     }
 
     /*---------------------------*/
-
-    public function getItemRef(): ?string
-    {
-        return $this->ItemRef;
-    }
-
-    public function setItemRef(?string $ItemRef): self
-    {
-        $this->ItemRef = $ItemRef;
-
-        return $this;
-    }
-
-    public function getItemName(): ?string
-    {
-        return $this->ItemName;
-    }
-
-    public function setItemName(?string $ItemName): self
-    {
-        $this->ItemName = $ItemName;
-
-        return $this;
-    }
-
-    public function getContentComment(): ?string
-    {
-        return $this->ContentComment;
-    }
-
-    public function setContentComment(?string $ContentComment): self
-    {
-        $this->ContentComment = $ContentComment;
-
-        return $this;
-    }
 
     public function getItemPurchasePrice(): ?string
     {

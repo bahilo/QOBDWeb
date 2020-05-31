@@ -8,7 +8,7 @@
     Commande & Avoir
 </li>
 <li class="breadcrumb-item">
-    <a href="#">Cmd à valider</a>
+    <a href="{{ path("order_preorder") }}">Cmd à valider</a>
 </li>
 <li class="breadcrumb-item">
     Détail commande
@@ -21,5 +21,67 @@
         class="btn btn-success btnValidation">Convertir en commande</a>
     <a href="{{ path("order_validation", {id: order.id, idStatus: order_status_quote.id}) }}"
         class="btn btn-danger btnValidation">Convertir en devis</a>
+</div>
+{% endblock %}
+
+{# Devis #}
+{% block quote_area %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-align-justify"></i> Devis
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-check">
+                            {% if order.IsQuote or order.IsQuote is null %}
+                            <input type="radio" name="order_detail_form[setting][devis][type]" id="rbDevis"
+                                value="devis" class="form-check-input" checked>
+                            {% else %}
+                            <input type="radio" name="order_detail_form[setting][devis][type]" id="rbDevis"
+                                value="devis" class="form-check-input">
+                            {% endif %}
+                            <label for="rbDevis" class="orm-check-label">Devis</label>
+                        </div>
+                        <div class="form-check">
+                            {% if not order.IsQuote and order.IsQuote is not null %}
+                            <input type="radio" name="order_detail_form[setting][devis][type]" id="rbProformat"
+                                value="pro forma" class="form-check-input" checked>
+                            {% else %}
+                            <input type="radio" name="order_detail_form[setting][devis][type]" id="rbProformat"
+                                value="pro forma" class="form-check-input">
+                            {% endif %}
+
+                            <label for="rbProformat" class="orm-check-label">Pro forma</label>
+                        </div>
+                        <div class="form-check">
+                            {% if order.IsRefVisible %}
+                            <input type="checkbox" name="order_detail_form[setting][devis][ref_visible]" id="chkRef"
+                                class="form-check-input" checked>
+                            {% else %}
+                            <input type="checkbox" name="order_detail_form[setting][devis][ref_visible]" id="chkRef"
+                                class="form-check-input">
+                            {% endif %}
+                            <label for="chkRef" class="form-check-label">Référence visible sur le
+                                devis</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="inptDuree">Duree de validité du devis</label>
+                            <input type="number" name="order_detail_form[setting][devis][duree]" id="inptDuree"
+                                class="form-control" value="{{ order.ValidityPeriode | default(2) }}">
+                        </div>
+                        <div class="btndevis-wrapper">
+                            <a href="{{ path("order_pdf_quote", {id: order.id}) }}" class="btn btn-primary">Générer le
+                                devis</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

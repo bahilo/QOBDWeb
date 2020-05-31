@@ -6,7 +6,7 @@
 parameters:
     app.name: '/QOBDWeb'
     app.name.base_dir: '%app.name%'
-    download_dir: '/ressources/download'
+    download_dir: 'ressources/download'
 
     agent_dir: 'agent/avatars'
     setting.catalogue_dir: 'setting/catalogue'
@@ -25,7 +25,10 @@ parameters:
     file.setting.image.download_dir: '%file.download_dir%/%setting.image_dir%'
     file.pdf.bill.download_dir: '%file.download_dir%/%pdf.bill_dir%'
     file.pdf.quote.download_dir: '%file.download_dir%/%pdf.quote_dir%'
-    file.pdf.delivery.download_dir: '%file.download_dir%/pdf/%pdf.delivery_dir%'
+    file.pdf.delivery.download_dir: '%file.download_dir%/%pdf.delivery_dir%'
+
+    file.setting.email: '%app.name.base_dir%/templates/email/files'
+    file.setting.text: '%app.name.base_dir%/templates/document/files'
 
     abs.public: '%app.name.base_dir%/public'
     abs.resource.download_dir: '%abs.public%/%download_dir%'
@@ -36,12 +39,11 @@ parameters:
     abs.file.setting.image.download_dir: '%abs.file.download_dir%/%setting.image_dir%'
     abs.file.pdf.bill.download_dir: '%abs.file.download_dir%/%pdf.bill_dir%'
     abs.file.pdf.quote.download_dir: '%abs.file.download_dir%/%pdf.quote_dir%'
-    abs.file.pdf.delivery.download_dir: '%abs.file.download_dir%/pdf/%pdf.delivery_dir%'
+    abs.file.pdf.delivery.download_dir: '%abs.file.download_dir%/%pdf.delivery_dir%'
 
-    file.setting.email: '../templates/email/files'
-    file.type.download_quote: 0
-    file.type.download_order: 1
-    file.type.download_refund: 2
+    tax.type.ht: 101
+    tax.type.ttc: 102
+    tax.type.tva_marge: 103
     session_max_idle_time: 3800
     secret: '%env(APP_SECRET)%'
     email.url: '%env(MAILER_URL)%'
@@ -63,6 +65,9 @@ services:
             $root_dir: '%app.name.base_dir%/public'
             $email_swiftmailer: '%email.swiftmailer%'
             $email_url: '%email.url%'
+            $tax_type_ht: '%tax.type.ht%'
+            $tax_type_ttc: '%tax.type.ttc%'
+            $tax_type_tva_marge: '%tax.type.tva_marge%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name

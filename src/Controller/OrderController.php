@@ -2,10 +2,12 @@
 
 namespace App\Controller;
 
+use Exception;
 use App\Entity\Bill;
 use App\Entity\Delivery;
 use App\Events\MyEvents;
 use App\Services\Mailer;
+use App\Services\Utility;
 use App\Entity\QuoteOrder;
 use App\Entity\OrderStatus;
 use App\Services\Serializer;
@@ -54,6 +56,9 @@ class OrderController extends Controller
     protected $quantityDelRepo;
     protected $eventDispatcher;
     protected $ErrorHandler;
+    protected $utility;
+    protected $manager;
+    protected $qtDelRepo;
 
 
     public function __construct(Serializer $serializer, 
@@ -68,6 +73,9 @@ class OrderController extends Controller
                                 BillRepository $billRepo,
                                 EventDispatcherInterface $eventDispatcher,
                                 TaxRepository $tvaRepo,
+                                Utility $utility,
+                                ObjectManager $manager,
+                                QuantityDeliveryRepository $qtDelRepo,
                                 ErrorHandler $ErrorHandler)
     {
         $this->orderDetailRepo = $orderDetailRepo;
@@ -83,10 +91,17 @@ class OrderController extends Controller
         $this->tvaRepo = $tvaRepo;
         $this->quantityDelRepo = $quantityDelRepo;
         $this->ErrorHandler = $ErrorHandler;
+        $this->utility = $utility;
+        $this->manager = $manager;
+        $this->qtDelRepo = $qtDelRepo;
     }
 
-    /*______________________________________________________________________________________________________________________ 
-    --------------------------------------------[ Views ]--------------------------------------------------------*/
+#region [ Liste Order ]
+
+  /*=====================================================================================================================================
+  ===================================================================================================================================== 
+     ______________________________________________________________________________________________________________________ 
+    --------------------------------------------[ Liste Order ]--------------------------------------------------------*/
 
     /**
      * @Route("/admin/commande/accueil", options={"expose"=true}, name="order")
@@ -208,7 +223,7 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
         
-        return $this->render('order/home/home_valid.html.twig', [
+        return $this->render('order/home/home_order_valid.html.twig', [
             'status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_VALID']),
         ]);
     }
@@ -241,6 +256,15 @@ class OrderController extends Controller
          ]);
     }
 
+#endregion
+
+#region [ show order ]
+
+/*=====================================================================================================================================
+  ===================================================================================================================================== 
+     ______________________________________________________________________________________________________________________ 
+    --------------------------------------------[ show order ]--------------------------------------------------------*/
+
     /**
      * @Route("/admin/commande/detail/{id}", options={"expose"=true}, requirements={"id"="\d+"}, name="order_show")
      */
@@ -253,18 +277,20 @@ class OrderController extends Controller
         }
 
         $bills = $this->orderManager->getHydrater()->hydrateBill($this->billRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']), $order);
-        $orderDetail = $this->orderManager->getHydrater()->hydrateOrderDetail($this->orderDetailRepo->findBy(['QuoteOrder' => $order]), $order);
-        $orderDetrailQtReceived = $this->orderManager->getHydrater()->hydrateOrderDetail($this->orderDetailRepo->findByQuantityRecieved($order), $order);
+        $orderDetail = $this->orderManager->hydrateOrderDetailStats($this->orderDetailRepo->findBy(['QuoteOrder' => $order]));
+        $orderDetrailQtReceived = $this->orderManager->hydrateOrderDetailStats($this->orderDetailRepo->findByQuantityRecieved($order));
         $roderDeliveries = $this->orderManager->getHydrater()->hydrateQuantityDelivery($this->quantityDelRepo->findByBillStatus($order), $order);
         $CreateDeliveries = $this->deliveryRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']);
         $infos = $this->orderManager->getCommandeInfo($orderDetail, $order);
         
         return $this->render('order/show/show_order.html.twig', [
-            'order_detail_data_source' => $this->serializer->serialize(['object_array' => $orderDetail, 'format' => 'json', 'group' => 'class_property']),
-            'order_detail_delivery_data_source' => $this->serializer->serialize(['object_array' => $orderDetrailQtReceived, 'format' => 'json', 'group' => 'class_property']),
-            'order_detail_bill_data_source' => $this->serializer->serialize(['object_array' => $roderDeliveries, 'format' => 'json', 'group' => 'class_property']),
-            'bill_data_source' => $this->serializer->serialize(['object_array' => $bills, 'format' => 'json', 'group' => 'class_property']),
-            'delivery_data_source' => $this->serializer->serialize(['object_array' => $CreateDeliveries, 'format' => 'json', 'group' => 'class_property']),
+            //'order_detail_data_source' => $this->serializer->serialize(['object_array' => $orderDetail, 'format' => 'json', 'group' => 'class_property']),
+            //'order_detail_delivery_data_source' => $this->serializer->serialize(['object_array' => $orderDetrailQtReceived, 'format' => 'json', 'group' => 'class_property']),
+            //'order_detail_bill_data_source' => $this->serializer->serialize(['object_array' => $roderDeliveries, 'format' => 'json', 'group' => 'class_property']),
+            //'bill_data_source' => $this->serializer->serialize(['object_array' => $bills, 'format' => 'json', 'group' => 'class_property']),
+            //'delivery_data_source' => $this->serializer->serialize(['object_array' => $CreateDeliveries, 'format' => 'json', 'group' => 'class_property']),
+            'count_delivery_processing' => count($this->orderDetailRepo->findByQuantityRecieved($order)),
+            'count_bill_processing' => count($this->quantityDelRepo->findByBillStatus($order)),
             'order' => $order,
             'currencies' => $currRepo->findAll(),
             'taxes' => $this->tvaRepo->findAll(),
@@ -276,7 +302,32 @@ class OrderController extends Controller
             'deliveries' => $this->deliveryRepo->findByBillStatus(['order' => $order, 'status' => 'STATUS_NOT_BILLED']),
             'info' => $infos,
             'can_open_row' => true,
-            'email_content' => file_get_contents($this->getParameter('file.setting.email') . '/' . 'facture.txt'),
+            'email_content' => file_get_contents($this->utility->getAbsoluteRootPath(). $this->getParameter('file.setting.email') . '/' . 'facture.txt'),
+        ]);
+    }
+
+    /**
+     * @Route("/admin/commande/cloture/detail/{id}", options={"expose"=true}, requirements={"id"="\d+"}, name="order_show_closed")
+     */
+    public function showOrderClosed(
+        QuoteOrder $order,
+        CurrencyRepository $currRepo) {
+
+        if (!$this->securityUtility->checkHasUpdate($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
+        $bills = $this->orderManager->getHydrater()->hydrateBill($this->billRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']), $order);
+        $orderDetail = $this->orderManager->hydrateOrderDetailStats($this->orderDetailRepo->findBy(['QuoteOrder' => $order]));
+        $orderDetrailQtReceived = $this->orderManager->hydrateOrderDetailStats($this->orderDetailRepo->findByQuantityRecieved($order));
+        $roderDeliveries = $this->orderManager->getHydrater()->hydrateQuantityDelivery($this->quantityDelRepo->findByBillStatus($order), $order);
+        $CreateDeliveries = $this->deliveryRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']);
+        $infos = $this->orderManager->getCommandeInfo($orderDetail, $order);
+        
+        return $this->render('order/show/show_order_closed.html.twig', [
+            'order' => $order,
+            'order_status_quote' => $this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE']),
+            'info' => $infos,
         ]);
     }
 
@@ -294,14 +345,13 @@ class OrderController extends Controller
         $orderDetails = $this->orderDetailRepo->findBy(['QuoteOrder' => $order]);
 
         return $this->render('order/show/show_quote.html.twig', [
-            'order_detail_data_source' => $this->serializer->serialize(['object_array' => $this->orderManager->getHydrater()->hydrateOrderDetail($orderDetails, $order), 'format' => 'json', 'group' => 'class_property']),
             'status_prerefund' => $this->statusRepo->findOneBy(['Name' => 'STATUS_PREREFUND']),
             'status_preorder' => $this->statusRepo->findOneBy(['Name' => 'STATUS_PREORDER']),
             'order' => $order,
             'currencies' => $currRepo->findAll(),
             'taxes' => $tvaRepo->findAll(),
             'info' => $this->orderManager->getCommandeInfo($orderDetails, $order),
-            'email_content' => file_get_contents($this->getParameter('file.setting.email') . '/' . 'devis.txt'),
+            'email_content' => file_get_contents($this->utility->getAbsoluteRootPath() . $this->getParameter('file.setting.email') . '/' . 'devis.txt'),
         ]);
     }
 
@@ -319,7 +369,6 @@ class OrderController extends Controller
         $order = $this->orderRepo->find($id);
         $orderDetails = $this->orderDetailRepo->findBy(['QuoteOrder' => $order]);
         return $this->render('order/show/show_preorder.html.twig', [
-            'order_detail_data_source' => $this->serializer->serialize(['object_array' => $this->orderManager->getHydrater()->hydrateOrderDetail($orderDetails, $order), 'format' => 'json', 'group' => 'class_property']),
             'status_order' => $this->statusRepo->findOneBy(['Name' => 'STATUS_ORDER']),
             'order_status_quote' => $this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE']),
             'order' => $order,
@@ -343,7 +392,6 @@ class OrderController extends Controller
         $order = $this->orderRepo->find($id);
         $orderDetails = $this->orderDetailRepo->findBy(['QuoteOrder' => $order]);
         return $this->render('order/show/show_valid.html.twig', [
-            'order_detail_data_source' => $this->serializer->serialize(['object_array' => $this->orderManager->getHydrater()->hydrateOrderDetail($orderDetails, $order), 'format' => 'json', 'group' => 'class_property']),
             'status_order' => $this->statusRepo->findOneBy(['Name' => 'STATUS_ORDER']),
             'order_status_quote' => $this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE']),
             'order' => $order,
@@ -366,29 +414,114 @@ class OrderController extends Controller
         }
 
         $bills = $this->orderManager->getHydrater()->hydrateBill($this->billRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']), $order);
-        $orderDetail = $this->orderManager->getHydrater()->hydrateOrderDetail($this->orderDetailRepo->findBy(['QuoteOrder' => $order]), $order);
-        $orderDetrailQtReceived = $this->orderManager->getHydrater()->hydrateOrderDetail($this->orderDetailRepo->findByQuantityRecieved($order), $order);
+        $orderDetail = $this->orderManager->hydrateOrderDetailStats($this->orderDetailRepo->findBy(['QuoteOrder' => $order]));
+        $orderDetrailQtReceived = $this->orderManager->hydrateOrderDetailStats($this->orderDetailRepo->findByQuantityRecieved($order));
         $roderDeliveries = $this->orderManager->getHydrater()->hydrateQuantityDelivery($this->quantityDelRepo->findByBillStatus($order), $order);
         $CreateDeliveries = $this->deliveryRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']);
         $infos = $this->orderManager->getCommandeInfo($orderDetail, $order);
 
         return $this->render('order/show/show_refund.html.twig', [
-            'order_detail_data_source' => $this->serializer->serialize(['object_array' => $orderDetail, 'format' => 'json', 'group' => 'class_property']),
-            'order_detail_delivery_data_source' => $this->serializer->serialize(['object_array' => $orderDetrailQtReceived, 'format' => 'json', 'group' => 'class_property']),
-            'order_detail_bill_data_source' => $this->serializer->serialize(['object_array' => $roderDeliveries, 'format' => 'json', 'group' => 'class_property']),
-            'bill_data_source' => $this->serializer->serialize(['object_array' => $bills, 'format' => 'json', 'group' => 'class_property']),
-            'delivery_data_source' => $this->serializer->serialize(['object_array' => $CreateDeliveries, 'format' => 'json', 'group' => 'class_property']),
+            //'order_detail_data_source' => $this->serializer->serialize(['object_array' => $orderDetail, 'format' => 'json', 'group' => 'class_property']),
+            // 'order_detail_delivery_data_source' => $this->serializer->serialize(['object_array' => $orderDetrailQtReceived, 'format' => 'json', 'group' => 'class_property']),
+            // 'order_detail_bill_data_source' => $this->serializer->serialize(['object_array' => $roderDeliveries, 'format' => 'json', 'group' => 'class_property']),
+            // 'bill_data_source' => $this->serializer->serialize(['object_array' => $bills, 'format' => 'json', 'group' => 'class_property']),
+            // 'delivery_data_source' => $this->serializer->serialize(['object_array' => $CreateDeliveries, 'format' => 'json', 'group' => 'class_property']),
+            'count_delivery_processing' => count($this->orderDetailRepo->findByQuantityRecieved($order)),
+            'count_bill_processing' => count($this->quantityDelRepo->findByBillStatus($order)),
             'order' => $order,
             'currencies' => $currRepo->findAll(),
             'taxes' => $this->tvaRepo->findAll(),
-            'status_prerefund' => $this->statusRepo->findOneBy(['Name' => 'STATUS_PREREFUND']),
-            'refund_status_close' => $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUNDCLOSED']),
+            'status_refund_close' => $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUNDCLOSED']),
+            // 'refund_status_close' => $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUNDCLOSED']),
             'order_status_quote' => $this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE']),
             'bills' => $bills,
             'deliveries' => $this->deliveryRepo->findByBillStatus(['order' => $order, 'status' => 'STATUS_NOT_BILLED']),
             'info' => $infos,
             'can_open_row' => true,
-            'email_content' => file_get_contents($this->getParameter('file.setting.email') . '/' . 'facture.txt'),
+            'email_content' => file_get_contents($this->utility->getAbsoluteRootPath() . $this->getParameter('file.setting.email') . '/' . 'facture.txt'),
+        ]);
+    }
+
+    /**
+     * @Route("/admin/commande/avoir/cloture/detail/{id}", options={"expose"=true}, requirements={"id"="\d+"}, name="order_show_refund_closed")
+     */
+    public function showRefundClosed(
+        QuoteOrder $order,
+        CurrencyRepository $currRepo
+    ) {
+
+        if (!$this->securityUtility->checkHasUpdate($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
+        $bills = $this->orderManager->getHydrater()->hydrateBill($this->billRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']), $order);
+        $orderDetail = $this->orderManager->hydrateOrderDetailStats($this->orderDetailRepo->findBy(['QuoteOrder' => $order]));
+        $orderDetrailQtReceived = $this->orderManager->hydrateOrderDetailStats($this->orderDetailRepo->findByQuantityRecieved($order));
+        $roderDeliveries = $this->orderManager->getHydrater()->hydrateQuantityDelivery($this->quantityDelRepo->findByBillStatus($order), $order);
+        $CreateDeliveries = $this->deliveryRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']);
+        $infos = $this->orderManager->getCommandeInfo($orderDetail, $order);
+
+        return $this->render('order/show/show_refund_closed.html.twig', [
+            'order' => $order,
+            'currencies' => $currRepo->findAll(),
+            'taxes' => $this->tvaRepo->findAll(),
+            'order_status_quote' => $this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE']),
+            'info' => $infos,
+        ]);
+    }
+
+    /**
+     * @Route("/admin/commande/facturee/detail/{id}", options={"expose"=true}, name="order_show_order_bill", requirements={"id"="\d+"})
+    */
+    public function showOrderBilled(QuoteOrder $order, 
+                                  CurrencyRepository $currRepo,
+                                  TaxRepository $tvaRepo) {
+
+        if (!$this->securityUtility->checkHasUpdate($this->actionRepo->findOneBy(['Name' => 'ACTION_REFUND']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
+        //$order = $this->orderRepo->find($id);
+        $bills = $this->orderManager->getHydrater()->hydrateBill($this->billRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']), $order);
+        $orderDetails = $this->orderDetailRepo->findBy(['QuoteOrder' => $order]);
+        return $this->render('order/show/show_order_billed.html.twig', [
+            'status_prerefund' => $this->statusRepo->findOneBy(['Name' => 'STATUS_PREREFUND']),
+            'order_status_valid' => $this->statusRepo->findOneBy(['Name' => 'STATUS_VALID']),
+            'order_status_quote' => $this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE']),
+            'status_close' => $this->statusRepo->findOneBy(['Name' => 'STATUS_CLOSED']),
+            'bills' => $bills,
+            'order' => $order,
+            'currencies' => $currRepo->findAll(),
+            'taxes' => $tvaRepo->findAll(),
+            'info' => $this->orderManager->getCommandeInfo($orderDetails, $order),
+            'email_content' => file_get_contents($this->utility->getAbsoluteRootPath() . $this->getParameter('file.setting.email') . '/' . 'facture.txt'),
+        ]);
+    }
+
+    /**
+     * @Route("/admin/commande/avoir/facture/detail/{id}", options={"expose"=true}, name="order_show_refund_bill", requirements={"id"="\d+"})
+    */
+    public function showRefundBilled(QuoteOrder $order, 
+                                  CurrencyRepository $currRepo,
+                                  TaxRepository $tvaRepo) {
+
+        if (!$this->securityUtility->checkHasUpdate($this->actionRepo->findOneBy(['Name' => 'ACTION_REFUND']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
+        //$order = $this->orderRepo->find($id);
+        $bills = $this->orderManager->getHydrater()->hydrateBill($this->billRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']), $order);
+        $orderDetails = $this->orderDetailRepo->findBy(['QuoteOrder' => $order]);
+        return $this->render('order/show/show_refund_billed.html.twig', [
+            'order_status_refund' => $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUND']),
+            'order_status_quote' => $this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE']),
+            'order' => $order,
+            'status_close' => $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUNDCLOSED']),
+            'bills' => $bills,
+            'currencies' => $currRepo->findAll(),
+            'taxes' => $tvaRepo->findAll(),
+            'info' => $this->orderManager->getCommandeInfo($orderDetails, $order),
+            'email_content' => file_get_contents($this->utility->getAbsoluteRootPath() . $this->getParameter('file.setting.email') . '/' . 'facture.txt'),
         ]);
     }
 
@@ -406,8 +539,7 @@ class OrderController extends Controller
         $order = $this->orderRepo->find($id);
         $orderDetails = $this->orderDetailRepo->findBy(['QuoteOrder' => $order]);
         return $this->render('order/show/show_prerefund.html.twig', [
-            'order_detail_data_source' => $this->serializer->serialize(['object_array' => $this->orderManager->getHydrater()->hydrateOrderDetail($orderDetails, $order), 'format' => 'json', 'group' => 'class_property']),
-            'status_refund' => $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUND']),
+             'status_refund' => $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUND']),
             'order_status_quote' => $this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE']),
             'order' => $order,
             'currencies' => $currRepo->findAll(),
@@ -416,53 +548,13 @@ class OrderController extends Controller
         ]);
     }
 
-    /*______________________________________________________________________________________________________________________ 
-    --------------------------------------------[ Validations ]--------------------------------------------------------*/
+#endregion
 
-    /**
-     * @Route("/admin/commande/validation/{id}/{idStatus}", options={"expose"=true}, name="order_validation", requirements={"id"="\d+"})
-     */
-    public function validation(
-        int $idStatus,
-        QuoteOrder $order,
-        SettingManager $settingManager,
-        ObjectManager $manager) {
+#region [ Registrations / Validation ]
 
-        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
-            return $this->redirectToRoute('security_deny_access');
-        }
-
-        $status = $this->statusRepo->find($idStatus);
-        $order->setStatus($status);
-
-        $manager->persist($order);
-        $manager->flush();
-
-        $result = $this->checkContact($order);
-        if ($result !== true)
-            return $result;
-
-        // envoi d'un mail de prise en compte de la commande
-        if(!empty($order->getStatus()) && $order->getStatus()->getName() == 'STATUS_ORDER'){
-            $societe = $settingManager->get('SOCIETE', 'SOCIETE_NOM');            
-            
-            $event = new GenericEvent([
-                'subject' => "Validation de votre commande",
-                'to' => $order->getContact()->getEmail(),
-                'view' => $this->renderView('email/_partials/validation.html', [
-                    'contact_name' => $order->getContact()->getLastName(),
-                    'company' => $societe->getValue(),
-                    'order' => $order
-                ]),
-            ]);
-            $this->eventDispatcher->dispatch(MyEvents::ORDER_EMAIL_VALIDATION, $event);
-
-        }
-
-        return $this->getRouteFromStatus($status, $order);
-    }
-
-    /*______________________________________________________________________________________________________________________ 
+/*=====================================================================================================================================
+  ===================================================================================================================================== 
+     ______________________________________________________________________________________________________________________ 
     --------------------------------------------[ Registrations ]--------------------------------------------------------*/
 
     /**
@@ -526,8 +618,6 @@ class OrderController extends Controller
             $session->set('panier', []);
             $session->set('client', []);
 
-            $this->orderManager->loggCommandeRegisterInfo($order);
-
             return $this->RedirectToRoute('order_show_quote', ['id' => $order->getId()]);
         }
         $this->ErrorHandler->error("Veuillez renseigner un client !");
@@ -577,7 +667,62 @@ class OrderController extends Controller
 
     }
 
-    /*______________________________________________________________________________________________________________________ 
+    /**
+     * @Route("/admin/commande/validation/{id}/{idStatus}", options={"expose"=true}, name="order_validation", requirements={"id"="\d+"})
+     */
+    public function validation(
+        int $idStatus,
+        QuoteOrder $order,
+        SettingManager $settingManager,
+        ObjectManager $manager
+    ) {
+
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
+        $status = $this->statusRepo->find($idStatus);
+        if ($this->getIsCleanable($order->getStatus(), $status)) {
+            $this->clearOrder($order); 
+        }
+
+        $order->setStatus($status); 
+        $manager->persist($order);
+        $manager->flush();
+
+        if (empty($order->getContact())){
+            $this->ErrorHandler->error("Veuillez renseigner une adresse de livraison pour la pré-commande");
+            return $this->getRouteFromStatus($order);
+        }
+
+        // envoi d'un mail de prise en compte de la commande
+        if (!empty($order->getStatus()) && $order->getStatus()->getName() == 'STATUS_ORDER') {
+            $societe = $settingManager->get('SOCIETE', 'SOCIETE_NOM');
+            // dump($status);
+            // dump($order);
+            // die();
+            $event = new GenericEvent([
+                'subject' => "Validation de votre commande",
+                'to' => $order->getContact()->getEmail(),
+                'view' => $this->renderView('email/_partials/validation.html', [
+                    'contact_name' => $order->getContact()->getLastName(),
+                    'company' => $societe->getValue(),
+                    'order' => $order
+                ]),
+            ]);
+            $this->eventDispatcher->dispatch(MyEvents::ORDER_EMAIL_VALIDATION, $event);
+        }
+
+        return $this->getRouteFromStatus($order);
+    }
+
+#endregion
+
+#region [ Emails ]
+
+  /*=====================================================================================================================================
+  ===================================================================================================================================== 
+     ______________________________________________________________________________________________________________________ 
     --------------------------------------------[ email ]--------------------------------------------------------*/
 
     /**
@@ -598,12 +743,9 @@ class OrderController extends Controller
         if (!empty($contact) && !empty($contact->getEmail())) {
 
             $form = $request->request->get('order_detail_form')['setting']['email'];
-            $file = $webservice->downloadQuote($order, $this->getParameter('file.pdf.quote.download_dir'), $this->getParameter('file.type.download_quote'));
-
-            // $mailer->sendAttachedFile(['to' => $contact->getEmail()], $form['subject'], $this->renderView('email/_partials/quote.html', [
-            //     'contact_name' => $contact->getLastName(),
-            // ]), $file);
-
+            $devisFile = $webservice->downloadQuotation($order, $this->getParameter('abs.file.pdf.quote.download_dir'));
+            $cgvFile = $webservice->downloadCGV($this->getParameter('abs.file.pdf.quote.download_dir'));
+           
             $view = $this->renderView('email/_partials/quote.html', [
                 'contact_name' => $contact->getLastName(),
             ]);
@@ -611,17 +753,16 @@ class OrderController extends Controller
             $event = new GenericEvent([
                 'to' => $contact->getEmail(),
                 'form' => $form,
-                'file' => $file,
+                'files' => [$devisFile, $cgvFile],
                 'view' => $view,
             ]);
             $this->eventDispatcher->dispatch(MyEvents::ORDER_EMAIL_BILL, $event);
-
-            $this->ErrorHandler->success("Le devis devis " . basename($file) . " a été envoyé au client avec succès!");
+            $this->ErrorHandler->success("Le devis devis " . basename($devisFile) . " a été envoyé au client avec succès!");
         } else {
             $this->ErrorHandler->error("Veuillez Renseigner une adresse de livraison!");
         }
 
-        return $this->redirectToRoute('order_show', [
+        return $this->redirectToRoute('order_show_quote', [
             'id' => $order->getId()
         ]);
     }
@@ -650,7 +791,7 @@ class OrderController extends Controller
 
             $form = $request->request->get('order_detail_form')['setting']['email'];
             $bill = $billRepo->find($form['bill']);
-            $file = $webservice->downloadBill($bill, $this->getParameter('file.pdf.bill.download_dir'), $this->getParameter('file.type.download_order'), $this->getParameter('file.type.download_refund'));
+            $file = $webservice->downloadOrder($order, $bill, $this->getParameter('abs.file.pdf.bill.download_dir'));
             $view = $this->renderView('email/_partials/bill.html', [
                 'contact_name' => $contact->getLastName(),
                 'bill_id' => $setManager->get("PDF", "FACTURE_PREFIX")->getValue() . $bill->getId(),
@@ -659,7 +800,7 @@ class OrderController extends Controller
             $event = new GenericEvent([
                 'to' => $contact->getEmail(),
                 'form' => $form,
-                'file' => $file,
+                'files' => [$file],
                 'view' => $view,
             ]);
             $this->eventDispatcher->dispatch(MyEvents::ORDER_EMAIL_BILL, $event);
@@ -675,35 +816,13 @@ class OrderController extends Controller
             'id' => $order->getId()
         ]);
     }
+    #endregion 
 
-    /*______________________________________________________________________________________________________________________ 
-    --------------------------------------------[ Ajax calls ]--------------------------------------------------------*/
-
-    /**
-     * @Route("/admin/commande/recherche", options={"expose"=true}, name="order_search")
-     */
-    public function search(Request $request,
-                           ClientRepository $clientRepo,
-                           BillRepository $billRepo,
-                           AgentRepository $agentRepo)
-    {
-
-        /*if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
-            return $this->redirectToRoute('security_deny_access');
-        }*/
-        
-        $data = $this->serializer->serialize([
-            'object_array' => [
-                'data' => $this->orderManager->getHydrater()->hydrateQuoteOrder($this->orderRepo->findCustomBy($request->request->get('search'), $this->getUser()))],
-            'format' => 'json',
-            'group' => 'class_property'
-        ]);        
-
-        return new Response($data);
-    }
-
-    /*______________________________________________________________________________________________________________________ 
-    --------------------------------------------[ Savings / Cancels / PDF ]--------------------------------------------------------*/
+#region [ Savings / Cancels ]
+ /*=====================================================================================================================================
+  ===================================================================================================================================== 
+     ______________________________________________________________________________________________________________________ 
+    --------------------------------------------[ Savings / Cancels ]--------------------------------------------------------*/
 
     /**
      * @Route("/admin/commande/detail/sauvegarde/{id}", options={"expose"=true}, name="order_detail_save", requirements={"id"="\d+"})
@@ -712,41 +831,49 @@ class OrderController extends Controller
                          BillRepository $billRepo,
                          OrderStatusRepository $statusRepo,
                          Request $request,
+                         Utility $utility,
                          ObjectManager $manager) {
 
         if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
             return $this->redirectToRoute('security_deny_access');
         }
-        $form = $request->request->get('order_detail_form');
-        $this->orderManager->loggCommandeSaveInfo($order, $form);
-        $order = $this->orderManager->getHydrater()->hydrateQuoteOrderRelationFromForm($order, $form);
-        $manager->persist($order);        
-        $manager->flush();
+        try{
+            $form = $request->request->get('order_detail_form');
+            
+            $order = $this->orderManager->getHydrater()->hydrateQuoteOrderRelationFromForm($order, $form);
+            
+            /*$TotoalOrderBill = $this->orderRepo->findScalarOrderBill($order);
 
-
-        $TotoalOrderBill = $this->orderRepo->findScalarOrderBill($order);
-        $totalBilled = $billRepo->findScalarBilledOrder($order);
-
-        dump($TotoalOrderBill);
-        dump($totalBilled);die();
-
-        if($TotoalOrderBill == $totalBilled){
-            dump($TotoalOrderBill);
-            dump($totalBilled);die();
-            $status = null;
-            if($order->getStatus()->getName() == "STATUS_ORDER")
-                $status = $statusRepo->findOneBy(['Name' => 'STATUS_BILL']);
-            else if($order->getStatus()->getName() == "STATUS_REFUND")
-                $status = $statusRepo->findOneBy(['Name' => 'STATUS_REFUNDBILL']);
-
-            if(!empty($status)){
-                $order->setStatus($status);
-                $manager->persist($order);
-                $manager->flush();
+            //---- recherche le montant de la facture
+            $bills = $utility->getDistinct($billRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']));
+            $totalBilled = 0;
+            foreach ($bills as $bill) {
+                $totalBilled += $bill->getPay();
             }
+
+            //--- facturer et expedier la commande
+            if (!empty($TotoalOrderBill) && $TotoalOrderBill > 0 && $TotoalOrderBill == $totalBilled) {
+                $status = null;
+                if ($order->getStatus()->getName() == "STATUS_ORDER")
+                    $status = $statusRepo->findOneBy(['Name' => 'STATUS_BILL']);
+                else if ($order->getStatus()->getName() == "STATUS_REFUND")
+                    $status = $statusRepo->findOneBy(['Name' => 'STATUS_REFUNDBILL']);
+
+                if (!empty($status)) {
+                    $order->setStatus($status);
+                }
+            }*/
+            $manager->persist($order);
+            $manager->flush();
+            // dump($order);
+            // die();
+            $this->ErrorHandler->success("Vos données on été sauvegardées avec succès!");
+        }catch(Exception $ex){
+            $this->ErrorHandler->error("Une erreur s'est produite durant la sauvegarde de vos données!");
+            $this->ErrorHandler->error($ex->getMessage());
         }
         
-        return $this->getRouteFromStatus($order->getStatus(), $order);
+        return $this->getRouteFromStatus($order);
     }
 
     /**
@@ -852,11 +979,18 @@ class OrderController extends Controller
             $manager->persist($qtDelivery);
         }
         $bill->setPay($amount);
+        
         $manager->persist($bill);
-
         $manager->flush();
 
-        return $this->getRouteFromStatus($order->getStatus(), $order);
+        $manager->persist($order);
+        $order = $this->orderManager->setOrderbilled($order);
+        // dump($order);
+        // dump($order->getStatus());
+        $manager->flush();
+        // die();
+
+        return $this->getRouteFromStatus($order);
     }
 
     /**
@@ -873,37 +1007,36 @@ class OrderController extends Controller
         if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_BILL']))) {
             return $this->redirectToRoute('security_deny_access');
         }
-
-        $status = $delStatusRepo->findOneBy(['Name' => 'STATUS_CANCELED']);
-
-        foreach ($deliveryRepo->findByBill($bill) as $delivery) {
+        try{
+            $message = "Votre facture n°". $bill->getId()." d'un montant de ". $bill->getPay()."Eur a été supprimée avec succès!";
+            $order = $this->orderRepo->findOneByBill($bill);
+    
+            foreach ($this->orderDetailRepo->findByBill($bill) as $orderDetail) {
+    
+                $qtDelivery = $qtDeliveryRepo->findOneByOrderDetailAndBill(['order_detail' => $orderDetail, 'bill' => $bill]);
+               
+                $quantity = $qtDelivery->getQuantity();
+                $qtDel = $orderDetail->getQuantityDelivery();
+                if(!empty($qtDel))
+                    $orderDetail->setQuantityDelivery($qtDel - $quantity);
+                
+                $item = $itemRepo->findOneByOrderDetail($orderDetail);
+                $stock = $item->getStock();
+                if (!empty($stock))
+                    $item->setStock($stock + $quantity);
+                
+                $manager->persist($item);
+                $manager->persist($orderDetail);
+            }
             
-            $delivery->setStatus($status);
-            $manager->persist($delivery);
-        }
-
-        foreach ($this->orderDetailRepo->findByBill($bill) as $orderDetail) {
-
-            $qtDelivery = $qtDeliveryRepo->findOneByOrderDetailAndBill(['order_detail' => $orderDetail, 'bill' => $bill]);
-           
-            $quantity = $qtDelivery->getQuantity();
-            $qtDel = $orderDetail->getQuantityDelivery();
-            if(!empty($qtDel))
-                $orderDetail->setQuantityDelivery($qtDel - $quantity);
-            
-            $item = $itemRepo->findOneByOrderDetail($orderDetail);
-            $stock = $item->getStock();
-            if (!empty($stock))
-                $item->setStock($stock + $quantity);
-            
-            $manager->persist($item);
-            $manager->persist($orderDetail);
-        }
-
-        $manager->flush();
-
-        $order = $this->orderRepo->findOneByBill($bill);
-        return $this->getRouteFromStatus($order->getStatus(), $order);
+            $manager->flush();
+            $this->deleteBill($bill);
+            $this->ErrorHandler->success($message);
+        }catch(Exception $ex){
+            $this->ErrorHandler->error("Une erreur s'est produite lors de la suppression de votre facture!");
+        }       
+        
+        return $this->getRouteFromStatus($order);
     }
 
     /**
@@ -918,27 +1051,37 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        $orderDetail = $qtDelivery->getOrderDetail();
+        $order = null;
 
-        if (!empty($orderDetail->getQuantityDelivery()))
-            $orderDetail->setQuantityDelivery($orderDetail->getQuantityDelivery() - $qtDelivery->getQuantity());
-        else
-            $orderDetail->setQuantityDelivery(0);
+        try{
+            $message = "Votre BL n°". $qtDelivery->getId()." a été supprimé avec succès!";
+            $orderDetail = $qtDelivery->getOrderDetail();
 
-        if (!empty($orderDetail->getQuantityRecieved()))
-            $orderDetail->setQuantityRecieved($orderDetail->getQuantityRecieved() + $qtDelivery->getQuantity());
-        else
-            $orderDetail->setQuantityRecieved($qtDelivery->getQuantity());
+            if (!empty($orderDetail->getQuantityDelivery()))
+                $orderDetail->setQuantityDelivery($orderDetail->getQuantityDelivery() - $qtDelivery->getQuantity());
+            else
+                $orderDetail->setQuantityDelivery(0);
 
-        $manager->remove($qtDelivery->getDelivery());
-        $manager->remove($qtDelivery);
-        
-        $manager->persist($orderDetail);
-        
-        $manager->flush();
+            if (!empty($orderDetail->getQuantityRecieved()))
+                $orderDetail->setQuantityRecieved($orderDetail->getQuantityRecieved() + $qtDelivery->getQuantity());
+            else
+                $orderDetail->setQuantityRecieved($qtDelivery->getQuantity());
 
-        $order = $orderDetail->getQuoteOrder();
-        return $this->getRouteFromStatus($order->getStatus(), $order);
+            $delivery = $qtDelivery->getDelivery();
+            $qtDelivery->setDelivery(null);
+            $manager->remove($delivery);
+            $manager->remove($qtDelivery);
+            $manager->persist($orderDetail);
+
+            $manager->flush();
+
+            $order = $orderDetail->getQuoteOrder();
+            $this->ErrorHandler->success($message);
+        }catch(Exception $ex){
+            $this->ErrorHandler->error("Une erreur s'est produite durant la suppression de votre BL!");
+            $this->ErrorHandler->error($ex->getMessage());
+        }
+        return $this->getRouteFromStatus($order);
     }
 
     /**
@@ -953,13 +1096,26 @@ class OrderController extends Controller
         }
 
         $order = $orderDetail->getQuoteOrder();
-        $orderDetail->setQuantityRecieved(0);
+        try{
+            $orderDetail->setQuantityRecieved(0);
 
-        $manager->persist($orderDetail);
-        $manager->flush();
+            $manager->persist($orderDetail);
+            $manager->flush();
+            $this->ErrorHandler->success("La rérérence a été annullé avec succès!");
+        }catch(Exception $ex){
+            $this->ErrorHandler->error("Une erreur s'est produite durant l'annulation de la référence!");
+        }
         
-        return $this->getRouteFromStatus($order->getStatus(), $order);
+        return $this->getRouteFromStatus($order);
     }
+
+#endregion
+
+#region [ PDF ]
+ /*=====================================================================================================================================
+  ===================================================================================================================================== 
+    ______________________________________________________________________________________________________________________ 
+    --------------------------------------------[ PDF ]--------------------------------------------------------*/
 
     /**
      * @Route("/admin/commande/pdf/facture/{id}", options={"expose"=true}, name="order_pdf_bill", requirements={"id"="\d+"})
@@ -973,10 +1129,15 @@ class OrderController extends Controller
 
         $order = $this->orderRepo->findOneByBill($bill);
         $contact = $order->getContact();
-        if (!empty($contact)) {
-            return $this->file($webservice->downloadBill($bill, $this->getParameter('file.pdf.bill.download_dir'), $this->getParameter('file.type.download_order'), $this->getParameter('file.type.download_refund')));
-        } else {
-            $this->ErrorHandler->error("Veuillez Renseigner une adresse de livraison!");
+        try{
+            if (!empty($contact)) {
+                return $this->file($webservice->downloadOrder($order, $bill, $this->getParameter('abs.file.pdf.bill.download_dir')));
+            } else {
+                $this->ErrorHandler->error("Veuillez Renseigner une adresse de livraison!");
+            }
+        }catch(Exception $ex){
+            $this->ErrorHandler->error("Une erreur s'est produite durant la création du la facture!");
+            $this->ErrorHandler->error($ex->getMessage());
         }
 
         return $this->redirectToRoute('order_show', [
@@ -995,11 +1156,17 @@ class OrderController extends Controller
         }
 
         $contact =$order->getContact();
-        if(!empty($contact)){
-            return $this->file($webservice->downloadQuote($order, $this->getParameter('file.pdf.quote.download_dir'), $this->getParameter('file.type.download_quote')));   
-        }
-        else{
-            $this->ErrorHandler->error("Veuillez Renseigner une adresse de livraison!");
+       
+        try {
+            if (!empty($contact)) {
+                return $this->file($webservice->downloadQuotation($order, $this->getParameter('abs.file.pdf.quote.download_dir')));
+                //return $this->file($webservice->downloadCGV($this->getParameter('abs.file.pdf.quote.download_dir')));   
+            } else {
+                $this->ErrorHandler->error("Veuillez Renseigner une adresse de livraison!");
+            }
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la création du devis!");
+            $this->ErrorHandler->error($ex->getMessage());
         }
 
         return $this->redirectToRoute('order_show', [
@@ -1018,11 +1185,17 @@ class OrderController extends Controller
         }
 
         $order = $this->orderRepo->findOneByDelivery($delivery);
-        $contact = $order->getContact();
-        if (!empty($contact)) {            
-            return $this->file($webservice->downloadDelivery($delivery, $this->getParameter('file.pdf.delivery.download_dir')));
-        } else {
-            $this->ErrorHandler->error("Veuillez Renseigner une adresse de livraison!");
+        $contact = $order->getContact();       
+
+        try {
+            if (!empty($contact)) {
+                return $this->file($webservice->downloadDelivery($delivery, $this->getParameter('abs.file.pdf.delivery.download_dir')));
+            } else {
+                $this->ErrorHandler->error("Veuillez Renseigner une adresse de livraison!");
+            }
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la création du BL!");
+            $this->ErrorHandler->error($ex->getMessage());
         }
 
         return $this->redirectToRoute('order_show', [
@@ -1030,7 +1203,12 @@ class OrderController extends Controller
         ]);
     }
 
-    /*______________________________________________________________________________________________________________________ 
+#endregion
+
+#region [ Deletes ]
+/*=====================================================================================================================================
+  ===================================================================================================================================== 
+     ______________________________________________________________________________________________________________________ 
     --------------------------------------------[ Deletes ]--------------------------------------------------------*/
 
 
@@ -1044,30 +1222,30 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        foreach($this->orderDetailRepo->findBy(['QuoteOrder' => $order]) as $orderDetail){
+        foreach ($this->orderDetailRepo->findBy(['QuoteOrder' => $order]) as $orderDetail) {
             $qtDeliveries = $orderDetail->getQuantityDeliveries();
             $item = $orderDetail->getItem();
             $item->setIsErasable(true);
-          
-            if($qtDeliveries){
+
+            if ($qtDeliveries) {
                 foreach ($qtDeliveries as $qtDelivery) {
                     $bill = $qtDelivery->getBill();
                     if ($bill)
-                        $manager->remove($bill);
+                        $this->manager->remove($bill);
 
                     $delivery = $qtDelivery->getDelivery();
                     if ($delivery)
-                        $manager->remove($delivery);
+                        $this->manager->remove($delivery);
 
-                    $manager->remove($qtDelivery);
+                    $this->manager->remove($qtDelivery);
                 }
             }
-            $manager->persist($item);
-            $manager->remove($orderDetail);
+            $this->manager->persist($item);
+            $this->manager->remove($orderDetail);
         }
-        $manager->remove($order);
-        $manager->flush();
-        return $this->RedirectToRoute('order_home');
+        $this->manager->remove($order);
+        $this->manager->flush();
+        return $this->getRouteFromStatus($order, false);
     }
 
     /**
@@ -1104,7 +1282,148 @@ class OrderController extends Controller
             return $this->RedirectToRoute('order_show_quote', ['id' => $order->getId()]);
     }
 
-    /*_____________________________________________[ Ajax/Data ]_________________________ */
+    #endregion
+
+#region [ Ajax/Data ]
+  /*=====================================================================================================================================
+  ===================================================================================================================================== 
+     ______________________________________________________________________________________________________________________ 
+    --------------------------------------------[ Ajax/Data ]--------------------------------------------------------*/
+
+    #region [ show details ]
+
+    /**
+     * @Route("/admin/commande/detail/{id}/donnee", options={"expose"=true}, name="order_data_detail")
+     */
+    public function dataOrderDetails(QuoteOrder $order)
+    {
+
+        /*if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }*/
+
+        $data = $this->serializer->serialize([
+            'object_array' => [
+                'data' => $this->orderManager->hydrateOrderDetailStats($this->orderDetailRepo->findBy(['QuoteOrder' => $order]))
+            ],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]);
+
+        return new Response($data);
+    }
+
+    /**
+     * @Route("/admin/commande/detail/creation/bl/{id}/donnee", options={"expose"=true}, name="order_data_delivery_processing_receipt")
+     */
+    public function dataDeliveryProcessingReceipt(QuoteOrder $order)
+    {
+
+        /*if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }*/
+
+        $data = $this->serializer->serialize([
+            'object_array' => [
+                'data' => $this->orderManager->hydrateOrderDetailStats($this->orderDetailRepo->findByQuantityRecieved($order))
+            ],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]);
+
+        return new Response($data);
+    }
+
+    /**
+     * @Route("/admin/commande/detail/creation/facture/{id}/donnee", options={"expose"=true}, name="order_data_bill_processing_receipt")
+     */
+    public function dataBillProcessingReceipt(QuoteOrder $order)
+    {
+
+        /*if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }*/
+
+        $data = $this->serializer->serialize([
+            'object_array' => [
+                'data' => $this->orderManager->getHydrater()->hydrateQuantityDelivery($this->quantityDelRepo->findByBillStatus($order), $order)
+            ],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]);
+
+        return new Response($data);
+    }
+    
+    /**
+     * @Route("/admin/commande/detail/bl/{id}/donnee", options={"expose"=true}, name="order_data_delivery_receipt")
+     */
+    public function dataDeliveryReceipt(QuoteOrder $order)
+    {
+
+        /*if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }*/
+
+        $data = $this->serializer->serialize([
+            'object_array' => [
+                'data' => $this->deliveryRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED'])
+            ],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]);
+
+        return new Response($data);
+    }
+
+    /**
+     * @Route("/admin/commande/detail/facture/{id}/donnee", options={"expose"=true}, name="order_data_bill_receipt")
+     */
+    public function dataBillReceipt(QuoteOrder $order) {
+
+        /*if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }*/
+
+        $data = $this->serializer->serialize([
+            'object_array' => [
+                'data' => $this->orderManager->getHydrater()->hydrateBill($this->billRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']), $order)
+            ],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]);
+
+        return new Response($data);
+    }
+
+    #endregion
+
+    #region [ listes ]
+
+    /**
+     * @Route("/admin/commande/recherche", options={"expose"=true}, name="order_search")
+     */
+    public function dataSearch(
+        Request $request,
+        ClientRepository $clientRepo,
+        BillRepository $billRepo,
+        AgentRepository $agentRepo
+    ) {
+
+        /*if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }*/
+
+        $data = $this->serializer->serialize([
+            'object_array' => [
+                'data' => $this->orderManager->getHydrater()->hydrateQuoteOrder($this->orderRepo->findCustomBy($request->request->get('search'), $this->getUser()))
+            ],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]);
+
+        return new Response($data);
+    }
 
     /**
      * @Route("/admin/commande/donnee", options={"expose"=true}, name="order_data")
@@ -1305,62 +1624,137 @@ class OrderController extends Controller
         ]));
     }
 
-    /*_____________________________________________[ private ]_________________________ */
+    #endregion
 
-    private function getRouteFromStatus(OrderStatus $status, $order){
+#endregion
+
+#region [ Private ]
+
+ /*=====================================================================================================================================
+  ===================================================================================================================================== 
+     ______________________________________________________________________________________________________________________ 
+      --------------------------------------------[ Private ]--------------------------------------------------------*/
+
+    private function getRouteFromStatus($order, bool $isShow = true){
         
-        switch ($status->getName()) {
-            case 'STATUS_REFUND':
-                return $this->redirectToRoute('order_show_refund', ['id' => $order->getId()]);
-            case 'STATUS_VALID':
-                return $this->redirectToRoute('order_show_valid', ['id' => $order->getId()]);
-            case 'STATUS_ORDER':
-                return $this->redirectToRoute('order_show', ['id' => $order->getId()]);
-            case 'STATUS_PREREFUND':
-                return $this->redirectToRoute('order_show_prerefund', ['id' => $order->getId()]);
-            case 'STATUS_PREORDER':
-                return $this->redirectToRoute('order_show_preorder', ['id' => $order->getId()]);
-            case 'STATUS_QUOTE':
-                return $this->redirectToRoute('order_show_quote', ['id' => $order->getId()]);
+        try{
+            switch ($order->getStatus()->getName()) {
+                case 'STATUS_REFUND':
+                    if ($isShow)
+                        return $this->redirectToRoute('order_show_refund', ['id' => $order->getId()]);
+                    return $this->redirectToRoute('order_refund');
+                case 'STATUS_VALID':
+                    if ($isShow)
+                        return $this->redirectToRoute('order_show_valid', ['id' => $order->getId()]);
+                    return $this->redirectToRoute('order_customer_valid');
+                case 'STATUS_ORDER':
+                    if ($isShow)
+                        return $this->redirectToRoute('order_show', ['id' => $order->getId()]);
+                    return $this->redirectToRoute('order_home');
+                case 'STATUS_PREREFUND':
+                    if ($isShow)
+                        return $this->redirectToRoute('order_show_prerefund', ['id' => $order->getId()]);
+                    return $this->redirectToRoute('order_prerefund');
+                case 'STATUS_PREORDER':
+                    if ($isShow)
+                        return $this->redirectToRoute('order_show_preorder', ['id' => $order->getId()]);
+                    return $this->redirectToRoute('order_preorder');
+                case 'STATUS_REFUNDCLOSED':
+                    if ($isShow)
+                        return $this->redirectToRoute('order_show_refund_closed', ['id' => $order->getId()]);
+                    return $this->redirectToRoute('order_refund_closed');
+                case 'STATUS_CLOSED':
+                    if ($isShow)
+                        return $this->redirectToRoute('order_show_closed', ['id' => $order->getId()]);
+                    return $this->redirectToRoute('order_closed');
+                case 'STATUS_QUOTE':
+                    if ($isShow)
+                        return $this->redirectToRoute('order_show_quote', ['id' => $order->getId()]);
+                    return $this->redirectToRoute('order_quote');
+                case 'STATUS_BILL':
+                    if ($isShow)
+                        return $this->redirectToRoute('order_show_order_bill', ['id' => $order->getId()]);
+                    return $this->redirectToRoute('order_bill');
+                case 'STATUS_REFUNDBILL':
+                    if ($isShow)
+                        return $this->redirectToRoute('order_show_refund_bill', ['id' => $order->getId()]);
+                    return $this->redirectToRoute('order_bill_refund');
+            }
+        }
+        catch(Exception $ex){
+            $this->ErrorHandler->error("Une erreur s'est produite durant l'opération!");
+            $this->ErrorHandler->error($ex->getMessage());
         }
 
         return $this->redirectToRoute('order_home');
     }
 
-    private function checkContact(QuoteOrder $order){
-        //dump();die();
-        if (empty($order->getContact())) {
-            $myRoute = null;
-            $message = "";
-            switch ($order->getStatus()->getName()) {
-                case 'STATUS_REFUND':
-                case 'STATUS_VALID':
-                case 'STATUS_ORDER':
-                    $myRoute = 'order_show';
-                    $message = "Veuillez renseigner une adresse de livraison!";
-                case 'STATUS_PREREFUND':
-                    $myRoute = 'order_show_prerefund';
-                    $message = "Veuillez renseigner une adresse de livraison pour le pré-avoir";
-                case 'STATUS_PREORDER':
-                    $myRoute = 'order_show_preorder';
-                    $message = "Veuillez renseigner une adresse de livraison pour la pré-commande";
-                case 'STATUS_QUOTE':
-                    $myRoute = 'order_show_quote';
-                    $message = "Veuillez renseigner une adresse de livraison pour le devis";
+    private function deleteBill($bill){
+        $qtDeliveries = $this->qtDelRepo->findByBill($bill);
+        if ($qtDeliveries) {
+            foreach ($qtDeliveries as $qtDelivery) {
+                $bill = $qtDelivery->getBill();
+                if ($bill)
+                    $this->manager->remove($bill);
+
+                $delivery = $qtDelivery->getDelivery();
+                if ($delivery)
+                    $this->manager->remove($delivery);
+                
+                $this->manager->remove($qtDelivery);
+                /*dump($qtDelivery);
+                die();*/
             }
-            $this->ErrorHandler->error($message);
-            if(!empty($myRoute)){
-                return $this->redirectToRoute($myRoute, [
-                    'id' => $order->getId()
-                ]);
-            }
-            else
-                $this->orderManager->loggCommandeErr($order, "La route retour apres le check du contact n'a pas pu être trouvée!");
-            
+            $this->manager->flush();
         }
-        return true;
     }
 
+    private function clearOrder(QuoteOrder $order){        
+        try{
+            foreach ($this->orderDetailRepo->findBy(['QuoteOrder' => $order]) as $orderDetail) {
+                $qtDeliveries = $orderDetail->getQuantityDeliveries();
+                //$item = $orderDetail->getItem();
+                //$item->setIsErasable(true);
+
+                if ($qtDeliveries) {
+                    foreach ($qtDeliveries as $qtDelivery) {
+                        $bill = $qtDelivery->getBill();
+                        if ($bill)
+                            $this->manager->remove($bill);
+
+                        $delivery = $qtDelivery->getDelivery();
+                        if ($delivery)
+                            $this->manager->remove($delivery);
+
+                        $this->manager->remove($qtDelivery);
+                    }
+                }
+                $orderDetail->setQuantityDelivery(0);
+                $orderDetail->setQuantityRecieved(0);
+                $this->manager->persist($orderDetail);
+            }
+            $this->manager->flush();
+        }catch(Exception $ex){
+            $this->ErrorHandler->error("Une erreur s'est produite durant la manipulation de la commande #". $order->getId());
+        }
+        
+    }
+
+    private function getIsCleanable(OrderStatus $statusFrom, OrderStatus $statusTo){
+        $statusArray = [
+            "STATUS_ORDER", 
+            "STATUS_CLOSED", 
+            "STATUS_BILL",
+            "STATUS_REFUND", 
+            "STATUS_REFUNDCLOSED", 
+            "STATUS_REFUNDBILL",
+        ];
+        if (in_array($statusFrom->getName(), $statusArray) && !in_array($statusTo->getName(), $statusArray)) {
+            return true;
+        }
+        return false;
+    }
+#endregion
 
 
 

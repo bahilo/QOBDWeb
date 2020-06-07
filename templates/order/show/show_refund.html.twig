@@ -84,49 +84,6 @@
 </div>
 {% endblock %}
 
-{% block email_area %}
-<!-- Email devis -->
-<form action="{{ path("order_email_bill",{id: order.id }) }}" method="post">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <i class="fa fa-align-justify"></i> Email
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-12">
-
-                            <div class="form-group">
-                                <label for="emailSubject">Object</label>
-                                <input type="text" name="order_detail_form[setting][email][subject]" id="emailSubject"
-                                    class="form-control"
-                                    value="** {{ search.get_setting("SOCIETE","SOCIETE_NOM").value }} Votre Avoir **">
-                            </div>
-                            <div class="form-group">
-                                <label for="emailBody">Message</label>
-                                <textarea name="order_detail_form[setting][email][body]" id="" cols="30" rows="10"
-                                    class="form-control">{{ email_content }}</textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="emailBody">Avoirs</label>
-                                <select name="order_detail_form[setting][email][bill]" class="form-control">
-                                    {% for bill in bills %}
-                                    <option value="{{ bill.id }}">
-                                        {{ search.get_setting("PDF","FACTURE_PREFIX").value ~ bill.id }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <input type="submit" value="Envoyer" class="btn btn-primary">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</form>
-{% endblock %}
-
 
 {# Creation bon de livraison #}
 {% block delivery_recipt_creation_area %}
@@ -223,7 +180,52 @@
 </div>
 {% endblock %}
 
-{# Cloture commande #}
+{# Email #}
+{% block email_area %}
+{% if bills is defined and bills | length > 0 %}
+<form action="{{ path("order_email_bill",{id: order.id }) }}" method="post">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa fa-align-justify"></i> Email
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+
+                            <div class="form-group">
+                                <label for="emailSubject">Object</label>
+                                <input type="text" name="order_detail_form[setting][email][subject]" id="emailSubject"
+                                    class="form-control"
+                                    value="** {{ search.get_setting("SOCIETE","SOCIETE_NOM").value }} Votre Avoir **">
+                            </div>
+                            <div class="form-group">
+                                <label for="emailBody">Message</label>
+                                <textarea name="order_detail_form[setting][email][body]" id="" cols="30" rows="10"
+                                    class="form-control">{{ email_content }}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="emailBody">Avoirs</label>
+                                <select name="order_detail_form[setting][email][bill]" class="form-control">
+                                    {% for bill in bills %}
+                                    <option value="{{ bill.id }}">
+                                        {{ search.get_setting("PDF","FACTURE_PREFIX").value ~ bill.id }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <input type="submit" value="Envoyer" class="btn btn-primary">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endif %}
+{% endblock %}
+
+{# Cloture devis #}
 {% block close_btn_area %}
 {% if bills | length > 0 %}
 <div class="row">

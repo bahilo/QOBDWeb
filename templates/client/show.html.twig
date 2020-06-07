@@ -138,7 +138,7 @@
                                     <div class="form-group row">
                                         <label class="col-md-3 col-form-label">Delais Max</label>
                                         <div class="col-md-9">
-                                            <strong><label class="col-form-label">{{ client.PayDelay | date("d/m/Y") }}</label></strong>
+                                            <strong><label class="col-form-label">{{ "now" | date_modify("+" ~ client.PayDelay ~ "day") | date("d/m/Y") }}</label></strong>
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -223,6 +223,19 @@
     <!-- <input type="hidden" id="contact_data_source" value="{#{ contact_data_source }#}"> -->
     <input type="hidden" id="client_id" value="{{ client.id }}">
 {% endblock %}
+
+{% block access_pool %}
+<div class="access_pool">
+    <input type="hidden" id="is_read" value="{{ search.get_right_read("ACTION_CLIENT") }}" />
+    <input type="hidden" id="is_quote_write" value="{{ search.get_right_write("ACTION_QUOTE") }}" />
+    <input type="hidden" id="is_write" value="{{ search.get_right_write("ACTION_CLIENT") }}" />
+    <input type="hidden" id="is_update" value="{{ search.get_right_update("ACTION_CLIENT") }}" />
+    <input type="hidden" id="is_delete" value="{{ search.get_right_delete("ACTION_CLIENT") }}" />
+    <input type="hidden" id="is_mail" value="{{ search.get_right_email("ACTION_CLIENT") }}" />
+    <input type="hidden" id="is_admin" value="{{ search.get_right_admin() }}" />
+</div>
+{% endblock %}
+
 {% block javascripts %}
 <script src="{{  asset('js/client.js','theme_default') }}"></script>
 {% endblock %}

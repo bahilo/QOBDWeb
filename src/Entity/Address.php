@@ -5,6 +5,9 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+use JMS\Serializer\Annotation\SerializedName;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\AddressRepository")
@@ -15,11 +18,15 @@ class Address
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"class_property"})
+     * @SerializedName("id")
      */
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("AddressName")
      */
     private $Name;
 
@@ -30,26 +37,39 @@ class Address
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message = "La ville ne peux pas être vide")
+     * @Groups({"class_property"})
+     * @SerializedName("City") 
      */
     private $City;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message = "La rue ne peux pas être vide")
+     * @Groups({"class_property"})
+     * @SerializedName("Street") 
      */
     private $Street;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message = "Le code postal ne peux pas être vide")
+     * @Groups({"class_property"})
+     * @SerializedName("ZipCode") 
      */
     private $ZipCode;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message = "Le pays ne peux pas être vide")
+     * @Groups({"class_property"})
+     * @SerializedName("Country") 
      */
     private $Country;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Comment", inversedBy="address", cascade={"persist", "remove"})
+     * @SerializedName("Country") 
      */
     private $Comment;
     

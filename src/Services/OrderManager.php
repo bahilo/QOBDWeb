@@ -86,15 +86,17 @@ class OrderManager{
             /** @var QuoteOrder */
             $order = $orderDetails[0]->getQuoteOrder();
             $currencyValue = ($order->getCurrency() && !empty($order->getCurrency()->getRate()) ) ? $order->getCurrency()->getRate() : 1;
-
             try{
                 /** @var QuoteOrderDetail */
                 foreach ($orderDetails as $orderDetail) {
                    
                     $qt = $orderDetail->getQuantity();
-                    $pa = $orderDetail->getItemPurchasePrice();
+                    $pa = $orderDetail->getItem()->getPurchasePrice();
                     $pv = $orderDetail->getItemSellPrice();
 
+                    if ($pv == 0)
+                        throw new Exception('Votre liste de produits contient un produit avec un prix de vente à 0!');
+                   
                     $total_HT = $pv * $qt;
                     $marge_perc = $pv > 0 ?  ($pv - $pa) / $pv * 100 : 0;
                     $marge_amount = $pv - $pa;
@@ -124,17 +126,15 @@ class OrderManager{
 
                     $output['total_HT'] = round($output['total_HT'] * $currencyValue, 2);
                     $output['total_TTC'] = round($output['total_TTC'] * $currencyValue, 2);
-                    $output['marge_perc'] = round(($output['total_PV'] - $output['total_PA']) / $output['total_PV']*100, 2);
+                    $output['marge_perc'] = round((($output['total_PV'] - $output['total_PA']) / $output['total_PV'])*100, 2);
                     $output['marge_amount'] = round(($output['total_PV'] - $output['total_PA']) * $currencyValue, 2);
                     $output['VAT_amount'] = round($output['VAT_amount'] * $currencyValue, 2);
-                }
-
-                if($pv == 0)
-                throw new Exception('Division par zéro.');
+                }                
 
             }catch(Exception $ex){
                 if($ex->getMessage() == 'Division par zéro.'){
-                    $this->errorHandler->error("Veuillez verifier la liste de vos produits, car une référence possède un prix de vente à 0!");                
+                    $this->errorHandler->error("Une erreur s'est produite durant l'exécution de votre requête!");                
+                    $this->errorHandler->error($ex->getMessage());                
                 }
                 else
                     $this->errorHandler->error($ex->getMessage());

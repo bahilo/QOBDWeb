@@ -284,11 +284,6 @@ class OrderController extends Controller
         $infos = $this->orderManager->getCommandeInfo($orderDetail, $order);
         
         return $this->render('order/show/show_order.html.twig', [
-            //'order_detail_data_source' => $this->serializer->serialize(['object_array' => $orderDetail, 'format' => 'json', 'group' => 'class_property']),
-            //'order_detail_delivery_data_source' => $this->serializer->serialize(['object_array' => $orderDetrailQtReceived, 'format' => 'json', 'group' => 'class_property']),
-            //'order_detail_bill_data_source' => $this->serializer->serialize(['object_array' => $roderDeliveries, 'format' => 'json', 'group' => 'class_property']),
-            //'bill_data_source' => $this->serializer->serialize(['object_array' => $bills, 'format' => 'json', 'group' => 'class_property']),
-            //'delivery_data_source' => $this->serializer->serialize(['object_array' => $CreateDeliveries, 'format' => 'json', 'group' => 'class_property']),
             'count_delivery_processing' => count($this->orderDetailRepo->findByQuantityRecieved($order)),
             'count_bill_processing' => count($this->quantityDelRepo->findByBillStatus($order)),
             'order' => $order,
@@ -302,7 +297,7 @@ class OrderController extends Controller
             'deliveries' => $this->deliveryRepo->findByBillStatus(['order' => $order, 'status' => 'STATUS_NOT_BILLED']),
             'info' => $infos,
             'can_open_row' => true,
-            'email_content' => file_get_contents($this->utility->getAbsoluteRootPath(). $this->getParameter('file.setting.email') . '/' . 'facture.txt'),
+            'email_content' => file_get_contents($this->utility->getAbsoluteRootPath() . '/'. $this->getParameter('file.setting.email') . '/' . 'facture.txt'),
         ]);
     }
 
@@ -351,7 +346,7 @@ class OrderController extends Controller
             'currencies' => $currRepo->findAll(),
             'taxes' => $tvaRepo->findAll(),
             'info' => $this->orderManager->getCommandeInfo($orderDetails, $order),
-            'email_content' => file_get_contents($this->utility->getAbsoluteRootPath() . $this->getParameter('file.setting.email') . '/' . 'devis.txt'),
+            'email_content' => file_get_contents($this->utility->getAbsoluteRootPath().'/' . $this->getParameter('file.setting.email') . '/' . 'devis.txt'),
         ]);
     }
 
@@ -398,6 +393,7 @@ class OrderController extends Controller
             'currencies' => $currRepo->findAll(),
             'taxes' => $tvaRepo->findAll(),
             'info' => $this->orderManager->getCommandeInfo($orderDetails, $order),
+            'email_content' => file_get_contents($this->utility->getAbsoluteRootPath() . '/' . $this->getParameter('file.setting.email') . '/' . 'devis.txt'),
         ]);
     }
 
@@ -438,7 +434,7 @@ class OrderController extends Controller
             'deliveries' => $this->deliveryRepo->findByBillStatus(['order' => $order, 'status' => 'STATUS_NOT_BILLED']),
             'info' => $infos,
             'can_open_row' => true,
-            'email_content' => file_get_contents($this->utility->getAbsoluteRootPath() . $this->getParameter('file.setting.email') . '/' . 'facture.txt'),
+            'email_content' => file_get_contents($this->utility->getAbsoluteRootPath() . '/' . $this->getParameter('file.setting.email') . '/' . 'facture.txt'),
         ]);
     }
 
@@ -494,7 +490,7 @@ class OrderController extends Controller
             'currencies' => $currRepo->findAll(),
             'taxes' => $tvaRepo->findAll(),
             'info' => $this->orderManager->getCommandeInfo($orderDetails, $order),
-            'email_content' => file_get_contents($this->utility->getAbsoluteRootPath() . $this->getParameter('file.setting.email') . '/' . 'facture.txt'),
+            'email_content' => file_get_contents($this->utility->getAbsoluteRootPath() . '/' . $this->getParameter('file.setting.email') . '/' . 'facture.txt'),
         ]);
     }
 
@@ -521,7 +517,7 @@ class OrderController extends Controller
             'currencies' => $currRepo->findAll(),
             'taxes' => $tvaRepo->findAll(),
             'info' => $this->orderManager->getCommandeInfo($orderDetails, $order),
-            'email_content' => file_get_contents($this->utility->getAbsoluteRootPath() . $this->getParameter('file.setting.email') . '/' . 'facture.txt'),
+            'email_content' => file_get_contents($this->utility->getAbsoluteRootPath() . '/' . $this->getParameter('file.setting.email') . '/' . 'facture.txt'),
         ]);
     }
 
@@ -573,54 +569,59 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        $clientSession = $session->get('client', []);
-        $panier = $session->get('panier', []);
-        $user = $security->getUser();
+        try{
+            $clientSession = $session->get('client', []);
+            $panier = $session->get('panier', []);
+            $user = $security->getUser();
 
-        if (count($clientSession) > 0 && count($panier) > 0 && $user) {
+            if (count($clientSession) > 0 && count($panier) > 0 && $user) {
 
-            $client = $clientRepo->find($clientSession['id']);
-            $status = $this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE']);
-            $tax = $taxRepo->findOneBy(['IsCurrent' => true]);
-            $currency = $currencyRepo->findOneBy(['IsDefault' => true]);
-            $order = new QuoteOrder();
+                $client = $clientRepo->find($clientSession['id']);
+                $status = $this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE']);
+                $tax = $taxRepo->findOneBy(['IsCurrent' => true]);
+                $currency = $currencyRepo->findOneBy(['IsDefault' => true]);
+                $order = new QuoteOrder();
 
-            if(!empty($tax))
-                $order->setTax($tax);
+                if(!empty($tax))
+                    $order->setTax($tax);
 
-            if(!empty($currency))
-                $order->setCurrency($currency);
+                if(!empty($currency))
+                    $order->setCurrency($currency);
 
-            $order->setCreatedAt(new \DateTime());
-            $order->setIsRefVisible(false);
-            $order->setStatus($status);
-            $order->setClient($client);
-            $order->setAgent($user);
+                $order->setCreatedAt(new \DateTime());
+                $order->setIsRefVisible(false);
+                $order->setStatus($status);
+                $order->setClient($client);
+                $order->setAgent($user);
 
-            foreach ($panier as $id => $quantity) {
-                $orderDetail = new QuoteOrderDetail();
-                $item = $itemRepo->find($id);
-                $item->setIsErasable(false);
-                $orderDetail->setItem($item);
-                $orderDetail->setQuantity($quantity);
-                $orderDetail->setItemSellPrice(0);
+                foreach ($panier as $id => $quantity) {
+                    $orderDetail = new QuoteOrderDetail();
+                    $item = $itemRepo->find($id);
+                    $item->setIsErasable(false);
+                    $orderDetail->setItem($item);
+                    $orderDetail->setQuantity($quantity);
+                    $orderDetail->setItemSellPrice(0);
 
-                $orderDetail->setQuoteOrder($order);
+                    $orderDetail->setQuoteOrder($order);
 
-                $manager->persist($order);
-                $manager->persist($item);
-                $manager->persist($orderDetail);
-                
+                    $manager->persist($order);
+                    $manager->persist($item);
+                    $manager->persist($orderDetail);
+                    
+                }
+
+                $manager->flush();
+
+                $session->set('panier', []);
+                $session->set('client', []);
+
+                return $this->RedirectToRoute('order_show_quote', ['id' => $order->getId()]);
             }
-
-            $manager->flush();
-
-            $session->set('panier', []);
-            $session->set('client', []);
-
-            return $this->RedirectToRoute('order_show_quote', ['id' => $order->getId()]);
+            $this->ErrorHandler->error("Veuillez renseigner un client !");
+        }catch(Exception $ex){
+            $this->ErrorHandler->error("Une erreur s'est produite durant la sauvegarde de vos données!");
+            $this->ErrorHandler->error($ex->getMessage());
         }
-        $this->ErrorHandler->error("Veuillez renseigner un client !");
         return $this->RedirectToRoute('cart_home');
     }
 
@@ -633,30 +634,35 @@ class OrderController extends Controller
                                    QuoteOrderDetailRepository $orderDetailRepo,
                                    ObjectManager $manager){
 
-        $panier = $session->get('panier', []);
-        if(count($panier) > 0){
-            
-            foreach ($panier as $id => $quantity) {
-                $item = $itemRepo->find($id);
-                $orderDetail = $orderDetailRepo->findOneBy(['QuoteOrder' => $order, 'Item' => $item]);
-                if(empty($orderDetail)){
-                    $orderDetail = new QuoteOrderDetail();
-                    $item->setIsErasable(false);
-                    $orderDetail->setItem($item);
-                    $orderDetail->setQuantity($quantity);
-                    $orderDetail->setItemSellPrice(0);
-    
-                    $orderDetail->setQuoteOrder($order);
-    
-                    $manager->persist($order);
-                    $manager->persist($item);
-                    $manager->persist($orderDetail);
-                }
-            }   
-            $manager->flush();         
-        }
-        else{
-            $this->ErrorHandler->info("Votre panier est vide");
+        try{
+            $panier = $session->get('panier', []);
+            if(count($panier) > 0){
+                
+                foreach ($panier as $id => $quantity) {
+                    $item = $itemRepo->find($id);
+                    $orderDetail = $orderDetailRepo->findOneBy(['QuoteOrder' => $order, 'Item' => $item]);
+                    if(empty($orderDetail)){
+                        $orderDetail = new QuoteOrderDetail();
+                        $item->setIsErasable(false);
+                        $orderDetail->setItem($item);
+                        $orderDetail->setQuantity($quantity);
+                        $orderDetail->setItemSellPrice(0);
+        
+                        $orderDetail->setQuoteOrder($order);
+        
+                        $manager->persist($order);
+                        $manager->persist($item);
+                        $manager->persist($orderDetail);
+                    }
+                }   
+                $manager->flush();         
+            }
+            else{
+                $this->ErrorHandler->info("Votre panier est vide");
+            }
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant l'ajout d'un produit dans le devis!");
+            $this->ErrorHandler->error($ex->getMessage());
         }
 
         $session->set('panier', []);
@@ -681,38 +687,42 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        $status = $this->statusRepo->find($idStatus);
-        if ($this->getIsCleanable($order->getStatus(), $status)) {
-            $this->clearOrder($order); 
+        try{
+            $status = $this->statusRepo->find($idStatus);
+            if ($this->getIsCleanable($order->getStatus(), $status)) {
+                $this->clearOrder($order); 
+            }
+
+            $order->setStatus($status); 
+            $manager->persist($order);
+            $manager->flush();
+
+            if (empty($order->getContact())){
+                $this->ErrorHandler->error("Veuillez renseigner une adresse de livraison pour la pré-commande");
+                return $this->getRouteFromStatus($order);
+            }
+
+            // envoi d'un mail de prise en compte de la commande
+            if (!empty($order->getStatus()) && $order->getStatus()->getName() == 'STATUS_ORDER') {
+                $societe = $settingManager->get('SOCIETE', 'SOCIETE_NOM');
+                // dump($status);
+                // dump($order);
+                // die();
+                $event = new GenericEvent([
+                    'subject' => "Validation de votre commande",
+                    'to' => $order->getContact()->getEmail(),
+                    'view' => $this->renderView('email/_partials/validation.html', [
+                        'contact_name' => $order->getContact()->getLastName(),
+                        'company' => $societe->getValue(),
+                        'order' => $order
+                    ]),
+                ]);
+                $this->eventDispatcher->dispatch(MyEvents::ORDER_EMAIL_VALIDATION, $event);
+            }
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la modification du statut!");
+            $this->ErrorHandler->error($ex->getMessage());
         }
-
-        $order->setStatus($status); 
-        $manager->persist($order);
-        $manager->flush();
-
-        if (empty($order->getContact())){
-            $this->ErrorHandler->error("Veuillez renseigner une adresse de livraison pour la pré-commande");
-            return $this->getRouteFromStatus($order);
-        }
-
-        // envoi d'un mail de prise en compte de la commande
-        if (!empty($order->getStatus()) && $order->getStatus()->getName() == 'STATUS_ORDER') {
-            $societe = $settingManager->get('SOCIETE', 'SOCIETE_NOM');
-            // dump($status);
-            // dump($order);
-            // die();
-            $event = new GenericEvent([
-                'subject' => "Validation de votre commande",
-                'to' => $order->getContact()->getEmail(),
-                'view' => $this->renderView('email/_partials/validation.html', [
-                    'contact_name' => $order->getContact()->getLastName(),
-                    'company' => $societe->getValue(),
-                    'order' => $order
-                ]),
-            ]);
-            $this->eventDispatcher->dispatch(MyEvents::ORDER_EMAIL_VALIDATION, $event);
-        }
-
         return $this->getRouteFromStatus($order);
     }
 
@@ -738,30 +748,34 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        $contact = $order->getContact();
+        try{
+            $contact = $order->getContact();
 
-        if (!empty($contact) && !empty($contact->getEmail())) {
+            if (!empty($contact) && !empty($contact->getEmail())) {
 
-            $form = $request->request->get('order_detail_form')['setting']['email'];
-            $devisFile = $webservice->downloadQuotation($order, $this->getParameter('abs.file.pdf.quote.download_dir'));
-            $cgvFile = $webservice->downloadCGV($this->getParameter('abs.file.pdf.quote.download_dir'));
-           
-            $view = $this->renderView('email/_partials/quote.html', [
-                'contact_name' => $contact->getLastName(),
-            ]);
+                $form = $request->request->get('order_detail_form')['setting']['email'];
+                $devisFile = $webservice->downloadQuotation($order, $this->getParameter('abs.file.pdf.quote.download_dir'));
+                $cgvFile = $webservice->downloadCGV($this->getParameter('abs.file.pdf.quote.download_dir'));
+            
+                $view = $this->renderView('email/_partials/quote.html', [
+                    'contact_name' => $contact->getLastName(),
+                ]);
 
-            $event = new GenericEvent([
-                'to' => $contact->getEmail(),
-                'form' => $form,
-                'files' => [$devisFile, $cgvFile],
-                'view' => $view,
-            ]);
-            $this->eventDispatcher->dispatch(MyEvents::ORDER_EMAIL_BILL, $event);
-            $this->ErrorHandler->success("Le devis devis " . basename($devisFile) . " a été envoyé au client avec succès!");
-        } else {
-            $this->ErrorHandler->error("Veuillez Renseigner une adresse de livraison!");
+                $event = new GenericEvent([
+                    'to' => $contact->getEmail(),
+                    'form' => $form,
+                    'files' => [$devisFile, $cgvFile],
+                    'view' => $view,
+                ]);
+                $this->eventDispatcher->dispatch(MyEvents::ORDER_EMAIL_BILL, $event);
+                $this->ErrorHandler->success("Le devis devis " . basename($devisFile) . " a été envoyé au client avec succès!");
+            } else {
+                $this->ErrorHandler->error("Veuillez Renseigner une adresse de livraison!");
+            }
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la création de l'email!");
+            $this->ErrorHandler->error($ex->getMessage());
         }
-
         return $this->redirectToRoute('order_show_quote', [
             'id' => $order->getId()
         ]);
@@ -785,31 +799,34 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        $contact = $order->getContact();
+        try{
+            $contact = $order->getContact();
 
-        if(!empty($contact) && !empty($contact->getEmail())){
+            if (!empty($contact) && !empty($contact->getEmail())) {
 
-            $form = $request->request->get('order_detail_form')['setting']['email'];
-            $bill = $billRepo->find($form['bill']);
-            $file = $webservice->downloadOrder($order, $bill, $this->getParameter('abs.file.pdf.bill.download_dir'));
-            $view = $this->renderView('email/_partials/bill.html', [
-                'contact_name' => $contact->getLastName(),
-                'bill_id' => $setManager->get("PDF", "FACTURE_PREFIX")->getValue() . $bill->getId(),
-            ]);
+                $form = $request->request->get('order_detail_form')['setting']['email'];
+                $bill = $billRepo->find($form['bill']);
+                $file = $webservice->downloadOrder($order, $bill, $this->getParameter('abs.file.pdf.bill.download_dir'));
+                $view = $this->renderView('email/_partials/bill.html', [
+                    'contact_name' => $contact->getLastName(),
+                    'bill_id' => $setManager->get("PDF", "FACTURE_PREFIX")->getValue() . $bill->getId(),
+                ]);
 
-            $event = new GenericEvent([
-                'to' => $contact->getEmail(),
-                'form' => $form,
-                'files' => [$file],
-                'view' => $view,
-            ]);
-            $this->eventDispatcher->dispatch(MyEvents::ORDER_EMAIL_BILL, $event);
+                $event = new GenericEvent([
+                    'to' => $contact->getEmail(),
+                    'form' => $form,
+                    'files' => [$file],
+                    'view' => $view,
+                ]);
+                $this->eventDispatcher->dispatch(MyEvents::ORDER_EMAIL_BILL, $event);
 
-            $this->ErrorHandler->success("La facture " . basename($file) . " a été envoyé au client avec succès!");
-           
-        }
-        else{
-            $this->ErrorHandler->error("Veuillez Renseigner une adresse de livraison!");            
+                $this->ErrorHandler->success("La facture " . basename($file) . " a été envoyé au client avec succès!");
+            } else {
+                $this->ErrorHandler->error("Veuillez Renseigner une adresse de livraison!");
+            }
+        }catch(Exception $ex){
+            $this->ErrorHandler->error("Une erreur s'est produite durant la création de l'email!");
+            $this->ErrorHandler->error($ex->getMessage());
         }
 
         return $this->redirectToRoute('order_show', [
@@ -838,35 +855,10 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
         try{
-            $form = $request->request->get('order_detail_form');
-            
-            $order = $this->orderManager->getHydrater()->hydrateQuoteOrderRelationFromForm($order, $form);
-            
-            /*$TotoalOrderBill = $this->orderRepo->findScalarOrderBill($order);
-
-            //---- recherche le montant de la facture
-            $bills = $utility->getDistinct($billRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']));
-            $totalBilled = 0;
-            foreach ($bills as $bill) {
-                $totalBilled += $bill->getPay();
-            }
-
-            //--- facturer et expedier la commande
-            if (!empty($TotoalOrderBill) && $TotoalOrderBill > 0 && $TotoalOrderBill == $totalBilled) {
-                $status = null;
-                if ($order->getStatus()->getName() == "STATUS_ORDER")
-                    $status = $statusRepo->findOneBy(['Name' => 'STATUS_BILL']);
-                else if ($order->getStatus()->getName() == "STATUS_REFUND")
-                    $status = $statusRepo->findOneBy(['Name' => 'STATUS_REFUNDBILL']);
-
-                if (!empty($status)) {
-                    $order->setStatus($status);
-                }
-            }*/
+            $form = $request->request->get('order_detail_form');            
+            $order = $this->orderManager->getHydrater()->hydrateQuoteOrderRelationFromForm($order, $form);            
             $manager->persist($order);
             $manager->flush();
-            // dump($order);
-            // die();
             $this->ErrorHandler->success("Vos données on été sauvegardées avec succès!");
         }catch(Exception $ex){
             $this->ErrorHandler->error("Une erreur s'est produite durant la sauvegarde de vos données!");
@@ -889,47 +881,49 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
+        try{
+            $form = $request->request->get('order_detail_form');
+            $delivery = new Delivery();       
+            $delStatus = $delStatusRepo->findOneBy(['Name' => 'STATUS_NOT_BILLED']);        
+            $delivery->setPackage($form['delivery']['package']);
+            $delivery->setCreatedAt(new \DateTime());        
+            $delivery->setStatus($delStatus); 
+            $manager->persist($delivery);  
+
+            foreach($this->orderDetailRepo->findByQuantityRecieved($order) as $orderDetail){
+
+                $qtDelivery = new QuantityDelivery();
+                $qtDelivery->setDelivery($delivery); 
+
+                $qtDel = $orderDetail->getQuantityDelivery();
+                $qtRecieved = $orderDetail->getQuantityRecieved();
+
+                if(empty($qtDel))
+                    $qtDel = 0;
+
+                if($qtRecieved)
+                    $qtDel += $qtRecieved;
+
+                $orderDetail->setQuantityDelivery($qtDel);
+                $qtDelivery->setQuantity($qtRecieved);
+                $orderDetail->setQuantityRecieved(0);
+                $orderDetail->addQuantityDelivery($qtDelivery);
+
+                $item = $itemRepo->findOneByOrderDetail($orderDetail);
+                $stock = $item->getStock();
+                if (!empty($stock))
+                    $item->setStock($stock - $qtRecieved);            
+
+                $manager->persist($item);
+                $manager->persist($qtDelivery);
+                $manager->persist($orderDetail);
+            }
+            $manager->flush();
         
-        $form = $request->request->get('order_detail_form');
-        $delivery = new Delivery();
-       
-        $delStatus = $delStatusRepo->findOneBy(['Name' => 'STATUS_NOT_BILLED']);
-        
-        $delivery->setPackage($form['delivery']['package']);
-        $delivery->setCreatedAt(new \DateTime());        
-        $delivery->setStatus($delStatus);        
-        
-        $manager->persist($delivery);  
-
-        foreach($this->orderDetailRepo->findByQuantityRecieved($order) as $orderDetail){
-
-            $qtDelivery = new QuantityDelivery();
-            $qtDelivery->setDelivery($delivery); 
-
-            $qtDel = $orderDetail->getQuantityDelivery();
-            $qtRecieved = $orderDetail->getQuantityRecieved();
-
-            if(empty($qtDel))
-                $qtDel = 0;
-
-            if($qtRecieved)
-                $qtDel += $qtRecieved;
-
-            $orderDetail->setQuantityDelivery($qtDel);
-            $qtDelivery->setQuantity($qtRecieved);
-            $orderDetail->setQuantityRecieved(0);
-            $orderDetail->addQuantityDelivery($qtDelivery);
-
-            $item = $itemRepo->findOneByOrderDetail($orderDetail);
-            $stock = $item->getStock();
-            if (!empty($stock))
-                $item->setStock($stock - $qtRecieved);            
-
-            $manager->persist($item);
-            $manager->persist($qtDelivery);
-            $manager->persist($orderDetail);
+        }catch(Exception $ex){
+            $this->ErrorHandler->error("Une erreur s'est produite durant la création du BL!");
+            $this->ErrorHandler->error($ex->getMessage());
         }
-        $manager->flush();
 
        return $this->RedirectToRoute("order_show", [
            'id' => $order->getId()
@@ -951,44 +945,46 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        $form = $request->request->get('order_detail_form');
-        $bill = new Bill();
-        
-        $status = $delStatusRepo->findOneBy(['Name' => 'STATUS_BILLED']);
-        $bill->setClient($order->getClient());
-        $bill->setCreatedAt(new \DateTime());
-        $bill->setContact($order->getContact());
-        
-        $amount = 0;
-        foreach ($form['bill']['delivery'] as $val) {
+        try{
+            $form = $request->request->get('order_detail_form');
+            $bill = new Bill();
             
-            $delivery = $deliveryRepo->find($val);
+            $status = $delStatusRepo->findOneBy(['Name' => 'STATUS_BILLED']);
+            $bill->setClient($order->getClient());
+            $bill->setCreatedAt(new \DateTime());
+            $bill->setContact($order->getContact());
             
-            foreach($this->orderDetailRepo->findByDelivery($order, $delivery) as $orderDetail){
-                $qtDelivery = $qtDelRepo->findOneByOrderDetailNotBilled($orderDetail);
+            $amount = 0;
+            foreach ($form['bill']['delivery'] as $val) {
                 
-                if($orderDetail){
-                    $amount += $qtDelivery->getQuantity() * $orderDetail->getItemSellPrice();
+                $delivery = $deliveryRepo->find($val);
+                
+                foreach($this->orderDetailRepo->findByDelivery($order, $delivery) as $orderDetail){
+                    $qtDelivery = $qtDelRepo->findOneByOrderDetailNotBilled($orderDetail);
+                    
+                    if($orderDetail){
+                        $amount += $qtDelivery->getQuantity() * $orderDetail->getItemSellPrice();
+                    }
+                    
+                    $qtDelivery->setBill($bill);
                 }
+                $delivery->setStatus($status);
                 
-                $qtDelivery->setBill($bill);
+                $manager->persist($delivery);
+                $manager->persist($qtDelivery);
             }
-            $delivery->setStatus($status);
+            $bill->setPay($amount);
             
-            $manager->persist($delivery);
-            $manager->persist($qtDelivery);
-        }
-        $bill->setPay($amount);
-        
-        $manager->persist($bill);
-        $manager->flush();
+            $manager->persist($bill);
+            $manager->flush();
 
-        $manager->persist($order);
-        $order = $this->orderManager->setOrderbilled($order);
-        // dump($order);
-        // dump($order->getStatus());
-        $manager->flush();
-        // die();
+            $manager->persist($order);
+            $order = $this->orderManager->setOrderbilled($order);
+            $manager->flush();
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la création de la facture!");
+            $this->ErrorHandler->error($ex->getMessage());
+        }
 
         return $this->getRouteFromStatus($order);
     }
@@ -1222,29 +1218,35 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        foreach ($this->orderDetailRepo->findBy(['QuoteOrder' => $order]) as $orderDetail) {
-            $qtDeliveries = $orderDetail->getQuantityDeliveries();
-            $item = $orderDetail->getItem();
-            $item->setIsErasable(true);
+        try{
+            foreach ($this->orderDetailRepo->findBy(['QuoteOrder' => $order]) as $orderDetail) {
+                $qtDeliveries = $orderDetail->getQuantityDeliveries();
+                $item = $orderDetail->getItem();
+                $item->setIsErasable(true);
 
-            if ($qtDeliveries) {
-                foreach ($qtDeliveries as $qtDelivery) {
-                    $bill = $qtDelivery->getBill();
-                    if ($bill)
-                        $this->manager->remove($bill);
+                if ($qtDeliveries) {
+                    foreach ($qtDeliveries as $qtDelivery) {
+                        $bill = $qtDelivery->getBill();
+                        if ($bill)
+                            $this->manager->remove($bill);
 
-                    $delivery = $qtDelivery->getDelivery();
-                    if ($delivery)
-                        $this->manager->remove($delivery);
+                        $delivery = $qtDelivery->getDelivery();
+                        if ($delivery)
+                            $this->manager->remove($delivery);
 
-                    $this->manager->remove($qtDelivery);
+                        $this->manager->remove($qtDelivery);
+                    }
                 }
+                $this->manager->persist($item);
+                $this->manager->remove($orderDetail);
             }
-            $this->manager->persist($item);
-            $this->manager->remove($orderDetail);
+            $this->manager->remove($order);
+            $this->manager->flush();
+        
+        }catch(Exception $ex){
+            $this->ErrorHandler->error("Une erreur s'est produite durant la suppression de la commande!");
+            $this->ErrorHandler->error($ex->getMessage());
         }
-        $this->manager->remove($order);
-        $this->manager->flush();
         return $this->getRouteFromStatus($order, false);
     }
 
@@ -1261,25 +1263,31 @@ class OrderController extends Controller
         if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_ORDER']))) {
             return $this->redirectToRoute('security_deny_access');
         }
-        //dump($order);die();
-        $item = $itemRepo->find($idItem);
-        $orderDetail = $orderDetailRepo->findOneBy(['QuoteOrder' => $order, 'Item' => $item]);
-        if (!empty($orderDetail)) {
-            $item->setIsErasable(true);
-            
-            $manager->remove($orderDetail);
-            $manager->persist($order);
-            $manager->persist($item);
-            $manager->flush();
-            $this->ErrorHandler->success("Le produit Ref. ". $item->getRef() . " a été supprimé avec succés!");
-        }
-        else
-            $this->ErrorHandler->error("Une erreur s'est produite lors la suppression du produit Ref. " . $item->getRef() . "!");
+        
+        try{
+            $item = $itemRepo->find($idItem);
+            $orderDetail = $orderDetailRepo->findOneBy(['QuoteOrder' => $order, 'Item' => $item]);
+            if (!empty($orderDetail)) {
+                $item->setIsErasable(true);
+                
+                $manager->remove($orderDetail);
+                $manager->persist($order);
+                $manager->persist($item);
+                $manager->flush();
+                $this->ErrorHandler->success("Le produit Ref. ". $item->getRef() . " a été supprimé avec succés!");
+            }
+            else
+                $this->ErrorHandler->error("Une erreur s'est produite lors la suppression du produit Ref. " . $item->getRef() . "!");
 
-        if($status == "STATUS_ORDER")
-            return $this->RedirectToRoute('order_show', ['id' => $order->getId()]);
-        else
-            return $this->RedirectToRoute('order_show_quote', ['id' => $order->getId()]);
+            if($status == "STATUS_ORDER")
+                return $this->RedirectToRoute('order_show', ['id' => $order->getId()]);
+            else
+                return $this->RedirectToRoute('order_show_quote', ['id' => $order->getId()]);
+            
+        }catch(Exception $ex){
+            $this->ErrorHandler->error("Une erreur s'est produite durant la suppression du produit!");
+            $this->ErrorHandler->error($ex->getMessage());
+        }
     }
 
     #endregion

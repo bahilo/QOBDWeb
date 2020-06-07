@@ -23,24 +23,11 @@ class ItemRegistrationType extends AbstractType
             ->add('SellPrice')
             ->add('PurchasePrice')
             ->add('Stock')
-            //->add('Imei')
             ->add('ImeiCode', ImeiCodeRegistrationType::class)
-            /*->add(
-                $builder->create('ImeiCode', EntityType::class, array('by_reference' => true))
-                ->add('Code', 'text')
-            )
-            ->add('Ean', EntityType:: class,[
-                'class' => EanCode::class,
-                'choice_label' => 'Code',
-            ])*/
-            //->add('CreatedAt')
             ->add('Comment', CommentRegistrationType::class)
             ->add('Provider')
             ->add('ItemGroupe')
             ->add('ItemBrand')
-            //->add('deliveries')
-            //->add('orders')
-            //->add('SerieCode')
             ->add('PictureFile', FileType::class, [
                 'label' => 'avatar',
 

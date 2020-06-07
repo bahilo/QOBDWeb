@@ -12,25 +12,13 @@ class ClientRegistrationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('FirstName')
-            ->add('LastName')
             ->add('CompanyName')
-            ->add('Email')
-            ->add('Phone')
-            ->add('Fax')
             ->add('Rib')
             ->add('CRN')
             ->add('PayDelay')
             ->add('MaxCredit')
             ->add('Denomination')
-            ->add('City')
-            //->add('IsProspect')
-            ->add('Street')
-            ->add('ZipCode')
-            ->add('Country')
-            ->add('ClientComment')
-            ->add('AddressComment')
-            //->add('AddressName')
+            ->add('Comment', CommentRegistrationType::class)
         ;
     }
 

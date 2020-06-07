@@ -12,16 +12,21 @@ class AddressRegistrationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('Name')
-            ->add('DisplayName')
-            ->add('City')
-            ->add('Street')
-            ->add('ZipCode')
-            ->add('Country')
-            ->add('IsPrincipal')
-            ->add('ContentComment')
-            //->add('client')
-            //->add('contact')
+            ->add('City', null, [
+                'label' => 'Ville'
+            ])
+            ->add('Street', null, [
+                'label' => 'Rue'
+            ])
+            ->add('ZipCode', null, [
+                'label' => 'Code postale'
+            ])
+            ->add('Country', null, [
+                'label' => 'Pays'
+            ])
+            ->add('Comment', CommentRegistrationType::class, [
+                'label' => false
+            ])
         ;
     }
 

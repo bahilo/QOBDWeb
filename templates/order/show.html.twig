@@ -89,6 +89,45 @@
                         </div>
                     </div>
                 </div>
+                {% endblock %}{# Commentaires #}
+                {% block comment_area %}
+                <div class="row">
+                    <div class="col-sm-6 col-md-4">
+                        <div class="card border-primary">
+                            <div class="card-header">
+                                <i class="fa fa-align-justify"></i> commentaire(interne)
+                            </div>
+                            <div class="card-body">
+                                <textarea name="order_detail_form[commentaire][prive]" id="" cols="30"
+                                    rows="10">{{ order.PrivateComment.Content| default("") }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                        <div class="card border-danger">
+                            <div class="card-header">
+                                <i class="fa fa-align-justify"></i> commentaire visible par le client
+                            </div>
+                            <div class="card-body">
+                                <textarea name="order_detail_form[commentaire][public]" id="" cols="30"
+                                    rows="10">{{ order.PublicComment.Content| default("") }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    {% if search.get_right_read("ACTION_SENSIBLE") %}
+                    <div class="col-sm-6 col-md-4">
+                        <div class="card  border-info">
+                            <div class="card-header">
+                                <i class="fa fa-align-justify"></i> commentaire admin
+                            </div>
+                            <div class="card-body">
+                                <textarea name="order_detail_form[commentaire][admin]" id=""
+                                    rows="10">{{ order.AdminComment.Content | default("") }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
                 {% endblock %}
 
                 {# Statistic #}
@@ -230,47 +269,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                {% endblock %}
-
-                {# Commentaires #}
-                {% block comment_area %}
-                <div class="row">
-                    <div class="col-sm-6 col-md-4">
-                        <div class="card border-primary">
-                            <div class="card-header">
-                                <i class="fa fa-align-justify"></i> commentaire(interne)
-                            </div>
-                            <div class="card-body">
-                                <textarea name="order_detail_form[commentaire][prive]" id="" cols="30"
-                                    rows="10">{{ order.PrivateComment.Content| default("") }}</textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-md-4">
-                        <div class="card border-danger">
-                            <div class="card-header">
-                                <i class="fa fa-align-justify"></i> commentaire visible par le client
-                            </div>
-                            <div class="card-body">
-                                <textarea name="order_detail_form[commentaire][public]" id="" cols="30"
-                                    rows="10">{{ order.PublicComment.Content| default("") }}</textarea>
-                            </div>
-                        </div>
-                    </div>
-                    {% if search.get_right_read("ACTION_SENSIBLE") %}
-                    <div class="col-sm-6 col-md-4">
-                        <div class="card  border-info">
-                            <div class="card-header">
-                                <i class="fa fa-align-justify"></i> commentaire admin
-                            </div>
-                            <div class="card-body">
-                                <textarea name="order_detail_form[commentaire][admin]" id=""
-                                    rows="10">{{ order.AdminComment.Content | default("") }}</textarea>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
                 </div>
                 {% endblock %}
 

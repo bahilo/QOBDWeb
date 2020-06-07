@@ -66,7 +66,12 @@ $(function () {
             col.push({ data: 'PurchasePrice', title: "P. Achat" });
         }        
 
-        col.push({ data: 'SellPrice', title: "P. Vente" });        
+        col.push({ data: 'SellPrice', title: "P. Vente" });
+        col.push({ data: 'Stock', title: "Stock" });
+
+        if ($('#is_quote_write', '.access_pool').length > 0 && $('#is_quote_write', '.access_pool').val()) {
+            col.push({ data: 'id', title: "Ajouter", render: Renders.renderAddCart });
+        }      
 
         col.push({
             data: 'id', title: "",
@@ -77,7 +82,6 @@ $(function () {
                 return Renders.renderControl(data, type, row, meta);
             }
         });
-        
         /*if($('#is_update','.access_pool').length > 0 && $('#is_update','.access_pool').val()){
             col.push({ data: 'id', title: "Modif.", render: Renders.renderEdit });
         }
@@ -85,27 +89,8 @@ $(function () {
             col.push({ data: 'id', title: "Supp.", render: Renders.renderDelete });
         }*/
 
-        if($('#is_quote_write','.access_pool').length > 0 && $('#is_quote_write','.access_pool').val()){
-            col.push({ data: 'id', title: "Ajouter", render: Renders.renderAddCart });
-        }
-
         return col;
     }
 
-/*================================[ Renders ]==================================*/
-
-    function renderImei(data, type, row, meta){
-        if(data){
-            return data.Code
-        }
-        return "";
-    }
-
-    function renderEAN(data, type, row, meta){
-        if (data && data.EanCode){
-            return data.EanCode.Code
-        }
-        return "";
-    }
 
 });

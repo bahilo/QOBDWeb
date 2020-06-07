@@ -315,7 +315,7 @@ $(function () {
                 initComplete: function (setting, json, api) {
                     $(api.$('td.details-control')).each(function (index) {
                         if ($("#control_can_open_row").length > 0)
-                            openTableChildRow(this, { TableApi: api, reccordRowTable: detailRows, rowFormat: format });
+                            openTableChildRow(this, { TableApi: api, reccordRowTable: detailRows, type: "detail", rowFormat: format });
                     });
                     $.fn.initEventBtnDelete();
                     $.fn.initTooltip();
@@ -471,7 +471,7 @@ $(function () {
 
         col.push({ data: 'id', title: "", visible: false });
         col.push({ data: 'IsErasable', title: "", visible: false });
-        col.push({ data: 'FullPathPicture', title: "", render: Renders.renderPictur });
+        col.push({ data: 'FullPathPicture', title: "", render: Renders.renderPicture });
         col.push({ data: 'Ref', title: "N° Serie" });
         col.push({ data: 'Name', title: "Désignation" });
         col.push({ data: 'ImeiCode', title: "EAN", render: Renders.renderEAN });
@@ -511,22 +511,21 @@ $(function () {
         
         col.push({ data: 'id', visible: false });
         col.push({ data: 'Item', visible: false });
-        col.push({ data: 'null', title: "", class: "details-control", orderable: false, defaultContent: "" });
+        if ($("#control_can_open_row").length > 0){
+            col.push({ data: 'null', title: "", class: "details-control", orderable: false, defaultContent: "" });
+        }
         col.push({ data: 'Item.Ref', title: "Ref." });
         col.push({ data: 'Item.Name', title: "Nom" });
         if($('#is_read_sensible','.access_pool').length > 0 && $('#is_read_sensible','.access_pool').val()){
             col.push({ data: 'ItemPurchasePrice', title: "P. achat" });
         }
         col.push({ data: 'ItemSellPrice', title: "P. vente" });
-        //col.push({ data: 'ItemSellPrice', title: "P. vente", render: inputSellPriceForm });
         col.push({ data: 'Quantity', title: "Quantité" });
-        //col.push({ data: 'Quantity', title: "Quantité", render: inputQuantityForm });
         col.push({ data: 'null', title: "Qt. en attente", render: renderQtEnAttente });
         col.push({ data: 'ItemSellPriceTotal', title: "P. vente total", render: renderDigit });
         col.push({ data: 'ItemSellPriceVATTotal', title: "P. TTC total", render: renderDigit });
         if ($('#is_read_sensible', '.access_pool').length > 0 && $('#is_read_sensible', '.access_pool').val()) {
             col.push({ data: 'ItemROIPercent', title: "Marge (%)", render: renderDigit });
-            //col.push({ data: 'ItemROICurrency', title: "Marge", render: renderDigit });
         }
 
         if ($('#is_delete', '.access_pool').val()){
@@ -546,7 +545,7 @@ $(function () {
 
         var data = row.data();
 
-        //if (typeof data.ItemSellPrice == typeof undefined || renderQtEnAttente(null, null, data) > 0){
+        if (!params.type || (data.Quantity - data.QuantityDelivery) > 0){
             if (row.child.isShown()) {
                 tr.removeClass('details');
                 row.child.hide();
@@ -563,7 +562,7 @@ $(function () {
                     params.reccordRowTable.push(tr.attr('id'));
                 }
             }
-        //}
+        }
     }
 
     

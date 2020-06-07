@@ -53,17 +53,23 @@ class ClientController extends Controller
         $this->ErrorHandler = $ErrorHandler;
         $this->orderManager = $orderManager;
     }
-    
+
+#region [ Views ]
     /**
      * @Route("/admin/client", options={"expose"=true}, name="client_home")
+     * @Route("/admin/client/panier/{cart}", options={"expose"=true}, name="client_cart_home")
      */
-    public function home(SerializerInterface $serializer, 
+    public function home($cart = null,
+                        SerializerInterface $serializer, 
                         ClientRepository $clientRepo,
                         ClientHydrate $clientHydrate) {
 
         if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
             return $this->redirectToRoute('security_deny_access');
         }
+
+        if(!empty($cart))
+            return $this->render('client/index.html.twig',['cart' => true]);
 
         return $this->render('client/index.html.twig');
     }
@@ -83,13 +89,18 @@ class ClientController extends Controller
         }
 
         $encours = 0;
-        $billAmount = $billRepo->findScalarBillByClient($client);
-        $payedBillAmount = $billRepo->findScalarBillPayedByClient($client);
+        try{
+            $billAmount = $billRepo->findScalarBillByClient($client);
+            $payedBillAmount = $billRepo->findScalarBillPayedByClient($client);
 
-        if(!empty($billAmount) && !empty($payedBillAmount))
+            if (!empty($billAmount) && !empty($payedBillAmount))
             $encours = $billAmount - $payedBillAmount;
-        else if(!empty($billAmount) && empty($payedBillAmount))
+            else if (!empty($billAmount) && empty($payedBillAmount))
             $encours = $billAmount;
+        }catch(Exception $ex){
+            $this->ErrorHandler->error("Une erreur s'est produite durant le rendu de la page client!");
+            $this->ErrorHandler->error($ex->getMessage());
+        }
        
         return $this->render('client/show.html.twig', [
             'client' => $client,
@@ -98,6 +109,9 @@ class ClientController extends Controller
             'encours' => $encours,
         ]);
     }
+#endregion
+
+#region [ Selection ]
 
     /**
      * @Route("/admin/client/selection/{id}", options={"expose"=true}, name="client_select")
@@ -108,13 +122,13 @@ class ClientController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
         $client = $session->get('client',[]);
-
         $client['id'] = $id;
-
-        $session->set('client', $client);
-          
+        $session->set('client', $client);          
         return $this->RedirectToRoute('order_registration');
     }
+#endregion
+
+#region [ Registrations ]
 
     /**
      * @Route("/admin/client/inscription", options={"expose"=true}, name="client_registration")
@@ -133,30 +147,32 @@ class ClientController extends Controller
 
         if(!$client)
             $client = new Client();
-        else
-            $client = $clientHydrate->hydrate([$client])[0];
      
         $form = $this->createForm(ClientRegistrationType::class, $client);
         $form->handleRequest($request);
         
-        if($form->isSubmitted()){
-            $this->ErrorHandler->registerError($validator->validate($client));
-            
-            if($form->isValid()){
-                $client = $clientHydrate->hydrateClientRelationFromForm($client, $request->request->get('client_registration'));
+        try{
+            if ($form->isSubmitted()) {
+                $this->ErrorHandler->registerError($validator->validate($client));
 
-                foreach ($client->getContacts()->toArray() as $contact) {
-                    $manager->persist($contact);
+                if ($form->isValid()) {
+
+                    $client->setIsActivated(true);
+                    $client->setIsProspect(true);
+                    if (!empty($request->request->get('client_registration')['client_prospect'])) {
+                        $client->setIsProspect(false);
+                    }
+
+                    $manager->persist($client);
+                    $manager->flush();
+                    $this->ErrorHandler->success("La client a été sauvegardé avec succès!");
+                    return $this->redirectToRoute('client_show', ['id' => $client->getId()]);/**/
                 }
-
-                $manager->persist($client);
-                $manager->flush();
-
-                
-
-                return $this->redirectToRoute('client_show', ['id' => $client->getId()]);/**/
-            }
-        }       
+            } 
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la sauvegarde du client!");
+            $this->ErrorHandler->error($ex->getMessage());
+        }
 
         return $this->render('Client/registration.html.twig', [
             'formClient' => $form->createView(),
@@ -186,19 +202,23 @@ class ClientController extends Controller
         $form = $this->createForm(AddressRegistrationType::class, $address);
         $form->handleRequest($request);
         
-        if($form->isSubmitted()){
-            $this->ErrorHandler->registerError($validator->validate($address));
-            
-           if($form->isValid()){
-                $address = $clientHydrate->hydrateAddressRelationFromForm($address, $request->request->get('client_address_registration'));
+       try{
+            if ($form->isSubmitted()) {
+                $this->ErrorHandler->registerError($validator->validate($address));
 
-                $manager->persist($address);
-                $manager->flush();
+                if ($form->isValid()) {
+                    $address = $clientHydrate->hydrateAddressRelationFromForm($address, $request->request->get('client_address_registration'));
 
-                return $this->redirectToRoute('client_home');
-           }
+                    $manager->persist($address);
+                    $manager->flush();
+                    $this->ErrorHandler->success("L'adresse a été sauvegardée avec succès!");
+                    return $this->redirectToRoute('client_home');
+                }
+            }
+       }catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la sauvegarde de l'adresse!");
+            $this->ErrorHandler->error($ex->getMessage());
         }
-
         return $this->render('client/address_registration.html.twig', [
             'formAddress' => $form->createView(),
         ]);
@@ -225,36 +245,38 @@ class ClientController extends Controller
             if ($idClient)
                 $contact->setClient($clientRepo->find($idClient));
         }
-        
-        $contact = $clientHydrate->hydrateContact($contact);
      
         $form = $this->createForm(ContactRegistrationType::class, $contact);
-
-        // dump($form);
-        //     dump($idClient);
-        //     die();
-        $form->handleRequest($request);
-        if($form->isSubmitted()){
-            // dump($form);
-            // dump($idClient);
-            // die();
-            $this->ErrorHandler->registerError($validator->validate($contact));
-            if($form->isValid()){
-                $contact = $clientHydrate->hydrateContactRelationFromForm($contact, $request->request->get('contact_registration'));
-
-                $manager->persist($contact->getClient());
-                $manager->persist($contact);
-                $manager->flush();
-
-                return $this->redirectToRoute('client_show', ['id' => $contact->getClient()->getId()]);
-           }
+        try{
+            $form->handleRequest($request);
+            if ($form->isSubmitted()) {
+                $this->ErrorHandler->registerError($validator->validate($contact));
+                if ($form->isValid()) {
+                    $client = $contact->getClient();
+                    $contact->setIsPrincipal(false);
+                    if (!empty($request->request->get('contact_registration')['is_principal'])) {
+                        $contact->setClient($clientHydrate->resetContactPrincipal($client));
+                        $contact->setIsPrincipal(true);
+                    }
+                    $manager->persist($client);
+                    $manager->persist($contact);
+                    $manager->flush();
+                    $this->ErrorHandler->success("Le contact a été sauvegardé avec succès!");
+                    return $this->redirectToRoute('client_show', ['id' => $client->getId()]);
+                }
+            }
+        }catch(Exception $ex){
+            $this->ErrorHandler->error("Une erreur s'est produite durant la sauvegarde du contact!");
+            $this->ErrorHandler->error($ex->getMessage());
         }
 
         return $this->render('client/contact_registration.html.twig', [
             'formContact' => $form->createView(),
         ]);
     }
-    
+#endregion
+
+#region [ Delete ]
 
     /**
      * @Route("/admin/client/{id}/delete", options={"expose"=true}, name="client_delete")
@@ -309,6 +331,9 @@ class ClientController extends Controller
 
         return $this->redirectToRoute('client_show', ['id' => $contact->getClient()->getId()]);
     }
+#endregion
+
+#region [ Data/Ajax ]
 
     /*-------------------------------------------------------------------------------------------------
     ---------------------------------------------[ Json/ Ajax ]---------------------------------------*/
@@ -327,7 +352,7 @@ class ClientController extends Controller
         }
 
         return new Response($this->serializer->serialize([
-            'object_array' =>['data' =>  $clientHydrate->hydrate($clientRepo->findAll())],
+            'object_array' =>['data' =>  $clientRepo->findAll()],
             'format' => 'json',
             'group' => 'class_property'
         ]));
@@ -392,4 +417,6 @@ class ClientController extends Controller
             'group' => 'class_property'
         ]));
     }
+
+    #endregion
 }

@@ -220,7 +220,7 @@ class ClientHydrate{
         return $client;
     }
 
-    private function resetContactPrincipal($client){
+    public function resetContactPrincipal($client){
         foreach ($client->getContacts() as $contact) {
             if ($contact->getIsPrincipal())
                 $contact->setIsPrincipal(false);

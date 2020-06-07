@@ -38,7 +38,10 @@
     </div>
 </div>
 
-<!-- <input type="hidden" id="client_data_source" value="{#{ client_data_source }#}"> -->
+{% if cart is defined %}
+<input type="hidden" id="from_cart" value="{{ cart }}">
+{% endif %}
+
 {% endblock %}
 
 {% block access_pool %}

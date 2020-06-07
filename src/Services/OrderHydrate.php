@@ -65,8 +65,8 @@ class OrderHydrate{
                 $item = $this->catHydrate->hydrateItem([$item])[0];
                 
                 $qt = $orderDetail->getQuantity();
-                $pa = $item->getPurchasePrice() ? $item->getPurchasePrice() : 0 ;//$orderDetail->getItemPurchasePrice();
-                $pv = $item->getSellPrice() ? $item->getSellPrice() : 0;
+                $pa = !empty($item->getPurchasePrice()) ? $item->getPurchasePrice() : 0 ;//$orderDetail->getItemPurchasePrice();
+                $pv = !empty($item->getSellPrice()) ? $item->getSellPrice() : 0;
                 
                 // $orderDetail->setItemRef($item->getRef());
                 // $orderDetail->setItemName($item->getName());
@@ -77,10 +77,6 @@ class OrderHydrate{
 
                 if (empty($orderDetail->getItemPurchasePrice())) {
                     $orderDetail->setItemPurchasePrice($pa);
-                }
-
-                if (empty($orderDetail->getQuantity())) {
-                    $orderDetail->setQuantity($qt);
                 }
 
                 $this->manager->persist($orderDetail);

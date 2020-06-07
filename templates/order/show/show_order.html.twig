@@ -194,8 +194,11 @@
         </div>
     </div>
 </div>
-{% endblock %}{# Email devis #}
+{% endblock %}
+
+{# Email devis #}
 {% block email_area %}
+{% if bills is defined and bills | length > 0 %}
 <form action="{{ path("order_email_bill",{id: order.id }) }}" method="post">
     <div class="row">
         <div class="col-md-12">
@@ -235,6 +238,7 @@
         </div>
     </div>
 </form>
+{% endif %}
 {% endblock %}
 
 {# Cloture commande #}

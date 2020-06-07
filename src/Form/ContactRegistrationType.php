@@ -3,8 +3,10 @@
 namespace App\Form;
 
 use App\Entity\Contact;
+use App\Form\AddressRegistrationType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ContactRegistrationType extends AbstractType
@@ -20,12 +22,14 @@ class ContactRegistrationType extends AbstractType
             ->add('Mobile')
             //->add('Fax')
             //->add('IsPrincipal')
-            ->add('ContentComment')
-            ->add('City')
-            ->add('Street')
-            ->add('ZipCode')
-            ->add('Country')
-            ->add('AddressComment')
+            ->add('Comment', CommentRegistrationType::class, [
+                'label' => 'Commentaire'
+            ])
+            ->add('Address', AddressRegistrationType::class)
+            // ->add('Street')
+            // ->add('ZipCode')
+            // ->add('Country')
+            // ->add('AddressComment')
             //->add('AddressName')
         ;
     }

@@ -4,7 +4,7 @@
 
 {% block home_path %}
 <li class="breadcrumb-item">
-    <a href="{{ path("catalogue_home") }}">Produit</a>
+    <a href="{{ path("catalogue_home") }}">Produits</a>
 </li>
 <li class="breadcrumb-item">
     {{ page_title }}
@@ -35,7 +35,14 @@
             <div class="card-body">
                 <input type="hidden" name="token" value="{{ csrf_token('upload') }}" />
         
+                <div class="profilImg-wrapper">
                 
+                    {% if formItem.vars.data.Picture %}
+                    <img class="img-avatar img-circle" src="{{ asset('setting/catalogue/' ~ formItem.vars.data.Picture, 'download_dir') }}"
+                        alt="Image profile">
+                    {% endif %}
+                </div>
+
                 {{ form_row(formItem.PictureFile,{'label': 'Image produit', 'attr': {'class':'form-control'}}) }}
                 {{ form_row(formItem.Name,{'label': 'Nom du produit','attr': {'placeholder': 'désignation du produit'}}) }}
                 {{ form_row(formItem.Ref,{'label': 'Reférence du produit','attr': {'placeholder': 'Réfference du produit'}}) }}

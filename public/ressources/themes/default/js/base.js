@@ -52,9 +52,9 @@ $(document).ready(function ($) {
 
     function displayPoolMessage() {
         var $messagePool = $(".messagePool");
-        displayMessage('Succés requête', $messagePool.find('input[data-status="200"]'), 200);
-        displayMessage('Erreur requête', $messagePool.find('input[data-status="500"]'), 500);
-        displayMessage('Attention requête', $messagePool.find('input[data-status="600"]'), 600);
+        displayMessage('Succès', $messagePool.find('input[data-status="200"]'), 200);
+        displayMessage('Erreur', $messagePool.find('input[data-status="500"]'), 500);
+        displayMessage('Attention', $messagePool.find('input[data-status="600"]'), 600);
 
         /*if ($feedback.length > 0 && $feedback.val()) {
 

@@ -9,7 +9,7 @@ $(document).ready(function ($) {
         });
 
     var contactRenders = new RenderMethod({
-        routeShow: { route: 'client_contact_edit', logo: 'fa-eye' },
+        //routeShow: { route: 'client_contact_edit', logo: 'fa-eye' },
         routeEdit: { route: 'client_contact_edit', logo: 'fa-edit' },
         routeDelete: { route: 'client_contact_delete', logo: 'fa-trash-alt' }
     });
@@ -140,18 +140,17 @@ $(document).ready(function ($) {
     function getCLientColumn(){
         var col = [];
 
-        if($('#is_quote_write','.access_pool').length > 0 && $('#is_quote_write','.access_pool').val()){
+        if ($("#from_cart").length > 0 && $('#is_quote_write','.access_pool').length > 0 && $('#is_quote_write','.access_pool').val()){
             col.push({ data: 'id', title: "", render: Renders.renderSelect });
         }
         else{
             col.push({ data: 'id', visible: false });
         }
+
         
         col.push({ data: 'CompanyName', title: "Société" });
-        col.push({ data: 'LastName', title: "Nom" });
-        col.push({ data: 'FirstName', title: "Prénom" });
-        col.push({ data: 'Phone', title: "Téléphone" });
-        col.push({ data: 'Email', title: "Email" });
+        col.push({ data: 'Denomination', title: "Dénomination" });
+        col.push({ data: 'IsProspect', title: "type", render: renderType });
         col.push({
             data: 'id', title: "",
             render: function (data, type, row, meta) {
@@ -225,6 +224,13 @@ $(document).ready(function ($) {
         return '<a href="' + Routing.generate(vars.routeShow.route, { id: row.id, idClient: $('#client_id').val() }) + '" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Page détail">' +
             '<i class="fa ' + vars.routeShow.logo + '"></i>' +
             '</a>';
+    }
+
+    function renderType(data, type, row) {
+        if (data == false)
+            return '<span class="badge badge-warning">Prospect</span>';
+        
+        return '<span class="badge badge-success">Client</span>';
     }
 
 });

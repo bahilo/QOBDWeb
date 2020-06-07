@@ -5,8 +5,8 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use Doctrine\Common\Collections\Collection;
 use JMS\Serializer\Annotation\SerializedName;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
@@ -100,53 +100,6 @@ class Contact
      * @SerializedName("IsPrincipal")
      */
     private $IsPrincipal;
-
-
-    /**
-     * @Groups({"class_property"})
-     * @SerializedName("ContentComment")
-     * */
-    private $ContentComment;
-
-    /**
-     * @Assert\NotBlank(message = "La ville ne peux pas être vide")
-     * @Groups({"class_property"})
-     * @SerializedName("City") 
-     * */
-    private $City;
-
-    /**
-     * @Assert\NotBlank(message = "La rue ne peux pas être vide")
-     * @Groups({"class_property"})
-     * @SerializedName("Street") 
-     * */
-    private $Street;
-
-    /**
-     * @Assert\NotBlank(message = "Le code postal ne peux pas être vide")
-     * @Groups({"class_property"})
-     * @SerializedName("ZipCode") 
-     */
-    private $ZipCode;
-
-    /**
-     * @Assert\NotBlank(message = "Le pays ne peux pas être vide")
-     * @Groups({"class_property"})
-     * @SerializedName("Country") 
-     */
-    private $Country;
-
-    /**
-     * @Groups({"class_property"})
-     * @SerializedName("AddressComment") 
-     */
-    private $AddressComment;
-
-    /**
-     * @Groups({"class_property"})
-     * @SerializedName("AddressName")
-     */
-    private $AddressName;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Address", cascade={"persist", "remove"})
@@ -316,90 +269,6 @@ class Contact
     public function setAddress(?Address $Address): self
     {
         $this->Address = $Address;
-
-        return $this;
-    }
-
-    public function getContentComment(): ?string
-    {
-        return $this->ContentComment;
-    }
-
-    public function setContentComment(?string $ContentComment): self
-    {
-        $this->ContentComment = $ContentComment;
-
-        return $this;
-    }
-
-    public function getAddressName(): ?string
-    {
-        return $this->AddressName;
-    }
-
-    public function setAddressName(string $AddressName): self
-    {
-        $this->AddressName = $AddressName;
-
-        return $this;
-    }
-
-    public function getCity(): ?string
-    {
-        return $this->City;
-    }
-
-    public function setCity(string $City): self
-    {
-        $this->City = $City;
-
-        return $this;
-    }
-
-    public function getStreet(): ?string
-    {
-        return $this->Street;
-    }
-
-    public function setStreet(string $Street): self
-    {
-        $this->Street = $Street;
-
-        return $this;
-    }
-
-    public function getZipCode(): ?string
-    {
-        return $this->ZipCode;
-    }
-
-    public function setZipCode(string $ZipCode): self
-    {
-        $this->ZipCode = $ZipCode;
-
-        return $this;
-    }
-
-    public function getCountry(): ?string
-    {
-        return $this->Country;
-    }
-
-    public function setCountry(string $Country): self
-    {
-        $this->Country = $Country;
-
-        return $this;
-    }
-
-    public function getAddressComment(): ?string
-    {
-        return $this->AddressComment;
-    }
-
-    public function setAddressComment(?string $Comment): self
-    {
-        $this->AddressComment= $Comment;
 
         return $this;
     }

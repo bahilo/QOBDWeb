@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Exception;
 use App\Entity\Role;
 use App\Entity\Agent;
 use App\Entity\Action;
@@ -221,55 +222,59 @@ class SecurityController extends Controller
         
         $form = $this->createForm(AgentRegistrationType::class, $agent);
 
-        $form->handleRequest($request);
-        $errors = $validator->validate($agent);
+        try{
+            $form->handleRequest($request);
+            $errors = $validator->validate($agent);
 
-        foreach ($errors as $error) {
-            $this->ErrorHandler->error($error->getMessage());
-        }
+            foreach ($errors as $error) {
+                $this->ErrorHandler->error($error->getMessage());
+            }
 
-        if($form->isSubmitted() && $form->isValid() && count($errors) == 0){
-            
-            $role = $roleRepo->findOneBy(['Name' => 'ROLE_ANONYMOUS']);
-            
-            $file = $request->files->get('agent_registration')['PictureFile'];
-          
-            $fileName = $utility->uploadFile($file, $this->getParameter('file.agent.download_dir'));
-            if (!empty($fileName)) {
-                if(!empty($agent->getPicture())){
-                    unlink($this->getParameter('file.agent.download_dir') . '/'. $agent->getPicture());
+            if ($form->isSubmitted() && $form->isValid() && count($errors) == 0) {
+
+                $role = $roleRepo->findOneBy(['Name' => 'ROLE_ANONYMOUS']);
+
+                $file = $request->files->get('agent_registration')['PictureFile'];
+
+                $fileName = $utility->uploadFile($file, $this->getParameter('file.agent.download_dir'));
+                if (!empty($fileName)) {
+                    if (!empty($agent->getPicture())) {
+                        unlink($this->getParameter('file.agent.download_dir') . '/' . $agent->getPicture());
+                    }
+                    $agent->setPicture($fileName);
                 }
-                $agent->setPicture($fileName);
-            }
 
-            if($agent->getPlainTextPassword() !== null){
-                $hash = $encoder->encodePassword($agent, $agent->getPlainTextPassword());
-                $agent->setPassword($hash);
-            }
+                if ($agent->getPlainTextPassword() !== null) {
+                    $hash = $encoder->encodePassword($agent, $agent->getPlainTextPassword());
+                    $agent->setPassword($hash);
+                }
 
-            $agent->setIsAdmin(false);
-            
-            if(!$isEdit){
-                $agent->setIsActivated(false);
-                $agent->addRole($role);
-            }
+                $agent->setIsAdmin(false);
 
-            $this->manager->persist($agent);
-            $this->manager->flush();
-            
+                if (!$isEdit) {
+                    $agent->setIsActivated(false);
+                    $agent->addRole($role);
+                }
 
-            if(!$isEdit){
-                $event = new GenericEvent([
-                    'to' => $agent->getEmail(),
-                    'subject' => 'Inscription',
-                    'view' =>$this->renderView('email/_partials/registration.html', ['agent' => $agent]),
-                ]);
-                $this->eventDispatcher->dispatch(MyEvents::USER_REGISTRATION_SEND_EMAIL, $event);
-                return $this->redirectToRoute('security_login');
+                $this->manager->persist($agent);
+                $this->manager->flush();
+
+
+                if (!$isEdit) {
+                    $event = new GenericEvent([
+                        'to' => $agent->getEmail(),
+                        'subject' => 'Inscription',
+                        'view' => $this->renderView('email/_partials/registration.html', ['agent' => $agent]),
+                    ]);
+                    $this->eventDispatcher->dispatch(MyEvents::USER_REGISTRATION_SEND_EMAIL, $event);
+                    return $this->redirectToRoute('security_login');
+                } else
+                    return $this->redirectToRoute('home');
             }
-            else
-                return $this->redirectToRoute('home');
-        }        
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant l'enregistrement du commercial!");
+            $this->ErrorHandler->error($ex->getMessage());
+        }  
 
         //dump($errors);die();
         if($isEdit){
@@ -388,82 +393,87 @@ class SecurityController extends Controller
 
         $privileges = $request->request->get('privilege');
 
-        foreach ($privileges as $keyRole => $oRole) {
+        try{
+            foreach ($privileges as $keyRole => $oRole) {
 
-            $role = $roleRepo->find($keyRole);
+                $role = $roleRepo->find($keyRole);
 
-            foreach ($oRole as $keyAction => $oAction) {
-                $bInitialized = false;
-                $action = $actionRepo->find($keyAction);
-                $actionRole = $actionRoleRepo->findOneBy(['Action' => $action, 'Role' => $role]);
+                foreach ($oRole as $keyAction => $oAction) {
+                    $bInitialized = false;
+                    $action = $actionRepo->find($keyAction);
+                    $actionRole = $actionRoleRepo->findOneBy(['Action' => $action, 'Role' => $role]);
 
-                if (!$actionRole)
-                    $actionRole = new ActionRole();
+                    if (!$actionRole)
+                        $actionRole = new ActionRole();
 
-                $privilege = $actionRole->getPrivilege();
+                    $privilege = $actionRole->getPrivilege();
 
-                if (!$privilege)
-                    $privilege = new Privilege();
+                    if (!$privilege)
+                        $privilege = new Privilege();
 
-                if ($privilege->getId() && $privilege->getId() > 0) {
-                    $bInitialized = true;
-                }
+                    if ($privilege->getId() && $privilege->getId() > 0) {
+                        $bInitialized = true;
+                    }
 
-                if ($privileges[$keyRole][$keyAction]['IsRead'] != "") {
-                    $privilege->setIsRead(true);
-                    $bInitialized = true;
-                } else
-                    $privilege->setIsRead(false);
+                    if ($privileges[$keyRole][$keyAction]['IsRead'] != "") {
+                        $privilege->setIsRead(true);
+                        $bInitialized = true;
+                    } else
+                        $privilege->setIsRead(false);
 
-                if ($privileges[$keyRole][$keyAction]['IsWrite'] != "") {
-                    $privilege->setIsWrite(true);
-                    $bInitialized = true;
-                } else
-                    $privilege->setIsWrite(false);
+                    if ($privileges[$keyRole][$keyAction]['IsWrite'] != "") {
+                        $privilege->setIsWrite(true);
+                        $bInitialized = true;
+                    } else
+                        $privilege->setIsWrite(false);
 
-                if ($privileges[$keyRole][$keyAction]['IsUpdate'] != "") {
-                    $privilege->setIsUpdate(true);
-                    $bInitialized = true;
-                } else
-                    $privilege->setIsUpdate(false);
+                    if ($privileges[$keyRole][$keyAction]['IsUpdate'] != "") {
+                        $privilege->setIsUpdate(true);
+                        $bInitialized = true;
+                    } else
+                        $privilege->setIsUpdate(false);
 
-                if ($privileges[$keyRole][$keyAction]['IsRead'] != "") {
-                    $privilege->setIsRead(true);
-                    $bInitialized = true;
-                } else
-                    $privilege->setIsRead(false);
+                    if ($privileges[$keyRole][$keyAction]['IsRead'] != "") {
+                        $privilege->setIsRead(true);
+                        $bInitialized = true;
+                    } else
+                        $privilege->setIsRead(false);
 
-                if ($privileges[$keyRole][$keyAction]['IsDelete'] != "") {
-                    $privilege->setIsDelete(true);
-                    $bInitialized = true;
-                } else
-                    $privilege->setIsDelete(false);
+                    if ($privileges[$keyRole][$keyAction]['IsDelete'] != "") {
+                        $privilege->setIsDelete(true);
+                        $bInitialized = true;
+                    } else
+                        $privilege->setIsDelete(false);
 
-                if ($privileges[$keyRole][$keyAction]['IsSendMail'] != "") {
-                    $privilege->setIsSendMail(true);
-                    $bInitialized = true;
-                } else
-                    $privilege->setIsSendMail(false);
+                    if ($privileges[$keyRole][$keyAction]['IsSendMail'] != "") {
+                        $privilege->setIsSendMail(true);
+                        $bInitialized = true;
+                    } else
+                        $privilege->setIsSendMail(false);
 
-                $privilege->setCreatedAt(new \DateTime());
+                    $privilege->setCreatedAt(new \DateTime());
 
-                $actionRole->setPrivilege($privilege);
-                $actionRole->setAction($action);
-                $actionRole->setRole($role);
+                    $actionRole->setPrivilege($privilege);
+                    $actionRole->setAction($action);
+                    $actionRole->setRole($role);
 
-                // dump($privilege);
-                // dump($action);
-                // dump($role);
+                    // dump($privilege);
+                    // dump($action);
+                    // dump($role);
 
-                if ($bInitialized) {
-                    $this->manager->persist($privilege);
-                    $this->manager->persist($action);
-                    $this->manager->persist($role);
-                    $this->manager->persist($actionRole);
-                    $this->manager->flush();
+                    if ($bInitialized) {
+                        $this->manager->persist($privilege);
+                        $this->manager->persist($action);
+                        $this->manager->persist($role);
+                        $this->manager->persist($actionRole);
+                        $this->manager->flush();
+                    }
                 }
             }
-        }
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la sauvegarde de l'action!");
+            $this->ErrorHandler->error($ex->getMessage());
+        } 
 
         return $this->RedirectToRoute('security_profile');
     }
@@ -484,27 +494,32 @@ class SecurityController extends Controller
 
         $profile = $request->request->get('profile');
 
-        foreach ($profile as $keyAgent => $oAgent) {
+        try{
+            foreach ($profile as $keyAgent => $oAgent) {
 
-            $agent = $agentRepo->find($keyAgent);
+                $agent = $agentRepo->find($keyAgent);
 
-            foreach ($oAgent as $keyRole => $oRole) {
+                foreach ($oAgent as $keyRole => $oRole) {
 
-                $role = $roleRepo->find($keyRole);
-                $agent_roles = $agent->getObjectRoles();
+                    $role = $roleRepo->find($keyRole);
+                    $agent_roles = $agent->getObjectRoles();
 
-                if ($agent_roles->contains($role)) {
-                    if ($profile[$keyAgent][$keyRole] == "") {
-                        $agent->removeRole($role);
+                    if ($agent_roles->contains($role)) {
+                        if ($profile[$keyAgent][$keyRole] == "") {
+                            $agent->removeRole($role);
+                        }
+                    } elseif ($profile[$keyAgent][$keyRole] != "") {
+                        $agent->addRole($role);
                     }
-                } elseif ($profile[$keyAgent][$keyRole] != "") {
-                    $agent->addRole($role);
-                }
 
-                $this->manager->persist($agent);
-                $this->manager->flush();
+                    $this->manager->persist($agent);
+                    $this->manager->flush();
+                }
             }
-        }
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la sauvegarde du profil!");
+            $this->ErrorHandler->error($ex->getMessage());
+        } 
 
         return $this->RedirectToRoute('security_agent_role');
     }
@@ -553,20 +568,25 @@ class SecurityController extends Controller
         /** @var Agent $agent */
         $agent = $this->agentRepo->findOneBy(["UserName" => $username]);
 
-        if (!empty($agent)) {
+        try{
+            if (!empty($agent)) {
 
-            $token = $tokenGen->generateToken();
-            $agent->setToken($token);
-            $this->manager->persist($agent);
-            $this->manager->flush();
-            $mailer->send(
-                ['to' => $agent->getEmail()],
-                "Mot de passe oublié",
-                $this->renderView("email/_partials/password_forgotten.html", ["url" => $this->generateUrl("security_form_password_forgotten", ["token" => $token], UrlGeneratorInterface::ABSOLUTE_URL)])
-            );
-            $this->ErrorHandler->success("Un mail vous a été envoyé avec un lien, clicker sur le lien pour confirmer le reset de mot de passe!");
-            return $this->redirectToRoute("security_login");
-        }
+                $token = $tokenGen->generateToken();
+                $agent->setToken($token);
+                $this->manager->persist($agent);
+                $this->manager->flush();
+                $mailer->send(
+                    ['to' => $agent->getEmail()],
+                    "Mot de passe oublié",
+                    $this->renderView("email/_partials/password_forgotten.html", ["url" => $this->generateUrl("security_form_password_forgotten", ["token" => $token], UrlGeneratorInterface::ABSOLUTE_URL)])
+                );
+                $this->ErrorHandler->success("Un mail vous a été envoyé avec un lien, clicker sur le lien pour confirmer le reset de mot de passe!");
+                return $this->redirectToRoute("security_login");
+            }
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la regénération du mot de passe!");
+            $this->ErrorHandler->error($ex->getMessage());
+        } 
 
         $this->ErrorHandler->error("Votre nom d'utilisateur n'existe pas dans notre base de données!");
         return $this->redirectToRoute("security_login");
@@ -582,21 +602,26 @@ class SecurityController extends Controller
         $token = $request->request->get("token");
         $agent = $this->agentRepo->findOneBy(["Token" => $token]);
 
-        if (!empty($agent)) {
-            $encoder = $encoderGene->getEncoder($agent);
-            $newPassword = $encoder->encodePassword($request->request->get("password"), $agent->getSalt());
-            if ($encoder->isPasswordValid($newPassword, $request->request->get("password"), $agent->getSalt())) {
-                $agent->setPassword($newPassword);
-                $agent->setToken(null);
-                $this->manager->persist($agent);
-                $this->manager->flush();
-                $this->ErrorHandler->success("Votre mot de passe a été regénéré avec succés!");
-                return $this->redirectToRoute("security_login");
-            } else {
-                $this->ErrorHandler->error("Votre mot de passe doit faire minimun 6 caractères!");
-                return $this->redirectToRoute("security_form_password_forgotten", ["token" => $token]);
+        try{
+            if (!empty($agent)) {
+                $encoder = $encoderGene->getEncoder($agent);
+                $newPassword = $encoder->encodePassword($request->request->get("password"), $agent->getSalt());
+                if ($encoder->isPasswordValid($newPassword, $request->request->get("password"), $agent->getSalt())) {
+                    $agent->setPassword($newPassword);
+                    $agent->setToken(null);
+                    $this->manager->persist($agent);
+                    $this->manager->flush();
+                    $this->ErrorHandler->success("Votre mot de passe a été regénéré avec succés!");
+                    return $this->redirectToRoute("security_login");
+                } else {
+                    $this->ErrorHandler->error("Votre mot de passe doit faire minimun 6 caractères!");
+                    return $this->redirectToRoute("security_form_password_forgotten", ["token" => $token]);
+                }
             }
-        }
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la regénération du mot de passe!");
+            $this->ErrorHandler->error($ex->getMessage());
+        } 
         $this->ErrorHandler->error("Mot de passe non reconnu!");
         return $this->redirectToRoute("security_login");
     }
@@ -614,8 +639,13 @@ class SecurityController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        $this->manager->remove($agent);
-        $this->manager->flush();
+        try{
+            $this->manager->remove($agent);
+            $this->manager->flush();
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la suppression du commercial!");
+            $this->ErrorHandler->error($ex->getMessage());
+        } 
 
         return $this->RedirectToRoute('agent_home');
     }
@@ -625,13 +655,17 @@ class SecurityController extends Controller
      */
     public function actionDelete(Action $action)
     {
-
         if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_SECURITY']))) {
             return $this->redirectToRoute('security_deny_access');
         }
 
-        $this->manager->remove($action);
-        $this->manager->flush();
+        try{
+            $this->manager->remove($action);
+            $this->manager->flush();
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la suppression de l'action!");
+            $this->ErrorHandler->error($ex->getMessage());
+        } 
 
         return $this->RedirectToRoute('security_action');
     }
@@ -648,8 +682,13 @@ class SecurityController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        $this->manager->remove($role);
-        $this->manager->flush();
+        try{
+            $this->manager->remove($role);
+            $this->manager->flush();
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la suppression du rôle!");
+            $this->ErrorHandler->error($ex->getMessage());
+        } 
 
         return $this->RedirectToRoute('security_role');
     }

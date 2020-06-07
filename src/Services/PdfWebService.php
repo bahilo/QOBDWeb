@@ -94,8 +94,8 @@ class PdfWebService{
         if (!empty($param['setting']) && !empty($param['setting']->getValue())) {
             $fileName = $param['setting']->getValue() . $param['bill']->getId() . '.pdf';
         }
-        file_put_contents($this->utility->getAbsoluteRootPath() . $param['download_dir'] .'/'. $fileName, $res[0]['Value']);
-        return $this->utility->getAbsoluteRootPath() . $param['download_dir'] . '/' . $fileName;
+        file_put_contents($this->utility->getAbsoluteRootPath() .'/' . $param['download_dir'] .'/'. $fileName, $res[0]['Value']);
+        return $this->utility->getAbsoluteRootPath() . '/' . $param['download_dir'] . '/' . $fileName;
     }
 
     public function downloadQuote($param, QuoteOrder $order, $downloadDir)
@@ -106,8 +106,8 @@ class PdfWebService{
         if (!empty($param['setting'])) {
             $fileName = $param['setting']->getValue() . $param['order']->getId() . '.pdf';
         }
-        file_put_contents($this->utility->getAbsoluteRootPath() . $param['download_dir'] . '/' . $fileName, $res[0]['Value']);
-        return $this->utility->getAbsoluteRootPath() . $param['download_dir'] . '/' . $fileName;
+        file_put_contents($this->utility->getAbsoluteRootPath() . '/' . $param['download_dir'] . '/' . $fileName, $res[0]['Value']);
+        return $this->utility->getAbsoluteRootPath() . '/' . $param['download_dir'] . '/' . $fileName;
     }
 
     public function downloadDelivery(Delivery $delivery, $downloadDir)
@@ -127,7 +127,8 @@ class PdfWebService{
         if (!empty($setting)) {
             $fileName = $setting->getValue() . $param['delivery']->getId() . '.pdf';
         }
-        file_put_contents($this->utility->getAbsoluteRootPath() . $param['download_dir'] . '/' . $fileName, $res[0]['Value']);        return $this->utility->getAbsoluteRootPath() . $param['download_dir'] . '/' . $fileName;
+        file_put_contents($this->utility->getAbsoluteRootPath() . '/' . $param['download_dir'] . '/' . $fileName, $res[0]['Value']);        
+        return $this->utility->getAbsoluteRootPath() . '/' . $param['download_dir'] . '/' . $fileName;
     }
 
     public function downloadCGV($downloadDir)
@@ -140,7 +141,8 @@ class PdfWebService{
         $response = $this->apiManager->execPdfRequest($param['ws_method'], $param['ws_params']);
         $res = $this->utility->restoreSpecialChars($response);
         $fileName = 'CGV.pdf';
-        file_put_contents($this->utility->getAbsoluteRootPath() . $param['download_dir'] . '/' . $fileName, $res[0]['Value']);        return $this->utility->getAbsoluteRootPath() . $param['download_dir'] . '/' . $fileName;
+        file_put_contents($this->utility->getAbsoluteRootPath() . '/' . $param['download_dir'] . '/' . $fileName, $res[0]['Value']);        
+        return $this->utility->getAbsoluteRootPath() . $param['download_dir'] . '/' . $fileName;
     }
 
     private function getSource(QuoteOrder $order, ?Bill $bill){

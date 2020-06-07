@@ -62,6 +62,7 @@ class SettingController extends Controller
     protected $ErrorHandler;
     protected $settingRepo;
     protected $eventDispatcher;
+    protected $utility;
 
 
     public function __construct(Serializer $serializer, 
@@ -70,6 +71,7 @@ class SettingController extends Controller
                                 SettingManager $settingManager,
                                 ValidatorInterface $validator,
                                 SettingRepository $settingRepo,
+                                Utility $utility,
                                 EventDispatcherInterface $eventDispatcher, 
                                 ErrorHandler $ErrorHandler)
     {
@@ -81,6 +83,7 @@ class SettingController extends Controller
         $this->ErrorHandler = $ErrorHandler;
         $this->settingRepo = $settingRepo;
         $this->eventDispatcher = $eventDispatcher;
+        $this->utility = $utility;
     }
 
 #region [ Views ]
@@ -250,12 +253,12 @@ class SettingController extends Controller
         }
 
         return $this->render('email/index.html.twig', [
-            'quote' => file_get_contents($this->getParameter('file.setting.email') . '/' . 'devis.txt'),
-            'bill' => file_get_contents($this->getParameter('file.setting.email') . '/' . 'facture.txt'),
-            'first_reminder' => file_get_contents($this->getParameter('file.setting.email').'/'. 'relance_paiement_1.txt'),
-            'seconde_reminder' => file_get_contents($this->getParameter('file.setting.email') . '/' . 'relance_paiement_2.txt'),
-            'validate' => file_get_contents($this->getParameter('file.setting.email') . '/' . 'validation_commande.txt'),
-            'inscription' => file_get_contents($this->getParameter('file.setting.email') . '/' . 'inscription.txt'),
+            'quote' => file_get_contents($this->utility->getAbsoluteRootPath() . '/' . $this->getParameter('file.setting.email') . '/' . 'devis.txt'),
+            'bill' => file_get_contents($this->utility->getAbsoluteRootPath() . '/' . $this->getParameter('file.setting.email') . '/' . 'facture.txt'),
+            'first_reminder' => file_get_contents($this->utility->getAbsoluteRootPath() . '/' . $this->getParameter('file.setting.email').'/'. 'relance_paiement_1.txt'),
+            'seconde_reminder' => file_get_contents($this->utility->getAbsoluteRootPath() . '/' . $this->getParameter('file.setting.email') . '/' . 'relance_paiement_2.txt'),
+            'validate' => file_get_contents($this->utility->getAbsoluteRootPath() . '/' . $this->getParameter('file.setting.email') . '/' . 'validation_commande.txt'),
+            'inscription' => file_get_contents($this->utility->getAbsoluteRootPath() . '/' . $this->getParameter('file.setting.email') . '/' . 'inscription.txt'),
         ]);
     }
 
@@ -306,39 +309,43 @@ class SettingController extends Controller
         
         $form = $this->createForm(SettingRegistrationType::class, $setting);
 
-        $form->handleRequest($request);
-        $errors = $this->validator->validate($setting);
+        try{
+            $form->handleRequest($request);
+            $errors = $this->validator->validate($setting);
 
-        //dump($request);die();
-        if($form->isSubmitted() && $form->isValid() ){
-            
-            if(isset($request->request->get('setting_registration')['switch'])){
-                $file = $request->files->get('setting_registration')['file'];
-                $fileName = $utility->uploadFile($file, $utility->getAbsoluteRootPath() . $this->getParameter('abs.file.setting.image.download_dir'), 'logo.png');
-                
-                if (!empty($fileName)) {
-                    if ( file_exists($utility->getAbsoluteRootPath() . $this->getParameter('abs.file.setting.image.download_dir') . '/' . $setting->getValue())) {
-                        unlink( $utility->getAbsoluteRootPath() . $this->getParameter('abs.file.setting.image.download_dir').'/'. $setting->getValue());
+            //dump($request);die();
+            if ($form->isSubmitted() && $form->isValid()) {
+
+                if (isset($request->request->get('setting_registration')['switch'])) {
+                    $file = $request->files->get('setting_registration')['file'];
+                    $fileName = $utility->uploadFile($file, $utility->getAbsoluteRootPath() . $this->getParameter('abs.file.setting.image.download_dir'), 'logo.png');
+
+                    if (!empty($fileName)) {
+                        if (file_exists($utility->getAbsoluteRootPath() . $this->getParameter('abs.file.setting.image.download_dir') . '/' . $setting->getValue())) {
+                            unlink($utility->getAbsoluteRootPath() . $this->getParameter('abs.file.setting.image.download_dir') . '/' . $setting->getValue());
+                        }
+                        $setting->setValue($fileName);
+                        $setting->setIsFile(true);
                     }
-                    $setting->setValue($fileName);
-                    $setting->setIsFile(true);
+
+                    $fileFullPath = $utility->getAbsoluteRootPath() . $this->getParameter('file.setting.image.download_dir') . '/' . $fileName;
+                    $event = new GenericEvent([
+                        "files" => [$fileFullPath],
+                    ]);
+                    $this->eventDispatcher->dispatch(MyEvents::FTP_IMAGE_SEND, $event);
+                } else {
+                    $setting->setIsFile(false);
                 }
 
-                $fileFullPath = $utility->getAbsoluteRootPath() . $this->getParameter('file.setting.image.download_dir').'/' . $fileName;
-                $event = new GenericEvent([
-                    "files" => [$fileFullPath],
-                ]);
-                $this->eventDispatcher->dispatch(MyEvents::FTP_IMAGE_SEND, $event);
+                $manager->persist($setting);
+                $manager->flush();
+                $this->ErrorHandler->success("La configuration a été sauvegardée avec succès!");
+                return $this->redirectToRoute('setting_home');
             }
-            else{
-                $setting->setIsFile(false);
-            }            
-            
-            $manager->persist($setting);
-            $manager->flush();
-
-            return $this->redirectToRoute('setting_home');
-        }        
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la sauvegarde de la configuration!");
+            $this->ErrorHandler->error($ex->getMessage());
+        }       
 
         return $this->render('setting/registration.html.twig', [
             'formSetting' => $form->createView(),
@@ -364,19 +371,24 @@ class SettingController extends Controller
         
         $form = $this->createForm(CurrencyRegistrationType::class, $currency);
 
-        $form->handleRequest($request);
-        $errors = $this->validator->validate($currency);
+        try{
+            $form->handleRequest($request);
+            $errors = $this->validator->validate($currency);
 
-        if($form->isSubmitted() && $form->isValid() ){
-            $isDefault = $request->request->get('currency_registration[IsDefault]');
-            if(!isset($isDefault)){
-                $currency->setIsDefault(false);
+            if ($form->isSubmitted() && $form->isValid()) {
+                $isDefault = $request->request->get('currency_registration[IsDefault]');
+                if (!isset($isDefault)) {
+                    $currency->setIsDefault(false);
+                }
+                $currency->setCreatedAt(new \DateTime());
+                $manager->persist($currency);
+                $manager->flush();
+                $this->ErrorHandler->success("La monnaie a été sauvegardée avec succès!");
+                return $this->redirectToRoute('setting_currency');
             }
-            $currency->setCreatedAt(new \DateTime());
-            $manager->persist($currency);
-            $manager->flush();
-
-            return $this->redirectToRoute('setting_currency');
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la sauvegarde de la monnaie!");
+            $this->ErrorHandler->error($ex->getMessage());
         }        
 
         return $this->render('setting/currency_registration.html.twig', [
@@ -403,15 +415,20 @@ class SettingController extends Controller
 
         $form = $this->createForm(DeliveryStatusRegistrationType::class, $status);
 
-        $form->handleRequest($request);
-        $errors = $this->validator->validate($status);
+        try{
+            $form->handleRequest($request);
+            $errors = $this->validator->validate($status);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $manager->persist($status);
-            $manager->flush();
-
-            return $this->redirectToRoute('setting_delivery_status');
-        }
+            if ($form->isSubmitted() && $form->isValid()) {
+                $manager->persist($status);
+                $manager->flush();
+                $this->ErrorHandler->success("Le satut a été sauvegardé avec succès!");
+                return $this->redirectToRoute('setting_delivery_status');
+            }
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la sauvegarde du statut!");
+            $this->ErrorHandler->error($ex->getMessage());
+        } 
 
         return $this->render('setting/delivery_status_registration.html.twig', [
             'formStatus' => $form->createView(),
@@ -442,26 +459,31 @@ class SettingController extends Controller
 
         $form = $this->createForm(TaxRegistrationType::class, $tax);
 
-        $form->handleRequest($request);
-        $errors = $this->validator->validate($tax);
+        try{
+            $form->handleRequest($request);
+            $errors = $this->validator->validate($tax);
 
-        if($form->isSubmitted() && $form->isValid() ){
-            if(!empty($request->request->get('tax_registration[CommentContent]'))){
-                
-                if(!$comment)
-                    $comment = new Comment();
-                $comment->setContent($request->request->get('tax_registration[CommentContent]'));
-                $comment->setCreateAt(new \DateTime());
-    
-                $tax->setComment($comment);
-                $manager->persist($comment);
+            if ($form->isSubmitted() && $form->isValid()) {
+                if (!empty($request->request->get('tax_registration[CommentContent]'))) {
+
+                    if (!$comment)
+                        $comment = new Comment();
+                    $comment->setContent($request->request->get('tax_registration[CommentContent]'));
+                    $comment->setCreateAt(new \DateTime());
+
+                    $tax->setComment($comment);
+                    $manager->persist($comment);
+                }
+
+                $tax->setCreateAt(new \DateTime());
+                $manager->persist($tax);
+                $manager->flush();
+                $this->ErrorHandler->success("La taxe a été sauvegardée avec succès!");
+                return $this->redirectToRoute('setting_tax');
             }
-            
-            $tax->setCreateAt(new \DateTime());
-            $manager->persist($tax);
-            $manager->flush();
-
-            return $this->redirectToRoute('setting_tax');
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la sauvegarde de la taxe!");
+            $this->ErrorHandler->error($ex->getMessage());
         }        
 
         return $this->render('setting/tax_registration.html.twig', [
@@ -488,19 +510,24 @@ class SettingController extends Controller
 
         $form = $this->createForm(ItemBrandRegistrationType::class, $itemBrand);
 
-        $form->handleRequest($request);
-        $errors = $this->validator->validate($itemBrand);
+        try{
+            $form->handleRequest($request);
+            $errors = $this->validator->validate($itemBrand);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
 
-            $itemBrand->setCreatedAt(new \DateTime());
-            $itemBrand->setIsEnabled(true);
+                $itemBrand->setCreatedAt(new \DateTime());
+                $itemBrand->setIsEnabled(true);
 
-            $manager->persist($itemBrand);
-            $manager->flush();
-
-            return $this->redirectToRoute('setting_catalogue_brand');
-        }
+                $manager->persist($itemBrand);
+                $manager->flush();
+                $this->ErrorHandler->success("La marque a été sauvegardée avec succès!");
+                return $this->redirectToRoute('setting_catalogue_brand');
+            }
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la sauvegarde de la marque!");
+            $this->ErrorHandler->error($ex->getMessage());
+        }  
 
         return $this->render('setting/brand_registration.html.twig', [
             'formBrand' => $form->createView(),
@@ -527,18 +554,23 @@ class SettingController extends Controller
 
         $form = $this->createForm(ItemGroupeRegistrationType::class, $itemGroupe);
 
-        $form->handleRequest($request);
-        $this->ErrorHandler->registerError($validator->validate($itemGroupe));
+        try{
+            $form->handleRequest($request);
+            $this->ErrorHandler->registerError($validator->validate($itemGroupe));
 
-        if ($form->isSubmitted() && $form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
 
-            $itemGroupe->setIsEnabled(true);
+                $itemGroupe->setIsEnabled(true);
 
-            $manager->persist($itemGroupe);
-            $manager->flush();
-
-            return $this->redirectToRoute('setting_catalogue_group');
-        }
+                $manager->persist($itemGroupe);
+                $manager->flush();
+                $this->ErrorHandler->success("La famille a été sauvegardée avec succès!");
+                return $this->redirectToRoute('setting_catalogue_group');
+            }
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la sauvegarde de la famille!");
+            $this->ErrorHandler->error($ex->getMessage());
+        } 
 
         return $this->render('setting/group_registration.html.twig', [
             'formGroup' => $form->createView(),
@@ -564,18 +596,23 @@ class SettingController extends Controller
 
         $form = $this->createForm(ProviderRegistrationType::class, $provider);
 
-        $form->handleRequest($request);
-        $this->ErrorHandler->registerError($validator->validate($provider));
+        try{
+            $form->handleRequest($request);
+            $this->ErrorHandler->registerError($validator->validate($provider));
 
-        if ($form->isSubmitted() && $form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
 
-            $provider->setIsEnabled(true);
+                $provider->setIsEnabled(true);
 
-            $manager->persist($provider);
-            $manager->flush();
-
-            return $this->redirectToRoute('setting_catalogue_provider');
-        }
+                $manager->persist($provider);
+                $manager->flush();
+                $this->ErrorHandler->success("Le fournisseur a été sauvegardé avec succès!");
+                return $this->redirectToRoute('setting_catalogue_provider');
+            }
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la sauvegarde du fournisseur!");
+            $this->ErrorHandler->error($ex->getMessage());
+        } 
 
         return $this->render('setting/provider_registration.html.twig', [
             'formProvider' => $form->createView(),
@@ -601,15 +638,20 @@ class SettingController extends Controller
 
         $form = $this->createForm(EanCodeRegistrationType::class, $ean);
 
-        $form->handleRequest($request);
-        $this->ErrorHandler->registerError($validator->validate($ean));
+       try{
+            $form->handleRequest($request);
+            $this->ErrorHandler->registerError($validator->validate($ean));
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $manager->persist($ean);
-            $manager->flush();
-
-            return $this->redirectToRoute('setting_catalogue_ean');
-        }
+            if ($form->isSubmitted() && $form->isValid()) {
+                $manager->persist($ean);
+                $manager->flush();
+                $this->ErrorHandler->success("L'EAN a été sauvegardé avec succès!");
+                return $this->redirectToRoute('setting_catalogue_ean');
+            }
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la sauvegarde de l'EAN!");
+            $this->ErrorHandler->error($ex->getMessage());
+        } 
 
         return $this->render('catalogue/ean_registration.html.twig', [
             'formEAN' => $form->createView(),
@@ -635,16 +677,21 @@ class SettingController extends Controller
 
         $form = $this->createForm(OrderStatusRegistrationType::class, $status);
 
-        $form->handleRequest($request);
-        $this->ErrorHandler->registerError($validator->validate($status));
+        try{
+            $form->handleRequest($request);
+            $this->ErrorHandler->registerError($validator->validate($status));
 
-        if ($form->isSubmitted() && $form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
 
-            $manager->persist($status);
-            $manager->flush();
-
-            return $this->redirectToRoute('setting_order_status');
-        }
+                $manager->persist($status);
+                $manager->flush();
+                $this->ErrorHandler->success("Le statut a été sauvegardé avec succès!");
+                return $this->redirectToRoute('setting_order_status');
+            }
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la sauvegarde du statut!");
+            $this->ErrorHandler->error($ex->getMessage());
+        } 
 
         return $this->render('setting/status_registration.html.twig', [
             'formStatus' => $form->createView(),
@@ -664,23 +711,28 @@ class SettingController extends Controller
             'message' => ''
         ];
 
-        $form = $request->files->get('catalogue_upload');
-        if(!empty($form['item']))
+        try{
+            $form = $request->files->get('catalogue_upload');
+            if (!empty($form['item']))
             $error = $this->settingManager->importCatalogueItem($form['item'], $this->getParameter('file.setting.catalogue.download_dir'));
-        
-        if (!empty($form['provider']) && $error['statut'] == 0)
+
+            if (!empty($form['provider']) && $error['statut'] == 0)
             $error = $this->settingManager->importCatalogueProvider($form['provider'], $this->getParameter('file.setting.catalogue.download_dir'));
 
-        if (!empty($form['categorie']) && $error['statut'] == 0)
+            if (!empty($form['categorie']) && $error['statut'] == 0)
             $error = $this->settingManager->importCatalogueCategorie($form['categorie'], $this->getParameter('file.setting.catalogue.download_dir'));
 
-        if (!empty($form['brand']) && $error['statut'] == 0)
+            if (!empty($form['brand']) && $error['statut'] == 0)
             $error = $this->settingManager->importCatalogueBrand($form['brand'], $this->getParameter('file.setting.catalogue.download_dir'));
 
-        if($error['statut'] == 0)
+            if ($error['statut'] == 0)
             $this->ErrorHandler->success('Vos éléments ont été importés avec succès!');
-        else
-        $this->ErrorHandler->error($error['message']);
+            else
+                $this->ErrorHandler->error($error['message']);
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant l'importation!");
+            $this->ErrorHandler->error($ex->getMessage());
+        } 
 
         return $this->redirectToRoute('setting_catalogue_import');
     }
@@ -696,19 +748,23 @@ class SettingController extends Controller
 
         $form = $request->request->get('emails');
 
-        if(!empty($form)){
-            $quoteFile = $this->getParameter('file.setting.email') . '/' . 'quote.txt';
-            file_put_contents($quoteFile,trim($form['quote'], ' \t'));
-            file_put_contents($this->getParameter('file.setting.email') . '/' . 'facture.txt', trim($form['bill'], ' \t'));
-            file_put_contents($this->getParameter('file.setting.email') . '/' . 'relance_paiement_1.txt', trim($form['first_reminder'], ' \t'));
-            file_put_contents($this->getParameter('file.setting.email') . '/' . 'relance_paiement_2.txt', trim($form['seconde_reminder'], ' \t'));
-            file_put_contents($this->getParameter('file.setting.email') . '/' . 'validation_commande.txt', trim($form['validate'], ' \t'));
-            file_put_contents($this->getParameter('file.setting.email') . '/' . 'inscription.txt', trim($form['inscription'], ' \t'));
-                    
-        }
-        else{
-             $this->errorHandler->error("Une erreur s'est produite lors de l'enregistrement de vos modèles d\'email!");
-        }
+        try{
+            if (!empty($form)) {
+                $quoteFile = $this->utility->getAbsoluteRootPath() . '/' . $this->getParameter('file.setting.email') . '/' . 'quote.txt';
+                file_put_contents($quoteFile, trim($form['quote'], ' \t'));
+                file_put_contents($this->utility->getAbsoluteRootPath() . '/' . $this->getParameter('file.setting.email') . '/' . 'facture.txt', trim($form['bill'], ' \t'));
+                file_put_contents($this->utility->getAbsoluteRootPath() . '/' . $this->getParameter('file.setting.email') . '/' . 'relance_paiement_1.txt', trim($form['first_reminder'], ' \t'));
+                file_put_contents($this->utility->getAbsoluteRootPath() . '/' . $this->getParameter('file.setting.email') . '/' . 'relance_paiement_2.txt', trim($form['seconde_reminder'], ' \t'));
+                file_put_contents($this->utility->getAbsoluteRootPath() . '/' . $this->getParameter('file.setting.email') . '/' . 'validation_commande.txt', trim($form['validate'], ' \t'));
+                file_put_contents($this->utility->getAbsoluteRootPath() . '/' . $this->getParameter('file.setting.email') . '/' . 'inscription.txt', trim($form['inscription'], ' \t'));
+                $this->ErrorHandler->success("Les templates emails ont été sauvegardés avec succès!");
+            } else {
+                $this->errorHandler->error("Une erreur s'est produite lors de l'enregistrement de vos modèles d\'email!");
+            }
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant l'enregistrement des templates email!");
+            $this->ErrorHandler->error($ex->getMessage());
+        } 
         
         return $this->redirectToRoute('setting_email');
     }
@@ -724,21 +780,26 @@ class SettingController extends Controller
 
         $form = $request->request->get('texts');
 
-        if(!empty($form)){
-            $cgvFile = $utility->getAbsoluteRootPath() . $this->getParameter('file.setting.text') . '/' . 'cgv.txt';
-            $quoteFile = $utility->getAbsoluteRootPath() . $this->getParameter('file.setting.text') . '/' . 'quote.txt';
-            //dump(trim($form['cgv']));die();
-            file_put_contents($cgvFile,trim($form['cgv'], ' \t'));
-            file_put_contents($quoteFile, trim($form['quote'], ' \t'));
-            
-            $event = new GenericEvent([
-                'files' => [$cgvFile, $quoteFile]
-            ]);
-            $this->eventDispatcher->dispatch(MyEvents::FTP_TEXT_SEND, $event);
-        }
-        else{
-             $this->errorHandler->error("Une erreur s'est produite lors de l'enregistrement de vos modèles d\'email!");
-        }
+        try{
+            if (!empty($form)) {
+                $cgvFile = $utility->getAbsoluteRootPath() . $this->getParameter('file.setting.text') . '/' . 'cgv.txt';
+                $quoteFile = $utility->getAbsoluteRootPath() . $this->getParameter('file.setting.text') . '/' . 'quote.txt';
+                //dump(trim($form['cgv']));die();
+                file_put_contents($cgvFile, trim($form['cgv'], ' \t'));
+                file_put_contents($quoteFile, trim($form['quote'], ' \t'));
+
+                $event = new GenericEvent([
+                    'files' => [$cgvFile, $quoteFile]
+                ]);
+                $this->eventDispatcher->dispatch(MyEvents::FTP_TEXT_SEND, $event);
+                $this->ErrorHandler->success("Les textes ont été sauvegardés avec succès!");
+            } else {
+                $this->errorHandler->error("Une erreur s'est produite lors de l'enregistrement de vos modèles d\'email!");
+            }
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant l'enregistrement des textes!");
+            $this->ErrorHandler->error($ex->getMessage());
+        } 
         
         return $this->redirectToRoute('setting_text');
     }
@@ -761,6 +822,7 @@ class SettingController extends Controller
         try {
             $manager->remove($setting);
             $manager->flush();
+            $this->ErrorHandler->success("La configuration a été supprimé avec succès!");
         } catch (Exception $ex) {
             $this->ErrorHandler->error("Une erreur s'est produite durant la suppression de la configuration");
             $this->ErrorHandler->error($ex->getMessage());
@@ -781,6 +843,7 @@ class SettingController extends Controller
         try {
             $manager->remove($currency);
             $manager->flush();
+            $this->ErrorHandler->success("La monnaie a été supprimé avec succès!");
         } catch (Exception $ex) {
             $this->ErrorHandler->error("Une erreur s'est produite durant la suppression de la monnaie");
             $this->ErrorHandler->error($ex->getMessage());
@@ -801,6 +864,7 @@ class SettingController extends Controller
         try {
             $manager->remove($tax);
             $manager->flush();
+            $this->ErrorHandler->success("La taxe a été supprimé avec succès!");
         } catch (Exception $ex) {
             $this->ErrorHandler->error("Une erreur s'est produite durant la suppression de la TVA");
             $this->ErrorHandler->error($ex->getMessage());
@@ -821,6 +885,7 @@ class SettingController extends Controller
         try {
             $manager->remove($status);
             $manager->flush();
+            $this->ErrorHandler->success("Le status a été supprimé avec succès!");
         } catch (Exception $ex) {
             $this->ErrorHandler->error("Une erreur s'est produite durant la suppression du status livraison");
             $this->ErrorHandler->error($ex->getMessage());
@@ -842,6 +907,7 @@ class SettingController extends Controller
         try {
             $manager->remove($provider);
             $manager->flush();
+            $this->ErrorHandler->success("Le fournisseur a été supprimé avec succès!");
         } catch (Exception $ex) {
             $this->ErrorHandler->error("Une erreur s'est produite durant la suppression du fournisseur");
             $this->ErrorHandler->error($ex->getMessage());
@@ -866,6 +932,7 @@ class SettingController extends Controller
                 $imei->setEanCode(null);
                 $manager->remove($ean);
                 $manager->flush();
+                $this->ErrorHandler->success("L'EAN a été supprimé avec succès!");
             }
         }catch(Exception $ex){
             $this->ErrorHandler->error("Une erreur s'est produite durant la suppression du code EAN");
@@ -888,6 +955,7 @@ class SettingController extends Controller
         try {
             $manager->remove($group);
             $manager->flush();
+            $this->ErrorHandler->success("La famille a été supprimé avec succès!");
         } catch (Exception $ex) {
             $this->ErrorHandler->error("Une erreur s'est produite durant la suppression de la famille!");
             $this->ErrorHandler->error($ex->getMessage());
@@ -909,6 +977,7 @@ class SettingController extends Controller
         try {
             $manager->remove($brand);
             $manager->flush();
+            $this->ErrorHandler->success("La marque a été supprimé avec succès!");
         } catch (Exception $ex) {
             $this->ErrorHandler->error("Une erreur s'est produite durant la suppression de la marque!");
             $this->ErrorHandler->error($ex->getMessage());
@@ -932,6 +1001,7 @@ class SettingController extends Controller
                 $manager->flush();
             } else
                 $this->ErrorHandler->error("Le status ne peut pas être supprimé. Il est en cours d'utilisation par au moins une commande!");
+            $this->ErrorHandler->success("Le status a été supprimé avec succès!");
         }catch(Exception $ex){
             $this->ErrorHandler->error("Une erreur s'est produite durant la suppression du status commande!");
             $this->ErrorHandler->error($ex->getMessage());

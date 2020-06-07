@@ -84,8 +84,43 @@
 </div>
 {% endblock %}
 
+{# Bons de livraison #}
+{% block delivery_recipt_area %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-align-justify"></i> Bon(s) de livraison émis
+            </div>
+            <div class="card-body">
+                <table id="delivery_table_js" class="table table-responsive-md table-bordered table-striped table-md">
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{# Factures emises #}
+{% block bill_recipt_area %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-align-justify"></i> Factures émises
+            </div>
+            <div class="card-body">
+                <table id="bill_table_js" class="table table-responsive-md table-bordered table-striped table-md">
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
 {# Email devis #}
 {% block email_area %}
+{% if bills is defined and bills | length > 0 %}
 <form action="{{ path("order_email_bill",{id: order.id }) }}" method="post">
     <div class="row">
         <div class="col-md-12">
@@ -125,44 +160,11 @@
         </div>
     </div>
 </form>
-{% endblock %}
-
-{# Bons de livraison #}
-{% block delivery_recipt_area %}
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <i class="fa fa-align-justify"></i> Bon(s) de livraison émis
-            </div>
-            <div class="card-body">
-                <table id="delivery_table_js" class="table table-responsive-md table-bordered table-striped table-md">
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
-
-{# Factures emises #}
-{% block bill_recipt_area %}
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <i class="fa fa-align-justify"></i> Factures émises
-            </div>
-            <div class="card-body">
-                <table id="bill_table_js" class="table table-responsive-md table-bordered table-striped table-md">
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
+{% endif %}
 {% endblock %}
 
 {% block close_btn_area %}
-{% if bills | length > 0 %}
+{% if bills is defined and bills | length > 0 %}
 <div class="row">
     <div class="col-md-12">
         <div class="card">

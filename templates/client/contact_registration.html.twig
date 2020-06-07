@@ -36,7 +36,7 @@
                 <i class="fa fa-align-justify"></i> Contact</div>
             <div class="card-body">
         
-                <div class="c-switch-wrapper">
+                <div class="switch-wrapper">
                     <span class="badge badge-success">Contact principal</span>
                     <label class="c-switch c-switch-label c-switch-primary">
                         {% if formContact.vars.data.IsPrincipal %}
@@ -55,7 +55,7 @@
                 {{ form_row(formContact.Email,{'label': 'Email', 'attr': {'placeholder': 'Email'}}) }}
                 {{ form_row(formContact.Phone,{'label': 'Téléphone', 'attr': {'placeholder': 'Téléphone'}}) }}
                 {{ form_row(formContact.Mobile,{'label': 'Téléphone mobile', 'attr': {'placeholder': 'Téléphone mobile'}}) }}
-                {{ form_row(formContact.ContentComment,{'label': 'Commentaires', 'attr': {'placeholder': 'Commentaires'}}) }}
+                {{ form_widget(formContact.Comment,{'label': 'Commentaires', 'attr': {'placeholder': 'Commentaires'}}) }}
                  
             </div>
         </div>
@@ -63,14 +63,9 @@
         <div class="card">
             <div class="card-header">
                 <i class="fa fa-align-justify"></i> Adresse</div>
-            <div class="card-body">
+            <div class="card-body">                
+                {{ form_widget(formContact.Address,{'attr': {'placeholder': 'Rue'}}) }}
                 
-                {{ form_row(formContact.Street,{'label': 'Rue', 'attr': {'placeholder': 'Rue'}}) }}
-                {{ form_row(formContact.ZipCode,{'label': 'Code postale', 'attr': {'placeholder': 'Code postale'}}) }}
-                {{ form_row(formContact.City,{'label': 'Ville', 'attr': {'placeholder': 'Ville'}}) }}
-                {{ form_row(formContact.Country,{'label': 'Pays', 'attr': {'placeholder': 'Pays'}}) }}
-                {{ form_row(formContact.AddressComment,{'label': 'Commentaire', 'attr': {'placeholder': 'Commentaire'}}) }}
-        
             </div>
         </div>
         {{ form_end(formContact) }}

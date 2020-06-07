@@ -1,6 +1,6 @@
 {% extends 'template_coreui.html.twig' %}
 
-{% set page_title = 'Nouveau client' %}
+{% set page_title = 'Création & modification' %}
 
 {% block home_path %}
 <li class="breadcrumb-item">
@@ -56,17 +56,17 @@
                 {{ form_row(formClient.Denomination,{'label': 'Dénomination','attr': {'placeholder': 'Dénomination'}}) }}
                 {{ form_row(formClient.Rib,{'label': 'RIB','attr': {'placeholder': 'Rib'}}) }}
                 {{ form_row(formClient.CRN,{'label': 'Kbis','attr': {'placeholder': 'kbis'}}) }}
-                {{ form_row(formClient.PayDelay,{'label': 'Délais de paiement', 'attr': {'placeholder': 'Délais de paiement'}})
+                {{ form_row(formClient.PayDelay,{'label': 'Délais de paiement(en jour)', 'attr': {'placeholder': 'Délais de paiement'}})
                 }}
                 {{ form_row(formClient.MaxCredit,{'label': 'Encours Max', 'attr': {'placeholder': 'Encours Max'}}) }}
-                {{ form_row(formClient.ClientComment,{'label': 'Commentaire général sur le client', 'attr': {'placeholder': 'Commentaire général sur le client'}})
+                {{ form_widget(formClient.Comment,{'label': 'Commentaire général sur le client', 'attr': {'placeholder': 'Commentaire général sur le client'}})
                 }}
         
         
             </div>
         </div>
         
-        {# Contact #}
+        {# Contact 
         <div class="card">
             <div class="card-header">
                 <i class="fa fa-align-justify"></i> Contact Principal</div>
@@ -81,7 +81,7 @@
             </div>
         </div>
         
-        {# Adresse #}
+       
         <div class="card">
             <div class="card-header">
                 <i class="fa fa-align-justify"></i> Adresse</div>
@@ -95,7 +95,7 @@
         
             </div>
         </div>
-        
+        #}
         {{ form_end(formClient) }}
     </div>
 

@@ -2,10 +2,10 @@
 -- version 4.8.5
 -- https://www.phpmyadmin.net/
 --
--- Hôte : 127.0.0.1:3306
--- Généré le :  mer. 20 nov. 2019 à 20:37
--- Version du serveur :  5.7.26
--- Version de PHP :  5.6.40
+-- Host: 127.0.0.1:3306
+-- Generation Time: Jul 13, 2020 at 02:44 PM
+-- Server version: 5.7.26
+-- PHP Version: 7.3.5
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -19,13 +19,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de données :  `qobdweb`
+-- Database: `qobdweb`
 --
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `action`
+-- Table structure for table `action`
 --
 
 DROP TABLE IF EXISTS `action`;
@@ -34,20 +34,38 @@ CREATE TABLE IF NOT EXISTS `action` (
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `display_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Déchargement des données de la table `action`
+-- Dumping data for table `action`
 --
 
 INSERT INTO `action` (`id`, `name`, `display_name`) VALUES
 (1, 'ACTION_BILL', 'Facturation'),
-(2, 'ACTION_PDF', 'Création PDF');
+(2, 'ACTION_PDF', 'Génération PDF'),
+(4, 'ACTION_QUOTE', 'Devis'),
+(5, 'ACTION_ORDER', 'Commande'),
+(6, 'ACTION_PREORDER', 'Pré-commande'),
+(7, 'ACTION_PREREFUND', 'Pré-avoir'),
+(8, 'ACTION_VALID', 'Revalidation client'),
+(9, 'ACTION_REFUND', 'Avoir'),
+(10, 'ACTION_REFUND_BILLED', 'Avoir facturé'),
+(11, 'ACTION_ORDER_CLOSED', 'Commande clôturée'),
+(12, 'ACTION_REFUND_CLOSED', 'Avoir clôturé'),
+(13, 'ACTION_DASHBORD', 'Tableau de bord'),
+(14, 'ACTION_AGENT', 'Profile commercial'),
+(15, 'ACTION_SETTING', 'Configuration'),
+(16, 'ACTION_CATALOGUE', 'Catalogue produits'),
+(17, 'ACTION_CLIENT', 'CLients'),
+(18, 'ACTION_SECURITY', 'Gestion de la sécurité'),
+(19, 'ACTION_STATISTIC', 'Statistiques et graphiques'),
+(20, 'ACTION_BLOG', 'Blog'),
+(21, 'ACTION_SENSIBLE', 'Données sensible (ex: marge, commentaire admin, etc...)');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `action_role`
+-- Table structure for table `action_role`
 --
 
 DROP TABLE IF EXISTS `action_role`;
@@ -60,12 +78,58 @@ CREATE TABLE IF NOT EXISTS `action_role` (
   KEY `IDX_218831649D32F035` (`action_id`),
   KEY `IDX_21883164D60322AC` (`role_id`),
   KEY `IDX_2188316432FB8AEA` (`privilege_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `action_role`
+--
+
+INSERT INTO `action_role` (`id`, `action_id`, `role_id`, `privilege_id`) VALUES
+(1, 1, 1, 1),
+(2, 2, 1, 2),
+(3, 4, 1, 3),
+(4, 5, 1, 4),
+(5, 6, 1, 5),
+(6, 7, 1, 6),
+(7, 8, 1, 7),
+(8, 9, 1, 8),
+(9, 10, 1, 9),
+(10, 11, 1, 10),
+(11, 12, 1, 11),
+(12, 13, 1, 12),
+(13, 14, 1, 13),
+(14, 15, 1, 14),
+(15, 16, 1, 15),
+(16, 17, 1, 16),
+(17, 18, 1, 17),
+(18, 1, 8, 18),
+(19, 1, 7, 19),
+(20, 20, 1, 20),
+(21, 19, 1, 21),
+(22, 2, 7, 22),
+(23, 4, 7, 23),
+(24, 5, 7, 24),
+(25, 6, 7, 25),
+(26, 7, 7, 26),
+(27, 8, 7, 27),
+(28, 9, 7, 28),
+(29, 10, 7, 29),
+(30, 11, 7, 30),
+(31, 12, 7, 31),
+(32, 13, 7, 32),
+(33, 14, 7, 33),
+(34, 15, 7, 34),
+(35, 16, 7, 35),
+(36, 17, 7, 36),
+(37, 18, 7, 37),
+(38, 19, 7, 38),
+(39, 20, 7, 39),
+(40, 21, 1, 40);
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `action_tracker`
+-- Table structure for table `action_tracker`
 --
 
 DROP TABLE IF EXISTS `action_tracker`;
@@ -81,14 +145,14 @@ CREATE TABLE IF NOT EXISTS `action_tracker` (
 -- --------------------------------------------------------
 
 --
--- Structure de la table `address`
+-- Table structure for table `address`
 --
 
 DROP TABLE IF EXISTS `address`;
 CREATE TABLE IF NOT EXISTS `address` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `comment_id` int(11) DEFAULT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `display_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `city` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `street` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -97,19 +161,12 @@ CREATE TABLE IF NOT EXISTS `address` (
   `is_principal` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNIQ_D4E6F81F8697D13` (`comment_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `address`
---
-
-INSERT INTO `address` (`id`, `comment_id`, `name`, `display_name`, `city`, `street`, `zip_code`, `country`, `is_principal`) VALUES
-(1, 3, '3 rue gambetta', NULL, 'Saint-Michel-sur-Orge', 'bat I appart. 204', '91240', 'France', 1);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `agent`
+-- Table structure for table `agent`
 --
 
 DROP TABLE IF EXISTS `agent`;
@@ -129,28 +186,39 @@ CREATE TABLE IF NOT EXISTS `agent` (
   `list_size` int(11) DEFAULT NULL,
   `is_activated` tinyint(1) NOT NULL,
   `ipaddress` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `logged_at` datetime DEFAULT NULL,
+  `token` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNIQ_268B9C9DF8697D13` (`comment_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Déchargement des données de la table `agent`
+-- Dumping data for table `agent`
 --
 
-INSERT INTO `agent` (`id`, `comment_id`, `first_name`, `last_name`, `phone`, `fax`, `email`, `user_name`, `password`, `picture`, `is_admin`, `is_online`, `list_size`, `is_activated`, `ipaddress`) VALUES
-(1, NULL, 'JOEL', 'DAGO', '+33618319489', NULL, 'Joel.dago@yahoo.fr', 'bahilo', '$2y$13$qca5h/VVx85216/D96ahZOrFv7./2m3YJjeXtaKYjabLxNWE8Jq.u', NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO `agent` (`id`, `comment_id`, `first_name`, `last_name`, `phone`, `fax`, `email`, `user_name`, `password`, `picture`, `is_admin`, `is_online`, `list_size`, `is_activated`, `ipaddress`, `logged_at`, `token`) VALUES
+(1, NULL, 'JOEL', 'DAGO', '+33618319489', NULL, 'Joel.dago@yahoo.fr', 'bahilo', '$2y$13$U492bfnvE.g8Wow6H/KokubxRMWiggin69N.p68FBlVI/ik6EhWRi', 'bahilo-5e0a373680906.png', 1, 1, NULL, 1, NULL, '2020-07-13 13:20:33', 'ewU8wZYxe6sTmN7SoLPWonGD5IBmORzOj1Cg8FsXy18'),
+(2, NULL, 'client 3', 'client 3', NULL, NULL, 'sisi.bahilo@gmail.com', 'danseur', '$2y$13$QM4mW.6v4WprHhY9lwDS0uEjKqmHiji2YhJWgZ3xkw8vgHNIjIrWa', NULL, 0, 0, NULL, 1, NULL, '2020-04-13 13:24:13', NULL),
+(3, NULL, 'Ruth', 'Lago', NULL, NULL, 'lago_ruth@yahoo.fr', 'ruth225', '$2y$13$2.Tituel1ZGvJrEWKadhuuZI12owKJgEOPHhn8JMZyub6z2UpyCQC', NULL, 0, 0, NULL, 0, NULL, '2020-01-04 18:16:31', NULL),
+(4, NULL, 'toto', 'toto', NULL, NULL, 'Joel.dago@yahoo.fr', 'toto', '$2y$13$KUe3iVlHY0XPl.1RVUIyEOB0JiML3GOjJhkfW05gQBRWiO/g5JEYy', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL),
+(6, NULL, 'toto', 'toto', NULL, NULL, 'joel.dago@yahoo.fr', 'toto3', '$2y$13$0TVNmP.O3pzoc3ZFkrlOHehdQ3/opCje3lyiMbRYR4t9WYCBs8cbO', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL),
+(7, NULL, 'toto', 'toto', NULL, NULL, 'joel.dago@yahoo.fr', 'toto4', '$2y$13$WfwnjlOIUbw5SIn8tx5Nuu/bWCK76EDRkGDqSRRoUJZxuGrTeEEIO', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `agent_discussion`
+-- Table structure for table `agent_discussion`
 --
 
 DROP TABLE IF EXISTS `agent_discussion`;
 CREATE TABLE IF NOT EXISTS `agent_discussion` (
-  `agent_id` int(11) NOT NULL,
-  `discussion_id` int(11) NOT NULL,
-  PRIMARY KEY (`agent_id`,`discussion_id`),
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `agent_id` int(11) DEFAULT NULL,
+  `discussion_id` int(11) DEFAULT NULL,
+  `is_current` tinyint(1) NOT NULL,
+  `is_owner` tinyint(1) DEFAULT NULL,
+  `unread` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
   KEY `IDX_B1FF28003414710B` (`agent_id`),
   KEY `IDX_B1FF28001ADED311` (`discussion_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -158,7 +226,7 @@ CREATE TABLE IF NOT EXISTS `agent_discussion` (
 -- --------------------------------------------------------
 
 --
--- Structure de la table `agent_role`
+-- Table structure for table `agent_role`
 --
 
 DROP TABLE IF EXISTS `agent_role`;
@@ -170,10 +238,28 @@ CREATE TABLE IF NOT EXISTS `agent_role` (
   KEY `IDX_FAF23089D60322AC` (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `agent_role`
+--
+
+INSERT INTO `agent_role` (`agent_id`, `role_id`) VALUES
+(1, 1),
+(1, 7),
+(1, 10),
+(2, 7),
+(2, 9),
+(2, 10),
+(3, 1),
+(3, 7),
+(3, 10),
+(4, 10),
+(6, 10),
+(7, 10);
+
 -- --------------------------------------------------------
 
 --
--- Structure de la table `alert`
+-- Table structure for table `alert`
 --
 
 DROP TABLE IF EXISTS `alert`;
@@ -187,7 +273,7 @@ CREATE TABLE IF NOT EXISTS `alert` (
 -- --------------------------------------------------------
 
 --
--- Structure de la table `alert_bill`
+-- Table structure for table `alert_bill`
 --
 
 DROP TABLE IF EXISTS `alert_bill`;
@@ -202,7 +288,35 @@ CREATE TABLE IF NOT EXISTS `alert_bill` (
 -- --------------------------------------------------------
 
 --
--- Structure de la table `bill`
+-- Table structure for table `article`
+--
+
+DROP TABLE IF EXISTS `article`;
+CREATE TABLE IF NOT EXISTS `article` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `author_id` int(11) DEFAULT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `short` varchar(3000) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `content` varchar(10000) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `publish_at` datetime DEFAULT NULL,
+  `publish_end_at` datetime DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `is_center_of_interest` tinyint(1) DEFAULT NULL,
+  `is_product` tinyint(1) DEFAULT NULL,
+  `is_partenaire` tinyint(1) DEFAULT NULL,
+  `is_team` tinyint(1) DEFAULT NULL,
+  `is_testimony` tinyint(1) DEFAULT NULL,
+  `role` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `picture` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `IDX_23A0E66F675F31B` (`author_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `bill`
 --
 
 DROP TABLE IF EXISTS `bill`;
@@ -212,32 +326,42 @@ CREATE TABLE IF NOT EXISTS `bill` (
   `public_comment_id` int(11) DEFAULT NULL,
   `income_statistic_id` int(11) DEFAULT NULL,
   `contact_id` int(11) DEFAULT NULL,
+  `client_id` int(11) DEFAULT NULL,
   `pay_mode` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `pay` double NOT NULL,
   `pay_received` double DEFAULT NULL,
   `created_at` datetime NOT NULL,
   `limit_date_at` datetime DEFAULT NULL,
   `payed_at` datetime DEFAULT NULL,
-  `client_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNIQ_7A2119E3F5ACD764` (`private_comment_id`),
   UNIQUE KEY `UNIQ_7A2119E362FBE97E` (`public_comment_id`),
   KEY `IDX_7A2119E3B622266F` (`income_statistic_id`),
   KEY `IDX_7A2119E3E7A1254A` (`contact_id`),
   KEY `IDX_7A2119E319EB6921` (`client_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `bill`
---
-
-INSERT INTO `bill` (`id`, `private_comment_id`, `public_comment_id`, `income_statistic_id`, `contact_id`, `pay_mode`, `pay`, `pay_received`, `created_at`, `limit_date_at`, `payed_at`, `client_id`) VALUES
-(4, NULL, NULL, NULL, 1, NULL, 205, NULL, '2019-11-20 19:37:47', NULL, NULL, 1);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `client`
+-- Table structure for table `blog_setting`
+--
+
+DROP TABLE IF EXISTS `blog_setting`;
+CREATE TABLE IF NOT EXISTS `blog_setting` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `value` varchar(300) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `is_file` tinyint(1) DEFAULT NULL,
+  `link` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `client`
 --
 
 DROP TABLE IF EXISTS `client`;
@@ -258,46 +382,26 @@ CREATE TABLE IF NOT EXISTS `client` (
   UNIQUE KEY `UNIQ_C7440455F8697D13` (`comment_id`),
   KEY `IDX_C74404553414710B` (`agent_id`),
   KEY `IDX_C74404551A8C12F5` (`bill_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `client`
---
-
-INSERT INTO `client` (`id`, `agent_id`, `bill_id`, `comment_id`, `company_name`, `rib`, `crn`, `pay_delay`, `max_credit`, `is_activated`, `is_prospect`, `denomination`) VALUES
-(1, NULL, NULL, 4, 'ivory', NULL, NULL, NULL, 2000, 1, 0, 'gagnoa');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `comment`
+-- Table structure for table `comment`
 --
 
 DROP TABLE IF EXISTS `comment`;
 CREATE TABLE IF NOT EXISTS `comment` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `content` varchar(3000) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `create_at` datetime NOT NULL,
+  `content` varchar(3000) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `create_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `comment`
---
-
-INSERT INTO `comment` (`id`, `content`, `create_at`) VALUES
-(1, 'mon petit commentaire 2', '2019-11-17 08:08:03'),
-(2, 'mon produit 2', '2019-11-17 08:09:31'),
-(3, '', '2019-11-17 12:29:32'),
-(4, 'commentaire général', '2019-11-17 12:29:32'),
-(17, '', '2019-11-20 19:36:19'),
-(18, '', '2019-11-20 19:36:19'),
-(19, '', '2019-11-20 19:36:19');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `contact`
+-- Table structure for table `contact`
 --
 
 DROP TABLE IF EXISTS `contact`;
@@ -320,19 +424,271 @@ CREATE TABLE IF NOT EXISTS `contact` (
   UNIQUE KEY `UNIQ_4C62E638F5B7AF75` (`address_id`),
   KEY `IDX_4C62E63819EB6921` (`client_id`),
   KEY `IDX_4C62E638A53A8AA` (`provider_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `contact`
---
-
-INSERT INTO `contact` (`id`, `client_id`, `comment_id`, `provider_id`, `address_id`, `firstname`, `last_name`, `position`, `email`, `phone`, `mobile`, `fax`, `is_principal`) VALUES
-(1, 1, NULL, NULL, 1, 'JOEL', 'DAGO', NULL, 'Joel.dago@yahoo.fr', '+33618319489', NULL, '', 1);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `currency`
+-- Table structure for table `country`
+--
+
+DROP TABLE IF EXISTS `country`;
+CREATE TABLE IF NOT EXISTS `country` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `culture` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=240 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `country`
+--
+
+INSERT INTO `country` (`id`, `name`, `culture`) VALUES
+(1, 'Afghanistan', 'AF'),
+(2, 'Albania', 'AL'),
+(3, 'Algeria', 'DZ'),
+(4, 'American Samoa', 'AS'),
+(5, 'Andorra', 'AD'),
+(6, 'Angola', 'AO'),
+(7, 'Anguilla', 'AI'),
+(8, 'Antarctica', 'AQ'),
+(9, 'Antigua and Barbuda', 'AG'),
+(10, 'Argentina', 'AR'),
+(11, 'Armenia', 'AM'),
+(12, 'Aruba', 'AW'),
+(13, 'Australia', 'AU'),
+(14, 'Austria', 'AT'),
+(15, 'Azerbaijan', 'AZ'),
+(16, 'Bahamas', 'BS'),
+(17, 'Bahrain', 'BH'),
+(18, 'Bangladesh', 'BD'),
+(19, 'Barbados', 'BB'),
+(20, 'Belarus', 'BY'),
+(21, 'Belgium', 'BE'),
+(22, 'Belize', 'BZ'),
+(23, 'Benin', 'BJ'),
+(24, 'Bermuda', 'BM'),
+(25, 'Bhutan', 'BT'),
+(26, 'Bolivia', 'BO'),
+(27, 'Bosnia and Herzegovina', 'BA'),
+(28, 'Botswana', 'BW'),
+(29, 'Bouvet Island', 'BV'),
+(30, 'Brazil', 'BR'),
+(31, 'British Indian Ocean Territory', 'IO'),
+(32, 'Brunei Darussalam', 'BN'),
+(33, 'Bulgaria', 'BG'),
+(34, 'Burkina Faso', 'BF'),
+(35, 'Burundi', 'BI'),
+(36, 'Cambodia', 'KH'),
+(37, 'Cameroon', 'CM'),
+(38, 'Canada', 'CA'),
+(39, 'Cape Verde', 'CV'),
+(40, 'Cayman Islands', 'KY'),
+(41, 'Central African Republic', 'CF'),
+(42, 'Chad', 'TD'),
+(43, 'Chile', 'CL'),
+(44, 'China', 'CN'),
+(45, 'Christmas Island', 'CX'),
+(46, 'Cocos (Keeling) Islands', 'CC'),
+(47, 'Colombia', 'CO'),
+(48, 'Comoros', 'KM'),
+(49, 'Congo', 'CG'),
+(50, 'Congo, the Democratic Republic of the', 'CD'),
+(51, 'Cook Islands', 'CK'),
+(52, 'Costa Rica', 'CR'),
+(53, 'Cote D\'Ivoire', 'CI'),
+(54, 'Croatia', 'HR'),
+(55, 'Cuba', 'CU'),
+(56, 'Cyprus', 'CY'),
+(57, 'Czech Republic', 'CZ'),
+(58, 'Denmark', 'DK'),
+(59, 'Djibouti', 'DJ'),
+(60, 'Dominica', 'DM'),
+(61, 'Dominican Republic', 'DO'),
+(62, 'Ecuador', 'EC'),
+(63, 'Egypt', 'EG'),
+(64, 'El Salvador', 'SV'),
+(65, 'Equatorial Guinea', 'GQ'),
+(66, 'Eritrea', 'ER'),
+(67, 'Estonia', 'EE'),
+(68, 'Ethiopia', 'ET'),
+(69, 'Falkland Islands (Malvinas)', 'FK'),
+(70, 'Faroe Islands', 'FO'),
+(71, 'Fiji', 'FJ'),
+(72, 'Finland', 'FI'),
+(73, 'France', 'FR'),
+(74, 'French Guiana', 'GF'),
+(75, 'French Polynesia', 'PF'),
+(76, 'French Southern Territories', 'TF'),
+(77, 'Gabon', 'GA'),
+(78, 'Gambia', 'GM'),
+(79, 'Georgia', 'GE'),
+(80, 'Germany', 'DE'),
+(81, 'Ghana', 'GH'),
+(82, 'Gibraltar', 'GI'),
+(83, 'Greece', 'GR'),
+(84, 'Greenland', 'GL'),
+(85, 'Grenada', 'GD'),
+(86, 'Guadeloupe', 'GP'),
+(87, 'Guam', 'GU'),
+(88, 'Guatemala', 'GT'),
+(89, 'Guinea', 'GN'),
+(90, 'Guinea-Bissau', 'GW'),
+(91, 'Guyana', 'GY'),
+(92, 'Haiti', 'HT'),
+(93, 'Heard Island and Mcdonald Islands', 'HM'),
+(94, 'Holy See (Vatican City State)', 'VA'),
+(95, 'Honduras', 'HN'),
+(96, 'Hong Kong', 'HK'),
+(97, 'Hungary', 'HU'),
+(98, 'Iceland', 'IS'),
+(99, 'India', 'IN'),
+(100, 'Indonesia', 'ID'),
+(101, 'Iran, Islamic Republic of', 'IR'),
+(102, 'Iraq', 'IQ'),
+(103, 'Ireland', 'IE'),
+(104, 'Israel', 'IL'),
+(105, 'Italy', 'IT'),
+(106, 'Jamaica', 'JM'),
+(107, 'Japan', 'JP'),
+(108, 'Jordan', 'JO'),
+(109, 'Kazakhstan', 'KZ'),
+(110, 'Kenya', 'KE'),
+(111, 'Kiribati', 'KI'),
+(112, 'Korea, Democratic People\'s Republic of', 'KP'),
+(113, 'Korea, Republic of', 'KR'),
+(114, 'Kuwait', 'KW'),
+(115, 'Kyrgyzstan', 'KG'),
+(116, 'Lao People\'s Democratic Republic', 'LA'),
+(117, 'Latvia', 'LV'),
+(118, 'Lebanon', 'LB'),
+(119, 'Lesotho', 'LS'),
+(120, 'Liberia', 'LR'),
+(121, 'Libyan Arab Jamahiriya', 'LY'),
+(122, 'Liechtenstein', 'LI'),
+(123, 'Lithuania', 'LT'),
+(124, 'Luxembourg', 'LU'),
+(125, 'Macao', 'MO'),
+(126, 'Macedonia, the Former Yugoslav Republic of', 'MK'),
+(127, 'Madagascar', 'MG'),
+(128, 'Malawi', 'MW'),
+(129, 'Malaysia', 'MY'),
+(130, 'Maldives', 'MV'),
+(131, 'Mali', 'ML'),
+(132, 'Malta', 'MT'),
+(133, 'Marshall Islands', 'MH'),
+(134, 'Martinique', 'MQ'),
+(135, 'Mauritania', 'MR'),
+(136, 'Mauritius', 'MU'),
+(137, 'Mayotte', 'YT'),
+(138, 'Mexico', 'MX'),
+(139, 'Micronesia, Federated States of', 'FM'),
+(140, 'Moldova, Republic of', 'MD'),
+(141, 'Monaco', 'MC'),
+(142, 'Mongolia', 'MN'),
+(143, 'Montserrat', 'MS'),
+(144, 'Morocco', 'MA'),
+(145, 'Mozambique', 'MZ'),
+(146, 'Myanmar', 'MM'),
+(147, 'Namibia', 'NA'),
+(148, 'Nauru', 'NR'),
+(149, 'Nepal', 'NP'),
+(150, 'Netherlands', 'NL'),
+(151, 'Netherlands Antilles', 'AN'),
+(152, 'New Caledonia', 'NC'),
+(153, 'New Zealand', 'NZ'),
+(154, 'Nicaragua', 'NI'),
+(155, 'Niger', 'NE'),
+(156, 'Nigeria', 'NG'),
+(157, 'Niue', 'NU'),
+(158, 'Norfolk Island', 'NF'),
+(159, 'Northern Mariana Islands', 'MP'),
+(160, 'Norway', 'NO'),
+(161, 'Oman', 'OM'),
+(162, 'Pakistan', 'PK'),
+(163, 'Palau', 'PW'),
+(164, 'Palestinian Territory, Occupied', 'PS'),
+(165, 'Panama', 'PA'),
+(166, 'Papua New Guinea', 'PG'),
+(167, 'Paraguay', 'PY'),
+(168, 'Peru', 'PE'),
+(169, 'Philippines', 'PH'),
+(170, 'Pitcairn', 'PN'),
+(171, 'Poland', 'PL'),
+(172, 'Portugal', 'PT'),
+(173, 'Puerto Rico', 'PR'),
+(174, 'Qatar', 'QA'),
+(175, 'Reunion', 'RE'),
+(176, 'Romania', 'RO'),
+(177, 'Russian Federation', 'RU'),
+(178, 'Rwanda', 'RW'),
+(179, 'Saint Helena', 'SH'),
+(180, 'Saint Kitts and Nevis', 'KN'),
+(181, 'Saint Lucia', 'LC'),
+(182, 'Saint Pierre and Miquelon', 'PM'),
+(183, 'Saint Vincent and the Grenadines', 'VC'),
+(184, 'Samoa', 'WS'),
+(185, 'San Marino', 'SM'),
+(186, 'Sao Tome and Principe', 'ST'),
+(187, 'Saudi Arabia', 'SA'),
+(188, 'Senegal', 'SN'),
+(189, 'Serbia and Montenegro', 'CS'),
+(190, 'Seychelles', 'SC'),
+(191, 'Sierra Leone', 'SL'),
+(192, 'Singapore', 'SG'),
+(193, 'Slovakia', 'SK'),
+(194, 'Slovenia', 'SI'),
+(195, 'Solomon Islands', 'SB'),
+(196, 'Somalia', 'SO'),
+(197, 'South Africa', 'ZA'),
+(198, 'South Georgia and the South Sandwich Islands', 'GS'),
+(199, 'Spain', 'ES'),
+(200, 'Sri Lanka', 'LK'),
+(201, 'Sudan', 'SD'),
+(202, 'Suriname', 'SR'),
+(203, 'Svalbard and Jan Mayen', 'SJ'),
+(204, 'Swaziland', 'SZ'),
+(205, 'Sweden', 'SE'),
+(206, 'Switzerland', 'CH'),
+(207, 'Syrian Arab Republic', 'SY'),
+(208, 'Taiwan, Province of China', 'TW'),
+(209, 'Tajikistan', 'TJ'),
+(210, 'Tanzania, United Republic of', 'TZ'),
+(211, 'Thailand', 'TH'),
+(212, 'Timor-Leste', 'TL'),
+(213, 'Togo', 'TG'),
+(214, 'Tokelau', 'TK'),
+(215, 'Tonga', 'TO'),
+(216, 'Trinidad and Tobago', 'TT'),
+(217, 'Tunisia', 'TN'),
+(218, 'Turkey', 'TR'),
+(219, 'Turkmenistan', 'TM'),
+(220, 'Turks and Caicos Islands', 'TC'),
+(221, 'Tuvalu', 'TV'),
+(222, 'Uganda', 'UG'),
+(223, 'Ukraine', 'UA'),
+(224, 'United Arab Emirates', 'AE'),
+(225, 'United Kingdom', 'GB'),
+(226, 'United States', 'US'),
+(227, 'United States Minor Outlying Islands', 'UM'),
+(228, 'Uruguay', 'UY'),
+(229, 'Uzbekistan', 'UZ'),
+(230, 'Vanuatu', 'VU'),
+(231, 'Venezuela', 'VE'),
+(232, 'Viet Nam', 'VN'),
+(233, 'Virgin Islands, British', 'VG'),
+(234, 'Virgin Islands, U.s.', 'VI'),
+(235, 'Wallis and Futuna', 'WF'),
+(236, 'Western Sahara', 'EH'),
+(237, 'Yemen', 'YE'),
+(238, 'Zambia', 'ZM'),
+(239, 'Zimbabwe', 'ZW');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `currency`
 --
 
 DROP TABLE IF EXISTS `currency`;
@@ -349,7 +705,7 @@ CREATE TABLE IF NOT EXISTS `currency` (
 ) ENGINE=InnoDB AUTO_INCREMENT=154 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Déchargement des données de la table `currency`
+-- Dumping data for table `currency`
 --
 
 INSERT INTO `currency` (`id`, `name`, `symbol`, `rate`, `country_code`, `country`, `is_default`, `created_at`) VALUES
@@ -510,7 +866,7 @@ INSERT INTO `currency` (`id`, `name`, `symbol`, `rate`, `country_code`, `country
 -- --------------------------------------------------------
 
 --
--- Structure de la table `delivery`
+-- Table structure for table `delivery`
 --
 
 DROP TABLE IF EXISTS `delivery`;
@@ -521,40 +877,35 @@ CREATE TABLE IF NOT EXISTS `delivery` (
   `created_at` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `IDX_3781EC106BF700BD` (`status_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `delivery`
---
-
-INSERT INTO `delivery` (`id`, `status_id`, `package`, `created_at`) VALUES
-(5, 1, 1, '2019-11-20 19:36:32');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `delivery_status`
+-- Table structure for table `delivery_status`
 --
 
 DROP TABLE IF EXISTS `delivery_status`;
 CREATE TABLE IF NOT EXISTS `delivery_status` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `display_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Déchargement des données de la table `delivery_status`
+-- Dumping data for table `delivery_status`
 --
 
-INSERT INTO `delivery_status` (`id`, `name`) VALUES
-(1, 'STATUS_BILLED'),
-(2, 'STATUS_NOT_BILLED');
+INSERT INTO `delivery_status` (`id`, `name`, `display_name`) VALUES
+(1, 'STATUS_BILLED', NULL),
+(2, 'STATUS_NOT_BILLED', NULL),
+(3, 'STATUS_CANCELED', NULL);
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `discussion`
+-- Table structure for table `discussion`
 --
 
 DROP TABLE IF EXISTS `discussion`;
@@ -568,7 +919,38 @@ CREATE TABLE IF NOT EXISTS `discussion` (
 -- --------------------------------------------------------
 
 --
--- Structure de la table `income_statistic`
+-- Table structure for table `ean_code`
+--
+
+DROP TABLE IF EXISTS `ean_code`;
+CREATE TABLE IF NOT EXISTS `ean_code` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `country_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `IDX_E04EF53F92F3E70` (`country_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `imei_code`
+--
+
+DROP TABLE IF EXISTS `imei_code`;
+CREATE TABLE IF NOT EXISTS `imei_code` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `ean_code_id` int(11) DEFAULT NULL,
+  `code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `serie_code` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `IDX_47401C75D6307EED` (`ean_code_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `income_statistic`
 --
 
 DROP TABLE IF EXISTS `income_statistic`;
@@ -589,7 +971,7 @@ CREATE TABLE IF NOT EXISTS `income_statistic` (
 -- --------------------------------------------------------
 
 --
--- Structure de la table `item`
+-- Table structure for table `item`
 --
 
 DROP TABLE IF EXISTS `item`;
@@ -607,25 +989,19 @@ CREATE TABLE IF NOT EXISTS `item` (
   `picture` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `is_erasable` tinyint(1) NOT NULL,
   `created_at` datetime NOT NULL,
+  `imei_code_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNIQ_1F1B251EF8697D13` (`comment_id`),
+  UNIQUE KEY `UNIQ_1F1B251EA4D07301` (`imei_code_id`),
   KEY `IDX_1F1B251E769F237C` (`item_groupe_id`),
   KEY `IDX_1F1B251E28F818C3` (`item_brand_id`),
   KEY `IDX_1F1B251EB2A824D8` (`tax_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `item`
---
-
-INSERT INTO `item` (`id`, `comment_id`, `item_groupe_id`, `item_brand_id`, `tax_id`, `ref`, `name`, `sell_price`, `purchase_price`, `stock`, `picture`, `is_erasable`, `created_at`) VALUES
-(1, 1, NULL, NULL, NULL, 'M-456521', 'Produit 1', 20, 10, 25, NULL, 1, '2019-11-17 08:08:03'),
-(2, 2, NULL, NULL, NULL, 'Z-M-456521', 'Produit 2', 35, 25, 75, NULL, 1, '2019-11-17 08:09:31');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `item_brand`
+-- Table structure for table `item_brand`
 --
 
 DROP TABLE IF EXISTS `item_brand`;
@@ -640,7 +1016,7 @@ CREATE TABLE IF NOT EXISTS `item_brand` (
 -- --------------------------------------------------------
 
 --
--- Structure de la table `item_groupe`
+-- Table structure for table `item_groupe`
 --
 
 DROP TABLE IF EXISTS `item_groupe`;
@@ -654,7 +1030,7 @@ CREATE TABLE IF NOT EXISTS `item_groupe` (
 -- --------------------------------------------------------
 
 --
--- Structure de la table `item_provider`
+-- Table structure for table `item_provider`
 --
 
 DROP TABLE IF EXISTS `item_provider`;
@@ -669,7 +1045,7 @@ CREATE TABLE IF NOT EXISTS `item_provider` (
 -- --------------------------------------------------------
 
 --
--- Structure de la table `license`
+-- Table structure for table `license`
 --
 
 DROP TABLE IF EXISTS `license`;
@@ -687,39 +1063,25 @@ CREATE TABLE IF NOT EXISTS `license` (
 -- --------------------------------------------------------
 
 --
--- Structure de la table `message`
+-- Table structure for table `message`
 --
 
 DROP TABLE IF EXISTS `message`;
 CREATE TABLE IF NOT EXISTS `message` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `discussion_id` int(11) DEFAULT NULL,
+  `agent_id` int(11) DEFAULT NULL,
   `content` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `is_red` tinyint(1) NOT NULL,
   `created_at` datetime NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `IDX_B6BD307F1ADED311` (`discussion_id`)
+  KEY `IDX_B6BD307F1ADED311` (`discussion_id`),
+  KEY `IDX_B6BD307F3414710B` (`agent_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `message_agent`
---
-
-DROP TABLE IF EXISTS `message_agent`;
-CREATE TABLE IF NOT EXISTS `message_agent` (
-  `message_id` int(11) NOT NULL,
-  `agent_id` int(11) NOT NULL,
-  PRIMARY KEY (`message_id`,`agent_id`),
-  KEY `IDX_D92D6376537A1329` (`message_id`),
-  KEY `IDX_D92D63763414710B` (`agent_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Structure de la table `migration_versions`
+-- Table structure for table `migration_versions`
 --
 
 DROP TABLE IF EXISTS `migration_versions`;
@@ -730,48 +1092,67 @@ CREATE TABLE IF NOT EXISTS `migration_versions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Déchargement des données de la table `migration_versions`
+-- Dumping data for table `migration_versions`
 --
 
 INSERT INTO `migration_versions` (`version`, `executed_at`) VALUES
-('20191117074540', '2019-11-17 07:46:38'),
-('20191119183536', '2019-11-19 18:36:21'),
-('20191119195215', '2019-11-19 19:52:36'),
-('20191119204626', '2019-11-19 20:46:45');
+('20200307125834', '2020-03-07 12:58:57'),
+('20200328160657', '2020-03-28 16:08:00'),
+('20200412234109', '2020-04-12 23:41:42'),
+('20200503123419', '2020-05-03 12:36:01'),
+('20200529201241', '2020-05-29 20:13:18'),
+('20200529203915', '2020-05-29 20:39:44'),
+('20200530130938', '2020-05-30 13:10:37'),
+('20200607084037', '2020-06-07 08:47:17');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `order_status`
+-- Table structure for table `order_status`
 --
 
 DROP TABLE IF EXISTS `order_status`;
 CREATE TABLE IF NOT EXISTS `order_status` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `display_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Déchargement des données de la table `order_status`
+-- Dumping data for table `order_status`
 --
 
-INSERT INTO `order_status` (`id`, `name`) VALUES
-(1, 'STATUS_QUOTE'),
-(2, 'STATUS_PREORDER'),
-(3, 'STATUS_PREREFUND'),
-(4, 'STATUS_VALID'),
-(5, 'STATUS_ORDER'),
-(6, 'STATUS_REFUND'),
-(7, 'STATUS_BILL'),
-(8, 'STATUS_REFUNDBILL'),
-(9, 'STATUS_CLOSED'),
-(10, 'STATUS_REFUNDCLOSED');
+INSERT INTO `order_status` (`id`, `name`, `display_name`) VALUES
+(1, 'STATUS_QUOTE', 'Devis'),
+(2, 'STATUS_PREORDER', 'Cmd à valider'),
+(3, 'STATUS_PREREFUND', 'Avoir à valider'),
+(4, 'STATUS_VALID', 'Demande revalidation'),
+(5, 'STATUS_ORDER', 'Commande'),
+(6, 'STATUS_REFUND', 'Avoir'),
+(7, 'STATUS_BILL', 'Commande facturée'),
+(8, 'STATUS_REFUNDBILL', 'Avoir facturé'),
+(9, 'STATUS_CLOSED', 'Commande clôturée'),
+(10, 'STATUS_REFUNDCLOSED', 'Avoir payé & clôturé');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `privilege`
+-- Table structure for table `pays`
+--
+
+DROP TABLE IF EXISTS `pays`;
+CREATE TABLE IF NOT EXISTS `pays` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `privilege`
 --
 
 DROP TABLE IF EXISTS `privilege`;
@@ -784,12 +1165,58 @@ CREATE TABLE IF NOT EXISTS `privilege` (
   `is_send_mail` tinyint(1) NOT NULL,
   `created_at` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `privilege`
+--
+
+INSERT INTO `privilege` (`id`, `is_write`, `is_read`, `is_update`, `is_delete`, `is_send_mail`, `created_at`) VALUES
+(1, 1, 1, 1, 1, 1, '2020-04-05 11:39:14'),
+(2, 1, 1, 1, 1, 1, '2020-04-05 11:39:14'),
+(3, 1, 1, 1, 1, 1, '2020-04-05 11:39:14'),
+(4, 1, 1, 1, 1, 1, '2020-04-05 11:39:14'),
+(5, 1, 1, 1, 1, 1, '2020-04-05 11:39:14'),
+(6, 1, 1, 1, 1, 1, '2020-04-05 11:39:14'),
+(7, 1, 1, 1, 1, 1, '2020-04-05 11:39:14'),
+(8, 1, 1, 1, 1, 1, '2020-04-05 11:39:14'),
+(9, 1, 1, 1, 1, 1, '2020-04-05 11:39:14'),
+(10, 1, 1, 1, 1, 1, '2020-04-05 11:39:14'),
+(11, 1, 1, 1, 1, 1, '2020-04-05 11:39:14'),
+(12, 1, 1, 1, 1, 1, '2020-04-05 11:39:14'),
+(13, 1, 1, 1, 1, 1, '2020-04-05 11:39:14'),
+(14, 1, 1, 1, 1, 1, '2020-04-05 11:39:15'),
+(15, 1, 1, 1, 1, 1, '2020-04-05 11:39:15'),
+(16, 1, 1, 1, 1, 1, '2020-04-05 11:39:15'),
+(17, 1, 1, 1, 1, 1, '2020-04-05 11:39:15'),
+(18, 0, 0, 0, 0, 0, '2020-04-05 11:39:16'),
+(19, 1, 1, 1, 0, 1, '2020-04-05 11:39:15'),
+(20, 1, 1, 1, 1, 1, '2020-04-05 11:39:15'),
+(21, 1, 1, 1, 1, 1, '2020-04-05 11:39:15'),
+(22, 1, 1, 1, 0, 1, '2020-04-05 11:39:15'),
+(23, 1, 1, 1, 0, 1, '2020-04-05 11:39:15'),
+(24, 1, 1, 1, 0, 1, '2020-04-05 11:39:15'),
+(25, 1, 1, 1, 0, 1, '2020-04-05 11:39:15'),
+(26, 1, 1, 1, 0, 1, '2020-04-05 11:39:15'),
+(27, 1, 1, 1, 0, 1, '2020-04-05 11:39:15'),
+(28, 1, 1, 1, 0, 1, '2020-04-05 11:39:15'),
+(29, 1, 1, 1, 0, 1, '2020-04-05 11:39:15'),
+(30, 1, 1, 1, 0, 1, '2020-04-05 11:39:15'),
+(31, 1, 1, 1, 0, 1, '2020-04-05 11:39:16'),
+(32, 0, 0, 0, 0, 0, '2020-04-05 11:39:16'),
+(33, 1, 1, 1, 0, 1, '2020-04-05 11:39:16'),
+(34, 1, 1, 1, 0, 1, '2020-04-05 11:39:16'),
+(35, 1, 1, 1, 1, 1, '2020-04-05 11:39:16'),
+(36, 1, 1, 1, 0, 1, '2020-04-05 11:39:16'),
+(37, 0, 0, 0, 0, 0, '2020-04-05 11:39:16'),
+(38, 1, 1, 1, 1, 1, '2020-04-05 11:39:16'),
+(39, 1, 1, 1, 1, 1, '2020-04-05 11:39:16'),
+(40, 1, 1, 1, 1, 1, '2020-04-05 11:39:15');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `provider`
+-- Table structure for table `provider`
 --
 
 DROP TABLE IF EXISTS `provider`;
@@ -804,7 +1231,7 @@ CREATE TABLE IF NOT EXISTS `provider` (
 -- --------------------------------------------------------
 
 --
--- Structure de la table `quantity_delivery`
+-- Table structure for table `quantity_delivery`
 --
 
 DROP TABLE IF EXISTS `quantity_delivery`;
@@ -818,20 +1245,12 @@ CREATE TABLE IF NOT EXISTS `quantity_delivery` (
   KEY `IDX_4718AC5664577843` (`order_detail_id`),
   KEY `IDX_4718AC5612136921` (`delivery_id`),
   KEY `IDX_4718AC561A8C12F5` (`bill_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `quantity_delivery`
---
-
-INSERT INTO `quantity_delivery` (`id`, `order_detail_id`, `delivery_id`, `bill_id`, `quantity`) VALUES
-(6, 13, 5, 4, 5),
-(7, 14, 5, 4, 3);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `quote_order`
+-- Table structure for table `quote_order`
 --
 
 DROP TABLE IF EXISTS `quote_order`;
@@ -849,6 +1268,7 @@ CREATE TABLE IF NOT EXISTS `quote_order` (
   `is_quote` tinyint(1) DEFAULT NULL,
   `validity_periode` int(11) DEFAULT NULL,
   `is_ref_visible` tinyint(1) NOT NULL,
+  `tax_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNIQ_F8D61EF93057DB96` (`admin_comment_id`),
   UNIQUE KEY `UNIQ_F8D61EF9F5ACD764` (`private_comment_id`),
@@ -857,20 +1277,14 @@ CREATE TABLE IF NOT EXISTS `quote_order` (
   KEY `IDX_F8D61EF919EB6921` (`client_id`),
   KEY `IDX_F8D61EF938248176` (`currency_id`),
   KEY `IDX_F8D61EF96BF700BD` (`status_id`),
-  KEY `IDX_F8D61EF9E7A1254A` (`contact_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `quote_order`
---
-
-INSERT INTO `quote_order` (`id`, `admin_comment_id`, `private_comment_id`, `public_comment_id`, `agent_id`, `client_id`, `currency_id`, `status_id`, `contact_id`, `created_at`, `is_quote`, `validity_periode`, `is_ref_visible`) VALUES
-(8, 17, 18, 19, 1, 1, NULL, 5, 1, '2019-11-20 19:31:29', 1, 2, 0);
+  KEY `IDX_F8D61EF9E7A1254A` (`contact_id`),
+  KEY `IDX_F8D61EF9B2A824D8` (`tax_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `quote_order_detail`
+-- Table structure for table `quote_order_detail`
 --
 
 DROP TABLE IF EXISTS `quote_order_detail`;
@@ -880,27 +1294,19 @@ CREATE TABLE IF NOT EXISTS `quote_order_detail` (
   `item_id` int(11) DEFAULT NULL,
   `tax_id` int(11) DEFAULT NULL,
   `quantity` int(11) NOT NULL,
+  `item_sell_price` double NOT NULL,
   `quantity_delivery` int(11) DEFAULT NULL,
   `quantity_recieved` int(11) DEFAULT NULL,
-  `item_sell_price` double NOT NULL,
   PRIMARY KEY (`id`),
   KEY `IDX_5A68304067A5C5A9` (`quote_order_id`),
   KEY `IDX_5A683040126F525E` (`item_id`),
   KEY `IDX_5A683040B2A824D8` (`tax_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `quote_order_detail`
---
-
-INSERT INTO `quote_order_detail` (`id`, `quote_order_id`, `item_id`, `tax_id`, `quantity`, `quantity_delivery`, `quantity_recieved`, `item_sell_price`) VALUES
-(13, 8, 1, NULL, 10, 5, 0, 20),
-(14, 8, 2, NULL, 5, 3, 0, 35);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `ref_generator`
+-- Table structure for table `ref_generator`
 --
 
 DROP TABLE IF EXISTS `ref_generator`;
@@ -913,36 +1319,37 @@ CREATE TABLE IF NOT EXISTS `ref_generator` (
 -- --------------------------------------------------------
 
 --
--- Structure de la table `role`
+-- Table structure for table `role`
 --
 
 DROP TABLE IF EXISTS `role`;
 CREATE TABLE IF NOT EXISTS `role` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `display_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Déchargement des données de la table `role`
+-- Dumping data for table `role`
 --
 
-INSERT INTO `role` (`id`, `name`) VALUES
-(1, 'ROLE_ADMIN'),
-(2, 'ROLE_BUYER'),
-(3, 'ROLE_INITIATOR'),
-(4, 'ROLE_VALIDATOR'),
-(5, 'ROLE_FINALIZER'),
-(6, 'ROLE_SUBMITTER'),
-(7, 'ROLE_OPERATOR'),
-(8, 'ROLE_MONITOR'),
-(9, 'ROLE_USER'),
-(10, 'ROLE_ANONYMOUS');
+INSERT INTO `role` (`id`, `name`, `display_name`) VALUES
+(1, 'ROLE_ADMIN', 'Administrateur'),
+(2, 'ROLE_BUYER', 'Acheteur'),
+(3, 'ROLE_INITIATOR', 'Initiateur'),
+(4, 'ROLE_VALIDATOR', 'Validateur'),
+(5, 'ROLE_FINALIZER', 'Finisseur'),
+(6, 'ROLE_SUBMITTER', 'Modificateur'),
+(7, 'ROLE_OPERATOR', 'Opérateur'),
+(8, 'ROLE_MONITOR', 'Superviseur'),
+(9, 'ROLE_USER', 'Rôle par défaut'),
+(10, 'ROLE_ANONYMOUS', 'Rôle non connecté');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `setting`
+-- Table structure for table `setting`
 --
 
 DROP TABLE IF EXISTS `setting`;
@@ -951,22 +1358,48 @@ CREATE TABLE IF NOT EXISTS `setting` (
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `value` varchar(3000) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `is_file` tinyint(1) DEFAULT NULL,
+  `display_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Déchargement des données de la table `setting`
+-- Dumping data for table `setting`
 --
 
-INSERT INTO `setting` (`id`, `name`, `value`, `code`) VALUES
-(1, 'APILINK', 'https://www.amdoren.com/api/currency.php', 'CURRENCY'),
-(2, 'APIKEY', '5Fex7jXDi492gz5jtKUkGupMzY5kMa', 'CURRENCY'),
-(3, 'NOM', 'BNOME', 'SOCIETE');
+INSERT INTO `setting` (`id`, `name`, `value`, `code`, `is_file`, `display_name`) VALUES
+(3, 'SOCIETE_NOM', 'BNOME', 'SOCIETE', 0, 'Nom de la société'),
+(4, 'QOBD_URL', 'http://bahilo-002-site2.ftempurl.com/qobd/server.php?wsdl', 'WEBSERVICE', 0, 'Adresse pour lé téléchargement des PDF'),
+(5, 'QOBD_LOGIN', '178290baac352f302c55f691b6102f78', 'WEBSERVICE', 0, 'Nom utilisateur'),
+(6, 'QOBD_PASSWORD', '178290baac352f302c55f691b6102f78', 'WEBSERVICE', 0, 'Mot de passe'),
+(7, 'SOCIETE_ADRESSE', 'SARL - 34, Rue Louis Pasteur - 92100 Boulogne-Billancourt', 'SOCIETE', 0, 'Adresse de la société'),
+(8, 'EMAIL_VALIDATION', 'joel.dago@yahoo.fr', 'SOCIETE', 0, 'Email d\'envoi pour la validation des commandes'),
+(12, 'BANQUE_NOM', 'CREDIT AGRICOLE PAUL DOUMER', 'BANQUE', 0, 'Nom de l\'établissement bancaire'),
+(16, 'BANQUE_BIC', 'AGRIFRPP882', 'BANQUE', 0, 'BIC'),
+(17, 'BANQUE_IBAN', 'FR76 1820 6004 0765 0198 9613 195', 'BANQUE', 0, 'IBAN'),
+(18, 'SOCIETE_TELEPHONE', '06 62 52 97 93', 'SOCIETE', 0, 'Numéro de téléphone de la société'),
+(19, 'SOCIETE_EMAIL', 'habib@bnome.fr', 'SOCIETE', 0, 'Email correspondance client'),
+(20, 'TVA_INTRACOMMUNAUTAIRE', '44571', 'SOCIETE', 0, 'N° de TVA Intracommunautaire'),
+(24, 'FACTURE_PREFIX', 'FA10', 'PDF', 0, 'Préfixe des noms de factures'),
+(25, 'DEVIS_PREFIX', 'DEV10', 'PDF', 0, 'Préfixe des noms de devis'),
+(26, 'LIVRAISON_PREFIX', 'BL10', 'PDF', 0, 'Préfixe des noms de bordereaux de livraison'),
+(28, 'SOCIETE_LOGO', 'logo.png', 'SOCIETE', 1, 'Logo de la société'),
+(29, 'CURRENCY_URL', 'http://data.fixer.io/api/latest?access_key=', 'WEBSERVICE', 0, 'Adresse de lecture des taux devise'),
+(30, 'CURRENCY_TOKEN', '71be59148b7ad207272b631b5eb0546f', 'WEBSERVICE', 0, 'Identifiant lecture taux devise'),
+(31, 'BANQUE_NUM_COMPTE', NULL, 'BANQUE', NULL, 'RIB'),
+(32, 'CLIENT_PREFIX', 'CL10', 'PDF', NULL, 'Préfixe des identifiants client'),
+(33, 'PROFORMA_PREFIX', 'PROFORMA10', 'PDF', NULL, 'Préfixe des noms de factures proforma'),
+(34, 'AVOIR_PREFIX', 'AV10', 'PDF', NULL, 'Préfixe des noms des avoirs'),
+(35, 'FTP_SERVER', 'ftp-eu.site4now.net', 'WEBSERVICE', NULL, 'Le server de fichiers FTP'),
+(36, 'FTP_USER', 'bnome', 'WEBSERVICE', NULL, 'Nom utilisateur FTP'),
+(37, 'FTP_PASSWORD', 'bnome225', 'WEBSERVICE', NULL, 'Mot de passe FTP'),
+(39, 'SOCIETE_RCS', NULL, 'SOCIETE', 0, 'Registre du commerce et des sociétés (RCS)'),
+(40, 'CAPITAL_SOCIAL', NULL, 'SOCIETE', 0, 'Capital social');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `tax`
+-- Table structure for table `tax`
 --
 
 DROP TABLE IF EXISTS `tax`;
@@ -985,20 +1418,20 @@ CREATE TABLE IF NOT EXISTS `tax` (
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Déchargement des données de la table `tax`
+-- Dumping data for table `tax`
 --
 
 INSERT INTO `tax` (`id`, `comment_id`, `income_statistic_id`, `type`, `value`, `is_current`, `create_at`, `is_tvamarge`) VALUES
-(1, NULL, NULL, 'TTC', 20, 0, '2019-11-19 18:19:44', 0),
+(1, NULL, NULL, 'TTC', 20, 1, '2019-11-19 18:19:44', 0),
 (2, NULL, NULL, 'HT', 0, 0, '2019-11-19 18:20:13', 0),
-(3, NULL, NULL, 'TVA/MARGE', 0, 0, '2019-11-19 18:20:38', 0);
+(3, NULL, NULL, 'TVA/MARGE', 20, 0, '2020-02-29 12:00:27', 1);
 
 --
--- Contraintes pour les tables déchargées
+-- Constraints for dumped tables
 --
 
 --
--- Contraintes pour la table `action_role`
+-- Constraints for table `action_role`
 --
 ALTER TABLE `action_role`
   ADD CONSTRAINT `FK_2188316432FB8AEA` FOREIGN KEY (`privilege_id`) REFERENCES `privilege` (`id`),
@@ -1006,47 +1439,53 @@ ALTER TABLE `action_role`
   ADD CONSTRAINT `FK_21883164D60322AC` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`);
 
 --
--- Contraintes pour la table `action_tracker`
+-- Constraints for table `action_tracker`
 --
 ALTER TABLE `action_tracker`
   ADD CONSTRAINT `FK_76C1A24E3414710B` FOREIGN KEY (`agent_id`) REFERENCES `agent` (`id`),
   ADD CONSTRAINT `FK_76C1A24E9D32F035` FOREIGN KEY (`action_id`) REFERENCES `action` (`id`);
 
 --
--- Contraintes pour la table `address`
+-- Constraints for table `address`
 --
 ALTER TABLE `address`
   ADD CONSTRAINT `FK_D4E6F81F8697D13` FOREIGN KEY (`comment_id`) REFERENCES `comment` (`id`);
 
 --
--- Contraintes pour la table `agent`
+-- Constraints for table `agent`
 --
 ALTER TABLE `agent`
   ADD CONSTRAINT `FK_268B9C9DF8697D13` FOREIGN KEY (`comment_id`) REFERENCES `comment` (`id`);
 
 --
--- Contraintes pour la table `agent_discussion`
+-- Constraints for table `agent_discussion`
 --
 ALTER TABLE `agent_discussion`
-  ADD CONSTRAINT `FK_B1FF28001ADED311` FOREIGN KEY (`discussion_id`) REFERENCES `discussion` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `FK_B1FF28003414710B` FOREIGN KEY (`agent_id`) REFERENCES `agent` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `FK_B1FF28001ADED311` FOREIGN KEY (`discussion_id`) REFERENCES `discussion` (`id`),
+  ADD CONSTRAINT `FK_B1FF28003414710B` FOREIGN KEY (`agent_id`) REFERENCES `agent` (`id`);
 
 --
--- Contraintes pour la table `agent_role`
+-- Constraints for table `agent_role`
 --
 ALTER TABLE `agent_role`
   ADD CONSTRAINT `FK_FAF230893414710B` FOREIGN KEY (`agent_id`) REFERENCES `agent` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `FK_FAF23089D60322AC` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`) ON DELETE CASCADE;
 
 --
--- Contraintes pour la table `alert_bill`
+-- Constraints for table `alert_bill`
 --
 ALTER TABLE `alert_bill`
   ADD CONSTRAINT `FK_F591CB671A8C12F5` FOREIGN KEY (`bill_id`) REFERENCES `bill` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `FK_F591CB6793035F72` FOREIGN KEY (`alert_id`) REFERENCES `alert` (`id`) ON DELETE CASCADE;
 
 --
--- Contraintes pour la table `bill`
+-- Constraints for table `article`
+--
+ALTER TABLE `article`
+  ADD CONSTRAINT `FK_23A0E66F675F31B` FOREIGN KEY (`author_id`) REFERENCES `agent` (`id`);
+
+--
+-- Constraints for table `bill`
 --
 ALTER TABLE `bill`
   ADD CONSTRAINT `FK_7A2119E319EB6921` FOREIGN KEY (`client_id`) REFERENCES `client` (`id`),
@@ -1056,7 +1495,7 @@ ALTER TABLE `bill`
   ADD CONSTRAINT `FK_7A2119E3F5ACD764` FOREIGN KEY (`private_comment_id`) REFERENCES `comment` (`id`);
 
 --
--- Contraintes pour la table `client`
+-- Constraints for table `client`
 --
 ALTER TABLE `client`
   ADD CONSTRAINT `FK_C74404551A8C12F5` FOREIGN KEY (`bill_id`) REFERENCES `bill` (`id`),
@@ -1064,7 +1503,7 @@ ALTER TABLE `client`
   ADD CONSTRAINT `FK_C7440455F8697D13` FOREIGN KEY (`comment_id`) REFERENCES `comment` (`id`);
 
 --
--- Contraintes pour la table `contact`
+-- Constraints for table `contact`
 --
 ALTER TABLE `contact`
   ADD CONSTRAINT `FK_4C62E63819EB6921` FOREIGN KEY (`client_id`) REFERENCES `client` (`id`),
@@ -1073,42 +1512,49 @@ ALTER TABLE `contact`
   ADD CONSTRAINT `FK_4C62E638F8697D13` FOREIGN KEY (`comment_id`) REFERENCES `comment` (`id`);
 
 --
--- Contraintes pour la table `delivery`
+-- Constraints for table `delivery`
 --
 ALTER TABLE `delivery`
   ADD CONSTRAINT `FK_3781EC106BF700BD` FOREIGN KEY (`status_id`) REFERENCES `delivery_status` (`id`);
 
 --
--- Contraintes pour la table `item`
+-- Constraints for table `ean_code`
+--
+ALTER TABLE `ean_code`
+  ADD CONSTRAINT `FK_E04EF53F92F3E70` FOREIGN KEY (`country_id`) REFERENCES `country` (`id`);
+
+--
+-- Constraints for table `imei_code`
+--
+ALTER TABLE `imei_code`
+  ADD CONSTRAINT `FK_47401C75D6307EED` FOREIGN KEY (`ean_code_id`) REFERENCES `ean_code` (`id`);
+
+--
+-- Constraints for table `item`
 --
 ALTER TABLE `item`
   ADD CONSTRAINT `FK_1F1B251E28F818C3` FOREIGN KEY (`item_brand_id`) REFERENCES `item_brand` (`id`),
   ADD CONSTRAINT `FK_1F1B251E769F237C` FOREIGN KEY (`item_groupe_id`) REFERENCES `item_groupe` (`id`),
+  ADD CONSTRAINT `FK_1F1B251EA4D07301` FOREIGN KEY (`imei_code_id`) REFERENCES `imei_code` (`id`),
   ADD CONSTRAINT `FK_1F1B251EB2A824D8` FOREIGN KEY (`tax_id`) REFERENCES `tax` (`id`),
   ADD CONSTRAINT `FK_1F1B251EF8697D13` FOREIGN KEY (`comment_id`) REFERENCES `comment` (`id`);
 
 --
--- Contraintes pour la table `item_provider`
+-- Constraints for table `item_provider`
 --
 ALTER TABLE `item_provider`
   ADD CONSTRAINT `FK_FEC9BB57126F525E` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `FK_FEC9BB57A53A8AA` FOREIGN KEY (`provider_id`) REFERENCES `provider` (`id`) ON DELETE CASCADE;
 
 --
--- Contraintes pour la table `message`
+-- Constraints for table `message`
 --
 ALTER TABLE `message`
-  ADD CONSTRAINT `FK_B6BD307F1ADED311` FOREIGN KEY (`discussion_id`) REFERENCES `discussion` (`id`);
+  ADD CONSTRAINT `FK_B6BD307F1ADED311` FOREIGN KEY (`discussion_id`) REFERENCES `discussion` (`id`),
+  ADD CONSTRAINT `FK_B6BD307F3414710B` FOREIGN KEY (`agent_id`) REFERENCES `agent` (`id`);
 
 --
--- Contraintes pour la table `message_agent`
---
-ALTER TABLE `message_agent`
-  ADD CONSTRAINT `FK_D92D63763414710B` FOREIGN KEY (`agent_id`) REFERENCES `agent` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `FK_D92D6376537A1329` FOREIGN KEY (`message_id`) REFERENCES `message` (`id`) ON DELETE CASCADE;
-
---
--- Contraintes pour la table `quantity_delivery`
+-- Constraints for table `quantity_delivery`
 --
 ALTER TABLE `quantity_delivery`
   ADD CONSTRAINT `FK_4718AC5612136921` FOREIGN KEY (`delivery_id`) REFERENCES `delivery` (`id`),
@@ -1116,7 +1562,7 @@ ALTER TABLE `quantity_delivery`
   ADD CONSTRAINT `FK_4718AC5664577843` FOREIGN KEY (`order_detail_id`) REFERENCES `quote_order_detail` (`id`);
 
 --
--- Contraintes pour la table `quote_order`
+-- Constraints for table `quote_order`
 --
 ALTER TABLE `quote_order`
   ADD CONSTRAINT `FK_F8D61EF919EB6921` FOREIGN KEY (`client_id`) REFERENCES `client` (`id`),
@@ -1125,11 +1571,12 @@ ALTER TABLE `quote_order`
   ADD CONSTRAINT `FK_F8D61EF938248176` FOREIGN KEY (`currency_id`) REFERENCES `currency` (`id`),
   ADD CONSTRAINT `FK_F8D61EF962FBE97E` FOREIGN KEY (`public_comment_id`) REFERENCES `comment` (`id`),
   ADD CONSTRAINT `FK_F8D61EF96BF700BD` FOREIGN KEY (`status_id`) REFERENCES `order_status` (`id`),
+  ADD CONSTRAINT `FK_F8D61EF9B2A824D8` FOREIGN KEY (`tax_id`) REFERENCES `tax` (`id`),
   ADD CONSTRAINT `FK_F8D61EF9E7A1254A` FOREIGN KEY (`contact_id`) REFERENCES `contact` (`id`),
   ADD CONSTRAINT `FK_F8D61EF9F5ACD764` FOREIGN KEY (`private_comment_id`) REFERENCES `comment` (`id`);
 
 --
--- Contraintes pour la table `quote_order_detail`
+-- Constraints for table `quote_order_detail`
 --
 ALTER TABLE `quote_order_detail`
   ADD CONSTRAINT `FK_5A683040126F525E` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`),
@@ -1137,7 +1584,7 @@ ALTER TABLE `quote_order_detail`
   ADD CONSTRAINT `FK_5A683040B2A824D8` FOREIGN KEY (`tax_id`) REFERENCES `tax` (`id`);
 
 --
--- Contraintes pour la table `tax`
+-- Constraints for table `tax`
 --
 ALTER TABLE `tax`
   ADD CONSTRAINT `FK_8E81BA76B622266F` FOREIGN KEY (`income_statistic_id`) REFERENCES `income_statistic` (`id`),

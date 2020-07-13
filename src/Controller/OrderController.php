@@ -693,17 +693,18 @@ class OrderController extends Controller
                 $this->clearOrder($order); 
             }
 
-            $order->setStatus($status); 
+            $order->setStatus($status);
             $manager->persist($order);
             $manager->flush();
 
             if (empty($order->getContact())){
-                $this->ErrorHandler->error("Veuillez renseigner une adresse de livraison pour la pré-commande");
+                $this->ErrorHandler->error("Veuillez renseigner une adresse de livraison pour la commande");
                 return $this->getRouteFromStatus($order);
             }
 
             // envoi d'un mail de prise en compte de la commande
             if (!empty($order->getStatus()) && $order->getStatus()->getName() == 'STATUS_ORDER') {
+                $this->orderManager->checkOrderStock($order->getQuoteOrderDetails());
                 $societe = $settingManager->get('SOCIETE', 'SOCIETE_NOM');
                 // dump($status);
                 // dump($order);

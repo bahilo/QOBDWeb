@@ -314,11 +314,15 @@ $(function(){
         compiledTemplate = _.template($('#template-discussion-agents').html());
         $.each(data.agents, function (indx, elt) {
             var myDate = new Date(elt.LoggedAt);
+            var str_myDate = "";
+            if (elt.LoggedAt){
+                str_myDate = myDate.getHours() + ':' + myDate.getMinutes() + ':' + myDate.getSeconds() + " " + moment(myDate).format('DD/MM/YYYY');
+            }
             $('.ctrlAgents', '#mdlDefault .discussion-new-wrapper').append(compiledTemplate({
                 agent_id: elt.id,
                 status: ((elt.IsOnline) ? 'success' : 'secondary'),
                 agent_username: elt.UserName,
-                last_connected: myDate.getHours() + 'h:' + myDate.getMinutes() + 'min:' + myDate.getSeconds() + 's ' + myDate.getDay() + '/' + myDate.getMonth() + '/' + myDate.getFullYear(),
+                last_connected: str_myDate,
                 url_agent_avatar: data.PathAvatarDir + '/' + ((elt.Picture) ? elt.Picture : 'default.png'),
             }));
         });

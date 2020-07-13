@@ -53,7 +53,7 @@ $(document).ready(function () {
                 order: setting.order,
                 columns: setting.columns,
                 info: false,
-                dom: '<"top"<"row"<"col-md-10 saveIgnore"f><"col-md-2 saveIgnore"l>>>rt<"bottom nav-wrapper"p><"clear">',
+                dom: '<"top"<"row"<"col-md-10 saveIgnore"f><"col-md-2 saveIgnore"l>>>r<"table-wrapper" t><"bottom nav-wrapper"p><"clear">',
                 BeforeSend: setting.beforeSend,
                 initComplete: function (settings, json) {
                     setting.initComplete(settings, json, this.api());                    

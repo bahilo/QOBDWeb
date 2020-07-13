@@ -53,7 +53,7 @@ class OrderHydrate{
         $this->errorHandler = $errorHandler;
     }
 
-    public function hydrateOrderDetail($orderDetails){
+    public function hydrateOrderDetail(Array $orderDetails){
 
         $output = [];
         foreach ($orderDetails as $orderDetail) {
@@ -141,7 +141,11 @@ class OrderHydrate{
 
                 $total += ($qtDelivery->getQuantity() * $qtDelivery->getOrderDetail()->getItemSellPrice()) * (1 + $tax->getValue() / 100);
             }
-
+            $currency = $order->getCurrency();
+            if(!empty($currency)){
+                $total = $total * $this->webApi->execCurrencyRequest($currency->getSymbol());
+            }
+            
             $bill->setItemSellPriceVATTotal(round($total, 2));
 
             if(empty($bill->getPayMode())){

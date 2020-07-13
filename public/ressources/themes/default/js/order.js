@@ -514,8 +514,8 @@ $(function () {
         if ($("#control_can_open_row").length > 0){
             col.push({ data: 'null', title: "", class: "details-control", orderable: false, defaultContent: "" });
         }
-        col.push({ data: 'Item.Ref', title: "Ref." });
         col.push({ data: 'Item.Name', title: "Nom" });
+        col.push({ data: 'Item.Ref', title: "Ref." });
         if($('#is_read_sensible','.access_pool').length > 0 && $('#is_read_sensible','.access_pool').val()){
             col.push({ data: 'ItemPurchasePrice', title: "P. achat" });
         }

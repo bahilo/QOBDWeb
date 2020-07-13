@@ -50,6 +50,10 @@
             //margin-top: 15px;
             margin-bottom: 15px;
         }
+
+        .table-wrapper{
+            overflow: auto;            
+        }
         
         td.details-control {
             // background: url('../resources/details_open.png') no-repeat center center;

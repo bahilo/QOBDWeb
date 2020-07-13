@@ -62,14 +62,15 @@ class OrderManager{
         return $this->orderHydrate;
     }
 
-    public function getCommandeInfo($orderDetails, QuoteOrder $order){
-        return $this->getOrderDetailStats($orderDetails, $order->getCurrency());
+    public function getCommandeInfo(array $orderDetails, QuoteOrder $order){
+        $output = $this->getOrderDetailStats($orderDetails, $order);
+        return $output;
     }
 
     /**
      * Calcul des stats de la commande
      */
-    public function getOrderDetailStats(array $orderDetails, Currency $currency){
+    public function getOrderDetailStats(array $orderDetails, QuoteOrder $order){
         $output = [
             'total_PA' => 0,
             'total_PV' => 0,
@@ -83,16 +84,14 @@ class OrderManager{
 
         if(count($orderDetails) > 0){
 
-            /** @var QuoteOrder */
-            $order = $orderDetails[0]->getQuoteOrder();
-            $currencyValue = ($order->getCurrency() && !empty($order->getCurrency()->getRate()) ) ? $order->getCurrency()->getRate() : 1;
+           $currency = $order->getCurrency();
             try{
                 /** @var QuoteOrderDetail */
                 foreach ($orderDetails as $orderDetail) {
                    
                     $qt = $orderDetail->getQuantity();
                     $pa = $orderDetail->getItem()->getPurchasePrice();
-                    $pv = $orderDetail->getItemSellPrice();
+                    $pv = ($orderDetail->getItemSellPrice() > 0) ? $orderDetail->getItemSellPrice() : $orderDetail->getItem()->getSellPrice();
 
                     if ($pv == 0)
                         throw new Exception('Votre liste de produits contient un produit avec un prix de vente à 0!');
@@ -112,8 +111,7 @@ class OrderManager{
                     if (!empty($tax)) {
                         $bTvaMarge = $tax->getIsTVAMarge();
                         $tva = $tax->getValue();
-                        $VAT_amount = $orderDetail->getItemSellPrice() * $orderDetail->getQuantity();
-
+                        
                         $output['VAT'] = $tva;
                         $output['VAT_amount'] += ($bTvaMarge ? $marge_amount : $pv) * $qt * $tva / 100;
                         $output['total_TTC'] += $bTvaMarge ? ($pv + $marge_amount * $tva / 100) * $qt : $pv * (1 + $tva / 100) * $qt;
@@ -123,7 +121,7 @@ class OrderManager{
                 }
 
                 if (!empty($currency)) {
-
+                    $currencyValue = $this->webApi->execCurrencyRequest($currency->getSymbol());
                     $output['total_HT'] = round($output['total_HT'] * $currencyValue, 2);
                     $output['total_TTC'] = round($output['total_TTC'] * $currencyValue, 2);
                     $output['marge_perc'] = round((($output['total_PV'] - $output['total_PA']) / $output['total_PV'])*100, 2);
@@ -132,15 +130,10 @@ class OrderManager{
                 }                
 
             }catch(Exception $ex){
-                if($ex->getMessage() == 'Division par zéro.'){
-                    $this->errorHandler->error("Une erreur s'est produite durant l'exécution de votre requête!");                
-                    $this->errorHandler->error($ex->getMessage());                
-                }
-                else
-                    $this->errorHandler->error($ex->getMessage());
-
+                $this->errorHandler->error("Une erreur s'est produite durant l'exécution de votre requête!");
+                $this->errorHandler->error($ex->getMessage()); 
             }
-        }        
+        }    
         
         return $output;
     }
@@ -148,13 +141,13 @@ class OrderManager{
     /**
      * alimentation de la commande avec les données stats + relation
      */
-    public function hydrateOrderDetailStats($orderDetails)
+    public function hydrateOrderDetailStats(Array $orderDetails)
     {
         $output = [];
         foreach ($this->orderHydrate->hydrateOrderDetail($orderDetails) as $orderDetail) {
             /** @var QuoteOrder */
             $order = $orderDetail->getQuoteOrder();
-            $stats = $this->getOrderDetailStats([$orderDetail], $order->getCurrency());
+            $stats = $this->getOrderDetailStats([$orderDetail], $order);
             $orderDetail->setItemSellPriceTotal($stats['total_HT']);
             $orderDetail->setItemSellPriceVATTotal($stats['total_TTC']);
 
@@ -197,6 +190,24 @@ class OrderManager{
             }
         }
         return $order;
+    }
+
+    /**
+     * Vérification du stock, afin de déterminer si le produit peut-être vendu
+     */
+    public function checkOrderStock($orderDetails){
+        /** @var QuoteOrderDetail */
+        foreach ($orderDetails as $orderDetail) {
+            if (!empty($orderDetail->getItem()->getStock() >= $orderDetail->getQuantity())) {
+                if ($orderDetail->getQuantity() + $orderDetail->getQuantityRecieved() <= $orderDetail->getQuantity()) {
+                    $orderDetail->setQuantityRecieved($orderDetail->getQuantity());
+                } else {
+                    $orderDetail->setQuantityRecieved($orderDetail->getQuantity() - $orderDetail->getQuantityRecieved());
+                }
+                $this->manager->persist($orderDetail);
+            }        
+        }
+        $this->manager->flush();
     }
 
 }

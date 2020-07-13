@@ -48,6 +48,10 @@
   margin-bottom: 15px;
 }
 
+.c-app .c-body .table-wrapper {
+  overflow: auto;
+}
+
 .c-app .c-body td.details-control {
   cursor: pointer;
 }

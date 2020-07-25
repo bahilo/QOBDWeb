@@ -81,9 +81,9 @@
   <div class="c-sidebar c-sidebar-dark c-sidebar-fixed c-sidebar-lg-show" id="sidebar">
     <div class="c-sidebar-brand d-md-down-none">
       {% if search.logo %}
-      <img class="navbar-brand-full" src="{{ search.logo }}" width="89" height="25" alt="CoreUI Logo">      
+      <img class="ste-logo navbar-brand-full" src="{{ search.logo }}" alt="Logo">      
       {% endif %}
-      {{ search.get_setting("SOCIETE","SOCIETE_NOM").value }}      
+      {#{ search.get_setting("SOCIETE","SOCIETE_NOM").value }#}      
     </div>
     <ul class="c-sidebar-nav ps ps--active-y">
 
@@ -94,231 +94,250 @@
         </a>
       </li>
       {% endif %}
-
-      {% if search.get_right_read("ACTION_CATALOGUE") %}
-      <li class="c-sidebar-nav-title">CATALOGUE</li>      
-      <li class="c-sidebar-nav-item">
-        <a class="c-sidebar-nav-link" href="{{ path("catalogue_home") }}">
-          <i class="fa fa-clone"></i> PRODUITS
-        </a>
-      </li>
-      <li class="c-sidebar-nav-item">
-        <a class="c-sidebar-nav-link" href="{{ path("setting_catalogue_brand") }}">
-          <i class="fa fa-copyright"></i> MARQUES
-        </a>
-      </li>
-      <li class="c-sidebar-nav-item">
-        <a class="c-sidebar-nav-link" href="{{ path("setting_catalogue_group") }}">
-          <i class="fa fa-caret-square-down"></i> FAMILLES
-        </a>
-      </li>
-      <li class="c-sidebar-nav-item">
-        <a class="c-sidebar-nav-link" href="{{ path("setting_catalogue_provider") }}">
-          <i class="fa fa-truck-loading"></i> FOURNISSEURS
-        </a>
-      </li>
-      <li class="c-sidebar-nav-item">
-        <a class="c-sidebar-nav-link" href="{{ path("setting_catalogue_ean") }}">
-          <i class="fa fa-barcode"></i> EAN
-        </a>
-      </li>
-      {% endif %}
-
-      <li class="c-sidebar-nav-title">COMMANDE & AVOIR</li>
-
-      {% if search.get_right_read("ACTION_QUOTE") %}
-      <li class="c-sidebar-nav-item">
-        <a class="c-sidebar-nav-link" href="{{ path("order_quote")}}">
-          <i class="fa fa-align-justify"></i> DEVIS
-        </a>
-      </li>
-      {% endif %}
-
-      {% if search.get_right_read("ACTION_ORDER") %}
-      <li class="c-sidebar-nav-dropdown">
-        <a class="c-sidebar-nav-dropdown-toggle" href="#">
-          <i class="fa fa-align-justify"></i> COMMANDES & FACTURES</a>
-        </a>
-        <ul class="c-sidebar-nav-dropdown-items">
-          <li class="c-sidebar-nav-item">
-            <a class="c-sidebar-nav-link" href="{{ path("order_preorder") }}">
-              <i class="fa fa-calendar"></i> CMD A VALIDER
-            </a>
-          </li>
-          <li class="c-sidebar-nav-item">
-            <a class="c-sidebar-nav-link" href="{{ path("order_home") }}">
-              <i class="fa fa-clipboard-check"></i> CMD VALIDEES
-            </a>
-          </li>
-          <li class="c-sidebar-nav-item">
-            <a class="c-sidebar-nav-link" href="{{ path("order_customer_valid") }}">
-              <i class="fa fa-calendar-check"></i> DEMANDES REVALIDATION
-            </a>
-          </li>
-          <li class="c-sidebar-nav-item">
-            <a class="c-sidebar-nav-link" href="{{ path("order_bill") }}">
-              <i class="fa fa-cubes"></i> CMD FACTUREES & EXPEDIEES</a>
-          </li>
-          <li class="c-sidebar-nav-item">
-            <a class="c-sidebar-nav-link" href="{{ path("order_closed") }}">
-              <i class="fa fa-closed-captioning"></i> CMD PAYEES & CLOTUREES</a>
-          </li>
-        </ul>
-      </li>
-
-      <li class="c-sidebar-nav-dropdown">
-        <a class="c-sidebar-nav-dropdown-toggle" href="#">
-          <i class="fa fa-align-justify"></i> AVOIRS</a>
-        </a>
-        <ul class="c-sidebar-nav-dropdown-items">
-          <li class="c-sidebar-nav-item">
-            <a class="c-sidebar-nav-link" href="{{ path("order_prerefund") }}">
-              <i class="fa fa-calendar"></i> AVOIRS A VALIDER
-            </a>
-          </li>
-          <li class="c-sidebar-nav-item">
-            <a class="c-sidebar-nav-link" href="{{ path("order_refund") }}">
-              <i class="fa fa-clipboard-check"></i> AVOIRS VALIDES
-            </a>
-          </li>
-          <li class="c-sidebar-nav-item">
-            <a class="c-sidebar-nav-link" href="{{ path("order_bill_refund") }}">
-              <i class="fa fa-cubes"></i> AVOIRS EXPEDIES</a>
-          </li>
-          <li class="c-sidebar-nav-item">
-            <a class="c-sidebar-nav-link" href="{{ path("order_refund_closed") }}">
-              <i class="fa fa-closed-captioning"></i> AVOIRS PAYES & CLOTURES</a>
-          </li>
-        </ul>
-      </li>
-      {% endif %}
-
-      {% if search.get_right_read("ACTION_CLIENT") %}
-      <li class="c-sidebar-nav-title">SUIVI CLIENTELE</li>
-      <li class="c-sidebar-nav-item">
-        <a class="c-sidebar-nav-link" href="{{ path("client_home") }}">
-          <i class="fa fa-user"></i> CLIENTS
-        </a>
-      </li>
-      {% endif %}
       
-      <li class="c-sidebar-nav-title">SECURITE & CONFIGURATION</li>
-      {% if search.get_right_read("ACTION_SECURITY") %}      
-      <li class="c-sidebar-nav-dropdown">
-        <a class="c-sidebar-nav-dropdown-toggle" href="#">
-          <i class="fa fa-user-secret"></i> SECURITE</a>
-        </a>
-        <ul class="c-sidebar-nav-dropdown-items">
+      {% block menu_left %}
+        {% block menu_left_catalogue %}
+          {% if search.get_right_read("ACTION_CATALOGUE") %}
+          <li class="c-sidebar-nav-title">CATALOGUE</li>      
           <li class="c-sidebar-nav-item">
-            <a class="c-sidebar-nav-link" href="{{ path("agent_home") }}">
-              <i class="fa fa-fingerprint"></i> COMMERCIAUX
+            <a class="c-sidebar-nav-link" href="{{ path("catalogue_home") }}">
+              <i class="fa fa-clone"></i> PRODUITS
             </a>
           </li>
           <li class="c-sidebar-nav-item">
-            <a class="c-sidebar-nav-link" href="{{ path("security_agent_role") }}">
-              <i class="fa fa-id-card"></i> ACCES
+            <a class="c-sidebar-nav-link" href="{{ path("setting_catalogue_brand") }}">
+              <i class="fa fa-copyright"></i> MARQUES
             </a>
           </li>
           <li class="c-sidebar-nav-item">
-            <a class="c-sidebar-nav-link" href="{{ path("security_profile") }}">
-              <i class="fa fa-passport"></i> PROFILES
+            <a class="c-sidebar-nav-link" href="{{ path("setting_catalogue_group") }}">
+              <i class="fa fa-caret-square-down"></i> FAMILLES
             </a>
           </li>
-        </ul>
-      </li>
-      {% endif %}
+          <li class="c-sidebar-nav-item">
+            <a class="c-sidebar-nav-link" href="{{ path("setting_catalogue_provider") }}">
+              <i class="fa fa-truck-loading"></i> FOURNISSEURS
+            </a>
+          </li>
+          <li class="c-sidebar-nav-item">
+            <a class="c-sidebar-nav-link" href="{{ path("setting_catalogue_ean") }}">
+              <i class="fa fa-barcode"></i> EAN
+            </a>
+          </li>
+          {% endif %}
+        {% endblock %}
 
-      {% if search.get_right_read("ACTION_SETTING") %}
-      <li class="c-sidebar-nav-dropdown">
-        <a class="c-sidebar-nav-dropdown-toggle" href="#">
-          <i class="fa fa-cogs"></i> CONFIGURATION
-        </a>        
-        <ul class="c-sidebar-nav-dropdown-items">
+        {% block menu_left_cmd_avoir %}
+          <li class="c-sidebar-nav-title">COMMANDE & AVOIR</li> 
+
+          {% if search.get_right_read("ACTION_QUOTE") %}
           <li class="c-sidebar-nav-item">
-            <a class="c-sidebar-nav-link" href="{{ path("setting_home") }}">
-              <i class="fa fa-sliders-h"></i> GENERALE
+            <a class="c-sidebar-nav-link" href="{{ path("order_quote")}}">
+              <i class="fa fa-align-justify"></i> DEVIS
             </a>
           </li>
-          <li class="c-sidebar-nav-item">
-            <a class="c-sidebar-nav-link" href="{{ path("setting_currency") }}">
-              <i class="fa fa-coins"></i> MONNAIES
-            </a>
-          </li>
-          <li class="c-sidebar-nav-item">
-            <a class="c-sidebar-nav-link" href="{{ path("setting_tax") }}">
-              <i class="fa fa-money-bill-wave-alt"></i> TAXES
-            </a>
-          </li>                  
-          <li class="c-sidebar-nav-item">
-            <a class="c-sidebar-nav-link" href="{{ path("setting_catalogue_import") }}">
-              <i class="fa fa-upload"></i> IMPORTS
-            </a>
-          </li>
+          {% endif %}
+          {% if search.get_right_read("ACTION_ORDER") %}
           <li class="c-sidebar-nav-dropdown">
             <a class="c-sidebar-nav-dropdown-toggle" href="#">
-              <i class="fa fa-folder-open"></i> DOCUMENTS
+              <i class="fa fa-align-justify"></i> COMMANDES & FACTURES</a>
             </a>
             <ul class="c-sidebar-nav-dropdown-items">
               <li class="c-sidebar-nav-item">
-                <a class="c-sidebar-nav-link" href="{{ path("setting_email") }}">
-                  <i class="fa fa-mail-bulk"></i> EMAILS
+                <a class="c-sidebar-nav-link" href="{{ path("order_preorder") }}">
+                  <i class="fa fa-calendar"></i> CMD A VALIDER
                 </a>
               </li>
               <li class="c-sidebar-nav-item">
-                <a class="c-sidebar-nav-link" href="{{ path("setting_text") }}">
-                  <i class="fa fa-file-alt"></i> TEXTES
+                <a class="c-sidebar-nav-link" href="{{ path("order_home") }}">
+                  <i class="fa fa-clipboard-check"></i> CMD VALIDEES
                 </a>
+              </li>
+              <li class="c-sidebar-nav-item">
+                <a class="c-sidebar-nav-link" href="{{ path("order_customer_valid") }}">
+                  <i class="fa fa-calendar-check"></i> DEMANDES REVALIDATION
+                </a>
+              </li>
+              <li class="c-sidebar-nav-item">
+                <a class="c-sidebar-nav-link" href="{{ path("order_bill") }}">
+                  <i class="fa fa-cubes"></i> CMD FACTUREES & EXPEDIEES</a>
+              </li>
+              <li class="c-sidebar-nav-item">
+                <a class="c-sidebar-nav-link" href="{{ path("order_closed") }}">
+                  <i class="fa fa-closed-captioning"></i> CMD PAYEES & CLOTUREES</a>
               </li>
             </ul>
-          </li> 
+          </li>
 
-          {% if app.user.isadmin %}
           <li class="c-sidebar-nav-dropdown">
             <a class="c-sidebar-nav-dropdown-toggle" href="#">
-              <i class="fa fa-user-secret"></i> STATUT
+              <i class="fa fa-align-justify"></i> AVOIRS</a>
             </a>
             <ul class="c-sidebar-nav-dropdown-items">
               <li class="c-sidebar-nav-item">
-                <a class="c-sidebar-nav-link" href="{{ path("setting_delivery_status") }}">
-                  <i class="fa fa-star"></i> FACTURATION
+                <a class="c-sidebar-nav-link" href="{{ path("order_prerefund") }}">
+                  <i class="fa fa-calendar"></i> AVOIRS A VALIDER
                 </a>
               </li>
               <li class="c-sidebar-nav-item">
-                <a class="c-sidebar-nav-link" href="{{ path("setting_order_status") }}">
-                  <i class="fa fa-star-half-alt"></i> COMMANDE
-                </a>
-              </li>
-            </ul>
-          </li>          
-          <li class="c-sidebar-nav-dropdown">
-            <a class="c-sidebar-nav-dropdown-toggle" href="#">
-              <i class="fa fa-user-secret"></i> SECURITE
-            </a>
-            <ul class="c-sidebar-nav-dropdown-items">
-              <li class="c-sidebar-nav-item">
-                <a class="c-sidebar-nav-link" href="{{ path("security_action") }}">
-                  <i class="fa fa-fingerprint"></i> ACTIONS
+                <a class="c-sidebar-nav-link" href="{{ path("order_refund") }}">
+                  <i class="fa fa-clipboard-check"></i> AVOIRS VALIDES
                 </a>
               </li>
               <li class="c-sidebar-nav-item">
-                <a class="c-sidebar-nav-link" href="{{ path("security_role") }}">
-                  <i class="fa fa-passport"></i> ROLES
-                </a>
+                <a class="c-sidebar-nav-link" href="{{ path("order_bill_refund") }}">
+                  <i class="fa fa-cubes"></i> AVOIRS EXPEDIES</a>
+              </li>
+              <li class="c-sidebar-nav-item">
+                <a class="c-sidebar-nav-link" href="{{ path("order_refund_closed") }}">
+                  <i class="fa fa-closed-captioning"></i> AVOIRS PAYES & CLOTURES</a>
               </li>
             </ul>
           </li>
           {% endif %}
+        {% endblock %}
 
-        </ul>
-      </li>
-      {% endif %}
+        {% block menu_left_client %}
+          {% if search.get_right_read("ACTION_CLIENT") %}
+          <li class="c-sidebar-nav-title">SUIVI CLIENTELE</li>
+          <li class="c-sidebar-nav-item">
+            <a class="c-sidebar-nav-link" href="{{ path("client_home") }}">
+              <i class="fa fa-user"></i> CLIENTS
+            </a>
+          </li>
+          {% endif %}
+        {% endblock %}
 
+        {% block menu_left_security_config %}
+          <li class="c-sidebar-nav-title">SECURITE & CONFIGURATION</li>
+          {% block menu_left_security %}
+            {% if search.get_right_read("ACTION_SECURITY") %}      
+            <li class="c-sidebar-nav-dropdown">
+              <a class="c-sidebar-nav-dropdown-toggle" href="#">
+                <i class="fa fa-user-secret"></i> SECURITE</a>
+              </a>
+              <ul class="c-sidebar-nav-dropdown-items">
+                <li class="c-sidebar-nav-item">
+                  <a class="c-sidebar-nav-link" href="{{ path("agent_home") }}">
+                    <i class="fa fa-fingerprint"></i> COMMERCIAUX
+                  </a>
+                </li>
+                <li class="c-sidebar-nav-item">
+                  <a class="c-sidebar-nav-link" href="{{ path("security_agent_role") }}">
+                    <i class="fa fa-id-card"></i> ACCES
+                  </a>
+                </li>
+                <li class="c-sidebar-nav-item">
+                  <a class="c-sidebar-nav-link" href="{{ path("security_profile") }}">
+                    <i class="fa fa-passport"></i> PROFILES
+                  </a>
+                </li>
+              </ul>
+            </li>
+            {% endif %}
+          {% endblock %}
+
+          {% block menu_left_config %}
+            {% if search.get_right_read("ACTION_SETTING") %}
+            <li class="c-sidebar-nav-dropdown">
+              <a class="c-sidebar-nav-dropdown-toggle" href="#">
+                <i class="fa fa-cogs"></i> CONFIGURATION
+              </a>        
+              <ul class="c-sidebar-nav-dropdown-items">
+                <li class="c-sidebar-nav-item">
+                  <a class="c-sidebar-nav-link" href="{{ path("setting_home") }}">
+                    <i class="fa fa-sliders-h"></i> GENERALE
+                  </a>
+                </li>
+                <li class="c-sidebar-nav-item">
+                  <a class="c-sidebar-nav-link" href="{{ path("setting_currency") }}">
+                    <i class="fa fa-coins"></i> MONNAIES
+                  </a>
+                </li>
+                <li class="c-sidebar-nav-item">
+                  <a class="c-sidebar-nav-link" href="{{ path("setting_tax") }}">
+                    <i class="fa fa-money-bill-wave-alt"></i> TAXES
+                  </a>
+                </li>                  
+                <li class="c-sidebar-nav-item">
+                  <a class="c-sidebar-nav-link" href="{{ path("setting_catalogue_import") }}">
+                    <i class="fa fa-upload"></i> IMPORTS
+                  </a>
+                </li>
+                <li class="c-sidebar-nav-dropdown">
+                  <a class="c-sidebar-nav-dropdown-toggle" href="#">
+                    <i class="fa fa-folder-open"></i> DOCUMENTS
+                  </a>
+                  <ul class="c-sidebar-nav-dropdown-items">
+                    <li class="c-sidebar-nav-item">
+                      <a class="c-sidebar-nav-link" href="{{ path("setting_email") }}">
+                        <i class="fa fa-mail-bulk"></i> EMAILS
+                      </a>
+                    </li>
+                    <li class="c-sidebar-nav-item">
+                      <a class="c-sidebar-nav-link" href="{{ path("setting_text") }}">
+                        <i class="fa fa-file-alt"></i> TEXTES
+                      </a>
+                    </li>
+                  </ul>
+                </li> 
+
+                {% block menu_left_admin_config %}
+                {% if app.user.isadmin %}
+                <li class="c-sidebar-nav-item">
+                  <a class="c-sidebar-nav-link" href="{{ path("setting_sites") }}">
+                    <i class="fa fa-money-bill-wave-alt"></i> SITES
+                  </a>
+                </li>
+                <li class="c-sidebar-nav-dropdown">
+                  <a class="c-sidebar-nav-dropdown-toggle" href="#">
+                    <i class="fa fa-user-secret"></i> STATUT
+                  </a>
+                  <ul class="c-sidebar-nav-dropdown-items">
+                    <li class="c-sidebar-nav-item">
+                      <a class="c-sidebar-nav-link" href="{{ path("setting_delivery_status") }}">
+                        <i class="fa fa-star"></i> FACTURATION
+                      </a>
+                    </li>
+                    <li class="c-sidebar-nav-item">
+                      <a class="c-sidebar-nav-link" href="{{ path("setting_order_status") }}">
+                        <i class="fa fa-star-half-alt"></i> COMMANDE
+                      </a>
+                    </li>
+                  </ul>
+                </li>          
+                <li class="c-sidebar-nav-dropdown">
+                  <a class="c-sidebar-nav-dropdown-toggle" href="#">
+                    <i class="fa fa-user-secret"></i> SECURITE
+                  </a>
+                  <ul class="c-sidebar-nav-dropdown-items">
+                    <li class="c-sidebar-nav-item">
+                      <a class="c-sidebar-nav-link" href="{{ path("security_action") }}">
+                        <i class="fa fa-fingerprint"></i> ACTIONS
+                      </a>
+                    </li>
+                    <li class="c-sidebar-nav-item">
+                      <a class="c-sidebar-nav-link" href="{{ path("security_role") }}">
+                        <i class="fa fa-passport"></i> ROLES
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+                {% endif %}
+                {% endblock %}
+              </ul>
+            </li>
+            {% endif %}
+          {% endblock %}
+        {% endblock %}
+      {% endblock %}
       <div class="ps__rail-x" style="left: 0px; bottom: 0px;">
-        <div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div>
+        <!-- <div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div> -->
       </div>
       <div class="ps__rail-y" style="top: 0px; height: 720px; right: 0px;">
-        <div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 399px;"></div>
+        <!-- <div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 399px;"></div> -->
       </div>
+
     </ul>
     <button class="c-sidebar-minimizer c-class-toggler" type="button" data-target="_parent"
       data-class="c-sidebar-unfoldable"></button>
@@ -728,10 +747,10 @@
   </div>
 
     <script src="{{ asset('js/jquery-3.4.1.js','theme_default') }}"></script>
-    
-    <script src="{{ asset('javascript/popper.min.js','theme_coreui') }}"></script> 
-<!--  
-    <script src="{{ asset('js/bootstrap/bootstrap.js','theme_default') }}"></script>-->
+     <script src="{{ asset('js/bootstrap/bootstrap.js','theme_default') }}"></script>
+    <!--<script src="{{ asset('javascript/popper.min.js','theme_coreui') }}"></script> 
+ 
+    -->
     <script src="{{ asset('js/moment.js','theme_default') }}"></script>
     <!--   
     <script src="{{ asset('javascript/src/coreui.js','theme_coreui') }}"></script>-->

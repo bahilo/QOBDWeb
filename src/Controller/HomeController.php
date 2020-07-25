@@ -50,11 +50,14 @@ class HomeController extends Controller
         if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_DASHBORD']))) {
             return $this->redirectToRoute('order');//('security_deny_access');
         }
-        
+        $orderStatus = $this->statusRepo->findOneBy(['Name' => 'STATUS_ORDER']);
+        $orderBilledStatus = $this->statusRepo->findOneBy(['Name' => 'STATUS_BILL']);
+        $refundStatus = $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUND']);
+        $refundBilledStatus = $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUNDBILL']);
         return $this->render('home/index.html.twig', [
             'nb_quote' => $this->orderRepo->countByStatus($this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE'])),
-            'nb_order' => $this->orderRepo->countByStatus($this->statusRepo->findOneBy(['Name' => 'STATUS_ORDER'])),
-            'nb_refund' => $this->orderRepo->countByStatus($this->statusRepo->findOneBy(['Name' => 'STATUS_REFUND'])),
+            'nb_order' => $this->orderRepo->countByStatus($orderStatus) + $this->orderRepo->countByStatus($orderBilledStatus),
+            'nb_refund' => $this->orderRepo->countByStatus($refundStatus) + $this->orderRepo->countByStatus($refundBilledStatus),
             'nb_validation' => $this->orderRepo->countByStatus($this->statusRepo->findOneBy(['Name' => 'STATUS_VALID'])),
         ]);
     }

@@ -102,7 +102,8 @@ class CatalogueController extends Controller
 
                     if (empty($item->getComment()->getId()))
                         $item->getComment()->setCreateAt(new \Datetime());
-
+                    
+                    $item->setCreatedAt(new \Datetime());
                     $manager->persist($item);
                     $manager->flush();
                     $this->ErrorHandler->success("Le produit a été enregistré avec succès.");

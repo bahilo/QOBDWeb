@@ -1,4 +1,4 @@
-{% extends 'template_coreui.html.twig' %}
+{% extends 'index_template.html.twig' %}
 
 {% set page_title = 'Création & modification' %}
 
@@ -68,8 +68,8 @@
                         {{ form_row(formSetting.Code,{'label': 'Catégorie', 'attr': {'placeholder': 'Catégorie'}}) }}
                         {{ form_row(formSetting.Name,{'label': 'Nom de la configuration', 'attr': {'placeholder': 'Nom de la configuration'}})
                         }}
-                        {{ form_row(formSetting.DisplayName,{'label': 'Nom à l\'affichage', 'attr': {'placeholder': 'Nom à l\'affichage'}})
-                        }}
+                        {{ form_row(formSetting.DisplayName,{'label': 'Nom à l\'affichage', 'attr': {'placeholder': 'Nom à l\'affichage'}})}}
+                        {{ form_row(formSetting.nRang,{'label': 'Rang', 'attr': {'placeholder': 'Rang'}})}}
                                                 
                         {% else %}
                         {{ form_row(formSetting.Code,{'attr': {'style': 'display:none;'}}) }}

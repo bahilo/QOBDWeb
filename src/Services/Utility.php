@@ -187,8 +187,10 @@ class Utility{
     public function getDistinctByCode($sourceArray){
         $outputArray = [];
         foreach($sourceArray as $key => $obj){
-            if(!$this->in_arrayByCode($outputArray, $obj))
-                $outputArray[] = $obj->getCode();
+            if(!$this->in_arrayByCode(array_keys($outputArray), $obj))
+                $outputArray[$obj->getCode()] = [];
+            else
+                $outputArray[$obj->getCode()][] = $obj;
         }
         return $outputArray;
     }

@@ -27,7 +27,7 @@ class ImeiCode
     private $EanCode;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups({"class_property"})
      * @SerializedName("Code")
      */

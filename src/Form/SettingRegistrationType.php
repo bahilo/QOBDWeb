@@ -2,9 +2,11 @@
 
 namespace App\Form;
 
+use App\Entity\Site;
 use App\Entity\Setting;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SettingRegistrationType extends AbstractType
@@ -15,8 +17,8 @@ class SettingRegistrationType extends AbstractType
             ->add('Name')
             ->add('Value')
             ->add('Code')
-            ->add('DisplayName')
-        ;
+            ->add('nRang')
+            ->add('DisplayName');
     }
 
     public function configureOptions(OptionsResolver $resolver)

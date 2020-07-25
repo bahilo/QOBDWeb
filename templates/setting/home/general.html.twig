@@ -9,22 +9,45 @@
 </li>
 {% endblock %}
 
+{% block body_header_right %}
+    <button form="global_form" type="submit" class="btn btn-primary"><i class="fa fa-save"></i></button>
+    {% if app.user.isadmin %}
+    <a href="{{ create_url }}" class="btn btn-primary"><i class="fa fa-plus"></i></a>
+    {% endif %}
+{% endblock %}
+
 {% block content_area %}
 
-{% for code in codes %}
+<form action="{{ path('setting_edit') }}" method="post" id="global_form" enctype="multipart/form-data">
+{% for key, settings in source %}
+
 <div class="example-wrapper">
     <div class="animated fadeIn">
         <div class="row">
             <div class="col-lg-12">
-                <div class="card">
+                <div class="card card-accent-info">
                     <div class="card-header">       
-                        <i class="fa fa-align-justify"></i> {{ code }}</div>
+                        <i class="fa fa-align-justify"></i> {{ key }}</div>
                     <div class="card-body">
-
-                        <table id="{{ code }}_setting_target_table_js" class="table table-responsive-md table-bordered table-striped table-md">
-                        </table>
-                        <input type="hidden" id="{{ code  }}_setting_target" data-source="{{ data_table_source }}">
-                        
+                        {% for setting in settings %}
+                        <div class="form-group">
+                            <label for="{{ key ~ setting.name }}" class="control-label">{{ setting.displayname }}</label>
+                            {% if setting.isfile %}
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="value-file">
+                                            <input type="file" name="settings[{{ key }}][{{ setting.name }}]" id="{{ key ~ setting.name }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <img class="ste-logo" src="{{ search.logo }}" alt="Logo">
+                                    </div>
+                                </div>
+                            {% else %}
+                                <input type="text" class="form-control" name="settings[{{ key }}][{{ setting.name }}]" id="{{ key ~ setting.name }}" value="{{ setting.value }}">
+                            {% endif %}
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -32,8 +55,8 @@
     </div>
 </div>
 {% endfor %}
+</form>
 
-
-<input type="hidden" id="setting_target_tables" value="{{ codes | json_encode() }}">
+<!-- <input type="hidden" id="setting_target_tables" value="{#{ codes | json_encode() }#}"> -->
 
 {% endblock %}

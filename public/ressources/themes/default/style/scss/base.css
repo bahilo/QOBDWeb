@@ -6,9 +6,59 @@
   text-decoration: none;
 }
 
+.c-app .ste-logo {
+  max-width: 60px;
+}
+
 .c-app pre {
   font-family: Arial, Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
   font-size: 14px;
+}
+
+.c-app .c-chartjs-tooltip {
+  position: absolute;
+  z-index: 1021;
+  display: -ms-flexbox;
+  display: -webkit-box;
+  display: flex;
+  -ms-flex-direction: column;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+          flex-direction: column;
+  padding: .25rem .5rem;
+  color: #fff;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  -webkit-transition: all .25s ease;
+  transition: all .25s ease;
+  -webkit-transform: translate(-50%, 0);
+  transform: translate(-50%, 0);
+  border-radius: .25rem;
+}
+
+.c-app .c-chartjs-tooltip .c-tooltip-body .c-tooltip-body-item {
+  display: -ms-flexbox;
+  display: -webkit-box;
+  display: flex;
+  -ms-flex-align: center;
+  -webkit-box-align: center;
+          align-items: center;
+  font-size: .765625rem;
+  white-space: nowrap;
+}
+
+.c-app .c-chartjs-tooltip .c-tooltip-body .c-tooltip-body-item .c-tooltip-body-item-value {
+  padding-left: 1rem;
+  margin-left: auto;
+  font-weight: 700;
+}
+
+.c-app .c-chartjs-tooltip .c-tooltip-body .c-tooltip-body-item .c-tooltip-body-item-color {
+  display: inline-block;
+  width: .875rem;
+  height: .875rem;
+  margin-right: .875rem;
 }
 
 .c-app ul.error-wrapper {

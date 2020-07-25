@@ -7,6 +7,7 @@ use App\Services\ChatToView;
 use App\Services\ChatManager;
 use App\Repository\ActionRepository;
 use App\Repository\SettingRepository;
+use App\Repository\SiteRepository;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class SearchToView{
@@ -18,6 +19,7 @@ class SearchToView{
     protected $chatManager;
     protected $securityManager;
     protected $actionRepo;
+    protected $siteRepo;
     protected $chatUtility;
 
     public function __construct(SettingManager $setting, 
@@ -27,6 +29,7 @@ class SearchToView{
                                 ChatManager $chatManager,
                                 SecurityManager $securityManager,
                                 ActionRepository $actionRepo,
+                                SiteRepository $siteRepo,
                                 ChatToView $chatUtility)
     {
         $this->setting = $setting;
@@ -36,6 +39,7 @@ class SearchToView{
         $this->chatManager = $chatManager;
         $this->securityManager = $securityManager;
         $this->actionRepo = $actionRepo;
+        $this->siteRepo = $siteRepo;
         $this->chatUtility = $chatUtility;
     }
 
@@ -105,5 +109,9 @@ class SearchToView{
             return true;
         }        
         return false;
+    }
+
+    public function get_site_config(){
+        return $this->siteRepo->findOneBy(['Active' => true]);
     }
 }

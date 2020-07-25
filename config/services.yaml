@@ -41,6 +41,8 @@ parameters:
     abs.file.pdf.quote.download_dir: '%abs.file.download_dir%/%pdf.quote_dir%'
     abs.file.pdf.delivery.download_dir: '%abs.file.download_dir%/%pdf.delivery_dir%'
 
+    logo_dir: '%file.download_dir%/setting/image'
+
     tax.type.ht: 101
     tax.type.ttc: 102
     tax.type.tva_marge: 103

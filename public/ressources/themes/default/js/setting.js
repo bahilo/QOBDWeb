@@ -50,6 +50,7 @@ $(function(){
                 var params = getColumn(api, tables_target[i]);
                 api.table[tables_target[i]] = $("#" + tables_target[i] + "_setting_target_table_js").myTable({
                     com: "async",
+                    order: [[0, "asc"]],
                     ajax: {
                         type: "POST",
                         url: Routing.generate(params.sourcePath, { code: tables_target[i]}),
@@ -104,6 +105,10 @@ $(function(){
             case "ean_data_source":                
                 output.column = getItemEanColumn();
                 output.sourcePath = 'setting_data_ean';
+                break;
+            case "site_data_source":                
+                output.column = getSiteColumn();
+                output.sourcePath = 'setting_data_sites';
                 break;
             default:                
                 output.column = getGeneralColumn();
@@ -254,11 +259,13 @@ $(function(){
 
         var col = [];
 
+        col.push({ data: 'nRang', visible: false, render: renderRang });
         col.push({ data: 'id', visible: false });
+        col.push({ data: 'IsFile', visible: false });
         col.push({ data: 'Code', visible: false });
         col.push({ data: 'Name', visible: false });
         col.push({ data: 'DisplayName', title: "Nom" });
-        col.push({ data: 'Value', title: "Valeur" });
+        col.push({ data: 'Value', title: "Valeur", render: renderValue });
         col.push({ data: null, title: "", 
             render: function (data, type, row, meta){
                 meta.settings.oInit.customParam = {
@@ -295,12 +302,48 @@ $(function(){
         return col;
     }
 
+    function getSiteColumn(){
+        
+        var oRender = new RenderMethod({
+            routeEdit: { route: "setting_sites_edit", logo: 'fa-edit' },
+            routeDelete: { route: "setting_sites_delete", logo: 'fa-trash-alt' }
+        });
+
+        var col = [];
+
+        col.push({ data: 'id', visible: false });
+        col.push({ data: 'DisplayName', title: "Nom" });
+        col.push({ data: null, title: "", 
+            render: function (data, type, row, meta){
+                meta.settings.oInit.customParam = {
+                    access: $.fn.getAccess()
+                };
+                return oRender.renderControl(data, type, row, meta);
+            } 
+        });
+
+        return col;
+    }
 
     function rendCountry(data, type, row, meta){
         if (data){
             return data.Name;
         }
         return "";
+    }
+
+    function renderRang(data, type, row, meta){
+        if (!data){
+            return 55555555555;
+        }
+        return data;
+    }
+
+    function renderValue(data, type, row, meta){
+        if (row.IsFile){
+            return '<img src="' + $('#base_dir').val() +'/ressources/download/setting/image/' + data +'" width="89" height="25" alt="Logo"/>';
+        }
+        return data;
     }
 
 });

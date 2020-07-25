@@ -1,0 +1,52 @@
+{% extends 'index_template.html.twig' %}
+
+{% set page_title = 'Création & modification' %}
+
+{% block home_path %}
+<li class="breadcrumb-item">
+    Catalogue
+</li>
+<li class="breadcrumb-item">
+    <a href="{{ path("setting_sites") }}">Sites</a>
+</li>
+<li class="breadcrumb-item">
+    {{ page_title }}
+</li>
+{% endblock %}
+
+{% block title %}{{ parent() }} - {{ page_title }} {% endblock %}
+
+{% block body_header_right %}
+<button form="global_form" type="submit" class="btn btn-primary"><i class="fa fa-save"></i></button>
+{% endblock %}
+
+{% block body %}
+
+{% include "notify.html.twig" %}
+<div class="brand-wrapper">
+
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa fa-align-justify"></i> {{ page_title }}</div>
+                    <div class="card-body">
+
+
+                        {{ form_start(formSite, { 'attr': {'id': 'global_form' }}) }}
+                        {{ form_row(formSite.Code,{'label': 'Code du site', 'attr': {'placeholder': 'Code du site'}}) }}
+                        {{ form_row(formSite.DisplayName,{'label': 'Nom à l\'affichage', 'attr': {'placeholder': 'Nom à l\'affichage'}})}}
+
+                        {{ form_end(formSite) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block javascripts %}
+<!-- <script src="{#{  asset('client.js','qobd_web_js') }#}"></script> -->
+{% endblock %}

@@ -1,4 +1,4 @@
-{% extends 'template_coreui.html.twig' %}
+{% extends 'index_template.html.twig' %}
 
 
 {% block title %}{{ parent() }}{% endblock %}
@@ -17,6 +17,9 @@
 
 
 {% block body %}
+
+    {% include "notify.html.twig" %}
+
     {% block content_area %}
     
     {% set code = codes[0] %}

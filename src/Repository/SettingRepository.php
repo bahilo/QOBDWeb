@@ -19,6 +19,10 @@ class SettingRepository extends ServiceEntityRepository
         parent::__construct($registry, Setting::class);
     }
 
+    /*public function findAll(){
+        return $this->findBy([], ['nRang' => 'asc']);
+    }*/
+
     // /**
     //  * @return Setting[] Returns an array of Setting objects
     //  */

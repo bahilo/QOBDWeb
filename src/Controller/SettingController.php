@@ -5,6 +5,7 @@ namespace App\Controller;
 use Exception;
 use App\Entity\Tax;
 use App\Entity\Item;
+use App\Entity\Site;
 use App\Entity\Comment;
 use App\Entity\EanCode;
 use App\Entity\Setting;
@@ -23,6 +24,8 @@ use App\Services\SettingManager;
 use App\Form\TaxRegistrationType;
 use App\Repository\TaxRepository;
 use App\Services\SecurityManager;
+use App\Form\SiteRegistrationType;
+use App\Repository\SiteRepository;
 use App\Repository\ActionRepository;
 use App\Form\EanCodeRegistrationType;
 use App\Form\SettingRegistrationType;
@@ -31,6 +34,7 @@ use App\Repository\SettingRepository;
 use App\Form\CurrencyRegistrationType;
 use App\Form\ProviderRegistrationType;
 use App\Repository\CurrencyRepository;
+use App\Repository\ImeiCodeRepository;
 use App\Repository\ProviderRepository;
 use App\Form\ItemBrandRegistrationType;
 use App\Repository\ItemBrandRepository;
@@ -41,7 +45,6 @@ use App\Form\OrderStatusRegistrationType;
 use App\Repository\OrderStatusRepository;
 use App\Form\DeliveryStatusRegistrationType;
 use App\Repository\DeliveryStatusRepository;
-use App\Repository\ImeiCodeRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\Response;
@@ -99,10 +102,13 @@ class SettingController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
         
+        //dump($utility->getDistinctByCode($this->settingRepo->findAll()));die();
+
         return $this->render('setting/home/general.html.twig', [
             'data_table' => 'general_table_js',
             'data_table_source' => 'general_data_source',
-            'codes' => $utility->getDistinctByCode($this->settingRepo->findAll()),
+            'source' => $utility->getDistinctByCode($this->settingRepo->findAll()),
+            //'' => $this->settingRepo->findBy(['Code' => $code]),
             'create_url' => $this->generateUrl('setting_registration'),
         ]);
     }
@@ -245,6 +251,23 @@ class SettingController extends Controller
     }
 
     /**
+     * @Route("/admin/configuration/sites", options={"expose"=true}, name="setting_sites")
+     */
+    public function sites(EanCodeRepository $eanRepo) {
+
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
+        return $this->render('setting/home/site.html.twig', [
+            'data_table' => 'ean_table_js',
+            'data_table_source' => 'site_data_source',
+            'codes' => ["SITE"],
+            'create_url' => $this->generateUrl('setting_sites_registration'),
+        ]);
+    }
+
+    /**
      * @Route("/admin/configuration/email", options={"expose"=true}, name="setting_email")
      */
     public function showEmail(){
@@ -292,8 +315,6 @@ class SettingController extends Controller
 
     /**
      * @Route("/admin/configuration/inscription", options={"expose"=true}, name="setting_registration")
-     * @Route("/admin/configuration/{id}/edit", options={"expose"=true}, requirements={"id"="\d+"}, name="setting_edit")
-     * 
      */
     public function registration(Setting $setting = null, 
                                  Request $request, 
@@ -328,11 +349,11 @@ class SettingController extends Controller
                         $setting->setIsFile(true);
                     }
 
-                    $fileFullPath = $utility->getAbsoluteRootPath() . $this->getParameter('file.setting.image.download_dir') . '/' . $fileName;
+                    /*$fileFullPath = $utility->getAbsoluteRootPath() . $this->getParameter('file.setting.image.download_dir') . '/' . $fileName;
                     $event = new GenericEvent([
                         "files" => [$fileFullPath],
                     ]);
-                    $this->eventDispatcher->dispatch(MyEvents::FTP_IMAGE_SEND, $event);
+                    $this->eventDispatcher->dispatch(MyEvents::FTP_IMAGE_SEND, $event);*/
                 } else {
                     $setting->setIsFile(false);
                 }
@@ -351,6 +372,73 @@ class SettingController extends Controller
             'formSetting' => $form->createView(),
             'errors' => $errors
         ]);
+    }
+
+    /**
+     * @Route("/admin/configuration/edit", options={"expose"=true}, name="setting_edit")
+     * 
+     */
+    public function edit(
+        Setting $setting = null,
+        Request $request,
+        ObjectManager $manager,
+        Utility $utility
+    ) {
+
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
+        try {
+            $form = $request->request->get('settings');
+            
+            foreach ($form as $code => $settings) {
+                foreach ($settings as $name => $value) {
+                    $setting = $this->settingRepo->findOneBy(["Code" => $code, "Name" => $name]);
+                    if (!empty($setting)) {
+                        //dump($setting);
+                        if ($setting->getIsFile()) {
+                            $file = $request->files->get('settings')['file'];
+                            $fileName = $utility->uploadFile($file, $utility->getAbsoluteRootPath() . $this->getParameter('abs.file.setting.image.download_dir'), 'logo.png');
+                            //dump($fileName);die();
+                            if (!empty($fileName)) {
+                                if (file_exists($utility->getAbsoluteRootPath() . $this->getParameter('abs.file.setting.image.download_dir') . '/' . $setting->getValue())) {
+                                    unlink($utility->getAbsoluteRootPath() . $this->getParameter('abs.file.setting.image.download_dir') . '/' . $setting->getValue());
+                                }
+                                $setting->setValue($fileName);
+                            }
+                        } else {
+                            $setting->setValue($value);
+                        }
+                        $manager->persist($setting);
+                    }
+                }
+            }
+
+            // sauvegarde du logo de la société
+            $setting = $this->settingRepo->findOneBy(["Code" => "SOCIETE", "Name" => "SOCIETE_LOGO"]);
+            $file = $request->files->get('settings')['SOCIETE']['SOCIETE_LOGO'];
+            if (!empty($setting) && $setting->getIsFile() && !empty($file)) {
+
+                // suppression de l'image précedemment sauvegardé
+                if (file_exists($utility->getAbsoluteRootPath() . $this->getParameter('abs.file.setting.image.download_dir') . '/' . $setting->getValue())) {
+                    unlink($utility->getAbsoluteRootPath() . $this->getParameter('abs.file.setting.image.download_dir') . '/' . $setting->getValue());
+                }
+
+                $fileName = $utility->uploadFile($file, $utility->getAbsoluteRootPath() . $this->getParameter('abs.file.setting.image.download_dir'), 'logo.png');
+               
+                if (!empty($fileName))                 
+                    $setting->setValue($fileName);
+            }
+            
+            $manager->flush();
+            $this->ErrorHandler->success("La configuration a été sauvegardée avec succès!");            
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la sauvegarde de la configuration!");
+            $this->ErrorHandler->error($ex->getMessage());            
+        }
+
+        return $this->redirectToRoute('setting_home');
     }
 
     /**
@@ -488,6 +576,47 @@ class SettingController extends Controller
 
         return $this->render('setting/tax_registration.html.twig', [
             'formTax' => $form->createView(),
+            'errors' => $errors
+        ]);
+    }
+
+    /**
+     * @Route("/admin/configuration/site/inscription", options={"expose"=true}, name="setting_sites_registration")
+     * @Route("/admin/configuration/site/{id}/edit", options={"expose"=true}, requirements={"id"="\d+"}, name="setting_sites_edit")
+     * 
+     */
+    public function siteRegistration(
+        Site $site = null,
+        Request $request,
+        ObjectManager $manager
+    ) {
+
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
+        if (!$site)
+            $site = new Site();
+
+        $form = $this->createForm(SiteRegistrationType::class, $site);
+
+        try {
+            $form->handleRequest($request);
+            $errors = $this->validator->validate($site);
+            if ($form->isSubmitted() && $form->isValid()) {
+                
+                $manager->persist($site);
+                $manager->flush();
+                $this->ErrorHandler->success("Le site a été sauvegardé avec succès!");
+                return $this->redirectToRoute('setting_sites');
+            }
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la sauvegarde du site!");
+            $this->ErrorHandler->error($ex->getMessage());
+        }
+
+        return $this->render('setting/site_registration.html.twig', [
+            'formSite' => $form->createView(),
             'errors' => $errors
         ]);
     }
@@ -829,6 +958,27 @@ class SettingController extends Controller
         }
 
         return $this->RedirectToRoute('setting_home');
+    }
+
+    /**
+     * @Route("/admin/configuration/site/{id}/delete", options={"expose"=true}, requirements={"id"="\d+"}, name="setting_sites_delete")
+     */
+    public function siteDelete(Site $site, ObjectManager $manager)
+    {
+        if (!$this->securityUtility->checkHasDelete($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
+        try {
+            $manager->remove($site);
+            $manager->flush();
+            $this->ErrorHandler->success("Le site a été supprimé avec succès!");
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la suppression du site");
+            $this->ErrorHandler->error($ex->getMessage());
+        }
+
+        return $this->RedirectToRoute('setting_sites');
     }
 
     /**
@@ -1199,6 +1349,29 @@ class SettingController extends Controller
 
         return new Response($this->serializer->serialize([
             'object_array' => ['data' => $eanRepo->findAll()],
+            'format' => 'json',
+            'group' => 'class_property'
+        ]));
+    }
+
+
+    /**
+     * @Route("/admin/configuration/site/donnee", options={"expose"=true}, name="setting_data_sites")
+     */
+    public function dataSite(SiteRepository $siteRepo)
+    {
+
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+            return new Response($this->serializer->serialize([
+                'object_array' => ['message' => 'Zone à accés restreint!"'],
+                'format' => 'json',
+            ]));
+        }
+
+        //dump($eanRepo->findAll());die();
+
+        return new Response($this->serializer->serialize([
+            'object_array' => ['data' => $siteRepo->findAll()],
             'format' => 'json',
             'group' => 'class_property'
         ]));

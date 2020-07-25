@@ -43,6 +43,8 @@ class Setting
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("IsFile")
      */
     private $IsFile;
 
@@ -52,6 +54,13 @@ class Setting
      * @SerializedName("DisplayName")
      */
     private $DisplayName;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"class_property"})
+     * @SerializedName("nRang")
+     */
+    private $nRang;
 
     public function getId(): ?int
     {
@@ -114,6 +123,18 @@ class Setting
     public function setDisplayName(?string $DisplayName): self
     {
         $this->DisplayName = $DisplayName;
+
+        return $this;
+    }
+
+    public function getNRang(): ?int
+    {
+        return $this->nRang;
+    }
+
+    public function setNRang(?int $nRang): self
+    {
+        $this->nRang = $nRang;
 
         return $this;
     }

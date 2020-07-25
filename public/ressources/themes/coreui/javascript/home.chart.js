@@ -39,11 +39,12 @@ $(document).ready(function(){
     };
 
     Chart.defaults.global.pointHitDetectionRadius = 1;
-    Chart.defaults.global.tooltips.enabled = true;
+    Chart.defaults.global.tooltips.enabled = false;
     Chart.defaults.global.tooltips.mode = 'index';
     Chart.defaults.global.tooltips.position = 'nearest';
-    //Chart.defaults.global.tooltips.custom = coreui.ChartJS.customTooltips;
-    Chart.defaults.global.defaultFontColor = '#646470';
+    Chart.defaults.global.tooltips.custom = coreui.ChartJS.customTooltips;
+    Chart.defaults.global.defaultFontColor = coreui.Utils.getStyle('--color', document.getElementsByClassName('c-app')[0]);
+    //Chart.defaults.global.defaultFontColor = '#646470';
     Chart.defaults.global.responsiveAnimationDuration = 1; 
 
     /*==========================[ début programme ]================================*/

@@ -33,6 +33,7 @@ security:
                 handlers: [App\Services\SecurityManager]
 
             remember_me:
+                always_remember_me: false
                 secret: '%secret%'
                 lifetime: 604800
                 path: home

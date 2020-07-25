@@ -56,7 +56,8 @@ $(document).ready(function () {
                 dom: '<"top"<"row"<"col-md-10 saveIgnore"f><"col-md-2 saveIgnore"l>>>r<"table-wrapper" t><"bottom nav-wrapper"p><"clear">',
                 BeforeSend: setting.beforeSend,
                 initComplete: function (settings, json) {
-                    setting.initComplete(settings, json, this.api());                    
+                    setting.initComplete(settings, json, this.api());  
+                    $.fn.initTooltip();                  
                 },
                 fnRowCallback: function (nRow, aData, index) {
                     setting.rowCallback(nRow, aData, index);

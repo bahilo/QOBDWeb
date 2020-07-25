@@ -1,4 +1,4 @@
-{% extends 'template_coreui.html.twig' %}
+{% extends 'index_template.html.twig' %}
 
 {% block title %}{{ search.get_setting("SOCIETE","SOCIETE_NOM").value }}{% endblock %}
 
@@ -9,7 +9,6 @@
 {% endblock %}
 
 {% block body %}
-
 
 <div class="home-wrapper">
     <div class="animated fadeIn">
@@ -29,18 +28,32 @@
                                 <i class="fa fa-cog"></i>
                             </button>
                             <div class="dropdown-menu dropdown-menu-right">
-                                <a class="dropdown-item" href="{{ path("order_home") }}">Détail</a>
+                                <a class="dropdown-item" href="{{ path("order_home") }}">Commandes validées</a>
+                                <a class="dropdown-item" href="{{ path("order_bill") }}">Commandes facturées</a>
                             </div>
                         </div>
                     </div>
                     <div class="c-chart-wrapper mt-3 mx-3" style="height:70px;">
-                        <div class="chartjs-size-monitor-expand">
-                            <div class=""></div>
+                        <div class="chartjs-size-monitor">
+                            <div class="chartjs-size-monitor-expand">
+                                <div class=""></div>
+                            </div>
+                            <div class="chartjs-size-monitor-shrink">
+                                <div class=""></div>
+                            </div>
                         </div>
-                        <div class="chartjs-size-monitor-shrink">
-                            <div class=""></div>
+                        <canvas class="chart chartjs-render-monitor" id="card-chart1" height="70" width="167" 
+                        style="display: block; width: 167px; height: 70px;"></canvas>
+                        <div id="card-chart1-tooltip" class="c-chartjs-tooltip top bottom" style="opacity: 0; left: 88.2422px; top: 113.173px;">
+                            <div class="c-tooltip-header">
+                                <div class="c-tooltip-header-item">January</div>
+                            </div>
+                            <div class="c-tooltip-body">
+                                <div class="c-tooltip-body-item"><span class="c-tooltip-body-item-color"
+                                        style="background-color: rgb(50, 31, 219);"></span><span class="c-tooltip-body-item-label">My First
+                                        dataset</span><span class="c-tooltip-body-item-value">65</span></div>
+                            </div>
                         </div>
-                        <canvas class="chart" id="card-chart1" width="182"></canvas>
                     </div>
                 </div>
             </div>
@@ -83,7 +96,8 @@
                                 <i class="fa fa-cog"></i>
                             </button>
                             <div class="dropdown-menu dropdown-menu-right">
-                                <a class="dropdown-item" href="{{ path("order_refund") }}">Détail</a>
+                                <a class="dropdown-item" href="{{ path("order_refund") }}">Avoirs validés</a>
+                                <a class="dropdown-item" href="{{ path("order_bill_refund") }}">Avoirs expédies</a>
                             </div>
                         </div>
                     </div>
@@ -153,8 +167,10 @@
 
 {% block javascripts %} 
     
-    <script src="{{ asset('javascript/src/coreui-chartjs.bundle.js','theme_coreui') }}"></script>
-    <script src="{{ asset('javascript/src/coreui-utils.js','theme_coreui') }}"></script>
-    <script type="text/javascript" src="{{ asset('javascript/home.chart.js','theme_coreui') }}"
-        class="view-script"></script>
+    <script type="text/javascript" src="{{ asset('javascript/src/coreui-chartjs.bundle.js','theme_coreui') }}"></script>
+    <script type="text/javascript" src="{{ asset('javascript/src/coreui-utils.js','theme_coreui') }}"></script>
+    <script type="text/javascript" src="{{ asset('javascript/home.chart.js','theme_coreui') }}"></script>
+      <!--
+    <script type="text/javascript" src="{{ asset('@coreui/js/main.js','theme_coreui') }}"></script>
+-->
 {% endblock %}

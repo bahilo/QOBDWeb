@@ -35,7 +35,6 @@ class ImeiCode
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Assert\NotNull(message = "Le numéro de série ne peut pas être null.")
      * @Groups({"class_property"})
      * @SerializedName("SerieCode")
      */

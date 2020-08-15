@@ -1,0 +1,17 @@
+{% extends 'order/home/home_prerefund.html.twig' %}
+
+{#% block title %}{{ parent() }} - Avoir validé{% endblock %}
+
+{% block home_path %}
+{{ parent() }}
+<li class="breadcrumb-item">
+    Avoirs
+</li>
+<li class="breadcrumb-item">
+    Avoirs à valider
+</li>
+{% endblock %}
+
+{% block body_title_are %}
+<i class="fa fa-align-justify"></i> Avoir à valider</div>
+{% endblock %#}

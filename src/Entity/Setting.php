@@ -129,6 +129,9 @@ class Setting
 
     public function getNRang(): ?int
     {
+        // de mettre en fin de ligne les éléments avec un rang à null
+        if(empty($this->nRang))
+            return 101010101;            
         return $this->nRang;
     }
 

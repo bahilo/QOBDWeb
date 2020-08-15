@@ -3,8 +3,11 @@
 namespace App\Form;
 
 use App\Entity\Address;
+use App\Entity\Country;
+use App\Form\PaysRegistrationType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AddressRegistrationType extends AbstractType
@@ -21,8 +24,9 @@ class AddressRegistrationType extends AbstractType
             ->add('ZipCode', null, [
                 'label' => 'Code postale'
             ])
-            ->add('Country', null, [
-                'label' => 'Pays'
+            ->add('Country', EntityType::class, [
+                'class' => Country::class,
+                'choice_label' => 'Name'
             ])
             ->add('Comment', CommentRegistrationType::class, [
                 'label' => false

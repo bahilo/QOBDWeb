@@ -3,18 +3,22 @@
 namespace App\Events;
 
 use App\Services\Mailer;
+use App\Services\OrderManager;
+use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class NotifyOrder implements EventSubscriberInterface
 {
     private $mailer;
-    private $sender;
+    private $manager;
+    private $orderManager;
 
-    public function __construct(Mailer $mailer)
+    public function __construct(Mailer $mailer, OrderManager $orderManager, ObjectManager $manager)
     {
         $this->mailer = $mailer;
-        //$this->sender = $sender;
+        $this->orderManager = $orderManager;
+        $this->manager = $manager;
     }
 
     public static function getSubscribedEvents(): array
@@ -22,6 +26,7 @@ class NotifyOrder implements EventSubscriberInterface
         return [
             MyEvents::ORDER_EMAIL_VALIDATION => 'onOrderValidated',
             MyEvents::ORDER_EMAIL_BILL => 'onOrderEmailBill',
+            MyEvents::ORDER_CHECK_STOCK => 'onRegisterStockCheck',
         ];
     }
 
@@ -37,5 +42,13 @@ class NotifyOrder implements EventSubscriberInterface
     {
         $result = $event->getSubject();
         $this->mailer->send(['to' => $result['to']], $result['subject'], $result['view']);
+    }
+
+    public function onRegisterStockCheck(GenericEvent $event): void
+    {
+        $result = $event->getSubject();
+        $class = "\App\Services\\". $result['code']."\StockManager";
+        $stockManager = new $class($this->manager, $this->orderManager);
+        $stockManager->checkOrderStock($result['order_details']);
     }
 }

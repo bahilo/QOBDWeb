@@ -1,0 +1,17 @@
+{% extends 'order/home/home_order_valid.html.twig' %}
+
+{#% block title %}{{ parent() }} - Commande à valider{% endblock %}
+
+{% block home_path %}
+{{ parent() }}
+<li class="breadcrumb-item">
+    Commandes
+</li>
+<li class="breadcrumb-item">
+    Cmd à valider
+</li>
+{% endblock %}
+
+{% block body_title_are %}
+<i class="fa fa-align-justify"></i> Demandes de revalidations</div>
+{% endblock %#}

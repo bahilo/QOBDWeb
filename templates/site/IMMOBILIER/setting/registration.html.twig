@@ -1,0 +1,103 @@
+{% extends 'setting/registration.twig' %}
+
+{#% set page_title = 'Création & modification' %}
+
+{% block home_path %}
+<li class="breadcrumb-item">
+    Securité & Configuration
+</li>
+<li class="breadcrumb-item">
+    <a href="{{ path("setting_home_admin") }}">Configuration</a>
+</li>
+<li class="breadcrumb-item">
+    {{ page_title }}
+</li>
+{% endblock %}
+
+{% block title %}{{ parent() }} - {{ page_title }} {% endblock %}
+
+{% block body_header_right %}
+    <button form="global_form" type="submit" class="btn btn-primary"><i class="fa fa-save"></i></button>
+{% endblock %}
+
+{% block body %}
+
+<div class="setting-wrapper">
+
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa fa-align-justify"></i> {{ page_title }}</div>
+                    <div class="card-body">
+
+                    {% include "notify.html.twig" %}
+
+                        {{ form_start(formSetting, {'attr': {'enctype': "multipart/form-data", 'id': 'global_form'}}) }}
+                             
+                        
+                        <div class="switch-wrapper">
+                            <span class="badge badge-success">Text</span>
+                            <label class="c-switch c-switch-3d switch-primary">
+                                {% if formSetting.vars.data.IsFile %}
+                                <input name="setting_registration[switch]" class="c-switch-input" type="checkbox" checked>
+                                {% else %}
+                                <input name="setting_registration[switch]" class="c-switch-input" type="checkbox">
+                                {% endif %}
+                                <span class="c-switch-slider"></span>
+                            </label>
+                            <span class="badge badge-warning">Fichier</span>
+                        </div>
+                        <br>
+
+                        {% if search.get_right_admin() %}
+                        {{ form_row(formSetting.Code,{'label': 'Catégorie', 'attr': {'placeholder': 'Catégorie'}}) }}
+                        {{ form_row(formSetting.Name,{'label': 'Nom de la configuration', 'attr': {'placeholder': 'Nom de la configuration'}})
+                        }}
+                        {{ form_row(formSetting.DisplayName,{'label': 'Nom à l\'affichage', 'attr': {'placeholder': 'Nom à l\'affichage'}})}}
+                        {{ form_row(formSetting.nRang,{'label': 'Rang', 'attr': {'placeholder': 'Rang'}})}}
+                                                
+                        {% else %}
+                        {{ form_row(formSetting.Code,{'attr': {'style': 'display:none;'}}) }}
+                        {{ form_row(formSetting.Name,{'attr': {'style': 'display:none;'}}) }}
+                        {{ form_row(formSetting.DisplayName,{'label': 'Nom à l\'affichage', 'attr': {'placeholder': 'Nom à l\'affichage'}})
+                        }}
+                                                
+                        {% endif %}
+
+                        <div class="value-wrapper">
+                            {% if formSetting.vars.data.IsFile %}
+                            <div class="value-display">
+                                <img class="navbar-brand-full" src="{{ search.logo }}" width="89" height="25" alt="Logo">
+                           </div>
+                            <div class="value-file">
+                                <input type="file" name="setting_registration[file]">
+                            </div>
+                            {% else %}
+                            <div class="value-file" style="display:none">
+                                <input type="file" name="setting_registration[file]">
+                            </div>
+                            {% endif %}   
+
+                            <div class="value-default">
+                                {{ form_row(formSetting.Value,{'label': 'Valeur', 'attr': {'placeholder': 'Valeur'}}) }}
+                            </div>
+                        </div>
+
+                        {{ form_end(formSetting) }}
+                    </div> 
+                </div> 
+            </div> 
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+
+
+{% block javascripts %}
+<script src="{{ asset('js/setting.js','theme_default') }}"></script>
+{% endblock %#}

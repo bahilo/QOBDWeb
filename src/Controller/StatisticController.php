@@ -11,6 +11,7 @@ use App\Repository\QuoteOrderRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
+use App\Services\SearchToView;
 
 class StatisticController extends Controller
 {
@@ -20,18 +21,21 @@ class StatisticController extends Controller
     protected $serializer;
     protected $orderManager;
     protected $statManager;
+    protected $search;
 
     public function __construct(OrderManager $orderManager, 
                                 Serializer $serializer, 
                                 SecurityManager $securityUtility, 
                                 ActionRepository $actionRepo,
-                                StatisticManager $statManager)
+                                StatisticManager $statManager,
+                                SearchToView $search)
     {
         $this->securityUtility = $securityUtility;
         $this->actionRepo = $actionRepo;
         $this->serializer = $serializer;
         $this->orderManager = $orderManager;
         $this->statManager = $statManager;
+        $this->search = $search;
     }
     
     /**
@@ -39,7 +43,7 @@ class StatisticController extends Controller
      */
     public function index()
     {
-        return $this->render('statistic/index.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/statistic/index.html.twig', [
             'controller_name' => 'StatisticController',
         ]);
     }
@@ -56,7 +60,7 @@ class StatisticController extends Controller
 
         $data =$this->serializer->serialize(['object_array' => $this->statManager->getOrderDataByWeek(), 'format' => 'json', 'group' => 'class_property']);
 
-        return new Response($data);
+        return new Response($data); 
     }
 
     /**

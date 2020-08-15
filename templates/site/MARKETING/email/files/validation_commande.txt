@@ -1,0 +1,24 @@
+Bonjour Madame, Monsieur {{ nom_client }}, 
+
+
+Nous vous confirmons la prise en charge de votre commande et nous vous en remercions. 
+
+N’hésitez pas a contacter directement votre commercial pour tout complément d'information. 
+
+
+Merci pour votre confiance.  
+
+Cordialement, 
+
+
+L’équipe {{ nom_societe }}.
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+

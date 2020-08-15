@@ -66,7 +66,16 @@
             </div>
         </div>
         
-        {# Contact 
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-align-justify"></i> Contact Principal</div>
+            <div class="card-body">
+                {{ form_widget(formClient.contactPrincipal,{'label': 'Prénom','attr': {'placeholder': 'Prénom'}}) }}
+                
+            </div>
+        </div>
+
+        {# Contact
         <div class="card">
             <div class="card-header">
                 <i class="fa fa-align-justify"></i> Contact Principal</div>
@@ -95,7 +104,7 @@
         
             </div>
         </div>
-        #}
+         #}
         {{ form_end(formClient) }}
     </div>
 

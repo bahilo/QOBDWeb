@@ -9,6 +9,7 @@ use App\Entity\Discussion;
 use App\Services\ChatToView;
 use App\Services\Serializer;
 use App\Services\ChatManager;
+use App\Services\SearchToView;
 use App\Entity\AgentDiscussion;
 use App\Repository\AgentRepository;
 use App\Repository\MessageRepository;
@@ -27,16 +28,19 @@ class ChatRoomController extends Controller
     protected $chatManager;
     protected $chatToView;
     protected $adRepo;
+    protected $search;
 
     public function __construct(Serializer $serializer, 
                                 ChatManager $chatManager, 
                                 ChatToView $chatToView,
-                                AgentDiscussionRepository $adRepo)
+                                AgentDiscussionRepository $adRepo,
+                                SearchToView $search)
     {
         $this->serializer = $serializer;
         $this->chatManager = $chatManager;
         $this->chatToView = $chatToView;
         $this->adRepo = $adRepo;
+        $this->search = $search;
     }
 
 

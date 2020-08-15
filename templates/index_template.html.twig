@@ -1,5 +1,4 @@
 
-{#% set site = search.get_site_config() %#}
-    {% extends 'site/template_high_tech.html.twig' %}
-{#% if %}
-{% endif %#}
+{% set site = search.get_site_config() %}
+{% set template = 'site/' ~ site.code ~'/template_'~ site.code ~'.html.twig' %}
+{% extends template %}

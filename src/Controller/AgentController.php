@@ -9,6 +9,9 @@ use App\Services\ErrorHandler;
 use App\Services\SecurityManager;
 use App\Repository\AgentRepository;
 use App\Repository\ActionRepository;
+use App\Repository\SiteRepository;
+use App\Services\SearchToView;
+use App\Services\SettingManager;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -18,15 +21,18 @@ class AgentController extends Controller
     protected $securityUtility;
     protected $actionRepo;
     protected $ErrorHandler;
+    protected $search;
 
 
     public function __construct(SecurityManager $securityUtility, 
                                 ActionRepository $actionRepo,
+                                SearchToView $search,
                                 ErrorHandler $ErrorHandler)
     {
         $this->securityUtility = $securityUtility;
         $this->actionRepo = $actionRepo;
         $this->ErrorHandler = $ErrorHandler;
+        $this->search = $search;
     }
     
     /**
@@ -38,7 +44,7 @@ class AgentController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        return $this->render('agent/index.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/agent/index.html.twig', [
             'agents_data_source' => $serializer->serialize(['object_array' => $agentRepo->findAll(), 'format' => 'json', 'group' => 'class_property']),
         ]);
     }

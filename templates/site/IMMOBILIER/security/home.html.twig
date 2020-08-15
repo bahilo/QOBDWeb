@@ -1,0 +1,43 @@
+{% extends 'security/home.html.twig' %}
+
+{#% block home_path %}
+<li class="breadcrumb-item">
+    <a href="#">Securité</a>
+</li>
+{% endblock %}
+
+{% block title %}{{ parent() }}{% endblock %}
+
+{% block body_header_right %}
+<button form="global_form" type="submit" class="btn btn-primary"><i class="fa fa-save"></i></button>
+{% endblock %}
+
+{% block body %}
+
+<div class="security-wrapper">
+    <div class="animated fadeIn">
+        {% block content_area %}{% endblock %}
+    </div>
+</div>
+
+{% if security_target is defined %}
+<input type="hidden" id="security_target" value="{{ security_target }}">
+{% endif %}
+
+{% endblock %}
+
+
+{% block access_pool %}
+<div class="access_pool">
+    <input type="hidden" id="is_read" value="{{ search.get_right_read("ACTION_SECURITY") }}" />
+    <input type="hidden" id="is_write" value="{{ search.get_right_write("ACTION_SECURITY") }}" />
+    <input type="hidden" id="is_update" value="{{ search.get_right_update("ACTION_SECURITY") }}" />
+    <input type="hidden" id="is_delete" value="{{ search.get_right_delete("ACTION_SECURITY") }}" />
+    <input type="hidden" id="is_mail" value="{{ search.get_right_email("ACTION_SECURITY") }}" />
+    <input type="hidden" id="is_admin" value="{{ search.get_right_admin() }}" />
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="{{  asset('js/security.js','theme_default') }}"></script>
+{% endblock %#}

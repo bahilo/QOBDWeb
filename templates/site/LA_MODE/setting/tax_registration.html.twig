@@ -1,0 +1,84 @@
+{% extends 'setting/tax_registration.html.twig' %}
+
+{#% set page_title = 'Création & modification' %}
+
+{% block home_path %}
+<li class="breadcrumb-item">
+    Securité & Configuration
+</li>
+<li class="breadcrumb-item">
+   Configuration
+</li>
+<li class="breadcrumb-item">
+    <a href="{{ path("setting_tax") }}">Taxes</a>
+</li>
+<li class="breadcrumb-item">
+    {{ page_title }}
+</li>
+{% endblock %}
+
+{% block title %}{{ parent() }} - {{ page_title }} {% endblock %}
+
+{% block body_header_right %}
+    <button form="global_form" type="submit" class="btn btn-primary"><i class="fa fa-save"></i></button>
+{% endblock %}
+
+{% block body %}
+
+<div class="tax-wrapper">
+
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa fa-align-justify"></i> {{ page_title }}</div>
+                    <div class="card-body">
+
+                        {% include "notify.html.twig" %}
+
+                        {{ form_start(formTax, { 'attr': {'id': 'global_form' }}) }}
+                        
+                        <div class="c-switch-wrapper">
+                            <span class="badge badge-success">Taxe par défaut</span>
+                            <label class="c-switch c-switch-label c-switch-primary">
+                                {% if formTax.vars.data.IsCurrent %}
+                                <input name="Tax_registration[is_current]" class="c-switch-input" type="checkbox" checked>
+                                {% else %}
+                                <input name="Tax_registration[is_current]" class="c-switch-input" type="checkbox">
+                                {% endif %}
+                                <span class="c-switch-slider" data-checked="Oui" data-unchecked="Non"></span>
+                            </label>
+                        </div>
+                        <div class="c-switch-wrapper">
+                            <span class="badge badge-success">TVA/MARGE</span>
+                            <label class="c-switch c-switch-label c-switch-primary">
+                                {% if formTax.vars.data.IsTVAMarge %}
+                                <input name="Tax_registration[is_TVAMarge]" class="c-switch-input" type="checkbox" checked>
+                                {% else %}
+                                <input name="Tax_registration[is_TVAMarge]" class="c-switch-input" type="checkbox">
+                                {% endif %}
+                                <span class="c-switch-slider" data-checked="Oui" data-unchecked="Non"></span>
+                            </label>
+                        </div>
+                        <br />
+                        
+                        {{ form_row(formTax.Type,{'label': 'désignation de la Tax', 'attr': {'placeholder': 'désignation de la Tax'}})
+                        }}
+                        {{ form_row(formTax.Value,{'label': 'Valeur', 'attr': {'placeholder': 'Valeur'}}) }}
+                        {{ form_row(formTax.CommentContent,{'label': 'Commentiare', 'attr': {'placeholder': 'Commentaire'}}) }}
+
+                        {{ form_row(formTax.IsCurrent, {'label': 'TVA par défaut'}) }}
+                        {{ form_row(formTax.IsTVAMarge, {'label': 'TVA/Marge'}) }}
+
+                        {{ form_end(formTax) }}
+                    </div> 
+                </div> 
+            </div> 
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block javascripts %}
+{% endblock %#}

@@ -17,45 +17,63 @@
 {% endblock %}
 
 {% block content_area %}
-
-<form action="{{ path('setting_edit') }}" method="post" id="global_form" enctype="multipart/form-data">
-{% for key, settings in source %}
-
 <div class="example-wrapper">
     <div class="animated fadeIn">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="card card-accent-info">
-                    <div class="card-header">       
-                        <i class="fa fa-align-justify"></i> {{ key }}</div>
-                    <div class="card-body">
-                        {% for setting in settings %}
-                        <div class="form-group">
-                            <label for="{{ key ~ setting.name }}" class="control-label">{{ setting.displayname }}</label>
-                            {% if setting.isfile %}
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="value-file">
-                                            <input type="file" name="settings[{{ key }}][{{ setting.name }}]" id="{{ key ~ setting.name }}">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <img class="ste-logo" src="{{ search.logo }}" alt="Logo">
-                                    </div>
-                                </div>
-                            {% else %}
-                                <input type="text" class="form-control" name="settings[{{ key }}][{{ setting.name }}]" id="{{ key ~ setting.name }}" value="{{ setting.value }}">
-                            {% endif %}
-                        </div>
-                        {% endfor %}
+
+        <form action="{{ path('setting_edit') }}" method="post" id="global_form" enctype="multipart/form-data">
+            <div class="card card-accent-info">
+                <div class="card-header">
+                        <i class="fa fa-align-justify"></i> Site
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="" class="control-label">Veuillez sélectionner le type de site</label>
+                        <select name="settings[site]" class="form-control" id="">
+                            {% for site in source_site %}
+                                {% if site.active %}
+                                    <option value="{{ site.id }}" selected>{{ site.displayname }}</option>
+                                {% else %}
+                                    <option value="{{ site.id }}">{{ site.displayname }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
             </div>
-        </div>
+            
+            {% for key, settings in source %}
+
+            <div class="card card-accent-info">
+                <div class="card-header">
+                    <i class="fa fa-align-justify"></i> {{ key }}</div>
+                <div class="card-body">
+                    {% for setting in settings | sort((a,b) => a.nrang <=> b.nrang) %}
+                    <div class="form-group">
+                        <label for="{{ key ~ setting.name }}" class="control-label">{{ setting.displayname }}</label>
+                        {% if setting.isfile %}
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="value-file">
+                                    <input type="file" name="settings[values][{{ key }}][{{ setting.name }}]" class="form-control"
+                                        id="{{ key ~ setting.name }}">
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <img class="ste-logo" src="{{ search.logo }}" alt="Logo">
+                            </div>
+                        </div>
+                        {% else %}
+                        <input type="text" class="form-control" name="settings[values][{{ key }}][{{ setting.name }}]"
+                            id="{{ key ~ setting.name }}" value="{{ setting.value }}">
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </form>
     </div>
 </div>
-{% endfor %}
-</form>
 
 <!-- <input type="hidden" id="setting_target_tables" value="{#{ codes | json_encode() }#}"> -->
 

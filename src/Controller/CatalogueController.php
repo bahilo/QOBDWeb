@@ -2,10 +2,12 @@
 
 namespace App\Controller;
 
+use Exception;
 use App\Entity\Item;
 use App\Services\Utility;
 use App\Services\Serializer;
 use App\Services\ErrorHandler;
+use App\Services\SearchToView;
 use App\Services\SecurityManager;
 use App\Form\ItemRegistrationType;
 use App\Repository\ItemRepository;
@@ -14,7 +16,6 @@ use App\Repository\ActionRepository;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\QuoteOrderDetailRepository;
 use Doctrine\Common\Persistence\ObjectManager;
-use Exception;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -28,18 +29,21 @@ class CatalogueController extends Controller
     protected $actionRepo;
     protected $ErrorHandler;
     protected $rootDir;
+    protected $search;
 
     public function __construct(Serializer $serializer, 
                                 SecurityManager $securityUtility, 
                                 ActionRepository $actionRepo,
                                 ErrorHandler $ErrorHandler,
-                                    $root_dir)
+                                $root_dir,
+                                SearchToView $search)
     {
         $this->serializer = $serializer;
         $this->securityUtility = $securityUtility;
         $this->actionRepo = $actionRepo;
         $this->ErrorHandler = $ErrorHandler;
         $this->rootDir = $root_dir;
+        $this->search = $search;
     }
     
     /**
@@ -51,7 +55,7 @@ class CatalogueController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        return $this->render('catalogue/index.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/catalogue/index.html.twig', [
             //'item_data_source' => $serializer->serialize([ 'object_array' => $catHydrate->hydrateItem($itemRepo->findAll()), 'format' => 'json', 'group' => 'class_property']),
             'cart_total' => count($session->get('panier', []))
         ]);
@@ -118,7 +122,7 @@ class CatalogueController extends Controller
         }        
         
 
-        return $this->render('catalogue/item_registration.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/catalogue/item_registration.html.twig', [
             'formItem' => $form->createView(),
         ]);
     }   

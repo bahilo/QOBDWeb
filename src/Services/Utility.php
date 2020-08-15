@@ -189,8 +189,21 @@ class Utility{
         foreach($sourceArray as $key => $obj){
             if(!$this->in_arrayByCode(array_keys($outputArray), $obj))
                 $outputArray[$obj->getCode()] = [];
-            else
-                $outputArray[$obj->getCode()][] = $obj;
+                
+            $outputArray[$obj->getCode()][] = $obj;
+        }
+        return $outputArray;
+    }
+
+    /**
+     * Récupère les données du setting sans doublon pour l'admin
+     */
+    public function getAdminDistinctByCode($sourceArray)
+    {
+        $outputArray = [];
+        foreach ($sourceArray as $key => $obj) {
+            if (!$this->in_arrayByCode($outputArray, $obj))
+                $outputArray[] = $obj->getCode();
         }
         return $outputArray;
     }

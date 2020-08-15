@@ -1,0 +1,176 @@
+{% extends 'home/index.html.twig' %}
+
+{#% block title %}{{ search.get_setting("SOCIETE","SOCIETE_NOM").value }}{% endblock %}
+
+{% block body_header_left %}
+  
+        
+    
+{% endblock %}
+
+{% block body %}
+
+<div class="home-wrapper">
+    <div class="animated fadeIn">
+        <div class="row">
+
+            <!-- /.col-->
+            <div class="col-sm-6 col-lg-3">
+                <div class="card text-white bg-gradient-primary">
+                    <div class="card-body card-body pb-0 d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="text-value-lg">{{ nb_order }}</div>
+                            <div>Commandes</div>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-transparent dropdown-toggle p-0" type="button" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-cog"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <a class="dropdown-item" href="{{ path("order_home") }}">Commandes validées</a>
+                                <a class="dropdown-item" href="{{ path("order_bill") }}">Commandes facturées</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="c-chart-wrapper mt-3 mx-3" style="height:70px;">
+                        <div class="chartjs-size-monitor">
+                            <div class="chartjs-size-monitor-expand">
+                                <div class=""></div>
+                            </div>
+                            <div class="chartjs-size-monitor-shrink">
+                                <div class=""></div>
+                            </div>
+                        </div>
+                        <canvas class="chart chartjs-render-monitor" id="card-chart1" height="70" width="167" 
+                        style="display: block; width: 167px; height: 70px;"></canvas>
+                        <div id="card-chart1-tooltip" class="c-chartjs-tooltip top bottom" style="opacity: 0; left: 88.2422px; top: 113.173px;">
+                            <div class="c-tooltip-header">
+                                <div class="c-tooltip-header-item">January</div>
+                            </div>
+                            <div class="c-tooltip-body">
+                                <div class="c-tooltip-body-item"><span class="c-tooltip-body-item-color"
+                                        style="background-color: rgb(50, 31, 219);"></span><span class="c-tooltip-body-item-label">My First
+                                        dataset</span><span class="c-tooltip-body-item-value">65</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- /.col-->
+            <div class="col-sm-6 col-lg-3">
+                <div class="card text-white bg-gradient-info">
+                    <div class="card-body card-body pb-0 d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="text-value-lg">{{ nb_quote }}</div>
+                            <div>Devis</div>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-transparent dropdown-toggle p-0" type="button" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-cog"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <a class="dropdown-item" href="{{ path("order_quote") }}">Détail</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="c-chart-wrapper mt-3 mx-3" style="height:70px;">
+                        <canvas class="chart" id="card-chart2" height="70" width="182"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- /.col-->
+            <div class="col-sm-6 col-lg-3">
+                <div class="card text-white bg-gradient-warning">
+                    <div class="card-body card-body pb-0 d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="text-value-lg">{{ nb_refund }}</div>
+                            <div>Avoirs</div>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-transparent dropdown-toggle p-0" type="button" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-cog"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <a class="dropdown-item" href="{{ path("order_refund") }}">Avoirs validés</a>
+                                <a class="dropdown-item" href="{{ path("order_bill_refund") }}">Avoirs expédies</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="c-chart-wrapper mt-3 mx-3" style="height:70px;">
+                        <canvas class="chart" id="card-chart3" height="70" width="182"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- /.col-->
+            <div class="col-sm-6 col-lg-3">
+                <div class="card text-white bg-gradient-danger">
+                    <div class="card-body card-body pb-0 d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="text-value-lg">{{ nb_validation }}</div>
+                            <div>Revalidation</div>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-transparent dropdown-toggle p-0" type="button" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-cog"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <a class="dropdown-item" href="{{ path("order_customer_valid") }}">Détail</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="c-chart-wrapper mt-3 mx-3" style="height:70px;">
+                        <canvas class="chart" id="card-chart4" height="70" width="182"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div >
+                                <h4 class="card-title mb-0">Commandes</h4>
+                                <div class="small text-muted">{{ "now"|date("F\\, Y") }}</div>
+                            </div>
+                            <div class="btn-toolbar d-none d-md-block" role="toolbar" aria-label="Toolbar with buttons">
+                                <div class="btn-date-select btn-group btn-group-toggle mx-3" data-toggle="buttons">
+                                    <label class="btn btn-outline-secondary">
+                                        <input id="optionWeek" type="radio" name="options" autocomplete="off"> Semaine
+                                    </label>
+                                    <label class="btn btn-outline-secondary active">
+                                        <input id="optionMonth" type="radio" name="options" autocomplete="off" checked=""> Mois
+                                    </label>
+                                    <label class="btn btn-outline-secondary">
+                                        <input id="optionYear" type="radio" name="options" autocomplete="off"> Année
+                                    </label>
+                                </div>
+                            </div>
+                            
+                        </div> 
+                        <canvas id="myChart0"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %} 
+    
+    <script type="text/javascript" src="{{ asset('javascript/src/coreui-chartjs.bundle.js','theme_coreui') }}"></script>
+    <script type="text/javascript" src="{{ asset('javascript/src/coreui-utils.js','theme_coreui') }}"></script>
+    <script type="text/javascript" src="{{ asset('javascript/home.chart.js','theme_coreui') }}"></script>
+      <!--
+    <script type="text/javascript" src="{{ asset('@coreui/js/main.js','theme_coreui') }}"></script>
+-->
+{% endblock %#}

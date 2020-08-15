@@ -1,0 +1,5 @@
+{% extends 'email/_partials/registration.html' %}
+{#
+{% block body_title %}Votre inscription{% endblock body_title %}
+{% block content_area %}{% include 'email/files/inscription.txt' with {'pseudo': agent.username, 'nom_societe': search.get_setting("SOCIETE","SOCIETE_NOM").value } %}{% endblock %}
+#}

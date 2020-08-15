@@ -1,0 +1,84 @@
+{% extends 'client/registration.html.twig' %}
+
+{#% set page_title = 'Création & modification' %}
+
+{% block home_path %}
+<li class="breadcrumb-item">
+    <a href="{{ path("client_home") }}">Clients</a>
+</li>
+<li class="breadcrumb-item">
+    {{ page_title }}
+</li>
+{% endblock %}
+
+{% block title %}{{ parent() }} - {{ page_title }} {% endblock %}
+
+{% block body_header_right %}
+    <button form="global_form" type="submit" class="btn btn-primary"><i class="fa fa-save"></i></button>
+    {% if formClient.vars.data.id > 0 %}
+    <a href="{{ path("client_show",{id: formClient.vars.data.id}) }}" class="btn btn-secondary"><i class="fa fa-undo"></i></a>
+    <a href="{{ path("client_delete",{id: formClient.vars.data.id}) }}" class="btn btn-danger btnDelete"><i class="fa fa-trash"></i></a>
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+
+<div class="client-wrapper">
+
+    <div class="animated fadeIn">
+
+        {% include "notify.html.twig" %}
+        
+        {{ form_start(formClient, { 'attr': {'id': 'global_form' }}) }}
+        
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-align-justify"></i> Société</div>
+            <div class="card-body">
+
+                
+                <div class="switch-wrapper">
+                    <span class="badge badge-success">Client</span>
+                    <label class="c-switch c-switch-3d switch-primary">
+                        {% if formClient.vars.data.IsProspect %}
+                        <input name="client_registration[client_prospect]" class="c-switch-input" type="checkbox">
+                        {% else %}
+                        <input name="client_registration[client_prospect]" class="c-switch-input" type="checkbox" checked>
+                        {% endif %}
+                        <span class="c-switch-slider" data-checked="Oui" data-unchecked="Non"></span>
+                    </label>
+                    <span class="badge badge-warning">Prospect</span>
+                </div>
+                <br />
+        
+                {{ form_row(formClient.CompanyName,{'label': 'Société','attr': {'placeholder': 'Société'}}) }}
+                {{ form_row(formClient.Denomination,{'label': 'Dénomination','attr': {'placeholder': 'Dénomination'}}) }}
+                {{ form_row(formClient.Rib,{'label': 'RIB','attr': {'placeholder': 'Rib'}}) }}
+                {{ form_row(formClient.CRN,{'label': 'Kbis','attr': {'placeholder': 'kbis'}}) }}
+                {{ form_row(formClient.PayDelay,{'label': 'Délais de paiement(en jour)', 'attr': {'placeholder': 'Délais de paiement'}})
+                }}
+                {{ form_row(formClient.MaxCredit,{'label': 'Encours Max', 'attr': {'placeholder': 'Encours Max'}}) }}
+                {{ form_widget(formClient.Comment,{'label': 'Commentaire général sur le client', 'attr': {'placeholder': 'Commentaire général sur le client'}})
+                }}
+        
+        
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-align-justify"></i> Contact Principal</div>
+            <div class="card-body">
+                {{ form_widget(formClient.contactPrincipal,{'label': 'Prénom','attr': {'placeholder': 'Prénom'}}) }}
+                
+            </div>
+        </div>
+
+        {{ form_end(formClient) }}
+    </div>
+
+</div>
+
+{% endblock %}
+{% block javascripts %}
+{% endblock %#}

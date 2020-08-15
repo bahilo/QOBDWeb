@@ -13,6 +13,7 @@ use App\Entity\OrderStatus;
 use App\Services\Serializer;
 use App\Services\ErrorHandler;
 use App\Services\OrderManager;
+use App\Services\SearchToView;
 use App\Services\PdfWebService;
 use App\Entity\QuantityDelivery;
 use App\Entity\QuoteOrderDetail;
@@ -59,6 +60,7 @@ class OrderController extends Controller
     protected $utility;
     protected $manager;
     protected $qtDelRepo;
+    protected $search;
 
 
     public function __construct(Serializer $serializer, 
@@ -76,7 +78,8 @@ class OrderController extends Controller
                                 Utility $utility,
                                 ObjectManager $manager,
                                 QuantityDeliveryRepository $qtDelRepo,
-                                ErrorHandler $ErrorHandler)
+                                ErrorHandler $ErrorHandler,
+                                SearchToView $search)
     {
         $this->orderDetailRepo = $orderDetailRepo;
         $this->orderRepo = $orderRepo;
@@ -94,6 +97,7 @@ class OrderController extends Controller
         $this->utility = $utility;
         $this->manager = $manager;
         $this->qtDelRepo = $qtDelRepo;
+        $this->search = $search;
     }
 
 #region [ Liste Order ]
@@ -108,7 +112,7 @@ class OrderController extends Controller
      */
     public function index(AgentRepository $agentRepo, ClientRepository $clientRepo)
     {
-        return $this->render('order/index.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/order/index.html.twig', [
             'status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_ORDER']),
             'agents' => $agentRepo->findAll(),
             'clients' => $clientRepo->findAll(),
@@ -124,7 +128,7 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        return $this->render('order/home/home_order.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/order/home/home_order.html.twig', [
             'status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_ORDER']),
         ]);
     }
@@ -138,7 +142,7 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
         
-        return $this->render('order/home/home_quote.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/order/home/home_quote.html.twig', [
             'status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE']),
         ]);
     }
@@ -152,7 +156,7 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
         
-        return $this->render('order/home/home_preorder.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/order/home/home_preorder.html.twig', [
             'status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_PREORDER']),
         ]);
     }
@@ -166,7 +170,7 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
         
-        return $this->render('order/home/home_prerefund.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/order/home/home_prerefund.html.twig', [
             'status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_PREREFUND']),
         ]);
     }
@@ -180,7 +184,7 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
         
-        return $this->render('order/home/home_refund.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/order/home/home_refund.html.twig', [
             'status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUND']),
         ]);
     }
@@ -194,7 +198,7 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
         
-        return $this->render('order/home/home_order_sent.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/order/home/home_order_sent.html.twig', [
             'status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_BILL']),
         ]);
     }
@@ -208,7 +212,7 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
         
-        return $this->render('order/home/home_refund_sent.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/order/home/home_refund_sent.html.twig', [
             'status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUNDBILL']),
         ]);
         
@@ -223,7 +227,7 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
         
-        return $this->render('order/home/home_order_valid.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/order/home/home_order_valid.html.twig', [
             'status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_VALID']),
         ]);
     }
@@ -237,7 +241,7 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        return $this->render('order/home/home_order_closed.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/order/home/home_order_closed.html.twig', [
             'status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_CLOSED']),
         ]);
     }
@@ -251,7 +255,7 @@ class OrderController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        return $this->render('order/home/home_refund_closed.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/order/home/home_refund_closed.html.twig', [
             'status' => $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUNDCLOSED']),
          ]);
     }
@@ -278,12 +282,12 @@ class OrderController extends Controller
 
         $bills = $this->orderManager->getHydrater()->hydrateBill($this->billRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']), $order);
         $orderDetail = $this->orderManager->hydrateOrderDetailStats($this->orderDetailRepo->findBy(['QuoteOrder' => $order]));
-        $orderDetrailQtReceived = $this->orderManager->hydrateOrderDetailStats($this->orderDetailRepo->findByQuantityRecieved($order));
-        $roderDeliveries = $this->orderManager->getHydrater()->hydrateQuantityDelivery($this->quantityDelRepo->findByBillStatus($order), $order);
-        $CreateDeliveries = $this->deliveryRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']);
+        //$orderDetrailQtReceived = $this->orderManager->hydrateOrderDetailStats($this->orderDetailRepo->findByQuantityRecieved($order));
+        //$roderDeliveries = $this->orderManager->getHydrater()->hydrateQuantityDelivery($this->quantityDelRepo->findByBillStatus($order), $order);
+        //$CreateDeliveries = $this->deliveryRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']);
         $infos = $this->orderManager->getCommandeInfo($orderDetail, $order);
         
-        return $this->render('order/show/show_order.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/order/show/show_order.html.twig', [
             'count_delivery_processing' => count($this->orderDetailRepo->findByQuantityRecieved($order)),
             'count_bill_processing' => count($this->quantityDelRepo->findByBillStatus($order)),
             'order' => $order,
@@ -319,7 +323,7 @@ class OrderController extends Controller
         $CreateDeliveries = $this->deliveryRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']);
         $infos = $this->orderManager->getCommandeInfo($orderDetail, $order);
         
-        return $this->render('order/show/show_order_closed.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/order/show/show_order_closed.html.twig', [
             'order' => $order,
             'order_status_quote' => $this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE']),
             'info' => $infos,
@@ -338,8 +342,8 @@ class OrderController extends Controller
         }
         $order = $this->orderRepo->find($id);
         $orderDetails = $this->orderDetailRepo->findBy(['QuoteOrder' => $order]);
-
-        return $this->render('order/show/show_quote.html.twig', [
+        //dump('site/' . $this->search->get_site_config()->getCode() . '/order/show/show_quote.html.twig');die();
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/order/show/show_quote.html.twig', [
             'status_prerefund' => $this->statusRepo->findOneBy(['Name' => 'STATUS_PREREFUND']),
             'status_preorder' => $this->statusRepo->findOneBy(['Name' => 'STATUS_PREORDER']),
             'order' => $order,
@@ -363,7 +367,7 @@ class OrderController extends Controller
 
         $order = $this->orderRepo->find($id);
         $orderDetails = $this->orderDetailRepo->findBy(['QuoteOrder' => $order]);
-        return $this->render('order/show/show_preorder.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/order/show/show_preorder.html.twig', [
             'status_order' => $this->statusRepo->findOneBy(['Name' => 'STATUS_ORDER']),
             'order_status_quote' => $this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE']),
             'order' => $order,
@@ -386,7 +390,7 @@ class OrderController extends Controller
 
         $order = $this->orderRepo->find($id);
         $orderDetails = $this->orderDetailRepo->findBy(['QuoteOrder' => $order]);
-        return $this->render('order/show/show_valid.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/order/show/show_valid.html.twig', [
             'status_order' => $this->statusRepo->findOneBy(['Name' => 'STATUS_ORDER']),
             'order_status_quote' => $this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE']),
             'order' => $order,
@@ -416,7 +420,7 @@ class OrderController extends Controller
         $CreateDeliveries = $this->deliveryRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']);
         $infos = $this->orderManager->getCommandeInfo($orderDetail, $order);
 
-        return $this->render('order/show/show_refund.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/order/show/show_refund.html.twig', [
             //'order_detail_data_source' => $this->serializer->serialize(['object_array' => $orderDetail, 'format' => 'json', 'group' => 'class_property']),
             // 'order_detail_delivery_data_source' => $this->serializer->serialize(['object_array' => $orderDetrailQtReceived, 'format' => 'json', 'group' => 'class_property']),
             // 'order_detail_bill_data_source' => $this->serializer->serialize(['object_array' => $roderDeliveries, 'format' => 'json', 'group' => 'class_property']),
@@ -457,7 +461,7 @@ class OrderController extends Controller
         $CreateDeliveries = $this->deliveryRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']);
         $infos = $this->orderManager->getCommandeInfo($orderDetail, $order);
 
-        return $this->render('order/show/show_refund_closed.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/order/show/show_refund_closed.html.twig', [
             'order' => $order,
             'currencies' => $currRepo->findAll(),
             'taxes' => $this->tvaRepo->findAll(),
@@ -480,7 +484,7 @@ class OrderController extends Controller
         //$order = $this->orderRepo->find($id);
         $bills = $this->orderManager->getHydrater()->hydrateBill($this->billRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']), $order);
         $orderDetails = $this->orderDetailRepo->findBy(['QuoteOrder' => $order]);
-        return $this->render('order/show/show_order_billed.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/order/show/show_order_billed.html.twig', [
             'status_prerefund' => $this->statusRepo->findOneBy(['Name' => 'STATUS_PREREFUND']),
             'order_status_valid' => $this->statusRepo->findOneBy(['Name' => 'STATUS_VALID']),
             'order_status_quote' => $this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE']),
@@ -508,7 +512,7 @@ class OrderController extends Controller
         //$order = $this->orderRepo->find($id);
         $bills = $this->orderManager->getHydrater()->hydrateBill($this->billRepo->findByOrder(['order' => $order, 'status' => 'STATUS_BILLED']), $order);
         $orderDetails = $this->orderDetailRepo->findBy(['QuoteOrder' => $order]);
-        return $this->render('order/show/show_refund_billed.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/order/show/show_refund_billed.html.twig', [
             'order_status_refund' => $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUND']),
             'order_status_quote' => $this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE']),
             'order' => $order,
@@ -534,7 +538,7 @@ class OrderController extends Controller
 
         $order = $this->orderRepo->find($id);
         $orderDetails = $this->orderDetailRepo->findBy(['QuoteOrder' => $order]);
-        return $this->render('order/show/show_prerefund.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/order/show/show_prerefund.html.twig', [
              'status_refund' => $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUND']),
             'order_status_quote' => $this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE']),
             'order' => $order,
@@ -704,21 +708,28 @@ class OrderController extends Controller
 
             // envoi d'un mail de prise en compte de la commande
             if (!empty($order->getStatus()) && $order->getStatus()->getName() == 'STATUS_ORDER') {
-                $this->orderManager->checkOrderStock($order->getQuoteOrderDetails());
+                //$this->orderManager->checkOrderStock($order->getQuoteOrderDetails());
                 $societe = $settingManager->get('SOCIETE', 'SOCIETE_NOM');
                 // dump($status);
                 // dump($order);
                 // die();
-                $event = new GenericEvent([
+                $validationEvent = new GenericEvent([
                     'subject' => "Validation de votre commande",
                     'to' => $order->getContact()->getEmail(),
-                    'view' => $this->renderView('email/_partials/validation.html', [
+                    'view' => $this->renderView('site/' . $this->search->get_site_config()->getCode() . '/email/_partials/validation.html', [
                         'contact_name' => $order->getContact()->getLastName(),
                         'company' => $societe->getValue(),
                         'order' => $order
                     ]),
                 ]);
-                $this->eventDispatcher->dispatch(MyEvents::ORDER_EMAIL_VALIDATION, $event);
+
+                $stockEvent = new GenericEvent([
+                    'code' => $this->search->get_site_config()->getCode(),
+                    'order_details' => $order->getQuoteOrderDetails()
+                ]);
+
+                $this->eventDispatcher->dispatch(MyEvents::ORDER_EMAIL_VALIDATION, $validationEvent);
+                $this->eventDispatcher->dispatch(MyEvents::ORDER_CHECK_STOCK, $stockEvent);
             }
         } catch (Exception $ex) {
             $this->ErrorHandler->error("Une erreur s'est produite durant la modification du statut!");
@@ -758,7 +769,7 @@ class OrderController extends Controller
                 $devisFile = $webservice->downloadQuotation($order, $this->getParameter('abs.file.pdf.quote.download_dir'));
                 $cgvFile = $webservice->downloadCGV($this->getParameter('abs.file.pdf.quote.download_dir'));
             
-                $view = $this->renderView('email/_partials/quote.html', [
+                $view = $this->renderView('site/' . $this->search->get_site_config()->getCode() . '/email/_partials/quote.html', [
                     'contact_name' => $contact->getLastName(),
                 ]);
 
@@ -808,7 +819,7 @@ class OrderController extends Controller
                 $form = $request->request->get('order_detail_form')['setting']['email'];
                 $bill = $billRepo->find($form['bill']);
                 $file = $webservice->downloadOrder($order, $bill, $this->getParameter('abs.file.pdf.bill.download_dir'));
-                $view = $this->renderView('email/_partials/bill.html', [
+                $view = $this->renderView('site/' . $this->search->get_site_config()->getCode() . '/email/_partials/bill.html', [
                     'contact_name' => $contact->getLastName(),
                     'bill_id' => $setManager->get("PDF", "FACTURE_PREFIX")->getValue() . $bill->getId(),
                 ]);

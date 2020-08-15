@@ -9,6 +9,7 @@ use App\Entity\Contact;
 use App\Services\Serializer;
 use App\Services\ErrorHandler;
 use App\Services\OrderManager;
+use App\Services\SearchToView;
 use App\Services\ClientHydrate;
 use App\Services\SecurityManager;
 use App\Repository\BillRepository;
@@ -39,19 +40,28 @@ class ClientController extends Controller
     protected $actionRepo;
     protected $ErrorHandler;
     protected $orderManager;
+    protected $clientRepo;
+    protected $contactRepo;
+    protected $search;
 
 
     public function __construct(SecurityManager $securityUtility, 
                                 ActionRepository $actionRepo,
+                                ClientRepository $clientRepo,
+                                ContactRepository $contactRepo,
                                 Serializer $serializer,
                                 OrderManager $orderManager,
-                                ErrorHandler $ErrorHandler)
+                                ErrorHandler $ErrorHandler,
+                                SearchToView $search)
     {
         $this->serializer = $serializer;
         $this->securityUtility = $securityUtility;
         $this->actionRepo = $actionRepo;
+        $this->clientRepo = $clientRepo;
+        $this->contactRepo = $contactRepo;
         $this->ErrorHandler = $ErrorHandler;
         $this->orderManager = $orderManager;
+        $this->search = $search;
     }
 
 #region [ Views ]
@@ -69,9 +79,9 @@ class ClientController extends Controller
         }
 
         if(!empty($cart))
-            return $this->render('client/index.html.twig',['cart' => true]);
+            return $this->render('site/' . $this->search->get_site_config()->getCode() . '/client/index.html.twig',['cart' => true]);
 
-        return $this->render('client/index.html.twig');
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/client/index.html.twig');
     }
 
     /**
@@ -102,7 +112,7 @@ class ClientController extends Controller
             $this->ErrorHandler->error($ex->getMessage());
         }
        
-        return $this->render('client/show.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/client/show.html.twig', [
             'client' => $client,
             'nb_order' => $orderRepo->countByStatus($statusRepo->findOneBy(['Name' => 'STATUS_ORDER'])),
             'nb_quote' => $orderRepo->countByStatus($statusRepo->findOneBy(['Name' => 'STATUS_QUOTE'])),
@@ -138,7 +148,6 @@ class ClientController extends Controller
     public function registration(Client $client = null, 
                                 Request $request, 
                                 ObjectManager $manager,
-                                ClientHydrate $clientHydrate,
                                 ValidatorInterface $validator) {
 
         if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_CLIENT']))) {
@@ -147,15 +156,29 @@ class ClientController extends Controller
 
         if(!$client)
             $client = new Client();
+
+            // Recherche du contact principal
+            $contactPrincipal = $this->contactRepo->findOneBy(['Client' => $client, 'IsPrincipal' => true]);
+            if(empty($contactPrincipal)){
+                $oneContact = $this->contactRepo->findOneBy(['Client' => $client]);
+                if(!empty($oneContact))
+                    $client->setContactPrincipal($oneContact);
+            }
+            else{
+                $client->setContactPrincipal($contactPrincipal);
+            }
      
-        $form = $this->createForm(ClientRegistrationType::class, $client);
-        $form->handleRequest($request);
-        
-        try{
-            if ($form->isSubmitted()) {
+            $form = $this->createForm(ClientRegistrationType::class, $client);
+            $form->handleRequest($request);
+            try{
+                if ($form->isSubmitted()) {
                 $this->ErrorHandler->registerError($validator->validate($client));
 
                 if ($form->isValid()) {
+                    $newContact = $client->getContactPrincipal();
+                    $newContact->setIsPrincipal(true);
+                    if(!empty($newContact) && $newContact->getId() == 0)
+                        $client->addContact($newContact);
 
                     $client->setIsActivated(true);
                     $client->setIsProspect(true);
@@ -163,6 +186,7 @@ class ClientController extends Controller
                         $client->setIsProspect(false);
                     }
 
+                    $manager->persist($newContact);
                     $manager->persist($client);
                     $manager->flush();
                     $this->ErrorHandler->success("La client a été sauvegardé avec succès!");
@@ -174,7 +198,7 @@ class ClientController extends Controller
             $this->ErrorHandler->error($ex->getMessage());
         }
 
-        return $this->render('Client/registration.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/Client/registration.html.twig', [
             'formClient' => $form->createView(),
         ]);
     }
@@ -219,7 +243,7 @@ class ClientController extends Controller
             $this->ErrorHandler->error("Une erreur s'est produite durant la sauvegarde de l'adresse!");
             $this->ErrorHandler->error($ex->getMessage());
         }
-        return $this->render('client/address_registration.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/client/address_registration.html.twig', [
             'formAddress' => $form->createView(),
         ]);
     }
@@ -270,7 +294,7 @@ class ClientController extends Controller
             $this->ErrorHandler->error($ex->getMessage());
         }
 
-        return $this->render('client/contact_registration.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/client/contact_registration.html.twig', [
             'formContact' => $form->createView(),
         ]);
     }

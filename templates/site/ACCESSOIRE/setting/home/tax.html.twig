@@ -1,0 +1,13 @@
+{% extends 'setting/home/tax.html.twig' %}
+
+{#% block title %}{{ parent() }} - Taxe{% endblock %}
+
+{% block home_path %}
+{{ parent() }}
+<li class="breadcrumb-item">
+    Configuration
+</li>
+<li class="breadcrumb-item">
+    Taxe
+</li>
+{% endblock %#}

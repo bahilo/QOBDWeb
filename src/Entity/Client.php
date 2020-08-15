@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Contact;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Groups;
 use Doctrine\Common\Collections\Collection;
@@ -84,9 +85,12 @@ class Client
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Contact", mappedBy="Client")
-     * @Groups({"relation_property"})
+     * @Groups({"relation_property", "class_property"})
+     * @SerializedName("Contacts")
      */
     private $contacts;
+
+    private $contactPrincipal;
 
     /**
      * @ORM\Column(type="boolean")
@@ -247,6 +251,18 @@ class Client
     public function setBill(?Bill $bill): self
     {
         $this->bill = $bill;
+
+        return $this;
+    }
+
+    public function getContactPrincipal(): ?Contact
+    {
+        return $this->contactPrincipal;
+    }
+
+    public function setContactPrincipal(?Contact $contact): self
+    {
+        $this->contactPrincipal = $contact;
 
         return $this;
     }

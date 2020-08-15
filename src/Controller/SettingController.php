@@ -19,6 +19,7 @@ use App\Entity\OrderStatus;
 use App\Services\Serializer;
 use App\Entity\DeliveryStatus;
 use App\Services\ErrorHandler;
+use App\Services\SearchToView;
 use Hoa\Event\Test\Unit\Source;
 use App\Services\SettingManager;
 use App\Form\TaxRegistrationType;
@@ -66,6 +67,7 @@ class SettingController extends Controller
     protected $settingRepo;
     protected $eventDispatcher;
     protected $utility;
+    protected $search;
 
 
     public function __construct(Serializer $serializer, 
@@ -76,7 +78,8 @@ class SettingController extends Controller
                                 SettingRepository $settingRepo,
                                 Utility $utility,
                                 EventDispatcherInterface $eventDispatcher, 
-                                ErrorHandler $ErrorHandler)
+                                ErrorHandler $ErrorHandler,
+                                SearchToView $search)
     {
         $this->securityUtility = $securityUtility;
         $this->actionRepo = $actionRepo;
@@ -87,6 +90,7 @@ class SettingController extends Controller
         $this->settingRepo = $settingRepo;
         $this->eventDispatcher = $eventDispatcher;
         $this->utility = $utility;
+        $this->search = $search;
     }
 
 #region [ Views ]
@@ -96,19 +100,34 @@ class SettingController extends Controller
     /**
      * @Route("/admin/configuration", name="setting_home")
      */
-    public function home(Utility $utility) {
+    public function home(Utility $utility, SiteRepository $siteRepo) {
 
         if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
             return $this->redirectToRoute('security_deny_access');
         }
-        
-        //dump($utility->getDistinctByCode($this->settingRepo->findAll()));die();
 
-        return $this->render('setting/home/general.html.twig', [
-            'data_table' => 'general_table_js',
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/setting/home/general.html.twig', [
+            'source_site' => $siteRepo->findAll(),
             'data_table_source' => 'general_data_source',
             'source' => $utility->getDistinctByCode($this->settingRepo->findAll()),
-            //'' => $this->settingRepo->findBy(['Code' => $code]),
+            'create_url' => $this->generateUrl('setting_registration'),
+        ]);
+    }
+
+    /**
+     * @Route("/admin/configuration/admin", name="setting_home_admin")
+     */
+    public function homeAdmin(Utility $utility)
+    {
+
+        if (!$this->securityUtility->checkHasRead($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/setting/home/general_admin.html.twig', [
+            'data_table' => 'general_table_js',
+            'data_table_source' => 'general_data_source',
+            'codes' => $utility->getAdminDistinctByCode($this->settingRepo->findAll()),
             'create_url' => $this->generateUrl('setting_registration'),
         ]);
     }
@@ -122,7 +141,7 @@ class SettingController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        return $this->render('setting/home/currency.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/setting/home/currency.html.twig', [
             'data_table' => 'currency_table_js',
             'data_table_source' => 'currency_data_source',
             'codes' => ["CURRENCY"],
@@ -139,7 +158,7 @@ class SettingController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
         //dump($this->settingManager->getSettingDataSource($taxRepo->findAll()));die();
-        return $this->render('setting/home/tax.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/setting/home/tax.html.twig', [
             'data_table' => 'tax_table_js',
             'data_table_source' => 'tax_data_source',
             'codes' => ["TAX"],
@@ -156,7 +175,7 @@ class SettingController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        return $this->render('setting/home/delivery_status.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/setting/home/delivery_status.html.twig', [
             'data_table' => 'delivery_status_table_js',
             'data_table_source' => 'delivery_status_data_source',
             'codes' => ["STATUS"],
@@ -174,7 +193,7 @@ class SettingController extends Controller
         }
 
         //dump($orderStatusRepo->findAll());die();
-        return $this->render('setting/home/order_status.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/setting/home/order_status.html.twig', [
             'data_table' => 'status_table_js',
             'data_table_source' => 'order_status_data_source',
             'codes' => ["STATUS"],
@@ -191,7 +210,7 @@ class SettingController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        return $this->render('setting/home/catalogue_brand.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/setting/home/catalogue_brand.html.twig', [
             'data_table' => 'brand_table_js',
             'data_table_source' => 'brand_data_source',
             'codes' => ["BRAND"],
@@ -208,7 +227,7 @@ class SettingController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        return $this->render('setting/home/catalogue_group.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/setting/home/catalogue_group.html.twig', [
             'data_table' => 'group_table_js',
             'data_table_source' => 'group_data_source',
             'codes' => ["GROUP"],
@@ -225,7 +244,7 @@ class SettingController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        return $this->render('setting/home/catalogue_provider.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/setting/home/catalogue_provider.html.twig', [
             'data_table' => 'provider_table_js',
             'data_table_source' => 'provider_data_source',
             'codes' => ["PROVIDER"],
@@ -242,7 +261,7 @@ class SettingController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        return $this->render('setting/home/catalogue_ean.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/setting/home/catalogue_ean.html.twig', [
             'data_table' => 'ean_table_js',
             'data_table_source' => 'ean_data_source',
             'codes' => ["EAN"],
@@ -259,7 +278,7 @@ class SettingController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        return $this->render('setting/home/site.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/setting/home/site.html.twig', [
             'data_table' => 'ean_table_js',
             'data_table_source' => 'site_data_source',
             'codes' => ["SITE"],
@@ -275,7 +294,7 @@ class SettingController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        return $this->render('email/index.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . 'email/index.html.twig', [
             'quote' => file_get_contents($this->utility->getAbsoluteRootPath() . '/' . $this->getParameter('file.setting.email') . '/' . 'devis.txt'),
             'bill' => file_get_contents($this->utility->getAbsoluteRootPath() . '/' . $this->getParameter('file.setting.email') . '/' . 'facture.txt'),
             'first_reminder' => file_get_contents($this->utility->getAbsoluteRootPath() . '/' . $this->getParameter('file.setting.email').'/'. 'relance_paiement_1.txt'),
@@ -293,7 +312,7 @@ class SettingController extends Controller
             return $this->redirectToRoute('security_deny_access');
         }
 
-        return $this->render('document/index.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . 'document/index.html.twig', [
             'cgv' => file_get_contents($utility->getAbsoluteRootPath() . $this->getParameter('file.setting.text') . '/' . 'cgv.txt'),
             'quote' => file_get_contents($utility->getAbsoluteRootPath() . $this->getParameter('file.setting.text') . '/' . 'quote.txt'),
         ]);
@@ -304,7 +323,7 @@ class SettingController extends Controller
      */
     public function import(){
         
-        return $this->render('setting/import_registration.html.twig');
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/setting/import_registration.html.twig');
     }
 
 #endregion
@@ -368,7 +387,7 @@ class SettingController extends Controller
             $this->ErrorHandler->error($ex->getMessage());
         }       
 
-        return $this->render('setting/registration.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/setting/registration.html.twig', [
             'formSetting' => $form->createView(),
             'errors' => $errors
         ]);
@@ -382,6 +401,7 @@ class SettingController extends Controller
         Setting $setting = null,
         Request $request,
         ObjectManager $manager,
+        SiteRepository $siteRepo,
         Utility $utility
     ) {
 
@@ -391,14 +411,30 @@ class SettingController extends Controller
 
         try {
             $form = $request->request->get('settings');
-            
-            foreach ($form as $code => $settings) {
+            //dump($form);
+            //dump($request->files->get('settings'));
+            //die();
+
+            if(!empty($form['site'])){
+                $site = $siteRepo->find($form['site']);
+                if(!empty($site)){
+                    $oldActiveSite = $siteRepo->findOneBy(['Active' => true]);
+                    if(!empty($oldActiveSite)){
+                        $oldActiveSite->setActive(false);
+                        $manager->persist($oldActiveSite);
+                    }
+                    $site->setActive(true);
+                    $manager->persist($site);                    
+                }
+            }
+           
+            foreach ($form['values'] as $code => $settings) {
                 foreach ($settings as $name => $value) {
                     $setting = $this->settingRepo->findOneBy(["Code" => $code, "Name" => $name]);
                     if (!empty($setting)) {
                         //dump($setting);
                         if ($setting->getIsFile()) {
-                            $file = $request->files->get('settings')['file'];
+                            $file = $request->files->get('settings')[$name];
                             $fileName = $utility->uploadFile($file, $utility->getAbsoluteRootPath() . $this->getParameter('abs.file.setting.image.download_dir'), 'logo.png');
                             //dump($fileName);die();
                             if (!empty($fileName)) {
@@ -415,9 +451,9 @@ class SettingController extends Controller
                 }
             }
 
-            // sauvegarde du logo de la société
+            // sauvegarde du logo de la société 
             $setting = $this->settingRepo->findOneBy(["Code" => "SOCIETE", "Name" => "SOCIETE_LOGO"]);
-            $file = $request->files->get('settings')['SOCIETE']['SOCIETE_LOGO'];
+            $file = $request->files->get('settings')['values']['SOCIETE']['SOCIETE_LOGO'];
             if (!empty($setting) && $setting->getIsFile() && !empty($file)) {
 
                 // suppression de l'image précedemment sauvegardé
@@ -435,10 +471,74 @@ class SettingController extends Controller
             $this->ErrorHandler->success("La configuration a été sauvegardée avec succès!");            
         } catch (Exception $ex) {
             $this->ErrorHandler->error("Une erreur s'est produite durant la sauvegarde de la configuration!");
-            $this->ErrorHandler->error($ex->getMessage());            
+            $this->ErrorHandler->error($ex->getMessage()); 
         }
 
         return $this->redirectToRoute('setting_home');
+    }
+
+    /**
+     * @Route("/admin/configuration/admin/edit/{id}", options={"expose"=true}, name="setting_admin_edit")
+     * 
+     */
+    public function editAdmin(
+        Setting $setting,
+        Request $request,
+        ObjectManager $manager,
+        Utility $utility
+    ) {
+
+        if (!$this->securityUtility->checkHasWrite($this->actionRepo->findOneBy(['Name' => 'ACTION_SETTING']))) {
+            return $this->redirectToRoute('security_deny_access');
+        }
+
+        if (!$setting)
+            $setting = new Setting();
+
+        $form = $this->createForm(SettingRegistrationType::class, $setting);
+
+        try {
+            $form->handleRequest($request);
+            $errors = $this->validator->validate($setting);
+
+            //dump($request);die();
+            if ($form->isSubmitted() && $form->isValid()) {
+
+                if (isset($request->request->get('setting_registration')['switch'])) {
+                    $file = $request->files->get('setting_registration')['file'];
+                    $fileName = $utility->uploadFile($file, $utility->getAbsoluteRootPath() . $this->getParameter('abs.file.setting.image.download_dir'), 'logo.png');
+
+                    if (!empty($fileName)) {
+                        if (file_exists($utility->getAbsoluteRootPath() . $this->getParameter('abs.file.setting.image.download_dir') . '/' . $setting->getValue())) {
+                            unlink($utility->getAbsoluteRootPath() . $this->getParameter('abs.file.setting.image.download_dir') . '/' . $setting->getValue());
+                        }
+                        $setting->setValue($fileName);
+                        $setting->setIsFile(true);
+                    }
+
+                    /*$fileFullPath = $utility->getAbsoluteRootPath() . $this->getParameter('file.setting.image.download_dir') . '/' . $fileName;
+                    $event = new GenericEvent([
+                        "files" => [$fileFullPath],
+                    ]);
+                    $this->eventDispatcher->dispatch(MyEvents::FTP_IMAGE_SEND, $event);*/
+                } else {
+                    $setting->setIsFile(false);
+                }
+
+                $manager->persist($setting);
+                $manager->flush();
+                $this->ErrorHandler->success("La configuration a été sauvegardée avec succès!");
+                return $this->redirectToRoute('setting_home_admin');
+            }
+        } catch (Exception $ex) {
+            $this->ErrorHandler->error("Une erreur s'est produite durant la sauvegarde de la configuration!");
+            $this->ErrorHandler->error($ex->getMessage());
+        }
+
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/setting/registration.html.twig', [
+            'formSetting' => $form->createView(),
+            'errors' => $errors
+        ]);
     }
 
     /**
@@ -479,7 +579,7 @@ class SettingController extends Controller
             $this->ErrorHandler->error($ex->getMessage());
         }        
 
-        return $this->render('setting/currency_registration.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/setting/currency_registration.html.twig', [
             'formCurrency' => $form->createView(),
             'errors' => $errors
         ]);
@@ -518,7 +618,7 @@ class SettingController extends Controller
             $this->ErrorHandler->error($ex->getMessage());
         } 
 
-        return $this->render('setting/delivery_status_registration.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/setting/delivery_status_registration.html.twig', [
             'formStatus' => $form->createView(),
             'errors' => $errors
         ]);
@@ -574,7 +674,7 @@ class SettingController extends Controller
             $this->ErrorHandler->error($ex->getMessage());
         }        
 
-        return $this->render('setting/tax_registration.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/setting/tax_registration.html.twig', [
             'formTax' => $form->createView(),
             'errors' => $errors
         ]);
@@ -615,7 +715,7 @@ class SettingController extends Controller
             $this->ErrorHandler->error($ex->getMessage());
         }
 
-        return $this->render('setting/site_registration.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/setting/site_registration.html.twig', [
             'formSite' => $form->createView(),
             'errors' => $errors
         ]);
@@ -658,7 +758,7 @@ class SettingController extends Controller
             $this->ErrorHandler->error($ex->getMessage());
         }  
 
-        return $this->render('setting/brand_registration.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/setting/brand_registration.html.twig', [
             'formBrand' => $form->createView(),
             'errors' => $errors
         ]);
@@ -701,7 +801,7 @@ class SettingController extends Controller
             $this->ErrorHandler->error($ex->getMessage());
         } 
 
-        return $this->render('setting/group_registration.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/setting/group_registration.html.twig', [
             'formGroup' => $form->createView(),
         ]);
     }
@@ -743,7 +843,7 @@ class SettingController extends Controller
             $this->ErrorHandler->error($ex->getMessage());
         } 
 
-        return $this->render('setting/provider_registration.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/setting/provider_registration.html.twig', [
             'formProvider' => $form->createView(),
         ]);
     }
@@ -782,7 +882,7 @@ class SettingController extends Controller
             $this->ErrorHandler->error($ex->getMessage());
         } 
 
-        return $this->render('catalogue/ean_registration.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . 'catalogue/ean_registration.html.twig', [
             'formEAN' => $form->createView(),
         ]);
     }
@@ -822,7 +922,7 @@ class SettingController extends Controller
             $this->ErrorHandler->error($ex->getMessage());
         } 
 
-        return $this->render('setting/status_registration.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/setting/status_registration.html.twig', [
             'formStatus' => $form->createView(),
         ]);
     }

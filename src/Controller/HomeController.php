@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Services\Mailer;
 use App\Services\Serializer;
 use App\Services\OrderManager;
+use App\Services\SearchToView;
 use App\Services\SecurityManager;
 use App\Repository\ActionRepository;
 use App\Repository\QuoteOrderRepository;
@@ -21,6 +22,7 @@ class HomeController extends Controller
     protected $statusRepo;
     protected $serializer;
     protected $orderManager;
+    protected $search;
 
 
     public function __construct(OrderManager $orderManager, 
@@ -28,7 +30,8 @@ class HomeController extends Controller
                                 SecurityManager $securityUtility, 
                                 QuoteOrderRepository $orderRepo,
                                 ActionRepository $actionRepo,
-                                OrderStatusRepository $statusRepo)
+                                OrderStatusRepository $statusRepo,
+                                SearchToView $search)
     {
         $this->securityUtility = $securityUtility;
         $this->orderRepo = $orderRepo;
@@ -36,6 +39,7 @@ class HomeController extends Controller
         $this->statusRepo = $statusRepo;
         $this->serializer = $serializer;
         $this->orderManager = $orderManager;
+        $this->search = $search;
     }
     
     /**
@@ -54,7 +58,7 @@ class HomeController extends Controller
         $orderBilledStatus = $this->statusRepo->findOneBy(['Name' => 'STATUS_BILL']);
         $refundStatus = $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUND']);
         $refundBilledStatus = $this->statusRepo->findOneBy(['Name' => 'STATUS_REFUNDBILL']);
-        return $this->render('home/index.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/home/index.html.twig', [
             'nb_quote' => $this->orderRepo->countByStatus($this->statusRepo->findOneBy(['Name' => 'STATUS_QUOTE'])),
             'nb_order' => $this->orderRepo->countByStatus($orderStatus) + $this->orderRepo->countByStatus($orderBilledStatus),
             'nb_refund' => $this->orderRepo->countByStatus($refundStatus) + $this->orderRepo->countByStatus($refundBilledStatus),

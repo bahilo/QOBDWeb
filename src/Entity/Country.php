@@ -42,9 +42,15 @@ class Country
      */
     private $eanCodes;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Address::class, mappedBy="Country")
+     */
+    private $addresses;
+
     public function __construct()
     {
         $this->eanCodes = new ArrayCollection();
+        $this->addresses = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -101,6 +107,37 @@ class Country
             // set the owning side to null (unless already changed)
             if ($eanCode->getCountry() === $this) {
                 $eanCode->setCountry(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Address[]
+     */
+    public function getAddresses(): Collection
+    {
+        return $this->addresses;
+    }
+
+    public function addAddress(Address $address): self
+    {
+        if (!$this->addresses->contains($address)) {
+            $this->addresses[] = $address;
+            $address->setCountry($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAddress(Address $address): self
+    {
+        if ($this->addresses->contains($address)) {
+            $this->addresses->removeElement($address);
+            // set the owning side to null (unless already changed)
+            if ($address->getCountry() === $this) {
+                $address->setCountry(null);
             }
         }
 

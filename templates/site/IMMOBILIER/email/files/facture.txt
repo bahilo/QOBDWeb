@@ -1,0 +1,18 @@
+Bonjour  Madame, Monsieur {{ nom_client }}
+
+Veuillez trouver ci joint votre facture {{ num_facture }} équivalente à votre dernière commande.
+
+Merci pour votre confiance.
+
+Cordialement, 
+
+L’équipe {{ nom_societe }}.                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+

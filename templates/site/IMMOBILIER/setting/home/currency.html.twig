@@ -1,0 +1,14 @@
+{% extends 'setting/home/currency.html.twig' %}
+
+{#% block title %}{{ parent() }} - Monnaie{% endblock %}
+
+{% block home_path %}
+{{ parent() }}
+<li class="breadcrumb-item">
+    Configuration
+</li>
+<li class="breadcrumb-item">
+    Monnaie
+</li>
+{% endblock %#}
+

@@ -60,16 +60,8 @@ class Address
     private $ZipCode;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank(message = "Le pays ne peux pas être vide")
-     * @Groups({"class_property"})
-     * @SerializedName("Country") 
-     */
-    private $Country;
-
-    /**
      * @ORM\OneToOne(targetEntity="App\Entity\Comment", inversedBy="address", cascade={"persist", "remove"})
-     * @SerializedName("Country") 
+     * @SerializedName("Comment") 
      */
     private $Comment;
     
@@ -80,6 +72,11 @@ class Address
     private $IsPrincipal;
 
     private $ContentComment;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Country::class, inversedBy="addresses")
+     */
+    private $Country;
 
 
     public function __construct()
@@ -151,18 +148,6 @@ class Address
         return $this;
     }
 
-    public function getCountry(): ?string
-    {
-        return $this->Country;
-    }
-
-    public function setCountry(string $Country): self
-    {
-        $this->Country = $Country;
-
-        return $this;
-    }
-
     public function getComment(): ?Comment
     {
         return $this->Comment;
@@ -195,6 +180,18 @@ class Address
     public function setContentComment(?string $ContentComment): self
     {
         $this->ContentComment = $ContentComment;
+
+        return $this;
+    }
+
+    public function getCountry(): ?Country
+    {
+        return $this->Country;
+    }
+
+    public function setCountry(?Country $Country): self
+    {
+        $this->Country = $Country;
 
         return $this;
     }

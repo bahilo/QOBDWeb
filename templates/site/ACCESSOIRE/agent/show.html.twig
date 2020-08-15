@@ -1,0 +1,155 @@
+{% extends 'agent/show.html.twig' %}
+
+{#% set page_title = 'Compte commercial' %}
+
+{% block home_path %}
+    {% if search.get_right_read("ACTION_SECURITY") %}
+    <li class="breadcrumb-item">
+        Securité & Configuration
+    </li>
+    <li class="breadcrumb-item">
+        Securité
+    </li>
+    <li class="breadcrumb-item">
+        <a href="{{ path("agent_home") }}">Commerciaux</a>
+    </li>
+    {% endif %}
+    <li class="breadcrumb-item">
+        {{ page_title }}
+    </li>
+{% endblock %}
+
+{% block title %}{{ parent() }} - {{ page_title }} {% endblock %}
+
+{% block body_header_right %}
+    <div class="agent-body-header">
+        <button form="global_form" type="submit" class="btn btn-primary"><i class="fa fa-save"></i></button>
+    </div>
+{% endblock %}
+
+
+{% block body %}
+
+    <div class="agent-wrapper">
+        
+        <div class="agent-show-wrapper">
+            <div class="animated fadeIn">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <!-- <div class="card-header">
+                                <i class="fa fa-align-justify"></i>{{ page_title }}</div> -->
+                            <div class="card-body">
+                                <div class="profilImg-wrapper">
+                                    
+                                    {% if agent is not null and agent.picture %}
+                                    <img class="img-avatar img-circle" src="{{ asset('agent/avatars/' ~ agent.picture, 'download_dir') }}" alt="Image profile">
+                                    {% else %}
+                                    <img class="img-avatar img-circle" src="{{ asset('agent/avatars/default.png', 'download_dir') }}"
+                                        alt="Image profile">
+                                    {% endif %}
+                                </div>
+                                {{ form_start(formAgent, {'enctype':'multipart/form-data', 'attr': {'id': 'global_form' }}) }}
+                            
+                                <input type="hidden" name="token" value="{{ csrf_token('upload') }}" />
+                            
+                                {% include "notify.html.twig" %}
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Nom">
+                                            <span class="fa fa-chess-board"></span>
+                                        </span>
+                                    </div>
+                                    {{ form_widget(formAgent.LastName,{'attr': {'placeholder': 'Nom'}}) }}
+                                </div>
+                            
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Prénom">
+                                            <i class="fa fa-chess-board"></i>
+                                        </span>
+                                    </div>
+                                    {{ form_widget(formAgent.FirstName,{'attr': {'placeholder': 'Prénom'}}) }}
+                                </div>
+                            
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Email">@</span>
+                                    </div>
+                                    {{ form_widget(formAgent.Email,{'attr': {'placeholder': 'Email...'}}) }}
+                                </div>
+                            
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Pseudo">
+                                            <i class="fa fa-user"></i>
+                                        </span>
+                                    </div>
+                                    {{ form_widget(formAgent.UserName,{'attr': {'placeholder': 'Pseudo'}}) }}
+                                </div>
+                            
+                                <div class="input-group mb-4">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Mot de passe">
+                                            <i class="fa fa-lock"></i>
+                                        </span>
+                                    </div>
+                                    {{ form_widget(formAgent.PlainTextPassword,{'attr': {'placeholder': 'mot de passe'}}) }}
+                                </div>
+                            
+                                <div class="input-group mb-4">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" data-toggle="tooltip" data-placement="top"
+                                            title="Veuillez répéter le mot de passe">
+                                            <i class="fa fa-lock"></i>
+                                        </span>
+                                    </div>
+                                    {{ form_widget(formAgent.Confirme_password,{'attr': {'placeholder': 'Veuillez répéter le mot de passe'}}) }}
+                                </div>
+                            
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Numéro de téléphone">
+                                            <i class="fa fa-phone"></i>
+                                        </span>
+                                    </div>
+                                    {{ form_widget(formAgent.Phone,{'attr': {'placeholder': 'Numéro de téléphone'}}) }}
+                                </div>
+                            
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" data-toggle="tooltip" data-placement="top" title="Fax">
+                                            <i class="fa fa-fax"></i>
+                                        </span>
+                                    </div>
+                                    {{ form_widget(formAgent.Fax,{'attr': {'placeholder': 'Fax'}}) }}
+                                </div>
+                            
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" data-toggle="tooltip" data-placement="top"
+                                            title="Taille par defaut des listes">
+                                            <i class="fa fa-list"></i>
+                                        </span>
+                                    </div>
+                                    {{ form_widget(formAgent.ListSize,{'attr': {'placeholder': 'Taille par defaut des listes', }})}}
+                                </div>
+                            
+                                <div class="form-group">
+                                    {{ form_widget(formAgent.PictureFile,{'attr': {'class':'form-control'}}) }}
+                                </div>
+                            
+                                {{ form_end(formAgent) }}
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block javascripts %} 
+    <script src="{{  asset('js/agent.js','theme_default') }}"></script>
+{% endblock %#}

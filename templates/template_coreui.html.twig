@@ -97,33 +97,48 @@
       
       {% block menu_left %}
         {% block menu_left_catalogue %}
+
           {% if search.get_right_read("ACTION_CATALOGUE") %}
-          <li class="c-sidebar-nav-title">CATALOGUE</li>      
+          <li class="c-sidebar-nav-title">CATALOGUE</li> 
+          {% block menu_left_catalogue_produit %}
           <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ path("catalogue_home") }}">
               <i class="fa fa-clone"></i> PRODUITS
             </a>
           </li>
+          {% endblock %}
+          
+          {% block menu_left_catalogue_marque %}
           <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ path("setting_catalogue_brand") }}">
               <i class="fa fa-copyright"></i> MARQUES
             </a>
           </li>
+          {% endblock %}
+          
+          {% block menu_left_catalogue_famille %}
           <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ path("setting_catalogue_group") }}">
               <i class="fa fa-caret-square-down"></i> FAMILLES
             </a>
           </li>
+          {% endblock %}
+          
+          {% block menu_left_catalogue_fournisseur %}
           <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ path("setting_catalogue_provider") }}">
               <i class="fa fa-truck-loading"></i> FOURNISSEURS
             </a>
           </li>
+          {% endblock %}
+          
+          {% block menu_left_catalogue_ean %}
           <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ path("setting_catalogue_ean") }}">
               <i class="fa fa-barcode"></i> EAN
             </a>
           </li>
+          {% endblock %}
           {% endif %}
         {% endblock %}
 
@@ -284,6 +299,12 @@
 
                 {% block menu_left_admin_config %}
                 {% if app.user.isadmin %}
+                <li class="c-sidebar-nav-title">ADMINISTRATION</li>
+                <li class="c-sidebar-nav-item">
+                  <a class="c-sidebar-nav-link" href="{{ path("setting_home_admin") }}">
+                    <i class="fa fa-money-bill-wave-alt"></i> GENERALE
+                  </a>
+                </li>
                 <li class="c-sidebar-nav-item">
                   <a class="c-sidebar-nav-link" href="{{ path("setting_sites") }}">
                     <i class="fa fa-money-bill-wave-alt"></i> SITES

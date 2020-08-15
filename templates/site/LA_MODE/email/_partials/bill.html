@@ -1,0 +1,6 @@
+{% extends 'email/_partials/bill.html' %}
+{#
+{% block body_title %}Votre facture{% endblock body_title %}
+
+{% block content_area %}{% include 'email/files/facture.txt' with {'nom_client': contact_name, 'nom_societe': search.get_setting("SOCIETE","SOCIETE_NOM").value, 'num_facture': bill_id } %}{% endblock %}
+#}

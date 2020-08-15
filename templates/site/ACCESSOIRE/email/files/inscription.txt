@@ -1,0 +1,17 @@
+Bonjour {{ pseudo }} 
+
+
+
+Nous vous confirmons votre inscription dans notre application, et nous vous en remercions. 
+
+Un email a été envoyé à votre administrateur afin de valider votre inscription. 
+
+N’hésitez pas a contacter directement votre administrateur pour tout complément d'information. 
+
+
+
+Cordialement, 
+
+
+
+L’équipe {{ nom_societe }}.

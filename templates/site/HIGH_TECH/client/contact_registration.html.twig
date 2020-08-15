@@ -1,0 +1,78 @@
+{% extends 'client/contact_registration.html.twig' %}
+
+{#% set page_title = 'Nouveau contact' %}
+
+{% block home_path %}
+<li class="breadcrumb-item">
+    <a href="{{ path("client_home") }}">Clients</a>
+</li>
+<li class="breadcrumb-item">
+    {{ page_title }}
+</li>
+{% endblock %}
+
+{% block title %}{{ parent() }} - {{ page_title }} {% endblock %}
+
+{% block body_header_right %}
+    <button form="global_form" type="submit" class="btn btn-primary"><i class="fa fa-save"></i></button>
+    {% if formContact.vars.data.id > 0 %}
+        <a href="{{ path("client_show",{id: formContact.vars.data.client.id}) }}" class="btn btn-secondary"><i class="fa fa-undo"></i></a>
+        <a href="{{ path("client_contact_delete",{id: formContact.vars.data.id}) }}" class="btn btn-danger btnDelete"><i class="fa fa-trash"></i></a>
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+
+<div class="contact-wrapper">
+
+    {% include "notify.html.twig" %}
+
+    <div class="animated fadeIn">
+
+        {{ form_start(formContact, { 'attr': {'id': 'global_form' }}) }}
+
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-align-justify"></i> Contact</div>
+            <div class="card-body">
+        
+                <div class="switch-wrapper">
+                    <span class="badge badge-success">Contact principal</span>
+                    <label class="c-switch c-switch-label c-switch-primary">
+                        {% if formContact.vars.data.IsPrincipal %}
+                        <input name="contact_registration[is_principal]" class="c-switch-input" type="checkbox" checked>
+                        {% else %}
+                        <input name="contact_registration[is_principal]" class="c-switch-input" type="checkbox">
+                        {% endif %}
+                        <span class="c-switch-slider" data-checked="Oui" data-unchecked="Non"></span>
+                    </label>
+                </div>
+                <br />
+        
+                {{ form_row(formContact.Firstname,{'label': 'Prénom', 'attr': {'placeholder': 'Prénom'}}) }}
+                {{ form_row(formContact.LastName,{'label': 'Nom', 'attr': {'placeholder': 'Nom'}}) }}
+                {{ form_row(formContact.Position,{'label': 'Fonction', 'attr': {'placeholder': 'Fonction'}}) }}
+                {{ form_row(formContact.Email,{'label': 'Email', 'attr': {'placeholder': 'Email'}}) }}
+                {{ form_row(formContact.Phone,{'label': 'Téléphone', 'attr': {'placeholder': 'Téléphone'}}) }}
+                {{ form_row(formContact.Mobile,{'label': 'Téléphone mobile', 'attr': {'placeholder': 'Téléphone mobile'}}) }}
+                {{ form_widget(formContact.Comment,{'label': 'Commentaires', 'attr': {'placeholder': 'Commentaires'}}) }}
+                 
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-align-justify"></i> Adresse</div>
+            <div class="card-body">                
+                {{ form_widget(formContact.Address,{'attr': {'placeholder': 'Rue'}}) }}
+                
+            </div>
+        </div>
+        {{ form_end(formContact) }}
+
+    </div>
+</div>
+
+{% endblock %}
+{% block javascripts %}
+{% endblock %#}

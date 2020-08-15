@@ -1,0 +1,84 @@
+{% extends 'email/index.html.twig' %}
+
+{#% block title %} Emails {% endblock %}
+
+{% block home_path %}
+<li class="breadcrumb-item">
+    Configuration
+</li>
+<li class="breadcrumb-item">
+    Emails
+</li>
+{% endblock %}
+
+{% block body_header_right %}
+<button form="global_form" type="submit" class="btn btn-primary"><i class="fa fa-save"></i></button>
+{% endblock %}
+
+{% block body %}
+
+<div class="email-wrapper">
+
+    {% include "notify.html.twig" %}
+    
+    <div class="animated fadeIn">
+        <form id="global_form" action="{{ path("setting_email_edit") }}" method="post">
+
+            <!-- Devis -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa fa-envelope-open-text"></i> Email devis</div>
+                <div class="card-body">
+                    <textarea class="form-control" name="emails[quote]" id="" cols="30" rows="10">{{ quote }}</textarea>
+                </div>
+            </div>
+
+            <!-- Facture -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa fa-envelope-open-text"></i> Email facture</div>
+                <div class="card-body">
+                    <textarea class="form-control" name="emails[bill]" id="" cols="30" rows="10">{{ bill }}</textarea>
+                </div>
+            </div>
+
+            <!-- première relance -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa fa-envelope-open-text"></i> Email première relance</div>
+                <div class="card-body">
+                    <textarea class="form-control" name="emails[first_reminder]" id="" cols="30" rows="10">{{ first_reminder }}</textarea>
+                </div>
+            </div>
+
+            <!-- deuxième relance -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa fa-envelope-open-text"></i> Email deuxième relance</div>
+                <div class="card-body">
+                    <textarea class="form-control" name="emails[seconde_reminder]" id="" cols="30" rows="10">{{ seconde_reminder }}</textarea>
+                </div>
+            </div>
+
+            <!-- Validation -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa fa-envelope-open-text"></i> Email validation</div>
+                <div class="card-body">
+                    <textarea class="form-control" name="emails[validate]" id="" cols="30" rows="10">{{ validate }}</textarea>
+                </div>
+            </div>
+
+            <!-- Inscription commerciaux -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa fa-envelope-open-text"></i> Email inscription</div>
+                <div class="card-body">
+                    <textarea class="form-control" name="emails[inscription]" id="" cols="30" rows="10">{{ inscription }}</textarea>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %#}

@@ -1,0 +1,128 @@
+{% extends 'template_coreui.html.twig' %}
+
+{% set page_title = 'Nouvelle configuration' %}
+
+{% block home_path %}
+<li class="breadcrumb-item">
+    <a href="{{ path("setting_home") }}">Configuration</a>
+</li>
+<li class="breadcrumb-item">
+    {{ page_title }}
+</li>
+{% endblock %}
+
+{% block title %}{{ parent() }} - {{ page_title }} {% endblock %}
+
+{% block body_header_right %}
+<button form="global_form" type="submit" class="btn btn-"><i class="fa fa-save"></i></button>
+{% endblock %}
+
+{% block body %}
+
+<div class="setting-wrapper">
+
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa fa-align-justify"></i> {{ page_title }}</div>
+                    <div class="card-body">
+
+                        {{ form_start(formSetting, {'attr': {'enctype': "multipart/form-data", 'id': 'global_form'}}) }}
+
+                        <div class="switch-wrapper">
+                            <span class="badge badge-success">Text</span>
+                            <label class="switch switch-3d switch-primary">
+                                {% if formSetting.vars.data.IsFile %}
+                                <input name="setting[switch]" class="switch-input" type="checkbox">
+                                {% else %}
+                                <input name="setting[switch]" class="switch-input" type="checkbox" checked>
+                                {% endif %}
+                                <span class="switch-slider"></span>
+                            </label>
+                            <span class="badge badge-warning">Fichier</span>
+                        </div>
+                        <br />
+
+                        {% if search.get_right_admin() %}
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top"
+                                    title="Clé utilisée dans le code pour faire référence à la configuration">
+                                    <span class="fa fa-key"></span>
+                                </span>
+                            </div>
+                            {{ form_widget(formSetting.Code,{'label': 'Catégorie', 'attr': {'placeholder': 'Catégorie'}})
+                            }}
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top"
+                                    title="Nom de la configuration">
+                                    <span class="fa fa-comment-dots"></span>
+                                </span>
+                            </div>
+                            {{ form_widget(formSetting.Name,{'label': 'Nom de la configuration', 'attr': {'placeholder': 'Nom de la configuration'}})
+                            }}
+                        </div>
+
+                        {% else %}
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top"
+                                    title="Clé utilisée dans le code pour faire référence à la configuration">
+                                    <span class="fa fa-key"></span>
+                                </span>
+                            </div>
+                            {{ form_widget(formSetting.Code,{'label': 'Catégorie', 'attr': {'placeholder': 'Catégorie', 'disabled':'disabled'}})
+                            }}
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" data-placement="top"
+                                    title="Nom de la configuration">
+                                    <span class="fa fa-comment-dots"></span>
+                                </span>
+                            </div>
+                            {{ form_widget(formSetting.Name,{'label': 'Nom de la configuration', 'attr': {'placeholder': 'Nom de la configuration', 'disabled':'disabled'}})
+                            }}
+                        </div>
+                        {% endif %}
+
+                        <div class="value-wrapper">
+                            <div class="value-default">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" data-toggle="tooltip" data-placement="top"
+                                            title="Valeur">
+                                            <span class="fa fa-chess-board"></span>
+                                        </span>
+                                    </div>
+                                    {{ form_widget(formSetting.Value,{'label': 'Valeur', 'attr': {'placeholder': 'Valeur'}})
+                                    }}
+                                </div>
+                            </div>
+                            <div class="value-file" style="display: none;">
+                                <input type="file" name="setting[file]">
+                            </div>
+                        </div>
+
+                        {{ form_end(formSetting) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+
+
+{% block javascripts %}
+<script src="{{ asset('setting.js','qobd_web_js') }}"></script>
+{% endblock %}

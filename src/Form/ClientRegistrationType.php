@@ -3,6 +3,8 @@
 namespace App\Form;
 
 use App\Entity\Client;
+use App\Entity\Contact;
+use App\Form\ContactRegistrationType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -18,6 +20,7 @@ class ClientRegistrationType extends AbstractType
             ->add('PayDelay')
             ->add('MaxCredit')
             ->add('Denomination')
+            ->add('contactPrincipal', ContactRegistrationType::class)
             ->add('Comment', CommentRegistrationType::class)
         ;
     }

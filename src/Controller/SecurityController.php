@@ -13,6 +13,7 @@ use App\Services\Utility;
 use App\Entity\ActionRole;
 use App\Services\Serializer;
 use App\Services\ErrorHandler;
+use App\Services\SearchToView;
 use App\Services\SecurityManager;
 use App\Form\RoleRegistrationType;
 use App\Repository\RoleRepository;
@@ -42,6 +43,7 @@ class SecurityController extends Controller
     protected $agentRepo;
     protected $eventDispatcher;
     protected $ErrorHandler;
+    protected $search;
 
 
     public function __construct(SecurityManager $securityUtility, 
@@ -49,7 +51,8 @@ class SecurityController extends Controller
                                 AgentRepository $agentRepo, 
                                 EventDispatcherInterface $eventDispatcher, 
                                 ObjectManager $manager,
-                                ErrorHandler $ErrorHandler)
+                                ErrorHandler $ErrorHandler,
+                                SearchToView $search)
     {
         $this->securityUtility = $securityUtility;
         $this->actionRepo = $actionRepo;
@@ -57,6 +60,7 @@ class SecurityController extends Controller
         $this->manager = $manager;
         $this->eventDispatcher = $eventDispatcher;
         $this->ErrorHandler = $ErrorHandler;
+        $this->search = $search;
     }
  
 #region [ Views ]
@@ -98,7 +102,7 @@ class SecurityController extends Controller
         
         $roles = $roleRepo->findAll();
         $actions = $this->actionRepo->findAll();
-        return $this->render('security/home/home_agent_role.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/security/home/home_agent_role.html.twig', [
             'agents' => $agentRepo->findAll(),
             'roles' => $roles,
         ]);
@@ -116,7 +120,7 @@ class SecurityController extends Controller
         }
         
         $actions = $actionRepo->findAll();
-        return $this->render('security/home/home_action.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/security/home/home_action.html.twig', [
             'action_data_source' => $serializer->serialize(['object_array' => $actions, 'format' => 'json', 'group' => 'class_property']),
             'security_target' => 'action',
        ]);
@@ -138,7 +142,7 @@ class SecurityController extends Controller
         $roles = $roleRepo->findAll();
         $actions = $this->actionRepo->findAll();
         
-        return $this->render('security/home/home_profile.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/security/home/home_profile.html.twig', [
             'agents' => $agentRepo->findAll(),
             'roles' => $roles,
             'roles_distinct' => $roles,
@@ -160,7 +164,7 @@ class SecurityController extends Controller
         }
         
         $roles = $roleRepo->findAll();
-        return $this->render('security/home/home_role.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/security/home/home_role.html.twig', [
             'role_data_source' => $serializer->serialize(['object_array' => $roles, 'format' => 'json', 'group' => 'class_property'], 'json'),
             'security_target' => 'role',
         ]);
@@ -171,7 +175,7 @@ class SecurityController extends Controller
      */
     public function denyAccess() {
         
-        return $this->render('security/access_deny.html.twig');
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/security/access_deny.html.twig');
     }
 
 #endregion
@@ -185,8 +189,8 @@ class SecurityController extends Controller
      * @Route("/security/agent/connexion", options={"expose"=true}, name="security_login")
      */
     public function login()
-    {
-        return $this->render('security/login.html.twig');
+    { 
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/security/login.html.twig');
     }
 
     /**
@@ -264,7 +268,7 @@ class SecurityController extends Controller
                     $event = new GenericEvent([
                         'to' => $agent->getEmail(),
                         'subject' => 'Inscription',
-                        'view' => $this->renderView('email/_partials/registration.html', ['agent' => $agent]),
+                        'view' => $this->renderView('site/' . $this->search->get_site_config()->getCode() . '/email/_partials/registration.html', ['agent' => $agent]),
                     ]);
                     $this->eventDispatcher->dispatch(MyEvents::USER_REGISTRATION_SEND_EMAIL, $event);
                     return $this->redirectToRoute('security_login');
@@ -278,13 +282,13 @@ class SecurityController extends Controller
 
         //dump($errors);die();
         if($isEdit){
-            return $this->render('agent/show.html.twig', [
+            return $this->render('site/' . $this->search->get_site_config()->getCode() . '/agent/show.html.twig', [
                 'formAgent' => $form->createView(),
                 'agent' => $agent,
             ]);  
         }
         else{
-            return $this->render('security/anonymous_registration.html.twig', [
+            return $this->render('site/' . $this->search->get_site_config()->getCode() . '/security/anonymous_registration.html.twig', [
                 'formAgent' => $form->createView(),
             ]);            
         }
@@ -296,7 +300,7 @@ class SecurityController extends Controller
     public function anonymousRegistration()
     {
         $form = $this->createForm(AgentRegistrationType::class, new Agent());
-        return $this->render('security/anonymous_registration.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/security/anonymous_registration.html.twig', [
             'formAgent' => $form->createView(),
             'errors' => []
         ]);
@@ -332,7 +336,7 @@ class SecurityController extends Controller
             return $this->redirectToRoute('security_action');
         }
 
-        return $this->render('security/action_registration.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/security/action_registration.html.twig', [
             'formAction' => $form->createView()
         ]);
     }
@@ -366,7 +370,7 @@ class SecurityController extends Controller
             return $this->redirectToRoute('security_role');
         }
 
-        return $this->render('security/role_registration.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/security/role_registration.html.twig', [
             'formRole' => $form->createView()
         ]);
     }
@@ -554,7 +558,7 @@ class SecurityController extends Controller
     public function forgottenPasswordForm(string $token)
     {
 
-        return $this->render('security/password_forgotten_form.html.twig', ["token" => $token]);
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/security/password_forgotten_form.html.twig', ["token" => $token]);
     }
 
     /**
@@ -578,7 +582,7 @@ class SecurityController extends Controller
                 $mailer->send(
                     ['to' => $agent->getEmail()],
                     "Mot de passe oublié",
-                    $this->renderView("email/_partials/password_forgotten.html", ["url" => $this->generateUrl("security_form_password_forgotten", ["token" => $token], UrlGeneratorInterface::ABSOLUTE_URL)])
+                    $this->renderView('site/' . $this->search->get_site_config()->getCode() . '/email/_partials/password_forgotten.html', ["url" => $this->generateUrl("security_form_password_forgotten", ["token" => $token], UrlGeneratorInterface::ABSOLUTE_URL)])
                 );
                 $this->ErrorHandler->success("Un mail vous a été envoyé avec un lien, clicker sur le lien pour confirmer le reset de mot de passe!");
                 return $this->redirectToRoute("security_login");

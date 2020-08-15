@@ -1,0 +1,19 @@
+{% extends 'setting/home/site.html.twig' %}
+
+{#% set page_title = 'Sites' %}
+
+{% block title %}{{ parent() }} - {{ page_title }}{% endblock %}
+
+{% block home_path %}
+{{ parent() }}
+<li class="breadcrumb-item">
+    Configuration
+</li>
+<li class="breadcrumb-item">
+    {{ page_title }}
+</li>
+{% endblock %}
+
+{% block body_title_are %}
+<i class="fa fa-align-justify"></i> {{ page_title }}</div>
+{% endblock %#}

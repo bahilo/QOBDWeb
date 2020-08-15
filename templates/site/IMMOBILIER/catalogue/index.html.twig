@@ -1,0 +1,72 @@
+{% extends 'catalogue/index.html.twig' %}
+
+{#% set page_title = "Produits" %}
+
+
+{% block title %}{{ parent() }} - {{ page_title }} {% endblock %}
+
+{% block home_path %}
+<li class="breadcrumb-item">
+    Catalogue
+</li>
+<li class="breadcrumb-item">
+    {{ page_title }}
+</li>
+{% endblock %}
+
+{% block home_path_right %} 
+    <a href="{{ path('cart_home') }}" class="btn"><i class="fa fa-shopping-cart"></i> ({{ cart_total }})</a>
+{% endblock %}
+
+{% block body_header_left %} {% endblock %}
+
+{% block body_header_right %}
+    {% if search.get_right_write("ACTION_CATALOGUE") %}
+        <a href="{{ path("catalogue_item_registration") }}" class="btn btn-primary"><i class="fa fa-plus"></i></a>
+    {% endif %}
+{% endblock %}
+
+
+{% block body %}
+
+<div class="catalogue-wrapper">
+
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa fa-align-justify"></i> {{ page_title }}</div>
+                    <div class="card-body">
+                    <table id="item_table_js" class="table table-responsive-md table-bordered table-striped table-md">
+                    </table>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block access_pool %}
+<div class="access_pool">
+    <input type="hidden" id="is_read" value="{{ search.get_right_read("ACTION_CATALOGUE") }}" />
+    <input type="hidden" id="is_write" value="{{ search.get_right_write("ACTION_CATALOGUE") }}" />
+    <input type="hidden" id="is_update" value="{{ search.get_right_update("ACTION_CATALOGUE") }}" />
+    <input type="hidden" id="is_delete" value="{{ search.get_right_delete("ACTION_CATALOGUE") }}" />
+    <input type="hidden" id="is_mail" value="{{ search.get_right_email("ACTION_CATALOGUE") }}" />
+    <input type="hidden" id="is_quote_write" value="{{ search.get_right_write("ACTION_QUOTE") }}" />
+    <input type="hidden" id="is_read_sensible" value="{{ search.get_right_read("ACTION_SENSIBLE") }}" />
+    <input type="hidden" id="is_admin" value="{{ search.get_right_admin() }}" />
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="{{  asset('js/catalogue.js','theme_default') }}"></script>
+{% endblock %#}
+
+{% block javascripts %}
+<script src="{{ asset('../' ~ search.get_site_config().code ~ '/js/catalogue.js','theme_default') }}"></script>
+{% endblock %}

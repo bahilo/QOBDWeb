@@ -1,0 +1,17 @@
+{% extends 'order/home/home_refund.html.twig' %}
+
+{#% block title %}{{ parent() }} - Avoirs{% endblock %}
+
+{% block home_path %}
+{{ parent() }}
+<li class="breadcrumb-item">
+    Avoirs
+</li>
+<li class="breadcrumb-item">
+    Avoirs validés
+</li>
+{% endblock %}
+
+{% block body_title_are %}
+<i class="fa fa-align-justify"></i> Avoirs validés</div>
+{% endblock %#}

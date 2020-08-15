@@ -1,0 +1,71 @@
+{% extends 'setting/currency_registration.html.twig' %}
+
+{#% set page_title = 'Création & modification' %}
+
+{% block home_path %}
+<li class="breadcrumb-item">
+    Securité & Configuration
+</li>
+<li class="breadcrumb-item">
+    Configuration
+</li>
+<li class="breadcrumb-item">
+    <a href="{{ path("setting_currency") }}">Monnaies</a>
+</li>
+<li class="breadcrumb-item">
+    {{ page_title }}
+</li>
+{% endblock %}
+
+{% block title %}{{ parent() }} - {{ page_title }} {% endblock %}
+
+{% block body_header_right %}
+    <button form="global_form" type="submit" class="btn btn-primary"><i class="fa fa-save"></i></button>
+{% endblock %}
+
+{% block body %}
+
+<div class="brand-wrapper">
+
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa fa-align-justify"></i> {{ page_title }}</div>
+                    <div class="card-body">
+
+                        {% include "notify.html.twig" %}
+
+                        <div class="c-switch-wrapper">
+                            <span class="badge badge-success">Monnaie de référence</span>
+                            <label class="c-switch c-switch-label c-switch-primary">
+                                {% if formCurrency.vars.data.isdefault %}
+                                <input name="currency_registration[is_default]" class="c-switch-input" type="checkbox" checked>
+                                {% else %}
+                                <input name="currency_registration[is_default]" class="c-switch-input" type="checkbox">
+                                {% endif %}
+                                <span class="c-switch-slider" data-checked="Oui" data-unchecked="Non"></span>
+                            </label>
+                        </div>
+                        <br />
+
+                        {{ form_start(formCurrency, { 'attr': {'id': 'global_form' }}) }}
+                        {{ form_row(formCurrency.Name,{'label': 'désignation de la monnaie', 'attr': {'placeholder': 'désignation de la monnaie'}})
+                        }}
+                        {{ form_row(formCurrency.Symbol,{'label': 'Symbole', 'attr': {'placeholder': 'Symbole'}}) }}
+                        {{ form_row(formCurrency.Rate,{'label': 'Taux', 'attr': {'placeholder': 'Taux'}}) }}
+                        {{ form_row(formCurrency.CountryCode,{'label': 'Code du pays', 'attr': {'placeholder': 'Code du pays'}}) }}
+                        {{ form_row(formCurrency.Country,{'label': 'Pays', 'attr': {'placeholder': 'Pays'}}) }}
+                    
+                        {{ form_end(formCurrency) }}
+                    </div> 
+                </div> 
+            </div> 
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block javascripts %}
+{% endblock %#}

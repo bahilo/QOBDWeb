@@ -1,0 +1,32 @@
+{% extends 'security/home/home_profile.html.twig' %}
+
+{#% block title %}{{ parent() }} - Profile{% endblock %}
+
+{% block home_path %}
+{{ parent() }}
+<li class="breadcrumb-item">
+    Profile
+</li>
+{% endblock %}
+
+
+{% block content_area %}
+
+<form id="global_form" action="{{ path('security_action_role') }}" method="POST">
+
+    {% for role in roles_distinct %}
+    <div class="card">
+        <div class="card-header">
+            <i class="fa fa-align-justify"></i>{{ role.displayname }}
+        </div>
+        
+        <div class="card-body">      
+            {% include "security/_partials/privilege.html" %}
+        </div>
+    </div>    
+    {% endfor %}
+
+</form>
+    
+
+{% endblock %#}

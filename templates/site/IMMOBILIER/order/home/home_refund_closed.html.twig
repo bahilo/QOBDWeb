@@ -1,0 +1,20 @@
+{% extends 'order/home/home_refund_closed.html.twig' %}
+
+{#% block title %}{{ parent() }} - Avoirs cloturés {% endblock %}
+
+
+{% block body_header_right %}{% endblock %}
+
+{% block home_path %}
+{{ parent() }}
+<li class="breadcrumb-item">
+    Avoirs
+</li>
+<li class="breadcrumb-item">
+    Avoirs payés & cloturés
+</li>
+{% endblock %}
+
+{% block body_title_are %}
+<i class="fa fa-align-justify"></i> Avoirs payés & clôtués</div>
+{% endblock %#}

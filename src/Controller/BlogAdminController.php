@@ -42,7 +42,7 @@ class BlogAdminController extends Controller
             'data_table' => 'general_table_js',
             'data_table_source' => 'general_data_source',
             'page_title' => '',
-            'source' => $utility->getSettingDataSource($settingRepo->findAll()),
+            //'source' => $utility->getSettingDataSource($settingRepo->findAll()),
             'codes' => $utility->getDistinctByCode($settingRepo->findAll()),
             'create_url' => $this->generateUrl('blog_admin_setting_registration'),
             'page' => 'setting/_partials/general.html',

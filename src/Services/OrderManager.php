@@ -198,7 +198,7 @@ class OrderManager{
     public function checkOrderStock($orderDetails){
         /** @var QuoteOrderDetail */
         foreach ($orderDetails as $orderDetail) {
-            if (!empty($orderDetail->getItem()->getStock() >= $orderDetail->getQuantity())) {
+            if ($orderDetail->getItem()->getStock() >= $orderDetail->getQuantity()) {
                 if ($orderDetail->getQuantity() + $orderDetail->getQuantityRecieved() <= $orderDetail->getQuantity()) {
                     $orderDetail->setQuantityRecieved($orderDetail->getQuantity());
                 } else {

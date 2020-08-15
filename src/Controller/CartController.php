@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Item;
 use App\Entity\QuoteOrder;
 use App\Services\Serializer;
+use App\Services\SearchToView;
 use App\Repository\ItemRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -14,11 +15,14 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 class CartController extends Controller
 {
     protected $serializer;
+    protected $search;
 
     public function __construct(
-        Serializer $serializer
+        Serializer $serializer,
+        SearchToView $search
     ) {
         $this->serializer = $serializer;
+        $this->search = $search;
     }
 
 
@@ -45,7 +49,7 @@ class CartController extends Controller
              }
         }
 
-        return $this->render('cart/index.html.twig', [
+        return $this->render('site/' . $this->search->get_site_config()->getCode() . '/cart/index.html.twig', [
             'items' => $items,
             'total' => $totalG,
         ]);

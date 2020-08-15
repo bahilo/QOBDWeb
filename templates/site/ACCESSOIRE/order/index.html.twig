@@ -1,0 +1,129 @@
+{% extends 'order/index.html.twig' %}
+
+{#% block title %}{{ parent() }} - Recheche Commande {% endblock %}
+
+{% block home_path %}
+<li class="breadcrumb-item">
+    Recheche Commande
+</li>
+{% endblock %}
+
+{% block body_header_right %}
+<button form="global_search_form" type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
+{% endblock %}
+
+{% block body %}
+
+<div class="commande-wrapper">
+
+    <input type="hidden" id="order_status" value="{{ status.name }}">
+   
+    <div class="animated fadeIn">
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-align-justify"></i> Recherche</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <form id="global_search_form" method="POST" action="{{ path("order_search") }}">
+
+                            <div class="form-group mb-3">
+                                <label>
+                                    N° de commande/avoir/devis
+                                </label>
+                                <input type="number" name="search[order]" class="form-control" placeholder="N° de commande/avoir/devis" />
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label>
+                                    N° de Facture
+                                </label>
+                                <input type="number" name="search[bill]" class="form-control" placeholder="N° de Facture" />
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label>
+                                    Veuillez sélectionner une société
+                                </label>
+                                <select name="search[client]" class="form-control">
+                                    <option value="">Veuillez sélectionner une société</option>
+                                    {% for client in clients %}
+                                    <option value="{{ client.id }}">{% if client.Denomination %} {{ client.CompanyName ~ ' : ' ~ client.Denomination }} {% else %} {{ client.CompanyName }} {% endif %}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            {% if  search.get_right_admin() %}
+                            <div class="form-group mb-3">
+                                <label>
+                                    Commercial en charge
+                                </label>
+                                <select name="search[agent]" class="form-control">
+                                    <option value="">Veuillez sélectionner un commercial</option>
+                                    {% for agent in agents %}
+                                    <option value="{{ agent.id }}">{{ agent.firstname ~ ' ' ~ agent.lastname }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% endif %}
+
+                            <div class="form-group mb-3">
+                                <label>
+                                    Date de début
+                                </label>
+                                <input type="date" name="search[dtDebut]" class="form-control" placeholder="Date de début" />
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label>
+                                    Date de fin
+                                </label>
+                                <input type="date" name="search[dtFin]" class="form-control" placeholder="Date de fin" />
+                            </div>
+
+
+                            <buton type="submit" value="Recherche" class="float-center" />
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa fa-align-justify"></i> Résultat de votre recherche</div>
+                    <div class="card-body tbResult">
+                        <table id="order_table_js"
+                            class="table table-responsive-md table-bordered table-striped table-md">
+                        </table>
+                        <div class="no-result">
+                            <tr>
+                                <td>Aucune donnée trouvée</td>
+                            </tr>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.col-->
+        </div>
+    </div>
+</div>
+<input type="hidden" id="CmdSearch" value="1">
+{% endblock %}
+
+{% block access_pool %}
+<div class="access_pool">
+    <input type="hidden" id="is_read" value="{{ search.get_right_read("ACTION_ORDER") }}" />
+    <input type="hidden" id="is_write" value="{{ search.get_right_write("ACTION_ORDER") }}" />
+    <input type="hidden" id="is_update" value="{{ search.get_right_update("ACTION_ORDER") }}" />
+    <input type="hidden" id="is_delete" value="{{ search.get_right_delete("ACTION_ORDER") }}" />
+    <input type="hidden" id="is_mail" value="{{ search.get_right_email("ACTION_ORDER") }}" />
+    <input type="hidden" id="is_admin" value="{{ search.get_right_admin() }}" />
+</div>
+{% endblock %}
+
+
+{% block javascripts %}
+<script src="{{  asset('js/order.js','theme_default') }}"></script>
+{% endblock %#}

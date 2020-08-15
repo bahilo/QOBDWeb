@@ -1,0 +1,78 @@
+{% extends 'setting/home/general.html.twig' %}
+
+{#% block title %}{{ parent() }}{% endblock %}
+
+{% block home_path %}
+{{ parent() }}
+<li class="breadcrumb-item">    
+    Configuration
+</li>
+{% endblock %}
+
+{% block body_header_right %}
+    <button form="global_form" type="submit" class="btn btn-primary"><i class="fa fa-save"></i></button>
+    {% if app.user.isadmin %}
+    <a href="{{ create_url }}" class="btn btn-primary"><i class="fa fa-plus"></i></a>
+    {% endif %}
+{% endblock %}
+
+{% block content_area %}
+<div class="example-wrapper">
+    <div class="animated fadeIn">
+
+        <form action="{{ path('setting_edit') }}" method="post" id="global_form" enctype="multipart/form-data">
+            <div class="card card-accent-info">
+                <div class="card-header">
+                        <i class="fa fa-align-justify"></i> Site
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="" class="control-label">Veuillez sélectionner le type de site</label>
+                        <select name="settings[site]" class="form-control" id="">
+                            {% for site in source_site %}
+                                {% if site.active %}
+                                    <option value="{{ site.id }}" selected>{{ site.displayname }}</option>
+                                {% else %}
+                                    <option value="{{ site.id }}">{{ site.displayname }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            {% for key, settings in source %}
+
+            <div class="card card-accent-info">
+                <div class="card-header">
+                    <i class="fa fa-align-justify"></i> {{ key }}</div>
+                <div class="card-body">
+                    {% for setting in settings | sort((a,b) => a.nrang <=> b.nrang) %}
+                    <div class="form-group">
+                        <label for="{{ key ~ setting.name }}" class="control-label">{{ setting.displayname }}</label>
+                        {% if setting.isfile %}
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="value-file">
+                                    <input type="file" name="settings[values][{{ key }}][{{ setting.name }}]" class="form-control"
+                                        id="{{ key ~ setting.name }}">
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <img class="ste-logo" src="{{ search.logo }}" alt="Logo">
+                            </div>
+                        </div>
+                        {% else %}
+                        <input type="text" class="form-control" name="settings[values][{{ key }}][{{ setting.name }}]"
+                            id="{{ key ~ setting.name }}" value="{{ setting.value }}">
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </form>
+    </div>
+</div>
+
+{% endblock %#}

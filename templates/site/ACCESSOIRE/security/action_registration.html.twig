@@ -1,0 +1,80 @@
+{% extends 'security/action_registration.html.twig' %}
+
+{#% set page_title = 'Editer action' %}
+
+{% block home_path %}
+{% if search.get_right_read("ACTION_SECURITY") %}
+<li class="breadcrumb-item">
+    Securité & Configuration
+</li>
+<li class="breadcrumb-item">
+    Configuration
+</li>
+<li class="breadcrumb-item">
+    Securité
+</li>
+<li class="breadcrumb-item">
+    <a href="{{ path("security_action") }}">Action</a>
+</li>
+{% endif %}
+<li class="breadcrumb-item">
+    {{ page_title }}
+</li>
+{% endblock %}
+
+{% block title %}{{ parent() }} - {{ page_title }}{% endblock %}
+
+{% block body_header_right %}
+    <button form="global_form" type="submit" class="btn btn-primary"><i class="fa fa-save"></i></button>
+{% endblock %}
+
+{% block body %}
+
+
+<div class="role-wrapper">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa fa-align-justify"></i>{{ page_title }}</div>
+                    <div class="card-body">
+
+                        {% include "notify.html.twig" %}
+                        
+                        {{ form_start(formAction, { 'attr': {'id': 'global_form' }}) }}
+                        
+                       
+                        <div class="input-group mb-4">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <i class="fa fa-key" data-toggle="tooltip" data-placement="top" title="Clé utilisée dans le code pour faire référence à l'action"></i>
+                                </span>
+                            </div>
+                            {% if is_granted('ROLE_OPERATOR') %}
+                                {{ form_widget(formAction.Name,{'label': 'Nom','attr': {'placeholder': 'Nom'}}) }}
+                            {% else %}
+                                {{ form_widget(formAction.Name,{'label': 'Nom','attr': {'placeholder': 'Nom', 'readonly': 'readonly'}}) }}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="input-group mb-4">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <i class="fa fa-comment-dots" data-toggle="tooltip" data-placement="top" title="Description de l'action"></i>
+                                </span>
+                            </div>
+                            {{ form_widget(formAction.DisplayName,{'label': 'Description','attr': {'placeholder': 'description'}}) }}
+                        </div>
+                        
+                        
+                        {{ form_end(formAction) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %#}
+

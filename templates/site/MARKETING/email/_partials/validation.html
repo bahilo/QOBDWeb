@@ -1,0 +1,5 @@
+{% extends 'email/_partials/validation.html' %}
+{#
+{% block body_title %}Validation de votre commande{% endblock body_title %}
+{% block content_area %}{% include 'email/files/validation_commande.txt' with {'nom_client': contact_name, 'nom_societe': search.get_setting("SOCIETE","SOCIETE_NOM").value, 'num_com': order.id } %}{% endblock %}
+#}

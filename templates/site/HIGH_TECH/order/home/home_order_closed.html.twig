@@ -1,0 +1,20 @@
+{% extends 'order/home/home_order_closed.html.twig' %}
+
+{#% block title %}{{ parent() }} - Commandes cloturées {% endblock %}
+
+
+{% block body_header_right %}{% endblock %}
+
+{% block home_path %}
+{{ parent() }}
+<li class="breadcrumb-item">
+    Commandes
+</li>
+<li class="breadcrumb-item">
+    Cmd payées & cloturées
+</li>
+{% endblock %}
+
+{% block body_title_are %}
+<i class="fa fa-align-justify"></i> Commandes payées et clôtuées</div>
+{% endblock %#}

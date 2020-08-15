@@ -27,11 +27,17 @@
 
                 {% block callout_resume %}
                 <div class="">
-                    {{ order.status.displayname }} n°#{{ order.id }} du {{ order.createdat | date("d/m/Y") }} pour
-                    la société <a
-                        href="{{ path("client_show", {id: order.client.id}) }}">{{ order.client.companyname }}</a><br />
-                    géré par
-                    {{ order.agent.Firstname }} {{ order.agent.LastName }}
+                    {{ order.status.displayname ~ ' n°#' ~ order.id ~ ' du ' ~ order.createdat | date("d/m/Y") }}
+                    
+                    {% if order.contact != null %}
+                    {{ ' pour le client ' ~ order.Contact.FirstName ~ ' ' ~ order.Contact.LastName }}
+                    {% endif %}
+
+                    {% if order.client.companyname is not empty %}
+                    <a href="{{ path("client_show", {id: order.client.id}) }}">{{ order.client.companyname }}</a><br />
+                    {% endif %}
+                    
+                    {{ 'géré par ' ~ order.agent.Firstname ~ ' ' ~ order.agent.LastName }}
                 </div>
                 {% endblock %}
 
@@ -301,7 +307,7 @@
                                             {% if order.contact %}
                                             {{ order.contact.Address.Street  }}<br />
                                             {{ order.contact.Address.ZipCode ~ " " ~ order.contact.Address.City }}<br />
-                                            {{ order.contact.Address.Country }}
+                                            {{ order.contact.Address.Country.name }}
                                             {% else %}
                                             Veuillez renseigner un contact pour l'adresse de livraison
                                             {% endif %}
@@ -349,10 +355,6 @@
     {% endif %}
 {% endblock %}
 
-{% block javascripts %}
-<script src="{{  asset('js/order.js','theme_default') }}"></script>
-{% endblock %}
-
 {% block access_pool %}
 <div class="access_pool">
     <input type="hidden" id="is_read" value="{{ search.get_right_read("ACTION_ORDER") }}" />
@@ -363,4 +365,8 @@
     <input type="hidden" id="is_read_sensible" value="{{ search.get_right_read("ACTION_SENSIBLE") }}" />
     <input type="hidden" id="is_admin" value="{{ search.get_right_admin() }}" />
 </div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="{{  asset('js/order.js','theme_default') }}"></script>
 {% endblock %}

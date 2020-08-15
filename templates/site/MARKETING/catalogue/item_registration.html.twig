@@ -1,0 +1,80 @@
+{% extends 'catalogue/item_registration.html.twig' %}
+
+{% set page_title = 'Création & modification' %}
+
+{% block home_path %}
+<li class="breadcrumb-item">
+    <a href="{{ path("catalogue_home") }}">Produits</a>
+</li>
+<li class="breadcrumb-item">
+    {{ page_title }}
+</li>
+{% endblock %}
+
+{% block title %}{{ parent() }} - {{ page_title }} {% endblock %}
+
+{% block body_header_right %}
+    <button form="global_form" type="submit" class="btn btn-primary"><i class="fa fa-save"></i></button>
+{% endblock %}
+
+{% block body %}
+
+<div class="item-wrapper">
+
+    <div class="animated fadeIn">
+        {% include "notify.html.twig" %}
+        
+        {{ form_start(formItem, {'enctype':'multipart/form-data', 'attr': {'id': 'global_form' }}) }}
+        
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-align-justify"></i> {{ page_title }}
+            </div>
+        
+            <div class="card-body">
+                <input type="hidden" name="token" value="{{ csrf_token('upload') }}" />
+        
+                <div class="profilImg-wrapper">
+                
+                    {% if formItem.vars.data.Picture %}
+                    <img class="img-avatar img-circle" src="{{ asset('setting/catalogue/' ~ formItem.vars.data.Picture, 'download_dir') }}"
+                        alt="Image profile">
+                    {% endif %}
+                </div>
+
+                <div style="display: none">
+                    {{ form_row(formItem.PictureFile,{'label': 'Image produit', 'attr': {'class':'form-control'}}) }}
+                </div>
+                {{ form_row(formItem.Name,{'label': 'Nom du produit','attr': {'placeholder': 'désignation du produit'}}) }}
+                {{ form_row(formItem.Ref,{'label': 'Reférence du produit','attr': {'placeholder': 'Réfference du produit'}}) }}
+                {{ form_row(formItem.PurchasePrice,{'label': 'Prix dchat', 'attr': {'placeholder': 'Prix dchat'}}) }}
+                {{ form_row(formItem.SellPrice,{'label': 'Prix de vente conseillé', 'attr': {'placeholder': 'Prix de vente conseillé'}}) }}
+                <div style="display: none">
+                    {{ form_row(formItem.Stock,{'label': 'Stock', 'attr': {'placeholder': 'Stock'}}) }}
+                </div>
+                {{ form_row(formItem.ItemGroupe,{'label': 'Famille', 'attr': {'placeholder': 'Famille'}}) }}
+                {{ form_widget(formItem.Comment,{'label': 'Commentaire', 'attr': {'placeholder': 'Commentaire'}})}}
+                
+            </div>
+        </div>
+        
+        <div class="card" style="display: none;">
+            <div class="card-header">
+                <i class="fa fa-align-justify"></i> Fournisseur
+            </div>            
+            <div class="card-body">
+                {{ form_row(formItem.ItemBrand,{'label': 'Marque', 'attr': {'placeholder': 'Marque'}}) }}
+                {#{ form_row(formItem.ItemGroupe,{'label': 'Famille', 'attr': {'placeholder': 'Famille'}}) }#}
+                {{ form_row(formItem.Provider,{'label': 'Fournisseur', 'attr': {'placeholder': 'Fournisseur'}}) }}
+                {{ form_widget(formItem.ImeiCode)}}
+                        
+            </div>
+        </div>
+        
+        {{ form_end(formItem) }}
+    </div>
+</div>
+
+{% endblock %}
+{% block javascripts %}
+{% endblock %}
